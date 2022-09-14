@@ -1,4 +1,7 @@
-use std::env;
+#![feature(generic_associated_types)]
+
+use ::std::env;
+
 use ::regex::Regex;
 
 mod ast;

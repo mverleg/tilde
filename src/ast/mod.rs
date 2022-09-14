@@ -1,5 +1,7 @@
+pub use ::std::slice;
+
 pub use crate::ast::mathbool::{Bool2Op, CompareOp, Math1Op, Math2Op};
-pub use crate::ast::value::{ValueOp};
+pub use crate::ast::value::ValueOp;
 
 mod mathbool;
 mod value;
@@ -7,6 +9,15 @@ mod value;
 #[derive(Debug)]
 pub struct Prog {
     ops: Vec<Op>
+}
+
+impl <'a> IntoIterator for &'a Prog {
+    type Item = Op;
+    type IntoIter = slice::Iter<'a, Self::Item>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.ops.iter()
+    }
 }
 
 #[derive(Debug)]
