@@ -3,6 +3,8 @@
 pub enum Math1Op {
     Neg,
     Abs,
+    Incr,
+    Decr,
 }
 
 #[derive(Debug)]
