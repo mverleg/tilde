@@ -16,17 +16,20 @@ pub fn run_tilde(args: Vec<String>) -> Result<Value, String> {
     }
 }
 
-fn parse_args(args: Vec<String>) -> Result<Option<String>, String> {
-    match args.get(1).map(|s| s.as_str()) {
+fn parse_args(mut args: Vec<String>) -> Result<Option<String>, String> {
+    args.reverse();
+    args.pop();
+    let arg1 = args.pop();
+    let source = match arg1.as_deref() {
         Some("-h") | Some("--help") => Ok(None),
         Some("-f") | Some("--file") => {
-            let pth = args.get(2)
+            let pth = args.pop()
                 .ok_or_else(|| format!("argument -f/--file expects a path to a source file"))?;
             Ok(Some(read_to_string(pth)
                 .map_err(|err| format!("failed to read source file, err {err}"))?))
         },
         Some("-s") | Some("--source") => {
-            Ok(Some(args.get(2)
+            Ok(Some(args.pop()
                 .ok_or_else(|| format!("argument -s/--source expects a single argument containing source code"))?
                 .to_owned()))
         },
@@ -39,7 +42,11 @@ fn parse_args(args: Vec<String>) -> Result<Option<String>, String> {
             Err(format!("unknown argument '{arg}'\n{hint}try --help for options"))
         },
         None => Err(format!("expected at least one argument; try --help for options")),
+    }?;
+    if !args.is_empty() {
+        return Err(format!("cannot handle these arguments: {}\ntry --help for options", args.join(" ")))
     }
+    Ok(source)
 }
 
 fn gen_help() -> String {
@@ -55,7 +62,7 @@ fn gen_help() -> String {
         //TODO @mverleg: put better example source ^
         "".to_owned(),
         "OPTIONS:".to_owned(),
-        "    -h, --help        Show this help".to_owned(),
+        "    -h, --help        Show this help text".to_owned(),
         "    -s, --source S    Run source S, which should be golfed source with unicode encoding".to_owned(),
         "    -f, --file P      Run source contained in file at path P, which should be golfed".to_owned(),
         "                      source with unicode encoding".to_owned(),
