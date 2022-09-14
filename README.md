@@ -2,6 +2,10 @@
 
 A codegolf language - stack-based, small executable.
 
+## Semantics
+
+Tilde is stack-based. The initial stack contains one vector, with a string value for each line of stdin in reverse.
+
 ## Building locally
 
 To build the executable:
