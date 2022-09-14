@@ -2,11 +2,14 @@ use ::std::fs::read_to_string;
 use ::std::io::{BufRead, stdin};
 
 use crate::exec::{execute, Value};
+use crate::parse::parse;
 
 pub fn run_tilde(args: Vec<String>) -> Result<Value, String> {
     if let Some(source) = parse_args(args)? {
-        let prog = parse(source);
-        let inp = stdin().lock().lines().collect();
+        let prog = parse(&source)?;
+        let inp = stdin().lock().lines()
+            .map(|l| l.expect("cannot read line from stdin, not utf8?"))
+            .collect();
         execute(prog, inp)
     } else {
         Ok(gen_help().into())

@@ -1,10 +1,25 @@
+use std::fmt;
+use std::fmt::Formatter;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum Value {
+    None,
     Num(Number),
     Txt(Text),
     Arr(Array),
 }
+
+impl fmt::Display for Value {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        match self {
+            Value::None => Ok(()),
+            Value::Num(val) => write!(f, "{}", val),
+            Value::Txt(val) => write!(f, "{}", val),
+            Value::Arr(val) => write!(f, "{}", val),
+        }
+    }
+}
+
 
 impl From<String> for Value {
     fn from(val: String) -> Self {
@@ -30,12 +45,18 @@ impl From<Array> for Value {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct Number {
     val: f64,
 }
 
-#[derive(Debug)]
+impl fmt::Display for Number {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.val)
+    }
+}
+
+#[derive(Debug, PartialEq)]
 pub struct Text {
     val: String,
 }
@@ -46,15 +67,30 @@ impl Text {
     }
 }
 
+impl fmt::Display for Text {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.val)
+    }
+}
+
 impl From<String> for Text {
     fn from(val: String) -> Self {
         Text::of(val)
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct Array {
     val: Vec<Value>,
+}
+
+impl fmt::Display for Array {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        for item in &self.val {
+            write!(f, "{}", item)?
+        }
+        Ok(())
+    }
 }
 
 impl Array {

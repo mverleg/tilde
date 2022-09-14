@@ -1,5 +1,7 @@
 use crate::ast::{Op, Prog};
-pub use self::data::{Value, Array, Text, Number};
+
+pub use self::data::{Array, Number, Text, Value};
+
 mod data;
 
 pub fn execute(prog: Prog, mut inp: Vec<String>) -> Result<Value, String> {
@@ -14,8 +16,5 @@ pub fn execute(prog: Prog, mut inp: Vec<String>) -> Result<Value, String> {
             Op::Value(value) => {}
         }
     }
-    if let Some(top) = stack.pop() {
-        println!("{:?}", top)
-    }
-    Ok(())
+    Ok(stack.pop().unwrap_or(Value::None))
 }
