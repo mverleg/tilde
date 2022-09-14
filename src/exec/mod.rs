@@ -3,7 +3,7 @@ use crate::exec::data::Array;
 
 mod data;
 
-pub fn execute(prog: Prog, mut inp: Vec<String>) {
+pub fn execute(prog: Prog, mut inp: Vec<String>) -> Result<(), String> {
     inp.reverse();
     let mut stack = Array::single(Array::of(inp));
     for op in prog.iter() {
@@ -18,4 +18,5 @@ pub fn execute(prog: Prog, mut inp: Vec<String>) {
     if let Some(top) = stack.pop() {
         println!("{:?}", top)
     }
+    Ok(())
 }

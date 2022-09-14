@@ -1,17 +1,40 @@
 use ::std::env;
+use ::std::io::{BufRead, stdin};
+use std::fs::read_to_string;
 
-pub enum ShowHelp { Show, NoShow }
+use crate::ast::Prog;
+use crate::exec::execute;
 
-pub fn run_tilde(args: Vec<String>) -> (ShowHelp, Result<(), String>) {
-    parse_args(args)
+pub fn run_tilde(args: Vec<String>) -> Result<(), String> {
+    if let Some(source) = parse_args(args)? {
+        let prog = parse(source);
+        let inp = stdin().lock().lines().collect();
+        execute(prog, inp)
+    } else {
+        println!(gen_help());
+        Ok(())
+    }
 }
 
-fn parse_args(args: Vec<String>) -> (ShowHelp, Result<(), String>) {
+fn parse_args(args: Vec<String>) -> Result<Option<String>, String> {
     match args.get(1).map(|s| s.as_str()) {
-        Some("-h") | Some("--help") => (ShowHelp::Show, Ok(())),
-        Some("-f") | Some("--file") => (ShowHelp::NoShow, Ok(())),
-        Some("-s") | Some("--source") => (ShowHelp::NoShow, Ok(())),
+        Some("-h") | Some("--help") => Ok(None),
+        Some("-f") | Some("--file") => {
+            let pth = args.get(2)
+                .ok_or(|| format!("argument -f/--file expects a path to a source file"))?;
+            Ok(Some(read_to_string(pth)
+                .map_err(|err| format!("failed to read source file, err {err}"))?))
+        },
+        Some("-s") | Some("--source") => {
+            Ok(Some(args.get(2)
+                .ok_or(|| format!("argument -s/--source expects a single argument containing source code"))?
+                .to_owned()))
+        },
         Some(arg) => Err(format!("unknown argument '{arg}'; try --help for options")),
         None => Err(format!("expected at least one argument; try --help for options")),
     }
+}
+
+fn gen_help() -> String {
+    "help here"
 }
