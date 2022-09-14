@@ -1,9 +1,8 @@
 use crate::ast::{Op, Prog};
-use crate::exec::data::Array;
-
+pub use self::data::{Value, Array, Text, Number};
 mod data;
 
-pub fn execute(prog: Prog, mut inp: Vec<String>) -> Result<(), String> {
+pub fn execute(prog: Prog, mut inp: Vec<String>) -> Result<Value, String> {
     inp.reverse();
     let mut stack = Array::single(Array::of(inp));
     for op in prog.iter() {

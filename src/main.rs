@@ -11,7 +11,10 @@ mod exec;
 
 fn main() -> ExitCode {
     match run_tilde(env::args().collect()) {
-        Ok(()) => ExitCode::from(0),
+        Ok(value) => {
+            println!("{}", value);
+            ExitCode::from(0)
+        },
         Err(err) => {
             eprintln!("{}", err);
             ExitCode::from(1)
