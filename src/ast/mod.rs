@@ -11,11 +11,8 @@ pub struct Prog {
     ops: Vec<Op>
 }
 
-impl <'a> IntoIterator for &'a Prog {
-    type Item = Op;
-    type IntoIter = slice::Iter<'a, Self::Item>;
-
-    fn into_iter(self) -> Self::IntoIter {
+impl Prog {
+    pub fn iter(&self) -> slice::Iter<Op> {
         self.ops.iter()
     }
 }

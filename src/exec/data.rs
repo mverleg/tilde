@@ -67,4 +67,8 @@ impl Array {
     pub fn single<V: Into<Value>>(val: V) -> Self {
         Array::of(vec![val])
     }
+
+    pub fn pop(&mut self) -> Option<Value> {
+        self.val.pop()
+    }
 }
