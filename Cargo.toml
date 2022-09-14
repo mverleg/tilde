@@ -1,6 +1,6 @@
 [package]
 name = "tilde"
-description = "Codegolf language - stack-based, single small executable"
+description = "Codegolf language - stack-based, small executable"
 version = "0.1.0"
 edition = "2021"
 authors = ["Mark <mverleg.noreply@gmail.com>"]
