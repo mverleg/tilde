@@ -6,6 +6,7 @@ edition = "2021"
 authors = ["Mark <mverleg.noreply@gmail.com>"]
 
 [dependencies]
+regex = { version = "1.6.0", default-features = false, features = ["std",] }
 
 [profile.release]
 opt-level = 'z'     # Optimize for size.
