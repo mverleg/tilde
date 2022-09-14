@@ -1,5 +1,10 @@
 use ::std::fs::read_to_string;
 use ::std::io::{BufRead, stdin};
+use ::std::thread;
+use ::std::thread::sleep;
+use ::std::time::Duration;
+use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, Ordering};
 
 use crate::exec::{execute, Value};
 use crate::parse::parse;
@@ -7,13 +12,27 @@ use crate::parse::parse;
 pub fn run_tilde(args: Vec<String>) -> Result<Value, String> {
     if let Some(source) = parse_args(args)? {
         let prog = parse(&source)?;
-        let inp = stdin().lock().lines()
-            .map(|l| l.expect("cannot read line from stdin, not utf8?"))
-            .collect();
+        let inp = gather_input();
         execute(prog, inp)
     } else {
         Ok(gen_help().into())
     }
+}
+
+fn gather_input() -> Vec<String> {
+    let is_ready = Arc::new(AtomicBool::new(false));
+    let is_ready_clone = is_ready.clone();
+    thread::spawn(move || {
+        sleep(Duration::from_secs(5));
+        if ! is_ready_clone.load(Ordering::Acquire) {
+            eprintln!("waiting for input on stdin")
+        }
+    });
+    let inp = stdin().lock().lines()
+        .map(|l| l.expect("cannot read line from stdin, not utf8?"))
+        .collect();
+    is_ready.store(true, Ordering::Release);
+    inp
 }
 
 fn parse_args(mut args: Vec<String>) -> Result<Option<String>, String> {
