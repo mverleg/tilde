@@ -11,8 +11,8 @@ use crate::parse::parse;
 
 pub fn run_tilde(args: Vec<String>) -> Result<Value, String> {
     if let Some(source) = parse_args(args)? {
-        let prog = parse(&source)?;
         let inp = gather_input();
+        let prog = parse(&source)?;
         execute(prog, inp)
     } else {
         Ok(gen_help().into())
@@ -25,7 +25,7 @@ fn gather_input() -> Vec<String> {
     thread::spawn(move || {
         sleep(Duration::from_secs(5));
         if ! is_ready_clone.load(Ordering::Acquire) {
-            eprintln!("waiting for input on stdin")
+            eprintln!("waiting for input on stdin; stdin needs to be closed before tilde can start")
         }
     });
     let inp = stdin().lock().lines()
