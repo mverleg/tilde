@@ -12,6 +12,10 @@ pub struct Prog {
 }
 
 impl Prog {
+    pub fn of(ops: Vec<Op>) -> Self {
+        Prog { ops }
+    }
+
     pub fn iter(&self) -> slice::Iter<Op> {
         self.ops.iter()
     }
