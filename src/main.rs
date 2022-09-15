@@ -1,5 +1,3 @@
-#![feature(once_cell)]
-
 use ::std::env;
 use ::std::process::ExitCode;
 
