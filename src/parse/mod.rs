@@ -21,12 +21,13 @@ pub fn parse(source: &str) -> Result<Prog, String> {
             '≤' => Op::Compare(CompareOp::Lte),
             '&' => Op::Bool2(Bool2Op::And),
             '|' => Op::Bool2(Bool2Op::Or),
-            'a' => Op::Bool2(Bool2Op::Nand),
-            'a' => Op::Bool2(Bool2Op::Xor),
-            'a' => Op::Bool2(Bool2Op::Impl),
-            '0'..'9' => Op::Value(ValueOp::Number()),
-            _ => unimplemented!()
+            //'a' => Op::Bool2(Bool2Op::Nand),  //TODO @mverleg:
+            '⊕' => Op::Bool2(Bool2Op::Xor),
+            '→' => Op::Bool2(Bool2Op::Impl),
+            '0'..='9' => Op::Value(ValueOp::Number(c.to_digit(10).unwrap() as f64)),
+            '←' => unimplemented!(),
+            sym => Err(format!("unknown source symbol: {sym}"))?
         })
     }
-    Prog
+    Ok(Prog::of(ops))
 }
