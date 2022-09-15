@@ -46,6 +46,7 @@ fn parse_args(mut args: Vec<String>) -> Result<Option<String>, String> {
             let pth = args.pop()
                 .ok_or_else(|| format!("argument -f/--file expects a path to a source file"))?;
             log!("reading source from file {}", pth);
+            log!("reading source from file {}", pth);
             Ok(Some(read_to_string(pth)
                 .map_err(|err| format!("failed to read source file, err {err}"))?))
         },
@@ -53,6 +54,7 @@ fn parse_args(mut args: Vec<String>) -> Result<Option<String>, String> {
             let src = args.pop()
                 .ok_or_else(|| format!("argument -s/--source expects a single argument containing source code"))?
                 .to_owned();
+            log!("getting source from command line (length in utf8 bytes: {})", src.len());
             log!("getting source from command line (length in utf8 bytes: {})", src.len());
             Ok(Some(src))
         },
