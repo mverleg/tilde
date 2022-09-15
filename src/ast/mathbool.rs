@@ -31,7 +31,8 @@ pub enum CompareOp {
 pub enum Bool2Op {
     And,
     Or,
-    Nand,
+    //Nand,
+    //TODO @mverleg: ^ ?
     Xor,
     Impl,
 }

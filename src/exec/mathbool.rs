@@ -1,7 +1,7 @@
 use crate::ast::Math2Op;
 use crate::exec::{Number, Value};
 
-pub fn exec_math2(op: &Math2Op, left: Value, right: Value) -> Value {
+pub fn exec_math2(op: &Math2Op, right: Value, left: Value) -> Value {
     match op {
         Math2Op::Plus => match (left, right) {
             (Value::Num(left), Value::Num(right)) => Value::Num(Number::of(left.value() + right.value())),
