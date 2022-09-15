@@ -126,11 +126,6 @@ impl Array {
         self.val.push(val)
     }
 
-    pub fn try_pop(&mut self) -> Option<Value> {
-        //TODO @mverleg: used?
-        self.val.pop()
-    }
-
     pub fn pop(&mut self) -> Value {
         match self.val.pop() {
             Some(val) => val,

@@ -13,6 +13,7 @@ pub enum Math2Op {
     Minus,
     Mul,
     Div,
+    IntDiv,
     Mod,
 }
 

@@ -12,6 +12,7 @@ pub fn parse(source: &str) -> Result<Prog, String> {
             '-' => Op::Math2(Math2Op::Minus),
             '*' => Op::Math2(Math2Op::Mul),
             '/' => Op::Math2(Math2Op::Div),
+            '\\' => Op::Math2(Math2Op::IntDiv),
             '%' => Op::Math2(Math2Op::Mod),
             '=' => Op::Compare(CompareOp::Eq),
             '≠' => Op::Compare(CompareOp::Neq),
