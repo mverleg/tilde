@@ -62,6 +62,10 @@ impl Number {
     pub fn of(val: f64) -> Self {
         Number { val }
     }
+
+    pub fn value(&self) -> f64 {
+        self.val
+    }
 }
 
 impl fmt::Display for Number {
