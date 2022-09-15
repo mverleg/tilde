@@ -1,11 +1,12 @@
 use ::std::fs::read_to_string;
 use ::std::io::{BufRead, stdin};
+use ::std::sync::Arc;
+use ::std::sync::atomic::{AtomicBool, Ordering};
 use ::std::thread;
 use ::std::thread::sleep;
 use ::std::time::Duration;
-use std::sync::Arc;
-use std::sync::atomic::{AtomicBool, Ordering};
 
+use crate::common::log;
 use crate::exec::{execute, Value};
 use crate::parse::parse;
 
@@ -44,13 +45,16 @@ fn parse_args(mut args: Vec<String>) -> Result<Option<String>, String> {
         Some("-f") | Some("--file") => {
             let pth = args.pop()
                 .ok_or_else(|| format!("argument -f/--file expects a path to a source file"))?;
+            log!("reading source from file {}", pth);
             Ok(Some(read_to_string(pth)
                 .map_err(|err| format!("failed to read source file, err {err}"))?))
         },
         Some("-s") | Some("--source") => {
-            Ok(Some(args.pop()
+            let src = args.pop()
                 .ok_or_else(|| format!("argument -s/--source expects a single argument containing source code"))?
-                .to_owned()))
+                .to_owned();
+            log!("getting source from command line (length in utf8 bytes: {})", src.len());
+            Ok(Some(src))
         },
         Some(arg) => {
             let hint = if arg.contains("=") {
