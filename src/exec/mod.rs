@@ -9,11 +9,11 @@ pub fn execute(prog: Prog, mut inp: Vec<String>) -> Result<Value, String> {
     let mut stack = Array::single(Array::of(inp));
     for op in prog.iter() {
         match op {
-            Op::Math1(math1) => {}
-            Op::Math2(math2) => {}
-            Op::Compare(compare) => {}
-            Op::Bool2(bool2) => {}
-            Op::Value(value) => {}
+            Op::Math1(_math1) => {}
+            Op::Math2(_math2) => {}
+            Op::Compare(_compare) => {}
+            Op::Bool2(_bool2) => {}
+            Op::Value(_value) => {}
         }
     }
     Ok(stack.pop().unwrap_or(Value::None))
