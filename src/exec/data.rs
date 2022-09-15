@@ -1,5 +1,6 @@
 use std::fmt;
 use std::fmt::Formatter;
+use crate::ast::ValueOp;
 
 #[derive(Debug, PartialEq)]
 pub enum Value {
@@ -7,6 +8,14 @@ pub enum Value {
     Num(Number),
     Txt(Text),
     Arr(Array),
+}
+
+impl Value {
+    pub fn of_op(op: &ValueOp) -> Self {
+        match op {
+            ValueOp::Number(nr) => Value::Num(Number::of(*nr))
+        }
+    }
 }
 
 impl fmt::Display for Value {
@@ -19,7 +28,6 @@ impl fmt::Display for Value {
         }
     }
 }
-
 
 impl From<String> for Value {
     fn from(val: String) -> Self {
@@ -48,6 +56,12 @@ impl From<Array> for Value {
 #[derive(Debug, PartialEq)]
 pub struct Number {
     val: f64,
+}
+
+impl Number {
+    pub fn of(val: f64) -> Self {
+        Number { val }
+    }
 }
 
 impl fmt::Display for Number {
@@ -102,6 +116,10 @@ impl Array {
 
     pub fn single<V: Into<Value>>(val: V) -> Self {
         Array::of(vec![val])
+    }
+
+    pub fn push(&mut self, val: Value) {
+        self.val.push(val)
     }
 
     pub fn pop(&mut self) -> Option<Value> {

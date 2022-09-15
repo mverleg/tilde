@@ -10,7 +10,8 @@ mod cli;
 mod exec;
 
 fn main() -> ExitCode {
-    match run_tilde(env::args().collect()) {
+    let res = run_tilde(env::args().collect());
+    match res {
         Ok(value) => {
             println!("{}", value);
             ExitCode::from(0)
