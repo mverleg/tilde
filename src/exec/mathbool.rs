@@ -1,5 +1,21 @@
-use crate::ast::Math2Op;
+use crate::ast::{Math1Op, Math2Op};
 use crate::exec::{Number, Value};
+
+pub fn exec_math1(op: &Math1Op, subject: Value) -> Value {
+    match op {
+        Math1Op::Neg => match subject {
+            Value::Num(nr) => Value::Num(Number::of(-nr.value())),
+            Value::Arr(mut arr) => {
+                arr.get_mut().reverse();
+                Value::Arr(arr)
+            }
+            _ => todo!(),
+        }
+        Math1Op::Abs => todo!(),
+        Math1Op::Incr => todo!(),
+        Math1Op::Decr => todo!(),
+    }
+}
 
 pub fn exec_math2(op: &Math2Op, right: Value, left: Value) -> Value {
     match op {

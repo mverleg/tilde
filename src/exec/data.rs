@@ -132,4 +132,8 @@ impl Array {
             None => Value::None,
         }
     }
+
+    pub fn get_mut(&mut self) -> &mut Vec<Value> {
+        &mut self.val
+    }
 }
