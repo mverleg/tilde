@@ -7,6 +7,7 @@ pub use self::token::Token;
 
 mod charset;
 mod token;
+mod tokengroup;
 
 pub fn parse(source: &str) -> Result<Prog, String> {
     let mut ops = vec![];

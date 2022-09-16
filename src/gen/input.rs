@@ -1,6 +1,12 @@
+use crate::parse::CHARSET;
+
 /// Generate all possible input starters with up to N modifiers.
-pub fn gen_inputs(max_modifier: u8) {
-    for t in TOKENS {}
+pub fn gen_inputs(max_modifier: u8) -> Vec<TokenGroup> {
+    let mut tokens = vec![];
+    for token in CHARSET {
+        todo!()
+    }
+    tokens
 }
 
 #[cfg(test)]
