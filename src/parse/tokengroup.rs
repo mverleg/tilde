@@ -3,7 +3,7 @@ use crate::TildeRes;
 
 //TODO @mverleg: this is only suitable for general context for now
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Modifiers {
     first: Option<Token>,
     second: Option<Token>,

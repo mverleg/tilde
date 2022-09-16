@@ -1,20 +1,37 @@
-use crate::parse::{Modifiers, TokenGroup, TokenType, TOKENSET};
+use crate::parse::{Modifiers, Token, TokenGroup, TokenType, TOKENSET};
 
 /// Generate all possible input starters with up to N modifiers.
 pub fn gen_inputs(max_modifier: u8) -> Vec<TokenGroup> {
-    let mut tokens = vec![];
+    let mut groups = vec![];
     let modifiers = generate_modifiers();
+    for modi in &modifiers {
+        groups.push(TokenGroup::JustMod(modi.clone()));
+    }
     for token in &TOKENSET {
         match token.typ {
-            TokenType::VariableOpen => {}
-            TokenType::FixedOpen => {}
+            TokenType::VariableOpen => {
+                for modi in &modifiers {
+                    groups.push(TokenGroup::Var(token.clone(), modi.clone()));
+                }
+            }
+            TokenType::FixedOpen => {
+                for second in &TOKENSET {
+                    for modi in &modifiers {
+                        groups.push(TokenGroup::Fixed(
+                            token.clone(),
+                            second.clone(),
+                            modi.clone(),
+                        ));
+                    }
+                }
+            }
             TokenType::Modifier => { /* pass */ }
         }
     }
-    tokens
+    groups
 }
 
-fn generate_modifiers() {
+fn generate_modifiers() -> Vec<Modifiers> {
     let mod_tokens = TOKENSET
         .iter()
         .filter(|token| token.is_modifier())
@@ -26,6 +43,7 @@ fn generate_modifiers() {
             modifiers.push(Modifiers::double((*modi1).clone(), (*modi2).clone()).unwrap())
         }
     }
+    modifiers
 }
 
 #[cfg(test)]
