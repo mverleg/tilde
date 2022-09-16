@@ -2,12 +2,12 @@ use crate::ast::{Bool2Op, CompareOp, Math1Op, Math2Op, Op, Prog, ValueOp};
 
 //TODO @mverleg: for now, reject duplicate modifiers and enforce order - this way is can be relaxed later without breaking compatibility
 
-pub use self::charset::CHARSET;
+pub use self::tokenset::TOKENSET;
 pub use self::token::Token;
 pub use self::tokengroup::Modifiers;
 pub use self::tokengroup::TokenGroup;
 
-mod charset;
+mod tokenset;
 mod token;
 mod tokengroup;
 

@@ -1,6 +1,6 @@
 use crate::parse::token::{Token, TokenType};
 
-pub static CHARSET: [Token; 1] = [Token::fixed(b'a', 'a', "a")];
+pub static TOKENSET: [Token; 1] = [Token::fixed(b'a', 'a', "a")];
 
 #[cfg(test)]
 mod tests {
@@ -11,7 +11,7 @@ mod tests {
 
     fn check_prop_unique<T: Eq + Hash>(getter: fn(&Token) -> T) {
         let mut seen = HashSet::new();
-        for c in &CHARSET {
+        for c in &TOKENSET {
             assert!(seen.insert(getter(c)))
         }
         assert_eq!(seen.len(), u8::MAX as usize)

@@ -57,6 +57,18 @@ impl Token {
     pub const fn modi(byte: u8, chr: char, long: &'static str) -> Self {
         Token::new(byte, chr, long, TokenType::Modifier)
     }
+
+    pub fn is_variable(&self) -> bool {
+        self.typ == TokenType::VariableOpen
+    }
+
+    pub fn is_fixed(&self) -> bool {
+        self.typ == TokenType::FixedOpen
+    }
+
+    pub fn is_modifier(&self) -> bool {
+        self.typ == TokenType::Modifier
+    }
 }
 
 impl PartialEq for Token {
