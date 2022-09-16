@@ -1,5 +1,8 @@
 use crate::parse::Token;
 use crate::TildeRes;
+use std::fmt;
+use std::fmt::Formatter;
+use std::ptr::write_bytes;
 
 //TODO @mverleg: this is only suitable for general context for now
 
@@ -25,7 +28,7 @@ impl Modifiers {
         }
     }
 
-    pub fn double(mut first: Token, mut second: Token) -> TildeRes<Self> {
+    pub fn double(first: Token, second: Token) -> TildeRes<Self> {
         assert!(first.is_modifier());
         assert!(second.is_modifier());
         if first == second {
@@ -45,9 +48,51 @@ impl Modifiers {
     }
 }
 
+impl Modifiers {
+    fn fmt_chars(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        if let Some(m) = &self.first {
+            write!(f, "{}", m)?;
+            if let Some(m) = &self.second {
+                write!(f, "{}", m)?
+            }
+        }
+        Ok(())
+    }
+}
+
 #[derive(Debug)]
 pub enum TokenGroup {
     Var(Token, Modifiers),
     Fixed(Token, Token, Modifiers),
     JustMod(Modifiers),
+}
+
+impl TokenGroup {
+    pub(crate) fn fmt_chars(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        match self {
+            TokenGroup::Var(open, modi) => {
+                write!(f, "{}", open.chr)?;
+                modi.fmt_chars(f)
+            }
+            TokenGroup::Fixed(open, second, modi) => {
+                write!(f, "{}{}", open.chr, second.chr)?;
+                modi.fmt_chars(f)
+            }
+            TokenGroup::JustMod(modi) => modi.fmt_chars(f),
+        }
+    }
+
+    pub(crate) fn fmt_bytes(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        match self {
+            TokenGroup::Var(open, modi) => {
+                write!(f, "{:x}", open.byte)?;
+                modi.fmt_bytes(f)
+            }
+            TokenGroup::Fixed(open, second, modi) => {
+                write!(f, "{:x},{:x}", open.byte, second.byte)?;
+                modi.fmt_bytes(f)
+            }
+            TokenGroup::JustMod(modi) => modi.fmt_bytes(f),
+        }
+    }
 }
