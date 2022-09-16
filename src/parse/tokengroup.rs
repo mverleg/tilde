@@ -1,7 +1,3 @@
-use ::std::mem;
-
-use crate::ast::Math2Op::Mod;
-use crate::parse::token::TokenType;
 use crate::parse::Token;
 use crate::TildeRes;
 
@@ -33,14 +29,14 @@ impl Modifiers {
         assert!(first.is_modifier());
         assert!(second.is_modifier());
         if first == second {
-            Err(format!(
+            return Err(format!(
                 "if {first} and {second} appear together, {first} must be first"
-            ))
+            ));
         }
-        if first < second {
-            Err(format!(
+        if first.byte < second.byte {
+            return Err(format!(
                 "if {first} and {second} appear together, {first} must be first"
-            ))
+            ));
         }
         Ok(Modifiers {
             first: Some(first),

@@ -1,4 +1,4 @@
-use crate::parse::token::{Token, TokenType};
+use crate::parse::Token;
 
 pub static TOKENSET: [Token; 1] = [Token::fixed(b'a', 'a', "a")];
 
