@@ -1,5 +1,7 @@
 use crate::ast::{Bool2Op, CompareOp, Math1Op, Math2Op, Op, Prog, ValueOp};
 
+mod charset;
+
 pub fn parse(source: &str) -> Result<Prog, String> {
     let mut ops = vec![];
     for c in source.chars() {
