@@ -11,7 +11,7 @@ Tilde has 256 input tokens, in order to make maximum use of bytes. These can be 
 
 In unicode mode, any other code points, or non-unicode bytes, cause the whole input to be rejected.
 
-In addition, there is a textual representation, with more than 256 tokens. This is just for display, and not currently parseable.
+In addition, there is a textual representation. This is just for display, and not currently parseable. It is a superset of the tokens, that maps more closely to the abstract syntax tree than the tokens.
 
 ## Grouping
 
