@@ -1,8 +1,7 @@
+use ::std::fmt;
+
 use crate::parse::Token;
 use crate::TildeRes;
-use std::fmt;
-use std::fmt::Formatter;
-use std::ptr::write_bytes;
 
 //TODO @mverleg: this is only suitable for general context for now
 
@@ -49,11 +48,22 @@ impl Modifiers {
 }
 
 impl Modifiers {
-    fn fmt_chars(&self, f: &mut Formatter<'_>) -> fmt::Result {
+    fn fmt_chars(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         if let Some(m) = &self.first {
-            write!(f, "{}", m)?;
+            write!(f, "{}", m.chr)?;
             if let Some(m) = &self.second {
-                write!(f, "{}", m)?
+                write!(f, "{}", m.chr)?
+            }
+        }
+        Ok(())
+    }
+
+    /// Byte numbers with leading commas
+    fn fmt_bytes(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        if let Some(m) = &self.first {
+            write!(f, ",{:x}", m.byte)?;
+            if let Some(m) = &self.second {
+                write!(f, ",{:x}", m.byte)?
             }
         }
         Ok(())
@@ -68,7 +78,7 @@ pub enum TokenGroup {
 }
 
 impl TokenGroup {
-    pub(crate) fn fmt_chars(&self, f: &mut Formatter<'_>) -> fmt::Result {
+    pub(crate) fn fmt_chars(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             TokenGroup::Var(open, modi) => {
                 write!(f, "{}", open.chr)?;
@@ -82,7 +92,7 @@ impl TokenGroup {
         }
     }
 
-    pub(crate) fn fmt_bytes(&self, f: &mut Formatter<'_>) -> fmt::Result {
+    pub(crate) fn fmt_bytes(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             TokenGroup::Var(open, modi) => {
                 write!(f, "{:x}", open.byte)?;
