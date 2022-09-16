@@ -1,6 +1,7 @@
+use crate::parse::TokenGroup;
 use std::hash::{Hash, Hasher};
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy)]
 pub enum TokenType {
     /// Token appears alone, or followed by modifiers.
     VariableOpen,
@@ -8,6 +9,23 @@ pub enum TokenType {
     FixedOpen,
     /// Affects the previous opener, or the whole program if there is no preceding opener.
     Modifier,
+}
+
+impl PartialEq for TokenType {
+    fn eq(&self, other: &Self) -> bool {
+        use TokenType::*;
+        match (self, other) {
+            (VariableOpen, VariableOpen) => true,
+            (VariableOpen, FixedOpen) => false,
+            (VariableOpen, Modifier) => false,
+            (FixedOpen, VariableOpen) => false,
+            (FixedOpen, FixedOpen) => true,
+            (FixedOpen, Modifier) => false,
+            (Modifier, VariableOpen) => false,
+            (Modifier, FixedOpen) => false,
+            (Modifier, Modifier) => true,
+        }
+    }
 }
 
 #[derive(Debug, Clone)]

@@ -1,6 +1,18 @@
-use crate::parse::token::Token;
+use crate::parse::token::{Token, TokenType};
 
-pub const CHARSET: [Token; 1] = [Token::fixed(b'a', 'a', "a")];
+pub static CHARSET: [Token; 1] = [Token::fixed(b'a', 'a', "a")];
+
+pub static MODIFIERS: [Token; 6] = select_modifiers(&CHARSET);
+
+const fn select_modifiers(tokens: &[Token]) -> [Token; 6] {
+    let mut modifiers = vec![];
+    for token in tokens {
+        if token.typ == TokenType::Modifier {
+            modifiers.push(token)
+        }
+    }
+    modifiers.into()
+}
 
 #[cfg(test)]
 mod tests {

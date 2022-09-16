@@ -4,6 +4,8 @@ use crate::ast::{Bool2Op, CompareOp, Math1Op, Math2Op, Op, Prog, ValueOp};
 
 pub use self::charset::CHARSET;
 pub use self::token::Token;
+pub use self::tokengroup::Modifiers;
+pub use self::tokengroup::TokenGroup;
 
 mod charset;
 mod token;
