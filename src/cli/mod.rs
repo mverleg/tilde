@@ -9,8 +9,9 @@ use ::std::time::Duration;
 use crate::common::log;
 use crate::exec::{execute, Value};
 use crate::parse::parse;
+use crate::TildeRes;
 
-pub fn run_tilde(args: Vec<String>) -> Result<Value, String> {
+pub fn run_tilde(args: Vec<String>) -> TildeRes<Value> {
     if let Some(source) = parse_args(args)? {
         let inp = gather_input();
         let prog = parse(&source)?;
@@ -38,7 +39,7 @@ fn gather_input() -> Vec<String> {
     inp
 }
 
-fn parse_args(mut args: Vec<String>) -> Result<Option<String>, String> {
+fn parse_args(mut args: Vec<String>) -> TildeRes<Option<String>> {
     args.reverse();
     args.pop();
     let arg1 = args.pop();

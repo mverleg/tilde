@@ -1,13 +1,14 @@
 use crate::ast::{Op, Prog};
 use crate::common::log;
 use crate::exec::mathbool::{exec_math1, exec_math2};
+use crate::TildeRes;
 
 pub use self::data::{Array, Number, Text, Value};
 
 mod data;
 mod mathbool;
 
-pub fn execute(prog: Prog, mut inp: Vec<String>) -> Result<Value, String> {
+pub fn execute(prog: Prog, mut inp: Vec<String>) -> TildeRes<Value> {
     inp.reverse();
     let mut stack = Array::single(Array::of(inp));
     for op in prog.iter() {

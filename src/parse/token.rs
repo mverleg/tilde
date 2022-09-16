@@ -1,4 +1,6 @@
 use crate::parse::TokenGroup;
+use std::fmt;
+use std::fmt::Formatter;
 use std::hash::{Hash, Hasher};
 
 #[derive(Debug, Clone, Copy)]
@@ -68,6 +70,12 @@ impl Token {
 
     pub fn is_modifier(&self) -> bool {
         self.typ == TokenType::Modifier
+    }
+}
+
+impl fmt::Display for Token {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(f, "{} ({:b})", self.chr, self.byte)
     }
 }
 

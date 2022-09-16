@@ -1,7 +1,9 @@
-use std::mem;
+use ::std::mem;
+
 use crate::ast::Math2Op::Mod;
-use crate::parse::Token;
 use crate::parse::token::TokenType;
+use crate::parse::Token;
+use crate::TildeRes;
 
 //TODO @mverleg: this is only suitable for general context for now
 
@@ -27,17 +29,23 @@ impl Modifiers {
         }
     }
 
-    pub fn double(mut first: Token, mut second: Token) -> Self {
+    pub fn double(mut first: Token, mut second: Token) -> TildeRes<Self> {
         assert!(first.is_modifier());
         assert!(second.is_modifier());
-        assert!(first != second);
-        if first > second {
-            mem::swap(&mut first, &mut second);
+        if first == second {
+            Err(format!(
+                "if {first} and {second} appear together, {first} must be first"
+            ))
         }
-        Modifiers {
+        if first < second {
+            Err(format!(
+                "if {first} and {second} appear together, {first} must be first"
+            ))
+        }
+        Ok(Modifiers {
             first: Some(first),
             second: Some(second),
-        }
+        })
     }
 }
 

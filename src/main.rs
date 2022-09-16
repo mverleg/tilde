@@ -10,6 +10,8 @@ mod exec;
 mod gen;
 mod parse;
 
+pub type TildeRes<T> = Result<T, String>;
+
 fn main() -> ExitCode {
     let res = run_tilde(env::args().collect());
     match res {
