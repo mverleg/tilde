@@ -1,5 +1,6 @@
 use crate::ast::{Bool2Op, CompareOp, Math1Op, Math2Op, Op, Prog, ValueOp};
 
+mod token;
 mod charset;
 
 pub fn parse(source: &str) -> Result<Prog, String> {
