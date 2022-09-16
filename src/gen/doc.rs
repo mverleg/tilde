@@ -13,16 +13,30 @@ impl fmt::Display for GroupDoc {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         write!(f, "input: ")?;
         self.token_group.fmt_chars(f)?;
-        write!(f, ", bytes: ")?;
+        write!(f, " ; bytes: ")?;
         self.token_group.fmt_bytes(f)
 
         //TODO @mverleg: parse the group and if successful, print description
     }
 }
 
-pub fn gen_docs() {
+pub fn gen_docs() -> Vec<GroupDoc> {
+    let mut docs = vec![];
     for token_group in gen_inputs() {
-        GroupDoc { token_group };
+        docs.push(GroupDoc { token_group });
     }
-    todo!(); //TODO @mverleg: TEMPORARY! REMOVE THIS!
+    //TODO @mverleg:
+    docs
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_gen_docs() {
+        for doc in gen_docs() {
+            println!("{}", doc);
+        }
+    }
 }
