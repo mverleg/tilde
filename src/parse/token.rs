@@ -74,7 +74,7 @@ impl Token {
 
 impl fmt::Display for Token {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        write!(f, "{} ({:b})", self.chr, self.byte)
+        write!(f, "{} (#{})", self.chr, self.byte)
     }
 }
 

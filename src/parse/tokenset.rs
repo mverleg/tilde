@@ -1,6 +1,12 @@
 use crate::parse::Token;
 
-pub static TOKENSET: [Token; 1] = [Token::fixed(b'a', 'a', "a")];
+pub static TOKENSET: [Token; 5] = [
+    Token::fixed(b'a', 'a', "a"),
+    Token::modi(252, '@', "harder"),
+    Token::modi(253, '#', "faster"),
+    Token::modi(254, '$', "stronger"),
+    Token::modi(255, '%', "larger"),
+];
 
 #[cfg(test)]
 mod tests {
