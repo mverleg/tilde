@@ -4,6 +4,7 @@ pub use crate::ast::mathbool::{Bool2Op, CompareOp, Math1Op, Math2Op};
 pub use crate::ast::value::ValueOp;
 
 mod mathbool;
+mod optype;
 mod value;
 
 #[derive(Debug)]
