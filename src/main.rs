@@ -7,6 +7,7 @@ mod ast;
 mod cli;
 mod common;
 mod exec;
+mod gen;
 mod parse;
 
 fn main() -> ExitCode {

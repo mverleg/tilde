@@ -1,5 +1,10 @@
 use crate::ast::{Bool2Op, CompareOp, Math1Op, Math2Op, Op, Prog, ValueOp};
 
+//TODO @mverleg: for now, reject duplicate modifiers and enforce order - this way is can be relaxed later without breaking compatibility
+
+pub use self::charset::CHARSET;
+pub use self::token::Token;
+
 mod charset;
 mod token;
 
