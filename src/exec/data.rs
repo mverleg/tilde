@@ -1,6 +1,6 @@
+use crate::ast::ValueOp;
 use std::fmt;
 use std::fmt::Formatter;
-use crate::ast::ValueOp;
 
 #[derive(Debug, PartialEq)]
 pub enum Value {
@@ -13,7 +13,7 @@ pub enum Value {
 impl Value {
     pub fn of_op(op: &ValueOp) -> Self {
         match op {
-            ValueOp::Number(nr) => Value::Num(Number::of(*nr))
+            ValueOp::Number(nr) => Value::Num(Number::of(*nr)),
         }
     }
 }
@@ -74,7 +74,7 @@ impl fmt::Display for Number {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct Text {
     val: String,
 }
@@ -114,7 +114,7 @@ impl fmt::Display for Array {
 impl Array {
     pub fn of<V: Into<Value>>(vec: Vec<V>) -> Self {
         Array {
-            val: vec.into_iter().map(|v| v.into()).collect()
+            val: vec.into_iter().map(|v| v.into()).collect(),
         }
     }
 

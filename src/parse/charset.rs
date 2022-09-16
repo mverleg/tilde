@@ -1,10 +1,6 @@
-use ::std::hash::{Hash, Hasher};
-
 use crate::parse::token::Token;
 
-pub const CHARSET: [Token; 1] = [
-    Token::fixed(b'a', 'a', "a"),
-];
+pub const CHARSET: [Token; 1] = [Token::fixed(b'a', 'a', "a")];
 
 #[cfg(test)]
 mod tests {

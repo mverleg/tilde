@@ -1,7 +1,7 @@
 use crate::ast::{Bool2Op, CompareOp, Math1Op, Math2Op, Op, Prog, ValueOp};
 
-mod token;
 mod charset;
+mod token;
 
 pub fn parse(source: &str) -> Result<Prog, String> {
     let mut ops = vec![];
@@ -30,7 +30,7 @@ pub fn parse(source: &str) -> Result<Prog, String> {
             '→' => Op::Bool2(Bool2Op::Impl),
             '0'..='9' => Op::Value(ValueOp::Number(c.to_digit(10).unwrap() as f64)),
             '←' => unimplemented!(),
-            sym => Err(format!("unknown source symbol: {sym}"))?
+            sym => Err(format!("unknown source symbol: {sym}"))?,
         })
     }
     Ok(Prog::of(ops))

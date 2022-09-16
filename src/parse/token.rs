@@ -12,10 +12,10 @@ pub enum TokenType {
 
 #[derive(Debug, Clone)]
 pub struct Token {
-    byte: u8,
-    chr: char,
-    long: &'static str,
-    typ: TokenType,
+    pub byte: u8,
+    pub chr: char,
+    pub long: &'static str,
+    pub typ: TokenType,
 }
 
 impl Token {
@@ -24,7 +24,7 @@ impl Token {
             byte,
             chr,
             long,
-            typ
+            typ,
         }
     }
 

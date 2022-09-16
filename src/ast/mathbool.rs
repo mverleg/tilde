@@ -1,4 +1,3 @@
-
 #[derive(Debug)]
 pub enum Math1Op {
     Neg,

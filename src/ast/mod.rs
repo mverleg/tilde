@@ -8,7 +8,7 @@ mod value;
 
 #[derive(Debug)]
 pub struct Prog {
-    ops: Vec<Op>
+    ops: Vec<Op>,
 }
 
 impl Prog {
