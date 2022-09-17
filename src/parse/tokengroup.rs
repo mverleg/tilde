@@ -113,4 +113,35 @@ impl TokenGroup {
             TokenGroup::JustMod(modi) => modi.fmt_bytes(f),
         }
     }
+
+    pub fn group(&self) -> &Token {
+        match &self {
+            TokenGroup::Var(opener, _) => opener,
+            TokenGroup::Fixed(opener, _, _) => opener,
+            TokenGroup::JustMod(modi) => modi.first().as_ref().unwrap(),
+        }
+    }
+
+    pub fn order(&self) -> u32 {
+        match &self {
+            TokenGroup::Var(opener, modifiers) => {
+                Self::calc_order_for(Some(opener), None, modifiers)
+            }
+            TokenGroup::Fixed(opener, second, modifiers) => {
+                Self::calc_order_for(Some(opener), Some(second), modifiers)
+            }
+            TokenGroup::JustMod(modifiers) => Self::calc_order_for(None, None, modifiers),
+        }
+    }
+
+    fn calc_order_for(first: Option<&Token>, second: Option<&Token>, modi: &Modifiers) -> u32 {
+        ((Self::calc_token_value(first) * 257 + Self::calc_token_value(second)) * 257
+            + Self::calc_token_value(modi.first().as_ref()))
+            * 257
+            + Self::calc_token_value(modi.second().as_ref())
+    }
+
+    fn calc_token_value(token: Option<&Token>) -> u32 {
+        token.map(|t| t.byte + 1).unwrap_or(0) as u32
+    }
 }

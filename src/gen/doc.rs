@@ -2,21 +2,11 @@ use ::std::fmt;
 use ::std::fmt::Formatter;
 
 use crate::gen::input::gen_inputs;
-use crate::parse::{Token, TokenGroup};
+use crate::parse::{Modifiers, Token, TokenGroup};
 
 #[derive(Debug)]
 pub struct OpDoc {
     token_group: TokenGroup,
-}
-
-impl OpDoc {
-    pub fn group(&self) -> &Token {
-        match &self.token_group {
-            TokenGroup::Var(opener, _) => opener,
-            TokenGroup::Fixed(opener, _, _) => opener,
-            TokenGroup::JustMod(modi) => modi.first().as_ref().unwrap(),
-        }
-    }
 }
 
 impl fmt::Display for OpDoc {
