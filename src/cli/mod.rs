@@ -14,12 +14,14 @@ use crate::parse::parse;
 use crate::TildeRes;
 
 pub fn run_tilde(args: Vec<String>) -> TildeRes<Value> {
-    if let Some(source) = parse_args(args)? {
-        let inp = gather_input();
-        let prog = parse(&source)?;
-        execute(prog, inp)
-    } else {
-        Ok(gen_help().into())
+    match parse_args(args)? {
+        CliOperation::Run(source) => {
+            let inp = gather_input();
+            let prog = parse(&source)?;
+            execute(prog, inp)
+        }
+        CliOperation::ShowHelp => Ok(gen_help().into()),
+        CliOperation::Noop => Ok(Value::None),
     }
 }
 
@@ -46,20 +48,28 @@ fn gen_md_docs() -> TildeRes<()> {
     Err("doc-gen can only be used if compiled with feature `gen`".to_owned())
 }
 
-fn parse_args(mut args: Vec<String>) -> TildeRes<Option<String>> {
+#[derive(Debug)]
+pub enum CliOperation {
+    Run(String),
+    ShowHelp,
+    Noop,
+}
+
+fn parse_args(mut args: Vec<String>) -> TildeRes<CliOperation> {
     args.reverse();
     args.pop();
     let arg1 = args.pop();
-    let source = match arg1.as_deref() {
-        Some("-h") | Some("--help") => Ok(None),
+    let cli_op = match arg1.as_deref() {
+        Some("-h") | Some("--help") => CliOperation::ShowHelp,
         Some("-f") | Some("--file") => {
             let pth = args
                 .pop()
                 .ok_or_else(|| "argument -f/--file expects a path to a source file".to_string())?;
             log!("reading source from file {}", pth);
-            Ok(Some(read_to_string(pth).map_err(|err| {
-                format!("failed to read source file, err {err}")
-            })?))
+            CliOperation::Run(
+                read_to_string(pth)
+                    .map_err(|err| format!("failed to read source file, err {err}"))?,
+            )
         }
         Some("-s") | Some("--source") => {
             let src = args.pop().ok_or_else(|| {
@@ -69,9 +79,9 @@ fn parse_args(mut args: Vec<String>) -> TildeRes<Option<String>> {
                 "getting source from command line (length in utf8 bytes: {})",
                 src.len()
             );
-            Ok(Some(src))
+            CliOperation::Run(src)
         }
-        Some("doc-gen") => gen_md_docs().map(|()| None),
+        Some("doc-gen") => gen_md_docs().map(|()| CliOperation::Noop),
         Some(arg) => {
             let hint = if arg.contains('=') {
                 "hint: --arg=value syntax is not supported, use '--arg value'\n"
@@ -90,7 +100,7 @@ fn parse_args(mut args: Vec<String>) -> TildeRes<Option<String>> {
             args.join(" ")
         ));
     }
-    Ok(source)
+    cli_op
 }
 
 fn gen_help() -> String {
