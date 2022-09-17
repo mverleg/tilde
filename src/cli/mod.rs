@@ -8,6 +8,8 @@ use ::std::time::Duration;
 
 use crate::common::log;
 use crate::exec::{execute, Value};
+#[cfg(feature = "gen")]
+use crate::gen::mddoc::gen_md_docs;
 use crate::parse::parse;
 use crate::TildeRes;
 
@@ -39,6 +41,11 @@ fn gather_input() -> Vec<String> {
     inp
 }
 
+#[cfg(not(feature = "gen"))]
+fn gen_md_docs() -> TildeRes<()> {
+    Err("doc-gen can only be used if compiled with feature `gen`".to_owned())
+}
+
 fn parse_args(mut args: Vec<String>) -> TildeRes<Option<String>> {
     args.reverse();
     args.pop();
@@ -64,13 +71,7 @@ fn parse_args(mut args: Vec<String>) -> TildeRes<Option<String>> {
             );
             Ok(Some(src))
         }
-        Some("doc-gen") => {
-            if cfg!(feature = "gen") {
-                todo!()
-            } else {
-                Err("doc-gen can only be used if compiled with feature `gen`".to_owned())
-            }
-        }
+        Some("doc-gen") => gen_md_docs(),
         Some(arg) => {
             let hint = if arg.contains('=') {
                 "hint: --arg=value syntax is not supported, use '--arg value'\n"

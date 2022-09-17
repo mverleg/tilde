@@ -2,7 +2,8 @@ use ::std::fmt;
 use ::std::fmt::Formatter;
 
 use crate::gen::input::gen_inputs;
-use crate::parse::TokenGroup;
+use crate::parse::{Token, TokenGroup};
+use crate::TildeRes;
 
 #[derive(Debug)]
 pub struct GroupDoc {
@@ -20,14 +21,16 @@ impl fmt::Display for GroupDoc {
     }
 }
 
+/// Generate document objects, grouped by opener and sorted.
+//TODO @mverleg: include standalone modifiers
+pub fn gen_grouped_docs() -> Vec<Vec<Token, GroupDoc>> {}
+
 pub fn gen_docs() -> Vec<GroupDoc> {
     let mut docs = vec![];
     let mut buf = String::new();
-    let mut formatter = core::fmt::Formatter::new(&mut buf);
     for token_group in gen_inputs() {
         docs.push(GroupDoc { token_group });
     }
-    //TODO @mverleg:
     docs
 }
 

@@ -1,2 +1,3 @@
-pub mod doc;
+mod doc;
 mod input;
+pub mod mddoc;
