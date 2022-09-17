@@ -59,17 +59,16 @@ fn parse_args(mut args: Vec<String>) -> TildeRes<CliOperation> {
     args.reverse();
     args.pop();
     let arg1 = args.pop();
-    let cli_op = match arg1.as_deref() {
-        Some("-h") | Some("--help") => CliOperation::ShowHelp,
+    let cli_op: CliOperation = match arg1.as_deref() {
+        Some("-h") | Some("--help") => Ok(CliOperation::ShowHelp),
         Some("-f") | Some("--file") => {
             let pth = args
                 .pop()
                 .ok_or_else(|| "argument -f/--file expects a path to a source file".to_string())?;
             log!("reading source from file {}", pth);
-            CliOperation::Run(
-                read_to_string(pth)
-                    .map_err(|err| format!("failed to read source file, err {err}"))?,
-            )
+            Ok(CliOperation::Run(read_to_string(pth).map_err(|err| {
+                format!("failed to read source file, err {err}")
+            })?))
         }
         Some("-s") | Some("--source") => {
             let src = args.pop().ok_or_else(|| {
@@ -79,7 +78,7 @@ fn parse_args(mut args: Vec<String>) -> TildeRes<CliOperation> {
                 "getting source from command line (length in utf8 bytes: {})",
                 src.len()
             );
-            CliOperation::Run(src)
+            Ok(CliOperation::Run(src))
         }
         Some("doc-gen") => gen_md_docs().map(|()| CliOperation::Noop),
         Some(arg) => {
@@ -100,7 +99,7 @@ fn parse_args(mut args: Vec<String>) -> TildeRes<CliOperation> {
             args.join(" ")
         ));
     }
-    cli_op
+    Ok(cli_op)
 }
 
 fn gen_help() -> String {
