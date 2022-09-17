@@ -118,7 +118,10 @@ impl TokenGroup {
         match &self {
             TokenGroup::Var(opener, _) => opener,
             TokenGroup::Fixed(opener, _, _) => opener,
-            TokenGroup::JustMod(modi) => modi.first().as_ref().unwrap(),
+            TokenGroup::JustMod(modi) => modi
+                .first()
+                .as_ref()
+                .expect("opening modifiers should not be empty"),
         }
     }
 

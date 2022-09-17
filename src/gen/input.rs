@@ -5,7 +5,9 @@ pub fn gen_inputs() -> Vec<TokenGroup> {
     let mut groups = vec![];
     let modifiers = generate_modifiers();
     for modi in &modifiers {
-        groups.push(TokenGroup::JustMod(modi.clone()));
+        if modi.first().is_some() {
+            groups.push(TokenGroup::JustMod(modi.clone()));
+        }
     }
     for token in &TOKENSET {
         match token.typ {
