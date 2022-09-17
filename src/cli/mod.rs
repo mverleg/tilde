@@ -64,6 +64,13 @@ fn parse_args(mut args: Vec<String>) -> TildeRes<Option<String>> {
             );
             Ok(Some(src))
         }
+        Some("doc-gen") => {
+            if cfg!(feature = "gen") {
+                todo!()
+            } else {
+                Err("doc-gen can only be used if compiled with feature `gen`".to_owned())
+            }
+        }
         Some(arg) => {
             let hint = if arg.contains('=') {
                 "hint: --arg=value syntax is not supported, use '--arg value'\n"
@@ -86,7 +93,7 @@ fn parse_args(mut args: Vec<String>) -> TildeRes<Option<String>> {
 }
 
 fn gen_help() -> String {
-    vec![
+    let mut help = vec![
         format!("{} {}", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION")),
         format!("{}", env!("CARGO_PKG_DESCRIPTION")),
         format!(
@@ -111,6 +118,11 @@ fn gen_help() -> String {
         "    -f, --file P      Run source contained in file at path P, which should be golfed"
             .to_owned(),
         "                      source with unicode encoding".to_owned(),
-    ]
-    .join("\n")
+    ];
+    if cfg!(feature = "gen") {
+        help.push(
+            "    doc-gen           Generate documentation (if built with `gen` feature)".to_owned(),
+        );
+    }
+    help.join("\n")
 }

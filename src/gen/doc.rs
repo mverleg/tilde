@@ -22,6 +22,8 @@ impl fmt::Display for GroupDoc {
 
 pub fn gen_docs() -> Vec<GroupDoc> {
     let mut docs = vec![];
+    let mut buf = String::new();
+    let mut formatter = core::fmt::Formatter::new(&mut buf);
     for token_group in gen_inputs() {
         docs.push(GroupDoc { token_group });
     }

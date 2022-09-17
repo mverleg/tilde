@@ -6,6 +6,9 @@ version = "0.1.0"
 edition = "2021"
 authors = ["Mark <mverleg.noreply@gmail.com>"]
 
+[features]
+gen = []
+
 [dependencies]
 regex = { version = "1.6.0", default-features = false, features = ["std",] }
 

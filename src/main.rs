@@ -1,3 +1,5 @@
+#![feature(fmt_internals)]
+
 use ::std::env;
 use ::std::process::ExitCode;
 
@@ -7,6 +9,7 @@ mod ast;
 mod cli;
 mod common;
 mod exec;
+#[cfg(feature = "gen")]
 mod gen;
 mod parse;
 
