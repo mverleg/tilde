@@ -19,7 +19,7 @@ impl Modifiers {
         }
     }
 
-    pub fn single(modi: Token) -> Self {
+    pub fn of_single(modi: Token) -> Self {
         assert!(modi.is_modifier());
         Modifiers {
             first: Some(modi),
@@ -27,7 +27,7 @@ impl Modifiers {
         }
     }
 
-    pub fn double(first: Token, second: Token) -> TildeRes<Self> {
+    pub fn of_double(first: Token, second: Token) -> TildeRes<Self> {
         assert!(first.is_modifier());
         assert!(second.is_modifier());
         if first == second {
@@ -44,6 +44,14 @@ impl Modifiers {
             first: Some(first),
             second: Some(second),
         })
+    }
+
+    pub fn first(&self) -> &Option<Token> {
+        &self.first
+    }
+
+    pub fn second(&self) -> &Option<Token> {
+        &self.second
     }
 }
 

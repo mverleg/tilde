@@ -71,7 +71,7 @@ fn parse_args(mut args: Vec<String>) -> TildeRes<Option<String>> {
             );
             Ok(Some(src))
         }
-        Some("doc-gen") => gen_md_docs(),
+        Some("doc-gen") => gen_md_docs().map(|()| None),
         Some(arg) => {
             let hint = if arg.contains('=') {
                 "hint: --arg=value syntax is not supported, use '--arg value'\n"

@@ -38,9 +38,9 @@ fn generate_modifiers() -> Vec<Modifiers> {
         .collect::<Vec<_>>();
     let mut modifiers = vec![Modifiers::empty()];
     for (n, modi1) in mod_tokens.iter().enumerate() {
-        modifiers.push(Modifiers::single((*modi1).clone()));
+        modifiers.push(Modifiers::of_single((*modi1).clone()));
         for modi2 in &mod_tokens[..n] {
-            modifiers.push(Modifiers::double((*modi1).clone(), (*modi2).clone()).unwrap())
+            modifiers.push(Modifiers::of_double((*modi1).clone(), (*modi2).clone()).unwrap())
         }
     }
     modifiers

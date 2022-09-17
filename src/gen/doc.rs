@@ -3,14 +3,23 @@ use ::std::fmt::Formatter;
 
 use crate::gen::input::gen_inputs;
 use crate::parse::{Token, TokenGroup};
-use crate::TildeRes;
 
 #[derive(Debug)]
-pub struct GroupDoc {
+pub struct OpDoc {
     token_group: TokenGroup,
 }
 
-impl fmt::Display for GroupDoc {
+impl OpDoc {
+    pub fn group(&self) -> &Token {
+        match &self.token_group {
+            TokenGroup::Var(opener, _) => opener,
+            TokenGroup::Fixed(opener, _, _) => opener,
+            TokenGroup::JustMod(modi) => modi.first().as_ref().unwrap(),
+        }
+    }
+}
+
+impl fmt::Display for OpDoc {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         write!(f, "input: ")?;
         self.token_group.fmt_chars(f)?;
@@ -23,13 +32,19 @@ impl fmt::Display for GroupDoc {
 
 /// Generate document objects, grouped by opener and sorted.
 //TODO @mverleg: include standalone modifiers
-pub fn gen_grouped_docs() -> Vec<Vec<Token, GroupDoc>> {}
+pub fn gen_grouped_docs() -> Vec<(Token, Vec<OpDoc>)> {
+    let mut groups = vec![];
+    // gen_docs()
+    //     .group_by(|token| token.group())
+    //     .collect();
+    groups
+}
 
-pub fn gen_docs() -> Vec<GroupDoc> {
+pub fn gen_docs() -> Vec<OpDoc> {
     let mut docs = vec![];
     let mut buf = String::new();
     for token_group in gen_inputs() {
-        docs.push(GroupDoc { token_group });
+        docs.push(OpDoc { token_group });
     }
     docs
 }
