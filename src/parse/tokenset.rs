@@ -1,6 +1,6 @@
 use crate::parse::Token;
 
-pub static TOKENSET: [Token; 100] = [
+pub static TOKENSET: [Token; 154] = [
     Token::fixed(b' ', ' ', "space"),
     Token::fixed(b'!', '!', "!"),
     Token::fixed(b'"', '"', "\""),
@@ -96,11 +96,65 @@ pub static TOKENSET: [Token; 100] = [
     Token::fixed(b'|', '|', "|"),
     Token::fixed(b'}', '}', "}"),
     Token::fixed(b'~', '~', "~"),
-    Token::fixed(b')', ')', ")"),
+    Token::fixed(127, 'α', "alpha"),
+    Token::fixed(128, 'β', "beta"),
+    Token::fixed(129, 'γ', "gamma"),
+    Token::fixed(130, 'Δ', "delta"),
+    Token::fixed(131, 'ε', "epsilon"),
+    Token::fixed(132, 'ζ', "zeta"),
+    Token::fixed(133, 'η', "eta"),
+    Token::fixed(134, 'θ', "theta"),
+    Token::fixed(135, 'κ', "kappa"),
+    Token::fixed(136, 'λ', "lambda"),
+    Token::fixed(137, 'μ', "mu"),
+    Token::fixed(138, 'Ξ', "xi"),
+    Token::fixed(139, 'π', "pi"),
+    Token::fixed(140, 'ρ', "rho"),
+    Token::fixed(141, 'σ', "sigma"),
+    Token::fixed(142, 'τ', "tau"),
+    Token::fixed(143, 'φ', "phi"),
+    Token::fixed(144, 'ψ', "psi"),
+    Token::fixed(145, 'Ω', "omega"),
+    Token::fixed(146, '♠', "space"),
+    Token::fixed(147, '♥', "heart"),
+    Token::fixed(148, '♦', "diamond"),
+    Token::fixed(149, '♣', "club"),
+    Token::fixed(150, '⟲', "undo"),
+    Token::fixed(151, '⟳', "redo"),
+    Token::fixed(152, '⇄', "swap"),
+    Token::fixed(153, '⇅', "vswap"),
+    Token::fixed(154, '⇦', "left"),
+    Token::fixed(155, '⇧', "up"),
+    Token::fixed(156, '⇨', "right"),
+    Token::fixed(157, '⇩', "down"),
+    Token::fixed(158, '⭑', "star"),
+    Token::fixed(159, '⬢', "circle"),
+    Token::fixed(160, '■', "square"),
+    Token::fixed(161, '▲', "triangle"),
+    Token::fixed(162, '∀', "forall"),
+    Token::fixed(163, '∃', "exists"),
+    Token::fixed(164, '∄', "nexists"),
+    Token::fixed(165, '∉', "ncontain"),
+    Token::fixed(166, '∊', "contain"),
+    Token::fixed(167, '±', "plusmin"),
+    Token::fixed(168, '∞', "inf"),
+    Token::fixed(169, '√', "sqrt"),
+    Token::fixed(170, '⋂', "intersection"),
+    Token::fixed(171, '⋃', "union"),
+    Token::fixed(172, '≤', "le"),
+    Token::fixed(173, '≥', "ge"),
+    Token::fixed(174, '≪', "lele"),
+    Token::fixed(175, '≫', "gege"),
+    Token::fixed(176, '⊂', "sub"),
+    Token::fixed(177, '⊃', "super"),
+    Token::fixed(178, '⊗', "combi"),
+    Token::fixed(179, '⋯', "ellipsis"),
+    Token::modi(250, '*', "harder"),
+    Token::modi(251, '&', "harder"),
     Token::modi(252, '@', "harder"),
     Token::modi(253, '#', "faster"),
     Token::modi(254, '$', "stronger"),
-    Token::modi(255, '%', "larger"),
+    Token::modi(255, '^', "larger"),
 ];
 
 #[cfg(test)]
@@ -113,7 +167,9 @@ mod tests {
     fn check_prop_unique<T: Eq + Hash>(getter: fn(&Token) -> T) {
         let mut seen = HashSet::new();
         for c in &TOKENSET {
-            assert!(seen.insert(getter(c)))
+            if !seen.insert(getter(c)) {
+                panic!("duplicate char: {c}")
+            }
         }
         assert_eq!(seen.len(), u8::MAX as usize)
     }
