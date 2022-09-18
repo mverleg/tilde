@@ -1,6 +1,6 @@
 use crate::parse::Token;
 
-pub static TOKENSET: [Token; 154] = [
+pub static TOKENSET: [Token; 160] = [
     Token::fixed(b' ', ' ', "space"),
     Token::fixed(b'!', '!', "!"),
     Token::fixed(b'"', '"', "\""),
@@ -149,6 +149,12 @@ pub static TOKENSET: [Token; 154] = [
     Token::fixed(177, '⊃', "super"),
     Token::fixed(178, '⊗', "combi"),
     Token::fixed(179, '⋯', "ellipsis"),
+    Token::fixed(180, '¿', "invquestion"),
+    Token::fixed(181, '¡', "invexclamation"),
+    Token::fixed(182, '¥', "yuan"),
+    Token::fixed(183, '£', "pound"),
+    Token::fixed(184, '€', "euro"),
+    Token::fixed(185, '$', "dollar"),
     Token::modi(250, '*', "harder"),
     Token::modi(251, '&', "harder"),
     Token::modi(252, '@', "harder"),
