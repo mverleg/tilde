@@ -27,10 +27,8 @@ pub fn gen_grouped_docs() -> Vec<(Token, Vec<OpDoc>)> {
         .iter()
         .map(|token| (token.clone(), vec![]))
         .collect::<Vec<(Token, Vec<OpDoc>)>>();
-    dbg!(groups.len()); //TODO @mverleg: TEMPORARY! REMOVE THIS!
     for op_doc in gen_docs() {
         let token_index = op_doc.token_group.group().byte as usize;
-        dbg!(token_index); //TODO @mverleg: TEMPORARY! REMOVE THIS!
         groups[token_index].1.push(op_doc);
     }
     // gen_docs()
