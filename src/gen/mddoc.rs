@@ -32,6 +32,13 @@ fn gen_opener_doc(opener: &Token, docs: &[(Token, Vec<OpDoc>)], ops: &[OpDoc]) -
     let mut docbuf = format!("\n# [Tilde](./README.md) v{}: opener {} ({})\n\n", env!("CARGO_PKG_VERSION"), opener.chr, opener.long);
     let mut openfmt = core::fmt::Formatter::new(&mut docbuf);
     write_openers(&docs, &mut openfmt);
+    write!(openfmt, "| Character | **{}** (#{:x}/{}) |\n", opener.chr, opener.byte, TOKENSET.len()).unwrap();
+    write!(openfmt, "| Name | {} |\n", &opener.long).unwrap();
+    write!(openfmt, "| Type | {} |\n", if opener.is_fixed() {
+        "always 1 argument, and optional modifiers"
+    } else {
+        "no fixed argument, but allows optional modifiers"
+    }).unwrap();
     fs::write(format!("doc/{}.md", opener.long), docbuf)
         .map_err(|err| format!("failed to write markdown opener doc, err: {}", err))?;
     Ok(())
