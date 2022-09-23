@@ -22,7 +22,7 @@ pub fn gen_md_docs() -> TildeRes<()> {
 fn gen_index_doc(docs: &Vec<(Token, Vec<OpDoc>)>) -> TildeRes<()> {
     let mut docbuf = format!("\n# Tilde reference (v{})\n\n", env!("CARGO_PKG_VERSION"));
     let mut tlreadme = core::fmt::Formatter::new(&mut docbuf);
-    write_openers(docs, &mut tlreadme);
+    write_openers(docs, &mut tlreadme, u8::MAX);
     fs::write("doc/README.md", docbuf)
         .map_err(|err| format!("failed to write markdown index, err: {}", err))?;
     Ok(())
@@ -31,20 +31,24 @@ fn gen_index_doc(docs: &Vec<(Token, Vec<OpDoc>)>) -> TildeRes<()> {
 fn gen_opener_doc(opener: &Token, docs: &[(Token, Vec<OpDoc>)], ops: &[OpDoc]) -> TildeRes<()> {
     let mut docbuf = format!("\n# [Tilde](./README.md) v{}: opener {} ({})\n\n", env!("CARGO_PKG_VERSION"), opener.chr, opener.long);
     let mut openfmt = core::fmt::Formatter::new(&mut docbuf);
-    write_openers(&docs, &mut openfmt);
-    write!(openfmt, "| Character | **{}** (#{:x}/{}) |\n", opener.chr, opener.byte, TOKENSET.len()).unwrap();
-    write!(openfmt, "| Name | {} |\n", &opener.long).unwrap();
-    write!(openfmt, "| Type | {} |\n", if opener.is_fixed() {
+    write_openers(&docs, &mut openfmt, opener.byte);
+    write!(openfmt, "* Character: **{}** (#{:x}/{})\n", opener.chr, opener.byte, TOKENSET.len()).unwrap();
+    write!(openfmt, "* Name: \"{}\"\n", &opener.long).unwrap();
+    write!(openfmt, "* Type: {}\n", if opener.is_fixed() {
         "always 1 argument, and optional modifiers"
     } else {
         "no fixed argument, but allows optional modifiers"
     }).unwrap();
+    write!(openfmt, "\n### Operations:\n\n").unwrap();
+    for op in ops {
+
+    }
     fs::write(format!("doc/{}.md", opener.long), docbuf)
         .map_err(|err| format!("failed to write markdown opener doc, err: {}", err))?;
     Ok(())
 }
 
-fn write_openers(docs: &[(Token, Vec<OpDoc>)], tlreadme: &mut Formatter) {
+fn write_openers(docs: &[(Token, Vec<OpDoc>)], tlreadme: &mut Formatter, highlight: u8) {
     write!(tlreadme, "Openers: ").unwrap();
     let mut is_first = true;
     for (opener, _) in docs {
@@ -54,7 +58,11 @@ fn write_openers(docs: &[(Token, Vec<OpDoc>)], tlreadme: &mut Formatter) {
             } else {
                 write!(tlreadme, " | ").unwrap();
             }
-            write!(tlreadme, "[{}](./{}.md)", opener.chr, &opener.long).unwrap();
+            if highlight == opener.byte {
+                write!(tlreadme, "**{}**", opener.chr).unwrap();
+            } else {
+                write!(tlreadme, "[{}](./{}.md)", opener.chr, &opener.long).unwrap();
+            }
         }
     }
     write!(tlreadme, "\n\n").unwrap();
