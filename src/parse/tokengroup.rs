@@ -56,14 +56,16 @@ impl Modifiers {
 }
 
 impl Modifiers {
-    fn fmt_chars(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    fn chars(&self) -> String {
         if let Some(m) = &self.first {
-            write!(f, "{}", m.chr)?;
-            if let Some(m) = &self.second {
-                write!(f, "{}", m.chr)?
+            if let Some(n) = &self.second {
+                format!("{}{}", m.chr, n.chr)
+            } else {
+                format!("{}", m.chr)
             }
+        } else {
+            "".to_string()
         }
-        Ok(())
     }
 
     /// Byte numbers with leading commas
@@ -89,10 +91,10 @@ impl TokenGroup {
     pub(crate) fn chars(&self) -> String {
         match self {
             TokenGroup::Var(open, modi) =>
-                format!("{}{}", open.chr, modi),
+                format!("{}{}", open.chr, modi.chars()),
             TokenGroup::Fixed(open, second, modi) =>
-                format!("{}{}{}", open.chr, second.chr, modi),
-            TokenGroup::JustMod(modi) => format!("{}", modi)
+                format!("{}{}{}", open.chr, second.chr, modi.chars()),
+            TokenGroup::JustMod(modi) => format!("{}", modi.chars())
         }
     }
 
