@@ -21,7 +21,10 @@ pub fn run_tilde(args: Vec<String>) -> TildeRes<Value> {
             execute(prog, inp)
         }
         CliOperation::ShowHelp => Ok(gen_help().into()),
-        CliOperation::Noop => Ok(Value::None),
+        CliOperation::DocGen => {
+            gen_md_docs()?;
+            Ok(Value::None)
+        },
     }
 }
 
@@ -52,7 +55,7 @@ fn gen_md_docs() -> TildeRes<()> {
 pub enum CliOperation {
     Run(String),
     ShowHelp,
-    Noop,
+    DocGen,
 }
 
 fn parse_args(mut args: Vec<String>) -> TildeRes<CliOperation> {
@@ -80,7 +83,7 @@ fn parse_args(mut args: Vec<String>) -> TildeRes<CliOperation> {
             );
             Ok(CliOperation::Run(src))
         }
-        Some("doc-gen") => gen_md_docs().map(|()| CliOperation::Noop),
+        Some("doc-gen") => Ok(CliOperation::DocGen),
         Some(arg) => {
             let hint = if arg.contains('=') {
                 "hint: --arg=value syntax is not supported, use '--arg value'\n"
