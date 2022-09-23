@@ -1,11 +1,13 @@
 pub use ::std::slice;
 
 pub use crate::ast::mathbool::{Bool2Op, CompareOp, Math1Op, Math2Op};
+use crate::ast::typ::Typ;
 pub use crate::ast::value::ValueOp;
 
 mod mathbool;
 mod optype;
 mod value;
+mod typ;
 
 #[derive(Debug)]
 pub struct Prog {
@@ -42,13 +44,13 @@ impl Op {
         }
     }
 
-    pub fn description(&self) -> &str {
+    pub fn description(&self, typ: Typ) -> &str {
         match self {
-            Op::Math1(op) => op.description(),
-            Op::Math2(op) => op.description(),
-            Op::Compare(op) => op.description(),
-            Op::Bool2(op) => op.description(),
-            Op::Value(op) => op.description(),
+            Op::Math1(op) => op.description(typ),
+            Op::Math2(op) => op.description(typ),
+            Op::Compare(op) => op.description(typ),
+            Op::Bool2(op) => op.description(typ),
+            Op::Value(op) => op.description(typ),
         }
     }
 }

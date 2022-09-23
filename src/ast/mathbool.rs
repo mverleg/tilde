@@ -1,3 +1,5 @@
+use crate::ast::typ::Typ;
+
 #[derive(Debug)]
 pub enum Math1Op {
     Neg,
@@ -8,11 +10,16 @@ pub enum Math1Op {
 
 impl Math1Op {
     pub fn name(&self) -> &str {
-
+        match self {
+            Math1Op::Neg => "neg",
+            Math1Op::Abs => "abs",
+            Math1Op::Incr => "incr",
+            Math1Op::Decr => "decr",
+        }
     }
 
-    pub fn description(&self) -> &str {
-
+    pub fn description(&self, typ: Typ) -> &str {
+        todo!();
     }
 }
 
@@ -28,11 +35,18 @@ pub enum Math2Op {
 
 impl Math2Op {
     pub fn name(&self) -> &str {
-
+        match self {
+            Math2Op::Plus => "plus",
+            Math2Op::Minus => "minus",
+            Math2Op::Mul => "mul",
+            Math2Op::Div => "div",
+            Math2Op::IntDiv => "intdiv",
+            Math2Op::Mod => "modulo",
+        }
     }
 
-    pub fn description(&self) -> &str {
-
+    pub fn description(&self, typ: Typ) -> &str {
+        todo!();
     }
 }
 
@@ -48,11 +62,18 @@ pub enum CompareOp {
 
 impl CompareOp {
     pub fn name(&self) -> &str {
-
+        match self {
+            CompareOp::Eq => "eq",
+            CompareOp::Neq => "neq",
+            CompareOp::Gt => "gt",
+            CompareOp::Gte => "gte",
+            CompareOp::Lt => "lt",
+            CompareOp::Lte => "lte",
+        }
     }
 
-    pub fn description(&self) -> &str {
-
+    pub fn description(&self, typ: Typ) -> &str {
+        todo!();
     }
 }
 
@@ -68,10 +89,15 @@ pub enum Bool2Op {
 
 impl Bool2Op {
     pub fn name(&self) -> &str {
-
+        match self {
+            Bool2Op::And => "and",
+            Bool2Op::Or => "or",
+            Bool2Op::Xor => "xor",
+            Bool2Op::Impl => "impl",
+        }
     }
 
-    pub fn description(&self) -> &str {
-
+    pub fn description(&self, typ: Typ) -> &str {
+        todo!();
     }
 }
