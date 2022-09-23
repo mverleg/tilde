@@ -1,5 +1,6 @@
 use ::std::fmt;
 use ::std::fmt::Formatter;
+use crate::ast::Op;
 
 use crate::gen::input::gen_inputs;
 use crate::parse::{Token, TokenGroup, TOKENSET};
@@ -7,14 +8,12 @@ use crate::parse::{Token, TokenGroup, TOKENSET};
 #[derive(Debug)]
 pub struct OpDoc {
     token_group: TokenGroup,
+    operation: Op,
 }
 
 impl fmt::Display for OpDoc {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        write!(f, "input: ")?;
-        self.token_group.fmt_chars(f)?;
-        write!(f, " ; bytes: ")?;
-        self.token_group.fmt_bytes(f)
+        self.token_group.fmt_chars(f)
 
         //TODO @mverleg: parse the group and if successful, print description
     }

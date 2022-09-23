@@ -30,3 +30,25 @@ pub enum Op {
     Bool2(Bool2Op),
     Value(ValueOp),
 }
+
+impl Op {
+    pub fn name(&self) -> &str {
+        match self {
+            Op::Math1(op) => op.name(),
+            Op::Math2(op) => op.name(),
+            Op::Compare(op) => op.name(),
+            Op::Bool2(op) => op.name(),
+            Op::Value(op) => op.name(),
+        }
+    }
+
+    pub fn description(&self) -> &str {
+        match self {
+            Op::Math1(op) => op.description(),
+            Op::Math2(op) => op.description(),
+            Op::Compare(op) => op.description(),
+            Op::Bool2(op) => op.description(),
+            Op::Value(op) => op.description(),
+        }
+    }
+}

@@ -6,6 +6,16 @@ pub enum Math1Op {
     Decr,
 }
 
+impl Math1Op {
+    pub fn name(&self) -> &str {
+
+    }
+
+    pub fn description(&self) -> &str {
+
+    }
+}
+
 #[derive(Debug)]
 pub enum Math2Op {
     Plus,
@@ -14,6 +24,16 @@ pub enum Math2Op {
     Div,
     IntDiv,
     Mod,
+}
+
+impl Math2Op {
+    pub fn name(&self) -> &str {
+
+    }
+
+    pub fn description(&self) -> &str {
+
+    }
 }
 
 #[derive(Debug)]
@@ -26,6 +46,16 @@ pub enum CompareOp {
     Lte,
 }
 
+impl CompareOp {
+    pub fn name(&self) -> &str {
+
+    }
+
+    pub fn description(&self) -> &str {
+
+    }
+}
+
 #[derive(Debug)]
 pub enum Bool2Op {
     And,
@@ -34,4 +64,14 @@ pub enum Bool2Op {
     //TODO @mverleg: ^ ?
     Xor,
     Impl,
+}
+
+impl Bool2Op {
+    pub fn name(&self) -> &str {
+
+    }
+
+    pub fn description(&self) -> &str {
+
+    }
 }
