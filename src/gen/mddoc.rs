@@ -41,7 +41,7 @@ fn gen_opener_doc(opener: &Token, docs: &[(Token, Vec<OpDoc>)], ops: &[OpDoc]) -
     }).unwrap();
     write!(openfmt, "\n### Operations:\n\n").unwrap();
     for op in ops {
-        write!(openfmt, "* [{}](./{}.md)\n", op, op.name).unwrap();
+        write!(openfmt, "* [{}](./{}.md)\n", op.chars(), op.op_name()).unwrap();
     }
     fs::write(format!("doc/{}.md", opener.long), docbuf)
         .map_err(|err| format!("failed to write markdown opener doc, err: {}", err))?;

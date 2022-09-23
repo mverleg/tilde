@@ -1,6 +1,4 @@
-use ::std::fmt;
-use ::std::fmt::Formatter;
-use crate::ast::Op;
+use crate::ast::{Math1Op, Op};
 
 use crate::gen::input::gen_inputs;
 use crate::parse::{Token, TokenGroup, TOKENSET};
@@ -11,11 +9,13 @@ pub struct OpDoc {
     operation: Op,
 }
 
-impl fmt::Display for OpDoc {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        self.token_group.fmt_chars(f)
+impl OpDoc {
+    pub fn chars(&self) -> String {
+        self.token_group.chars()
+    }
 
-        //TODO @mverleg: parse the group and if successful, print description
+    pub fn op_name(&self) -> &str {
+        self.operation.name()
     }
 }
 
@@ -41,7 +41,7 @@ pub fn gen_docs() -> Vec<OpDoc> {
     for token_group in gen_inputs() {
         docs.push(OpDoc {
             token_group,
-            operation: (),
+            operation: Op::Math1(Math1Op::Incr),
         });
     }
     docs

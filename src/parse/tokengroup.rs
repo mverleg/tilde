@@ -86,33 +86,29 @@ pub enum TokenGroup {
 }
 
 impl TokenGroup {
-    pub(crate) fn fmt_chars(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    pub(crate) fn chars(&self) -> String {
         match self {
-            TokenGroup::Var(open, modi) => {
-                write!(f, "{}", open.chr)?;
-                modi.fmt_chars(f)
-            }
-            TokenGroup::Fixed(open, second, modi) => {
-                write!(f, "{}{}", open.chr, second.chr)?;
-                modi.fmt_chars(f)
-            }
-            TokenGroup::JustMod(modi) => modi.fmt_chars(f),
+            TokenGroup::Var(open, modi) =>
+                format!("{}{}", open.chr, modi),
+            TokenGroup::Fixed(open, second, modi) =>
+                format!("{}{}{}", open.chr, second.chr, modi),
+            TokenGroup::JustMod(modi) => format!("{}", modi)
         }
     }
 
-    pub(crate) fn fmt_bytes(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            TokenGroup::Var(open, modi) => {
-                write!(f, "{:x}", open.byte)?;
-                modi.fmt_bytes(f)
-            }
-            TokenGroup::Fixed(open, second, modi) => {
-                write!(f, "{:x},{:x}", open.byte, second.byte)?;
-                modi.fmt_bytes(f)
-            }
-            TokenGroup::JustMod(modi) => modi.fmt_bytes(f),
-        }
-    }
+    // pub(crate) fn fmt_bytes(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    //     match self {
+    //         TokenGroup::Var(open, modi) => {
+    //             write!(f, "{:x}", open.byte)?;
+    //             modi.fmt_bytes(f)
+    //         }
+    //         TokenGroup::Fixed(open, second, modi) => {
+    //             write!(f, "{:x},{:x}", open.byte, second.byte)?;
+    //             modi.fmt_bytes(f)
+    //         }
+    //         TokenGroup::JustMod(modi) => modi.fmt_bytes(f),
+    //     }
+    // }
 
     pub fn group(&self) -> &Token {
         match &self {
