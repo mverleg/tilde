@@ -1,11 +1,11 @@
 use crate::parse::Token;
 
 pub static TOKENSET: [Token; 16] = [
-    Token::fixed(0, '0', "num"),
-    Token::fixed(1, 'i', "inp"),
-    Token::fixed(2, 'n', "seq"),
-    Token::fixed(3, '.', "more"),
-    Token::var(4, '"', "str"),
+    Token::literal(0, '0', "num"),
+    Token::literal(1, '"', "str"),
+    Token::fixed(2, 'i', "inp"),
+    Token::fixed(3, 'n', "seq"),
+    Token::fixed(4, '.', "more"),
     Token::var(5, '+', "plus"),
     Token::var(6, 'x', "x"),
     Token::var(7, '=', "eq"),

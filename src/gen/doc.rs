@@ -39,7 +39,10 @@ pub fn gen_grouped_docs() -> Vec<(Token, Vec<OpDoc>)> {
 pub fn gen_docs() -> Vec<OpDoc> {
     let mut docs = vec![];
     for token_group in gen_inputs() {
-        docs.push(OpDoc { token_group });
+        docs.push(OpDoc {
+            token_group,
+            operation: (),
+        });
     }
     docs
 }

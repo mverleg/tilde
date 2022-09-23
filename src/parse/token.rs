@@ -4,6 +4,8 @@ use std::hash::{Hash, Hasher};
 
 #[derive(Debug, Clone, Copy)]
 pub enum TokenType {
+    /// Special token that starts a number or text literal.
+    Literal,
     /// Token appears alone, or followed by modifiers.
     VariableOpen,
     /// Token is followed by one other token of any type, and then optional modifiers.
@@ -47,6 +49,10 @@ impl Token {
         }
     }
 
+    pub const fn literal(byte: u8, chr: char, long: &'static str) -> Self {
+        Token::new(byte, chr, long, TokenType::Literal)
+    }
+
     pub const fn var(byte: u8, chr: char, long: &'static str) -> Self {
         Token::new(byte, chr, long, TokenType::VariableOpen)
     }
@@ -59,12 +65,20 @@ impl Token {
         Token::new(byte, chr, long, TokenType::Modifier)
     }
 
+    pub fn is_literal(&self) -> bool {
+        self.typ == TokenType::Literal
+    }
+
     pub fn is_variable(&self) -> bool {
         self.typ == TokenType::VariableOpen
     }
 
     pub fn is_fixed(&self) -> bool {
         self.typ == TokenType::FixedOpen
+    }
+
+    pub fn is_opener(&self) -> bool {
+        self.is_fixed() || self.is_variable()
     }
 
     pub fn is_modifier(&self) -> bool {
