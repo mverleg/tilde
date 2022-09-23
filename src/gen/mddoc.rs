@@ -29,7 +29,7 @@ fn gen_index_doc(docs: &Vec<(Token, Vec<OpDoc>)>) -> TildeRes<()> {
 }
 
 fn gen_opener_doc(opener: &Token, docs: &[(Token, Vec<OpDoc>)], ops: &[OpDoc]) -> TildeRes<()> {
-    let mut docbuf = format!("\n# Tilde v{}: {}\n\n", env!("CARGO_PKG_VERSION"), opener.chr);
+    let mut docbuf = format!("\n# [Tilde](./README.md) v{}: opener {} ({})\n\n", env!("CARGO_PKG_VERSION"), opener.chr, opener.long);
     let mut openfmt = core::fmt::Formatter::new(&mut docbuf);
     write_openers(&docs, &mut openfmt);
     fs::write(format!("doc/{}.md", opener.long), docbuf)
