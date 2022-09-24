@@ -12,6 +12,8 @@ pub use self::tokenset::TOKENSET;
 mod token;
 mod tokengroup;
 mod tokenset;
+mod tokenize;
+mod link_ops;
 
 pub fn parse(source: &str) -> TildeRes<Prog> {
     let mut ops = vec![];

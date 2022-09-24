@@ -11,7 +11,7 @@ pub fn gen_md_docs() -> TildeRes<()> {
         .map_err(|err| format!("failed to create doc directory, err: {}", err))?;
     gen_index_doc(&docs)?;
     for (opener, ops) in &docs {
-        if !opener.is_modifier() {
+        if opener.is_opener() {
             gen_opener_doc(opener, &docs, ops)?;
         }
     }
@@ -52,7 +52,7 @@ fn write_openers(docs: &[(Token, Vec<OpDoc>)], tlreadme: &mut Formatter, highlig
     write!(tlreadme, "Openers: ").unwrap();
     let mut is_first = true;
     for (opener, _) in docs {
-        if !opener.is_modifier() {
+        if opener.is_opener() {
             if is_first {
                 is_first = false;
             } else {

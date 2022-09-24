@@ -19,14 +19,13 @@ impl PartialEq for TokenType {
         use TokenType::*;
         match (self, other) {
             (VariableOpen, VariableOpen) => true,
-            (VariableOpen, FixedOpen) => false,
-            (VariableOpen, Modifier) => false,
-            (FixedOpen, VariableOpen) => false,
+            (VariableOpen, _) => false,
             (FixedOpen, FixedOpen) => true,
-            (FixedOpen, Modifier) => false,
-            (Modifier, VariableOpen) => false,
-            (Modifier, FixedOpen) => false,
+            (FixedOpen, _) => false,
             (Modifier, Modifier) => true,
+            (Modifier, _) => false,
+            (Literal, Literal) => true,
+            (Literal, _) => false,
         }
     }
 }
