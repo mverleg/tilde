@@ -1,7 +1,7 @@
 use ::std::fmt;
 
 use crate::parse::Token;
-use crate::TildeRes;
+use crate::{NR, TildeRes};
 
 //TODO @mverleg: this is only suitable for general context for now
 

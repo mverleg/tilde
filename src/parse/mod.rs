@@ -1,5 +1,5 @@
-use crate::ast::{Bool2Op, CompareOp, Math1Op, Math2Op, Op, Prog, ValueOp};
-use crate::parse::link_ops::link_ops;
+use crate::ast::Prog;
+use crate::parse::build_ast::build_ast;
 use crate::parse::tokenize::tokenize;
 use crate::TildeRes;
 
@@ -15,9 +15,9 @@ mod token;
 mod tokengroup;
 mod tokenset;
 mod tokenize;
-mod link_ops;
+mod build_ast;
 
 pub fn parse(src: &str) -> TildeRes<Prog> {
     let tokens: Vec<TokenGroup> = tokenize(src)?;
-    link_ops(&tokens)
+    build_ast(&tokens)
 }

@@ -1,4 +1,5 @@
 pub use ::std::slice;
+use ::std::vec;
 
 pub use crate::ast::mathbool::{Bool2Op, CompareOp, Math1Op, Math2Op};
 use crate::ast::typ::Typ;
@@ -21,6 +22,9 @@ impl Prog {
 
     pub fn iter(&self) -> slice::Iter<Op> {
         self.ops.iter()
+    }
+    pub fn into_iter(&self) -> vec::IntoIter<Op> {
+        self.ops.into_iter()
     }
 }
 

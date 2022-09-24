@@ -2,7 +2,7 @@ use crate::ast::{Op, Prog};
 use crate::parse::TokenGroup;
 use crate::TildeRes;
 
-pub fn link_ops(tokens: &[TokenGroup]) -> TildeRes<Prog> {
+pub fn build_ast(tokens: &[TokenGroup]) -> TildeRes<Prog> {
     let mut ops = vec![];
     let mut missing = vec![];
     for token_group in tokens {
@@ -14,8 +14,14 @@ pub fn link_ops(tokens: &[TokenGroup]) -> TildeRes<Prog> {
     todo!()
 }
 
-pub fn link_op(group: &TokenGroup) -> Option<Op> {
-    todo!();
+/// Try to link one token group to one Op, by adding some
+/// simple tokens behind it and seeing what the first Op is.
+///
+/// Might not work for some conceivable parsings, but should
+/// work for all currently implemented ones.
+pub fn link_op(group: TokenGroup) -> Option<Op> {
+    let tokens = vec![group, TokenGroup::Number(0), TokenGroup::Number(0)];
+    build_ast(&tokens).ok().and_then(|prog| prog.iter().next())
 }
 
 fn parse(source: &str) -> TildeRes<Prog> {
