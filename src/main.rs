@@ -14,6 +14,7 @@ mod gen;
 mod parse;
 
 pub type TildeRes<T> = Result<T, String>;
+pub type NR = f64;
 
 fn main() -> ExitCode {
     let res = run_tilde(env::args().collect());

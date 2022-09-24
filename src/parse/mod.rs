@@ -1,4 +1,6 @@
 use crate::ast::{Bool2Op, CompareOp, Math1Op, Math2Op, Op, Prog, ValueOp};
+use crate::parse::link_ops::link_ops;
+use crate::parse::tokenize::tokenize;
 use crate::TildeRes;
 
 pub use self::token::Token;
@@ -14,3 +16,8 @@ mod tokengroup;
 mod tokenset;
 mod tokenize;
 mod link_ops;
+
+pub fn parse(src: &str) -> TildeRes<Prog> {
+    let tokens: Vec<TokenGroup> = tokenize(src)?;
+    link_ops(&tokens)
+}

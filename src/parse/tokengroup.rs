@@ -82,6 +82,8 @@ impl Modifiers {
 
 #[derive(Debug)]
 pub enum TokenGroup {
+    Text(String),
+    Number(NR),
     Var(Token, Modifiers),
     Fixed(Token, Token, Modifiers),
     JustMod(Modifiers),

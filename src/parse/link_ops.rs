@@ -11,9 +11,7 @@ pub fn link_ops(tokens: &[TokenGroup]) -> TildeRes<Prog> {
             None => missing.push(token_group),
         }
     }
-    tokens.into_iter()
-        .map(|tokens| link_op(tokens).ok_or_else(|| ))
-        .collect()
+    todo!()
 }
 
 pub fn link_op(group: &TokenGroup) -> Option<Op> {
