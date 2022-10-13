@@ -1,14 +1,14 @@
 use ::std::fmt;
 
-use crate::parse::Token;
+use crate::parse::Letter;
 use crate::{TildeRes, NR};
 
 //TODO @mverleg: this is only suitable for general context for now
 
 #[derive(Debug, Clone)]
 pub struct Modifiers {
-    first: Option<Token>,
-    second: Option<Token>,
+    first: Option<Letter>,
+    second: Option<Letter>,
 }
 
 impl Modifiers {
@@ -19,7 +19,7 @@ impl Modifiers {
         }
     }
 
-    pub fn of_single(modi: Token) -> Self {
+    pub fn of_single(modi: Letter) -> Self {
         assert!(modi.is_modifier());
         Modifiers {
             first: Some(modi),
@@ -27,7 +27,7 @@ impl Modifiers {
         }
     }
 
-    pub fn of_double(first: Token, second: Token) -> TildeRes<Self> {
+    pub fn of_double(first: Letter, second: Letter) -> TildeRes<Self> {
         assert!(first.is_modifier());
         assert!(second.is_modifier());
         if first == second {
@@ -46,11 +46,11 @@ impl Modifiers {
         })
     }
 
-    pub fn first(&self) -> &Option<Token> {
+    pub fn first(&self) -> &Option<Letter> {
         &self.first
     }
 
-    pub fn second(&self) -> &Option<Token> {
+    pub fn second(&self) -> &Option<Letter> {
         &self.second
     }
 }
@@ -81,24 +81,24 @@ impl Modifiers {
 }
 
 #[derive(Debug, Clone)]
-pub enum TokenGroup {
+pub enum Word {
     Text(String),
     Number(NR),
-    Var(Token, Modifiers),
-    Fixed(Token, Token, Modifiers),
+    Var(Letter, Modifiers),
+    Fixed(Letter, Letter, Modifiers),
     JustMod(Modifiers),
 }
 
-impl TokenGroup {
+impl Word {
     pub(crate) fn chars(&self) -> String {
         match self {
-            TokenGroup::Text(_txt) => todo!(),
-            TokenGroup::Number(_nr) => todo!(),
-            TokenGroup::Var(open, modi) => format!("{}{}", open.chr, modi.chars()),
-            TokenGroup::Fixed(open, second, modi) => {
+            Word::Text(_txt) => todo!(),
+            Word::Number(_nr) => todo!(),
+            Word::Var(open, modi) => format!("{}{}", open.chr, modi.chars()),
+            Word::Fixed(open, second, modi) => {
                 format!("{}{}{}", open.chr, second.chr, modi.chars())
             }
-            TokenGroup::JustMod(modi) => format!("{}", modi.chars()),
+            Word::JustMod(modi) => format!("{}", modi.chars()),
         }
     }
 
@@ -116,7 +116,7 @@ impl TokenGroup {
     //     }
     // }
 
-    pub fn group(&self) -> &Token {
+    pub fn group(&self) -> &Letter {
         todo!()
         // match &self {
         //     TokenGroup::Text(_) => Token::literal(),
@@ -143,14 +143,14 @@ impl TokenGroup {
         // }
     }
 
-    fn calc_order_for(first: Option<&Token>, second: Option<&Token>, modi: &Modifiers) -> u32 {
-        ((Self::calc_token_value(first) * 257 + Self::calc_token_value(second)) * 257
-            + Self::calc_token_value(modi.first().as_ref()))
+    fn calc_order_for(first: Option<&Letter>, second: Option<&Letter>, modi: &Modifiers) -> u32 {
+        ((Self::calc_letter_value(first) * 257 + Self::calc_letter_value(second)) * 257
+            + Self::calc_letter_value(modi.first().as_ref()))
             * 257
-            + Self::calc_token_value(modi.second().as_ref())
+            + Self::calc_letter_value(modi.second().as_ref())
     }
 
-    fn calc_token_value(token: Option<&Token>) -> u32 {
-        token.map(|t| t.byte + 1).unwrap_or(0) as u32
+    fn calc_letter_value(letter: Option<&Letter>) -> u32 {
+        letter.map(|t| t.byte + 1).unwrap_or(0) as u32
     }
 }

@@ -2,7 +2,7 @@ use ::std::fs;
 use std::fmt::Formatter;
 
 use crate::gen::doc::{gen_grouped_docs, OpDoc};
-use crate::parse::{Token, TOKENSET};
+use crate::parse::{Letter, ALPHABET};
 use crate::TildeRes;
 
 pub fn gen_md_docs() -> TildeRes<()> {
@@ -19,7 +19,7 @@ pub fn gen_md_docs() -> TildeRes<()> {
     Ok(())
 }
 
-fn gen_index_doc(docs: &Vec<(Token, Vec<OpDoc>)>) -> TildeRes<()> {
+fn gen_index_doc(docs: &Vec<(Letter, Vec<OpDoc>)>) -> TildeRes<()> {
     let mut docbuf = format!("\n# Tilde reference (v{})\n\n", env!("CARGO_PKG_VERSION"));
     let mut tlreadme = core::fmt::Formatter::new(&mut docbuf);
     write_openers(docs, &mut tlreadme, u8::MAX);
@@ -28,7 +28,7 @@ fn gen_index_doc(docs: &Vec<(Token, Vec<OpDoc>)>) -> TildeRes<()> {
     Ok(())
 }
 
-fn gen_opener_doc(opener: &Token, docs: &[(Token, Vec<OpDoc>)], ops: &[OpDoc]) -> TildeRes<()> {
+fn gen_opener_doc(opener: &Letter, docs: &[(Letter, Vec<OpDoc>)], ops: &[OpDoc]) -> TildeRes<()> {
     let mut docbuf = format!(
         "\n# [Tilde](./README.md) v{}: opener {} ({})\n\n",
         env!("CARGO_PKG_VERSION"),
@@ -42,7 +42,7 @@ fn gen_opener_doc(opener: &Token, docs: &[(Token, Vec<OpDoc>)], ops: &[OpDoc]) -
         "* Character: **{}** (#{:x}/{})\n",
         opener.chr,
         opener.byte,
-        TOKENSET.len()
+        ALPHABET.len()
     )
     .unwrap();
     write!(openfmt, "* Name: \"{}\"\n", &opener.long).unwrap();
@@ -65,7 +65,7 @@ fn gen_opener_doc(opener: &Token, docs: &[(Token, Vec<OpDoc>)], ops: &[OpDoc]) -
     Ok(())
 }
 
-fn write_openers(docs: &[(Token, Vec<OpDoc>)], tlreadme: &mut Formatter, highlight: u8) {
+fn write_openers(docs: &[(Letter, Vec<OpDoc>)], tlreadme: &mut Formatter, highlight: u8) {
     write!(tlreadme, "Openers: ").unwrap();
     let mut is_first = true;
     for (opener, _) in docs {

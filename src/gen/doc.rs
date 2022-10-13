@@ -1,17 +1,17 @@
 use crate::ast::{Math1Op, Op};
 
 use crate::gen::input::gen_inputs;
-use crate::parse::{Token, TokenGroup, TOKENSET};
+use crate::parse::{Letter, Word, ALPHABET};
 
 #[derive(Debug)]
 pub struct OpDoc {
-    token_group: TokenGroup,
+    word: Word,
     operation: Op,
 }
 
 impl OpDoc {
     pub fn chars(&self) -> String {
-        self.token_group.chars()
+        self.word.chars()
     }
 
     pub fn op_name(&self) -> &str {
@@ -21,14 +21,14 @@ impl OpDoc {
 
 /// Generate document objects, grouped by opener and sorted.
 //TODO @mverleg: include standalone modifiers
-pub fn gen_grouped_docs() -> Vec<(Token, Vec<OpDoc>)> {
-    let mut groups = TOKENSET
+pub fn gen_grouped_docs() -> Vec<(Letter, Vec<OpDoc>)> {
+    let mut groups = ALPHABET
         .iter()
-        .map(|token| (token.clone(), vec![]))
-        .collect::<Vec<(Token, Vec<OpDoc>)>>();
+        .map(|letter| (letter.clone(), vec![]))
+        .collect::<Vec<(Letter, Vec<OpDoc>)>>();
     for op_doc in gen_docs() {
-        let token_index = op_doc.token_group.group().byte as usize;
-        groups[token_index].1.push(op_doc);
+        let index = op_doc.word.group().byte as usize;
+        groups[index].1.push(op_doc);
     }
     // gen_docs()
     //     .group_by(|token| token.group())
@@ -38,9 +38,9 @@ pub fn gen_grouped_docs() -> Vec<(Token, Vec<OpDoc>)> {
 
 pub fn gen_docs() -> Vec<OpDoc> {
     let mut docs = vec![];
-    for token_group in gen_inputs() {
+    for word in gen_inputs() {
         docs.push(OpDoc {
-            token_group,
+            word,
             operation: Op::Math1(Math1Op::Incr),
         });
     }

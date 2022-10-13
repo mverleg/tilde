@@ -1,11 +1,11 @@
 use crate::ast::{Bool2Op, CompareOp, Math1Op, Math2Op, Op, Prog, ValueOp};
-use crate::parse::TokenGroup;
+use crate::parse::Word;
 use crate::TildeRes;
 
-pub fn build_ast(tokens: &[TokenGroup]) -> TildeRes<Prog> {
+pub fn build_ast(words: &[Word]) -> TildeRes<Prog> {
     // let mut ops = vec![];
     // let mut missing = vec![];
-    for token_group in tokens {
+    for word in words {
         unimplemented!();
         // match link_op(token_group) {
         //     Some(op) => ops.push(op),
