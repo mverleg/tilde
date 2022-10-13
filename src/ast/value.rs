@@ -9,7 +9,7 @@ pub enum ValueOp {
 impl ValueOp {
     pub fn name(&self) -> &str {
         match self {
-            ValueOp::Number(nr) => "0-9"
+            ValueOp::Number(nr) => "0-9",
         }
     }
 

@@ -24,7 +24,7 @@ pub fn run_tilde(args: Vec<String>) -> TildeRes<Value> {
         CliOperation::DocGen => {
             gen_md_docs()?;
             Ok(Value::None)
-        },
+        }
     }
 }
 

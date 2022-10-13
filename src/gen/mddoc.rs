@@ -29,16 +29,33 @@ fn gen_index_doc(docs: &Vec<(Token, Vec<OpDoc>)>) -> TildeRes<()> {
 }
 
 fn gen_opener_doc(opener: &Token, docs: &[(Token, Vec<OpDoc>)], ops: &[OpDoc]) -> TildeRes<()> {
-    let mut docbuf = format!("\n# [Tilde](./README.md) v{}: opener {} ({})\n\n", env!("CARGO_PKG_VERSION"), opener.chr, opener.long);
+    let mut docbuf = format!(
+        "\n# [Tilde](./README.md) v{}: opener {} ({})\n\n",
+        env!("CARGO_PKG_VERSION"),
+        opener.chr,
+        opener.long
+    );
     let mut openfmt = core::fmt::Formatter::new(&mut docbuf);
     write_openers(&docs, &mut openfmt, opener.byte);
-    write!(openfmt, "* Character: **{}** (#{:x}/{})\n", opener.chr, opener.byte, TOKENSET.len()).unwrap();
+    write!(
+        openfmt,
+        "* Character: **{}** (#{:x}/{})\n",
+        opener.chr,
+        opener.byte,
+        TOKENSET.len()
+    )
+    .unwrap();
     write!(openfmt, "* Name: \"{}\"\n", &opener.long).unwrap();
-    write!(openfmt, "* Type: {}\n", if opener.is_fixed() {
-        "always 1 argument, and optional modifiers"
-    } else {
-        "no fixed argument, but allows optional modifiers"
-    }).unwrap();
+    write!(
+        openfmt,
+        "* Type: {}\n",
+        if opener.is_fixed() {
+            "always 1 argument, and optional modifiers"
+        } else {
+            "no fixed argument, but allows optional modifiers"
+        }
+    )
+    .unwrap();
     write!(openfmt, "\n### Operations:\n\n").unwrap();
     for op in ops {
         write!(openfmt, "* [{}](./{}.md)\n", op.chars(), op.op_name()).unwrap();

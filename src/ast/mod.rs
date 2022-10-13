@@ -7,8 +7,8 @@ pub use crate::ast::value::ValueOp;
 
 mod mathbool;
 mod optype;
-mod value;
 mod typ;
+mod value;
 
 #[derive(Debug)]
 pub struct Prog {
@@ -23,7 +23,7 @@ impl Prog {
     pub fn iter(&self) -> slice::Iter<Op> {
         self.ops.iter()
     }
-    pub fn into_iter(&self) -> vec::IntoIter<Op> {
+    pub fn into_iter(self) -> vec::IntoIter<Op> {
         self.ops.into_iter()
     }
 }

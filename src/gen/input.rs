@@ -13,7 +13,7 @@ pub fn gen_inputs() -> Vec<TokenGroup> {
         match token.typ {
             TokenType::Literal => {
                 // TODO @mverleg
-            },
+            }
             TokenType::VariableOpen => {
                 for modi in &modifiers {
                     groups.push(TokenGroup::Var(token.clone(), modi.clone()));

@@ -11,11 +11,11 @@ pub use self::tokenset::TOKENSET;
 
 //TODO @mverleg: for now, reject duplicate modifiers and enforce order - this way is can be relaxed later without breaking compatibility
 
+mod build_ast;
 mod token;
 mod tokengroup;
-mod tokenset;
 mod tokenize;
-mod build_ast;
+mod tokenset;
 
 pub fn parse(src: &str) -> TildeRes<Prog> {
     let tokens: Vec<TokenGroup> = tokenize(src)?;

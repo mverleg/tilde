@@ -1,7 +1,7 @@
 use ::std::fmt;
 
 use crate::parse::Token;
-use crate::{NR, TildeRes};
+use crate::{TildeRes, NR};
 
 //TODO @mverleg: this is only suitable for general context for now
 
@@ -80,7 +80,7 @@ impl Modifiers {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum TokenGroup {
     Text(String),
     Number(NR),
@@ -92,11 +92,13 @@ pub enum TokenGroup {
 impl TokenGroup {
     pub(crate) fn chars(&self) -> String {
         match self {
-            TokenGroup::Var(open, modi) =>
-                format!("{}{}", open.chr, modi.chars()),
-            TokenGroup::Fixed(open, second, modi) =>
-                format!("{}{}{}", open.chr, second.chr, modi.chars()),
-            TokenGroup::JustMod(modi) => format!("{}", modi.chars())
+            TokenGroup::Text(_txt) => todo!(),
+            TokenGroup::Number(_nr) => todo!(),
+            TokenGroup::Var(open, modi) => format!("{}{}", open.chr, modi.chars()),
+            TokenGroup::Fixed(open, second, modi) => {
+                format!("{}{}{}", open.chr, second.chr, modi.chars())
+            }
+            TokenGroup::JustMod(modi) => format!("{}", modi.chars()),
         }
     }
 
@@ -115,26 +117,30 @@ impl TokenGroup {
     // }
 
     pub fn group(&self) -> &Token {
-        match &self {
-            TokenGroup::Var(opener, _) => opener,
-            TokenGroup::Fixed(opener, _, _) => opener,
-            TokenGroup::JustMod(modi) => modi
-                .first()
-                .as_ref()
-                .expect("opening modifiers should not be empty"),
-        }
+        todo!()
+        // match &self {
+        //     TokenGroup::Text(_) => Token::literal(),
+        //     TokenGroup::Number(_) => todo!(),
+        //     TokenGroup::Var(opener, _) => opener,
+        //     TokenGroup::Fixed(opener, _, _) => opener,
+        //     TokenGroup::JustMod(modi) => modi
+        //         .first()
+        //         .as_ref()
+        //         .expect("opening modifiers should not be empty"),
+        // }
     }
 
     pub fn order(&self) -> u32 {
-        match &self {
-            TokenGroup::Var(opener, modifiers) => {
-                Self::calc_order_for(Some(opener), None, modifiers)
-            }
-            TokenGroup::Fixed(opener, second, modifiers) => {
-                Self::calc_order_for(Some(opener), Some(second), modifiers)
-            }
-            TokenGroup::JustMod(modifiers) => Self::calc_order_for(None, None, modifiers),
-        }
+        todo!()
+        // match &self {
+        //     TokenGroup::Var(opener, modifiers) => {
+        //         Self::calc_order_for(Some(opener), None, modifiers)
+        //     }
+        //     TokenGroup::Fixed(opener, second, modifiers) => {
+        //         Self::calc_order_for(Some(opener), Some(second), modifiers)
+        //     }
+        //     TokenGroup::JustMod(modifiers) => Self::calc_order_for(None, None, modifiers),
+        // }
     }
 
     fn calc_order_for(first: Option<&Token>, second: Option<&Token>, modi: &Modifiers) -> u32 {
