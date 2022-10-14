@@ -54,7 +54,8 @@ mod tests {
     #[test]
     fn test_gen_docs() {
         for doc in gen_docs() {
-            println!("{}", doc);
+            println!("{:?}", doc);
         }
+        //TODO @mark:
     }
 }
