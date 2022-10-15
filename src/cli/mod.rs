@@ -7,10 +7,10 @@ use ::std::thread::sleep;
 use ::std::time::Duration;
 
 use crate::common::log;
+use crate::compile::parse;
 use crate::exec::{execute, Value};
 #[cfg(feature = "gen")]
 use crate::gen::mddoc::gen_md_docs;
-use crate::parse::parse;
 use crate::TildeRes;
 
 pub fn run_tilde(args: Vec<String>) -> TildeRes<Value> {

@@ -1,5 +1,5 @@
-use crate::ast::{Bool2Op, CompareOp, Math1Op, Math2Op, Op, Prog, ValueOp};
-use crate::parse::Word;
+use crate::ast::Prog;
+use crate::compile::Word;
 use crate::TildeRes;
 
 pub fn build_ast(words: &[Word]) -> TildeRes<Prog> {
@@ -25,7 +25,7 @@ pub fn build_ast(words: &[Word]) -> TildeRes<Prog> {
 //     build_ast(&tokens).ok().and_then(|prog| prog.iter().next())
 // }
 
-// fn parse(source: &str) -> TildeRes<Prog> {
+// fn compile(source: &str) -> TildeRes<Prog> {
 //     let mut ops = vec![];
 //     for c in source.chars() {
 //         ops.push(match c {

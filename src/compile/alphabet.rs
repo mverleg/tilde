@@ -1,4 +1,4 @@
-use crate::parse::Letter;
+use crate::compile::Letter;
 
 pub static ALPHABET: [Letter; 16] = [
     Letter::literal(0, '0', "num"),

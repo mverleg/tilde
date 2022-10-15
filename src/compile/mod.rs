@@ -1,6 +1,6 @@
 use crate::ast::Prog;
-use crate::parse::lex::lex_str;
-use crate::parse::parse::build_ast;
+use crate::compile::lex::lex_str;
+use crate::compile::parse::build_ast;
 use crate::TildeRes;
 
 pub use self::alphabet::ALPHABET;

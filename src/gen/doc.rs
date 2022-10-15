@@ -1,7 +1,7 @@
 use crate::ast::{Math1Op, Op};
 
+use crate::compile::{Letter, Word, ALPHABET};
 use crate::gen::input::gen_inputs;
-use crate::parse::{Letter, Word, ALPHABET};
 
 #[derive(Debug)]
 pub struct OpDoc {

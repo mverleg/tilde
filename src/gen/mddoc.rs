@@ -1,8 +1,8 @@
 use ::std::fs;
 use std::fmt::Formatter;
 
+use crate::compile::{Letter, ALPHABET};
 use crate::gen::doc::{gen_grouped_docs, OpDoc};
-use crate::parse::{Letter, ALPHABET};
 use crate::TildeRes;
 
 pub fn gen_md_docs() -> TildeRes<()> {
@@ -19,7 +19,7 @@ pub fn gen_md_docs() -> TildeRes<()> {
     Ok(())
 }
 
-fn gen_index_doc(docs: &Vec<(Letter, Vec<OpDoc>)>) -> TildeRes<()> {
+fn gen_index_doc(docs: &[(Letter, Vec<OpDoc>)]) -> TildeRes<()> {
     let mut docbuf = format!("\n# Tilde reference (v{})\n\n", env!("CARGO_PKG_VERSION"));
     let mut tlreadme = core::fmt::Formatter::new(&mut docbuf);
     write_openers(docs, &mut tlreadme, u8::MAX);
@@ -36,19 +36,19 @@ fn gen_opener_doc(opener: &Letter, docs: &[(Letter, Vec<OpDoc>)], ops: &[OpDoc])
         opener.long
     );
     let mut openfmt = core::fmt::Formatter::new(&mut docbuf);
-    write_openers(&docs, &mut openfmt, opener.byte);
-    write!(
+    write_openers(docs, &mut openfmt, opener.byte);
+    writeln!(
         openfmt,
-        "* Character: **{}** (#{:x}/{})\n",
+        "* Character: **{}** (#{:x}/{})",
         opener.chr,
         opener.byte,
         ALPHABET.len()
     )
     .unwrap();
-    write!(openfmt, "* Name: \"{}\"\n", &opener.long).unwrap();
-    write!(
+    writeln!(openfmt, "* Name: \"{}\"", &opener.long).unwrap();
+    writeln!(
         openfmt,
-        "* Type: {}\n",
+        "* Type: {}",
         if opener.is_fixed() {
             "always 1 argument, and optional modifiers"
         } else {
@@ -56,9 +56,9 @@ fn gen_opener_doc(opener: &Letter, docs: &[(Letter, Vec<OpDoc>)], ops: &[OpDoc])
         }
     )
     .unwrap();
-    write!(openfmt, "\n### Operations:\n\n").unwrap();
+    writeln!(openfmt, "\n### Operations:\n").unwrap();
     for op in ops {
-        write!(openfmt, "* [{}](./{}.md)\n", op.chars(), op.op_name()).unwrap();
+        writeln!(openfmt, "* [{}](./{}.md)", op.chars(), op.op_name()).unwrap();
     }
     fs::write(format!("doc/{}.md", opener.long), docbuf)
         .map_err(|err| format!("failed to write markdown opener doc, err: {}", err))?;

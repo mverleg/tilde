@@ -1,6 +1,6 @@
 use ::std::fmt;
 
-use crate::parse::Letter;
+use crate::compile::Letter;
 use crate::{TildeRes, NR};
 
 //TODO @mverleg: this is only suitable for general context for now
@@ -98,7 +98,7 @@ impl Word {
             Word::Fixed(open, second, modi) => {
                 format!("{}{}{}", open.chr, second.chr, modi.chars())
             }
-            Word::JustMod(modi) => format!("{}", modi.chars()),
+            Word::JustMod(modi) => modi.chars(),
         }
     }
 
