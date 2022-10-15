@@ -13,7 +13,7 @@ use crate::exec::{execute, Value};
 use crate::gen::mddoc::gen_md_docs;
 use crate::TildeRes;
 
-pub fn run_tilde(args: Vec<String>) -> TildeRes<Value> {
+pub fn run_tilde(args: Vec<String>) -> TildeRes<Vec<Value>> {
     match parse_args(args)? {
         CliOperation::Run(source) => {
             let inp = gather_input();
@@ -23,7 +23,7 @@ pub fn run_tilde(args: Vec<String>) -> TildeRes<Value> {
         CliOperation::ShowHelp => Ok(gen_help().into()),
         CliOperation::DocGen => {
             gen_md_docs()?;
-            Ok(Value::None)
+            Ok(vec![Value::None])
         }
     }
 }
