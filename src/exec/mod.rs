@@ -8,7 +8,7 @@ pub use self::data::{Array, Number, Text, Value};
 mod data;
 mod mathbool;
 
-pub fn execute(prog: Prog, mut inp: Vec<String>) -> TildeRes<Value> {
+pub fn execute(prog: Prog, mut inp: Vec<String>) -> TildeRes<Vec<Value>> {
     inp.reverse();
     let mut stack = Array::single(Array::of(inp));
     for op in prog.iter() {
@@ -24,5 +24,5 @@ pub fn execute(prog: Prog, mut inp: Vec<String>) -> TildeRes<Value> {
     log!("stack at end: {:?}", stack);
     let out = stack.pop();
     log!("final value: {:?}", out);
-    Ok(out)
+    Ok(vec![out])
 }

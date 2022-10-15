@@ -20,7 +20,7 @@ pub fn run_tilde(args: Vec<String>) -> TildeRes<Vec<Value>> {
             let prog = parse(&source)?;
             execute(prog, inp)
         }
-        CliOperation::ShowHelp => Ok(gen_help().into()),
+        CliOperation::ShowHelp => Ok(vec![gen_help().into()]),
         CliOperation::DocGen => {
             gen_md_docs()?;
             Ok(vec![Value::None])
