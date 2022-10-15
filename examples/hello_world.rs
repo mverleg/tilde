@@ -1,4 +1,6 @@
+use tilde::tilde_strs;
+
 fn main() {
-    let res = run_tilde(",hello world");
-    assert_eq!(res.unwrap(), vec!["hello world"])
+    let res = tilde_strs("", ",hello world");
+    assert_eq!(res.unwrap(), "hello world")
 }

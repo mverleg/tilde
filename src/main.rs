@@ -4,6 +4,7 @@ use ::std::process::ExitCode;
 use crate::cli::run_tilde;
 
 mod cli;
+mod common;
 
 fn main() -> ExitCode {
     let res = run_tilde(env::args().collect());

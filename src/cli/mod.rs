@@ -6,14 +6,15 @@ use ::std::thread;
 use ::std::thread::sleep;
 use ::std::time::Duration;
 
+use ::tilde::TildeRes;
+
 use crate::common::log;
 use crate::compile::parse;
 use crate::exec::{execute, Value};
 #[cfg(feature = "gen")]
 use crate::gen::mddoc::gen_md_docs;
-use crate::TildeRes;
 
-pub fn run_tilde(args: Vec<String>) -> TildeRes<Vec<Value>> {
+pub fn run_tilde(args: Vec<String>) -> TildeRes<Value> {
     match parse_args(args)? {
         CliOperation::Run(source) => {
             let inp = gather_input();
@@ -128,7 +129,7 @@ fn gen_help() -> String {
         "    -h, --help        Show this help text".to_owned(),
         "    -s, --source S    Run source S, which should be golfed source with unicode encoding"
             .to_owned(),
-        "    -f, --file P      Run source contained in file at path P, which should be golfed"
+        "    -f, --file P      Run source contained in file at path P, which should be golTfed"
             .to_owned(),
         "                      source with unicode encoding".to_owned(),
     ];
