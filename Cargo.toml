@@ -5,7 +5,6 @@ homepage = "tbd"
 version = "0.1.0"
 edition = "2021"
 authors = ["Mark <mverleg.noreply@gmail.com>"]
-license = "copyright-by-mverleg"
 
 [features]
 gen = []

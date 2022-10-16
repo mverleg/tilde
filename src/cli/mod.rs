@@ -7,24 +7,25 @@ use ::std::thread::sleep;
 use ::std::time::Duration;
 
 use ::tilde::TildeRes;
+use ::tilde::Value;
+use tilde::tilde_from;
 
 use crate::common::log;
-use crate::compile::parse;
-use crate::exec::{execute, Value};
 #[cfg(feature = "gen")]
 use crate::gen::mddoc::gen_md_docs;
 
 pub fn run_tilde(args: Vec<String>) -> TildeRes<Value> {
     match parse_args(args)? {
         CliOperation::Run(source) => {
+            tilde_from();
             let inp = gather_input();
             let prog = parse(&source)?;
             execute(prog, inp)
         }
-        CliOperation::ShowHelp => Ok(vec![gen_help().into()]),
+        CliOperation::ShowHelp => Ok(gen_help().into()),
         CliOperation::DocGen => {
             gen_md_docs()?;
-            Ok(vec![Value::None])
+            Ok(Value::None)
         }
     }
 }
