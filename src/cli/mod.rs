@@ -6,9 +6,9 @@ use ::std::thread;
 use ::std::thread::sleep;
 use ::std::time::Duration;
 
+use ::tilde::tilde_from;
 use ::tilde::TildeRes;
 use ::tilde::Value;
-use tilde::tilde_from;
 
 use crate::common::log;
 #[cfg(feature = "gen")]
