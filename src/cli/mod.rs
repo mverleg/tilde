@@ -17,10 +17,11 @@ use crate::gen::mddoc::gen_md_docs;
 pub fn run_tilde(args: Vec<String>) -> TildeRes<Value> {
     match parse_args(args)? {
         CliOperation::Run(source) => {
-            tilde_from();
-            let inp = gather_input();
-            let prog = parse(&source)?;
-            execute(prog, inp)
+            todo!() //TODO @mark: TEMPORARY! REMOVE THIS!
+                    //tilde_from();
+                    // let inp = gather_input();
+                    // let prog = parse(&source)?;
+                    // execute(prog, inp)
         }
         CliOperation::ShowHelp => Ok(gen_help().into()),
         CliOperation::DocGen => {

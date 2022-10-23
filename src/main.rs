@@ -5,6 +5,8 @@ use crate::cli::run_tilde;
 
 mod cli;
 mod common;
+#[cfg(feature = "gen")]
+mod gen;
 
 fn main() -> ExitCode {
     let res = run_tilde(env::args().collect());
