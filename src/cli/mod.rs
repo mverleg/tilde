@@ -6,11 +6,10 @@ use ::std::thread;
 use ::std::thread::sleep;
 use ::std::time::Duration;
 
-use ::tilde::tilde_from;
+use ::tilde::tilde_log;
 use ::tilde::TildeRes;
 use ::tilde::Value;
 
-use crate::common::log;
 #[cfg(feature = "gen")]
 use crate::gen::mddoc::gen_md_docs;
 
@@ -71,7 +70,7 @@ fn parse_args(mut args: Vec<String>) -> TildeRes<CliOperation> {
             let pth = args
                 .pop()
                 .ok_or_else(|| "argument -f/--file expects a path to a source file".to_string())?;
-            log!("reading source from file {}", pth);
+            tilde_log!("reading source from file {}", pth);
             Ok(CliOperation::Run(read_to_string(pth).map_err(|err| {
                 format!("failed to read source file, err {err}")
             })?))
@@ -80,7 +79,7 @@ fn parse_args(mut args: Vec<String>) -> TildeRes<CliOperation> {
             let src = args.pop().ok_or_else(|| {
                 "argument -s/--source expects a single argument containing source code".to_string()
             })?;
-            log!(
+            tilde_log!(
                 "getting source from command line (length in utf8 bytes: {})",
                 src.len()
             );

@@ -1,7 +1,7 @@
-use ::std::fs;
-use std::fmt::Formatter;
-
 use crate::compile::{Letter, ALPHABET};
+use ::std::fmt::Formatter;
+use ::std::fs;
+
 use crate::gen::doc::{gen_grouped_docs, OpDoc};
 use crate::TildeRes;
 

@@ -3,6 +3,7 @@ use ::std::sync::atomic::AtomicU8;
 // unfortunate to be public, but works
 pub(crate) static LOG_ON: AtomicU8 = AtomicU8::new(0);
 
+#[macro_export]
 macro_rules! log {
     ($templ:literal, $($args:expr)*) => {
         {
@@ -28,7 +29,7 @@ macro_rules! log {
     }
 }
 
-pub(crate) use log;
+pub use log;
 
 #[cfg(test)]
 mod tests {

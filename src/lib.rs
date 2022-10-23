@@ -3,10 +3,11 @@
 
 use ::std::env;
 use ::std::io;
+use ::std::io::{BufReader, BufWriter};
 use ::std::path::Path;
 use ::std::process::ExitCode;
-use std::io::{BufReader, BufWriter};
 
+pub use crate::common::log as tilde_log;
 pub use crate::exec::Value;
 
 mod ast;
