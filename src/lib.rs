@@ -29,10 +29,14 @@ pub fn tilde_from<R: io::Read, W: io::Write>(
 }
 
 /// Run tilde with strings as input and output, useful for testing.
-pub fn tilde_sts(code: &str, input: &str) -> TildeRes<String> {
-    let mut output = String::new();
-    tilde_from(code, BufReader::new(input), BufWriter::new(&mut output))?;
-    Ok(output)
+pub fn tilde_strs(code: &str, input: &str) -> TildeRes<String> {
+    let mut output = vec![];
+    tilde_from(
+        code,
+        BufReader::new(io::Cursor::new(input)),
+        BufWriter::new(io::Cursor::new(&mut output)),
+    )?;
+    String::from_utf8(output).map_err(|err| format!("output was not utf8, err: {}", err))
 }
 
 /// Run a Tilde routine, taking a single Value as input and producing a single value

@@ -1,4 +1,4 @@
-use ::tilde::tilde_from;
+use ::tilde::tilde_strs;
 
 fn main() {
     let res = tilde_strs("", ",hello world");
