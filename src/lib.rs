@@ -16,6 +16,12 @@ mod compile;
 mod exec;
 #[cfg(feature = "gen")]
 mod gen;
+#[cfg(feature = "gen")]
+pub use self::gen::mddoc;
+#[cfg(not(feature = "gen"))]
+fn gen_md_docs() -> TildeRes<()> {
+    Err("doc-gen can only be used if compiled with feature `gen`".to_owned())
+}
 
 pub type TildeRes<T> = Result<T, String>;
 pub type NR = f64;

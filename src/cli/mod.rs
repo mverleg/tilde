@@ -6,6 +6,7 @@ use ::std::thread;
 use ::std::thread::sleep;
 use ::std::time::Duration;
 
+use ::tilde::mddoc::gen_md_docs;
 use ::tilde::tilde_log;
 use ::tilde::TildeRes;
 use ::tilde::Value;
@@ -43,11 +44,6 @@ fn gather_input() -> Vec<String> {
         .collect();
     is_ready.store(true, Ordering::Release);
     inp
-}
-
-#[cfg(not(feature = "gen"))]
-fn gen_md_docs() -> TildeRes<()> {
-    Err("doc-gen can only be used if compiled with feature `gen`".to_owned())
 }
 
 #[derive(Debug)]
