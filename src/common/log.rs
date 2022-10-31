@@ -1,14 +1,10 @@
-use ::std::sync::atomic::AtomicU8;
-
-// unfortunate to be public, but works
-pub(crate) static LOG_ON: AtomicU8 = AtomicU8::new(0);
-
 #[macro_export]
 macro_rules! log {
     ($templ:literal, $($args:expr)*) => {
         {
-            use crate::common::LOG_ON;
+            use ::std::sync::atomic::AtomicU8;
             use ::std::sync::atomic::Ordering;
+            static LOG_ON: AtomicU8 = AtomicU8::new(0);
             use ::std::env;
             const UNKNOWN: u8 = 0;
             const ON: u8 = 1;
