@@ -5,7 +5,7 @@ use ::std::fs;
 use crate::gen::doc::{gen_grouped_docs, OpDoc};
 use crate::TildeRes;
 
-pub fn gen_md_docs() -> TildeRes<()> {
+pub fn tilde_gen_md_docs() -> TildeRes<()> {
     let docs = gen_grouped_docs();
     fs::create_dir_all("doc")
         .map_err(|err| format!("failed to create doc directory, err: {}", err))?;

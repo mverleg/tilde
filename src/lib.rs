@@ -19,7 +19,7 @@ mod gen;
 #[cfg(feature = "gen")]
 pub use self::gen::mddoc;
 #[cfg(not(feature = "gen"))]
-fn gen_md_docs() -> TildeRes<()> {
+fn tilde_gen_md_docs() -> TildeRes<()> {
     Err("doc-gen can only be used if compiled with feature `gen`".to_owned())
 }
 
@@ -50,4 +50,18 @@ pub fn tilde_strs(code: &str, input: &str) -> TildeRes<String> {
 /// as output if successful, or failing with an error message if unsuccessful.
 pub fn tilde_eval(code: &str, input: Value) -> TildeRes<Value> {
     todo!() //TODO @mark:
+}
+
+/// Analyze the Tilde source code and report stats as json.
+pub fn tilde_analyze(code: &str) -> TildeRes<String> {
+    let mut analysis = String::with_capacity(512);
+    analysis.push_str("{\n");
+    analysis.push_str("\"has_preview\": false,\n");
+    analysis.push_str("\"golf_code\": \"\",\n");
+    analysis.push_str("\"base64_golf_code\": \"\",\n");
+    analysis.push_str("\"long_command_code\": \"\",\n");
+    analysis.push_str("\"length_valid\": 0,\n");
+    analysis.push_str("\"length_preview_features\": 0\n");
+    analysis.push_str("}");
+    Ok(analysis)
 }

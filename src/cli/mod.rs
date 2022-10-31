@@ -6,7 +6,7 @@ use ::std::thread;
 use ::std::thread::sleep;
 use ::std::time::Duration;
 
-use ::tilde::mddoc::gen_md_docs;
+use ::tilde::mddoc::tilde_gen_md_docs;
 use ::tilde::tilde_log;
 use ::tilde::TildeRes;
 use ::tilde::Value;
@@ -22,7 +22,7 @@ pub fn run_tilde(args: Vec<String>) -> TildeRes<Value> {
         }
         CliOperation::ShowHelp => Ok(gen_help().into()),
         CliOperation::DocGen => {
-            gen_md_docs()?;
+            tilde_gen_md_docs()?;
             Ok(Value::None)
         }
     }
