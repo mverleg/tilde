@@ -2,9 +2,15 @@
 
 A codegolf language - stack-based, small executable.
 
+## Status
+
+Tilde is in early development, and breaking changes in the language or code are likely. That is, if the project doesn't just die altogether.
+
 ## Semantics
 
 Tilde is stack-based. The initial stack contains one vector, with a string value for each line of stdin in reverse.
+
+To encode instructions as compactly as possible, each 'letter' is a half byte, so there are 16 only. But they can be combined in different ways, so in practice many instructions will be 1 byte, 1.5 byte or even longer
 
 ## Building locally
 

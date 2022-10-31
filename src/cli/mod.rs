@@ -121,11 +121,10 @@ fn gen_help() -> String {
         "".to_owned(),
         "OPTIONS:".to_owned(),
         "    -h, --help        Show this help text".to_owned(),
-        "    -s, --source S    Run source S, which should be golfed source with unicode encoding"
-            .to_owned(),
-        "    -f, --file P      Run source contained in file at path P, which should be golTfed"
-            .to_owned(),
-        "                      source with unicode encoding".to_owned(),
+        "    -s, --source S    Run source string S (utf8)".to_owned(),
+        "    -f, --file P      Run source contained in file at path P (utf8)".to_owned(),
+        // "    --stats           Show stats (json) about the program instead of running it"
+        //     .to_owned(),
     ];
     if cfg!(feature = "gen") {
         help.push(
