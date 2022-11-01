@@ -18,7 +18,10 @@ impl Math1Op {
         }
     }
 
-    pub fn description(&self, typ: Typ) -> &str {
+    pub fn description(
+        &self,
+        typ: Typ,
+    ) -> &str {
         todo!();
     }
 }
@@ -45,7 +48,10 @@ impl Math2Op {
         }
     }
 
-    pub fn description(&self, typ: Typ) -> &str {
+    pub fn description(
+        &self,
+        typ: Typ,
+    ) -> &str {
         todo!();
     }
 }
@@ -72,7 +78,10 @@ impl CompareOp {
         }
     }
 
-    pub fn description(&self, typ: Typ) -> &str {
+    pub fn description(
+        &self,
+        typ: Typ,
+    ) -> &str {
         todo!();
     }
 }
@@ -97,7 +106,10 @@ impl Bool2Op {
         }
     }
 
-    pub fn description(&self, typ: Typ) -> &str {
+    pub fn description(
+        &self,
+        typ: Typ,
+    ) -> &str {
         todo!();
     }
 }

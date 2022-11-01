@@ -1,14 +1,22 @@
-use crate::ast::{Op, Prog};
+use crate::ast::Op;
+use crate::ast::Prog;
 use crate::common::log;
-use crate::exec::mathbool::{exec_math1, exec_math2};
+use crate::exec::mathbool::exec_math1;
+use crate::exec::mathbool::exec_math2;
 use crate::TildeRes;
 
-pub use self::data::{Array, Number, Text, Value};
+pub use self::data::Array;
+pub use self::data::Number;
+pub use self::data::Text;
+pub use self::data::Value;
 
 mod data;
 mod mathbool;
 
-pub fn execute(prog: Prog, mut inp: Vec<String>) -> TildeRes<Vec<Value>> {
+pub fn execute(
+    prog: Prog,
+    mut inp: Vec<String>,
+) -> TildeRes<Vec<Value>> {
     inp.reverse();
     let mut stack = Array::single(Array::of(inp));
     for op in prog.iter() {

@@ -19,7 +19,10 @@ impl Value {
 }
 
 impl fmt::Display for Value {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+    fn fmt(
+        &self,
+        f: &mut Formatter<'_>,
+    ) -> fmt::Result {
         match self {
             Value::None => Ok(()),
             Value::Num(val) => write!(f, "{}", val),
@@ -69,7 +72,10 @@ impl Number {
 }
 
 impl fmt::Display for Number {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+    fn fmt(
+        &self,
+        f: &mut Formatter<'_>,
+    ) -> fmt::Result {
         write!(f, "{}", self.val)
     }
 }
@@ -86,7 +92,10 @@ impl Text {
 }
 
 impl fmt::Display for Text {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+    fn fmt(
+        &self,
+        f: &mut Formatter<'_>,
+    ) -> fmt::Result {
         write!(f, "{}", self.val)
     }
 }
@@ -103,7 +112,10 @@ pub struct Array {
 }
 
 impl fmt::Display for Array {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+    fn fmt(
+        &self,
+        f: &mut Formatter<'_>,
+    ) -> fmt::Result {
         for item in &self.val {
             write!(f, "{}", item)?
         }
@@ -113,16 +125,17 @@ impl fmt::Display for Array {
 
 impl Array {
     pub fn of<V: Into<Value>>(vec: Vec<V>) -> Self {
-        Array {
-            val: vec.into_iter().map(|v| v.into()).collect(),
-        }
+        Array { val: vec.into_iter().map(|v| v.into()).collect() }
     }
 
     pub fn single<V: Into<Value>>(val: V) -> Self {
         Array::of(vec![val])
     }
 
-    pub fn push(&mut self, val: Value) {
+    pub fn push(
+        &mut self,
+        val: Value,
+    ) {
         self.val.push(val)
     }
 

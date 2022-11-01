@@ -1,6 +1,9 @@
-use crate::ast::{Math1Op, Op};
+use crate::ast::Math1Op;
+use crate::ast::Op;
 
-use crate::compile::{Letter, Word, ALPHABET};
+use crate::compile::Letter;
+use crate::compile::Word;
+use crate::compile::ALPHABET;
 use crate::gen::input::gen_inputs;
 
 #[derive(Debug)]
@@ -22,10 +25,7 @@ impl OpDoc {
 /// Generate document objects, grouped by opener and sorted.
 //TODO @mverleg: include standalone modifiers
 pub fn gen_grouped_docs() -> Vec<(Letter, Vec<OpDoc>)> {
-    let mut groups = ALPHABET
-        .iter()
-        .map(|letter| (letter.clone(), vec![]))
-        .collect::<Vec<(Letter, Vec<OpDoc>)>>();
+    let mut groups = ALPHABET.iter().map(|letter| (letter.clone(), vec![])).collect::<Vec<(Letter, Vec<OpDoc>)>>();
     for op_doc in gen_docs() {
         let index = op_doc.word.group().byte as usize;
         groups[index].1.push(op_doc);
@@ -39,10 +39,7 @@ pub fn gen_grouped_docs() -> Vec<(Letter, Vec<OpDoc>)> {
 pub fn gen_docs() -> Vec<OpDoc> {
     let mut docs = vec![];
     for word in gen_inputs() {
-        docs.push(OpDoc {
-            word,
-            operation: Op::Math1(Math1Op::Incr),
-        });
+        docs.push(OpDoc { word, operation: Op::Math1(Math1Op::Incr) });
     }
     docs
 }

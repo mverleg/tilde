@@ -13,7 +13,10 @@ impl ValueOp {
         }
     }
 
-    pub fn description(&self, typ: Typ) -> &str {
+    pub fn description(
+        &self,
+        typ: Typ,
+    ) -> &str {
         todo!();
     }
 }

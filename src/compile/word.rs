@@ -1,7 +1,8 @@
 use ::std::fmt;
 
 use crate::compile::Letter;
-use crate::{TildeRes, NR};
+use crate::TildeRes;
+use crate::NR;
 
 //TODO @mverleg: this is only suitable for general context for now
 
@@ -13,37 +14,27 @@ pub struct Modifiers {
 
 impl Modifiers {
     pub fn empty() -> Self {
-        Modifiers {
-            first: None,
-            second: None,
-        }
+        Modifiers { first: None, second: None }
     }
 
     pub fn of_single(modi: Letter) -> Self {
         assert!(modi.is_modifier());
-        Modifiers {
-            first: Some(modi),
-            second: None,
-        }
+        Modifiers { first: Some(modi), second: None }
     }
 
-    pub fn of_double(first: Letter, second: Letter) -> TildeRes<Self> {
+    pub fn of_double(
+        first: Letter,
+        second: Letter,
+    ) -> TildeRes<Self> {
         assert!(first.is_modifier());
         assert!(second.is_modifier());
         if first == second {
-            return Err(format!(
-                "if {first} and {second} appear together, {first} must be first"
-            ));
+            return Err(format!("if {first} and {second} appear together, {first} must be first"));
         }
         if first.byte < second.byte {
-            return Err(format!(
-                "if {first} and {second} appear together, {first} must be first"
-            ));
+            return Err(format!("if {first} and {second} appear together, {first} must be first"));
         }
-        Ok(Modifiers {
-            first: Some(first),
-            second: Some(second),
-        })
+        Ok(Modifiers { first: Some(first), second: Some(second) })
     }
 
     pub fn first(&self) -> &Option<Letter> {
@@ -69,7 +60,10 @@ impl Modifiers {
     }
 
     /// Byte numbers with leading commas
-    fn fmt_bytes(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    fn fmt_bytes(
+        &self,
+        f: &mut fmt::Formatter<'_>,
+    ) -> fmt::Result {
         if let Some(m) = &self.first {
             write!(f, ",{:x}", m.byte)?;
             if let Some(m) = &self.second {
@@ -97,7 +91,7 @@ impl Word {
             Word::Var(open, modi) => format!("{}{}", open.chr, modi.chars()),
             Word::Fixed(open, second, modi) => {
                 format!("{}{}{}", open.chr, second.chr, modi.chars())
-            }
+            },
             Word::JustMod(modi) => modi.chars(),
         }
     }
@@ -143,11 +137,12 @@ impl Word {
         // }
     }
 
-    fn calc_order_for(first: Option<&Letter>, second: Option<&Letter>, modi: &Modifiers) -> u32 {
-        ((Self::calc_letter_value(first) * 257 + Self::calc_letter_value(second)) * 257
-            + Self::calc_letter_value(modi.first().as_ref()))
-            * 257
-            + Self::calc_letter_value(modi.second().as_ref())
+    fn calc_order_for(
+        first: Option<&Letter>,
+        second: Option<&Letter>,
+        modi: &Modifiers,
+    ) -> u32 {
+        ((Self::calc_letter_value(first) * 257 + Self::calc_letter_value(second)) * 257 + Self::calc_letter_value(modi.first().as_ref())) * 257 + Self::calc_letter_value(modi.second().as_ref())
     }
 
     fn calc_letter_value(letter: Option<&Letter>) -> u32 {

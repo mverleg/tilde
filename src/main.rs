@@ -13,10 +13,10 @@ fn main() -> ExitCode {
         Ok(value) => {
             println!("{}", value);
             ExitCode::from(0)
-        }
+        },
         Err(err) => {
             eprintln!("{}", err);
             ExitCode::from(1)
-        }
+        },
     }
 }

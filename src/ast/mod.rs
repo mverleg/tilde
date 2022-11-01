@@ -1,7 +1,10 @@
 pub use ::std::slice;
 use ::std::vec;
 
-pub use crate::ast::mathbool::{Bool2Op, CompareOp, Math1Op, Math2Op};
+pub use crate::ast::mathbool::Bool2Op;
+pub use crate::ast::mathbool::CompareOp;
+pub use crate::ast::mathbool::Math1Op;
+pub use crate::ast::mathbool::Math2Op;
 use crate::ast::typ::Typ;
 pub use crate::ast::value::ValueOp;
 
@@ -23,6 +26,7 @@ impl Prog {
     pub fn iter(&self) -> slice::Iter<Op> {
         self.ops.iter()
     }
+
     pub fn into_iter(self) -> vec::IntoIter<Op> {
         self.ops.into_iter()
     }
@@ -48,7 +52,10 @@ impl Op {
         }
     }
 
-    pub fn description(&self, typ: Typ) -> &str {
+    pub fn description(
+        &self,
+        typ: Typ,
+    ) -> &str {
         match self {
             Op::Math1(op) => op.description(typ),
             Op::Math2(op) => op.description(typ),

@@ -1,4 +1,7 @@
-use crate::compile::{LetterType, Modifiers, Word, ALPHABET};
+use crate::compile::LetterType;
+use crate::compile::Modifiers;
+use crate::compile::Word;
+use crate::compile::ALPHABET;
 
 /// Generate all possible input starters with up to N modifiers.
 pub fn gen_inputs() -> Vec<Word> {
@@ -13,30 +16,27 @@ pub fn gen_inputs() -> Vec<Word> {
         match letter.typ {
             LetterType::Literal => {
                 // TODO @mverleg
-            }
+            },
             LetterType::VariableOpen => {
                 for modi in &modifiers {
                     groups.push(Word::Var(letter.clone(), modi.clone()));
                 }
-            }
+            },
             LetterType::FixedOpen => {
                 for second in &ALPHABET {
                     for modi in &modifiers {
                         groups.push(Word::Fixed(letter.clone(), second.clone(), modi.clone()));
                     }
                 }
-            }
-            LetterType::Modifier => { /* pass */ }
+            },
+            LetterType::Modifier => { /* pass */ },
         }
     }
     groups
 }
 
 fn generate_modifiers() -> Vec<Modifiers> {
-    let modifier_letters = ALPHABET
-        .iter()
-        .filter(|letter| letter.is_modifier())
-        .collect::<Vec<_>>();
+    let modifier_letters = ALPHABET.iter().filter(|letter| letter.is_modifier()).collect::<Vec<_>>();
     let mut modifiers = vec![Modifiers::empty()];
     for (n, modi1) in modifier_letters.iter().enumerate() {
         modifiers.push(Modifiers::of_single((*modi1).clone()));

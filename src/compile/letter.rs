@@ -1,6 +1,7 @@
 use std::fmt;
 use std::fmt::Formatter;
-use std::hash::{Hash, Hasher};
+use std::hash::Hash;
+use std::hash::Hasher;
 
 #[derive(Debug, Clone, Copy)]
 //TODO @mark: remove?
@@ -16,7 +17,10 @@ pub enum LetterType {
 }
 
 impl PartialEq for LetterType {
-    fn eq(&self, other: &Self) -> bool {
+    fn eq(
+        &self,
+        other: &Self,
+    ) -> bool {
         use LetterType::*;
         match (self, other) {
             (VariableOpen, VariableOpen) => true,
@@ -40,28 +44,44 @@ pub struct Letter {
 }
 
 impl Letter {
-    pub const fn new(byte: u8, chr: char, long: &'static str, typ: LetterType) -> Self {
-        Letter {
-            byte,
-            chr,
-            long,
-            typ,
-        }
+    pub const fn new(
+        byte: u8,
+        chr: char,
+        long: &'static str,
+        typ: LetterType,
+    ) -> Self {
+        Letter { byte, chr, long, typ }
     }
 
-    pub const fn literal(byte: u8, chr: char, long: &'static str) -> Self {
+    pub const fn literal(
+        byte: u8,
+        chr: char,
+        long: &'static str,
+    ) -> Self {
         Letter::new(byte, chr, long, LetterType::Literal)
     }
 
-    pub const fn var(byte: u8, chr: char, long: &'static str) -> Self {
+    pub const fn var(
+        byte: u8,
+        chr: char,
+        long: &'static str,
+    ) -> Self {
         Letter::new(byte, chr, long, LetterType::VariableOpen)
     }
 
-    pub const fn fixed(byte: u8, chr: char, long: &'static str) -> Self {
+    pub const fn fixed(
+        byte: u8,
+        chr: char,
+        long: &'static str,
+    ) -> Self {
         Letter::new(byte, chr, long, LetterType::FixedOpen)
     }
 
-    pub const fn modi(byte: u8, chr: char, long: &'static str) -> Self {
+    pub const fn modi(
+        byte: u8,
+        chr: char,
+        long: &'static str,
+    ) -> Self {
         Letter::new(byte, chr, long, LetterType::Modifier)
     }
 
@@ -87,13 +107,19 @@ impl Letter {
 }
 
 impl fmt::Display for Letter {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+    fn fmt(
+        &self,
+        f: &mut Formatter<'_>,
+    ) -> fmt::Result {
         write!(f, "{} (#{})", self.chr, self.byte)
     }
 }
 
 impl PartialEq for Letter {
-    fn eq(&self, other: &Self) -> bool {
+    fn eq(
+        &self,
+        other: &Self,
+    ) -> bool {
         self.byte == other.byte
     }
 }
@@ -101,7 +127,10 @@ impl PartialEq for Letter {
 impl Eq for Letter {}
 
 impl Hash for Letter {
-    fn hash<H: Hasher>(&self, state: &mut H) {
+    fn hash<H: Hasher>(
+        &self,
+        state: &mut H,
+    ) {
         self.byte.hash(state)
     }
 }
