@@ -1,7 +1,7 @@
-use std::fmt;
-use std::fmt::Formatter;
-use std::hash::Hash;
-use std::hash::Hasher;
+use ::std::fmt;
+use ::std::fmt::Formatter;
+use ::std::hash::Hash;
+use ::std::hash::Hasher;
 
 #[derive(Debug, Clone, Copy)]
 //TODO @mark: remove?
