@@ -1,6 +1,6 @@
 #[macro_export]
 macro_rules! log {
-    ($templ:literal, $($args:expr)*) => {
+    ($templ:literal $(, $args:expr)?) => {
         {
             use ::std::sync::atomic::AtomicU8;
             use ::std::sync::atomic::Ordering;
@@ -33,6 +33,7 @@ mod tests {
 
     #[test]
     fn do_log() {
+        log!("hello");
         log!("hello {}", "world")
     }
 }
