@@ -57,55 +57,40 @@ pub enum CliOperation {
 fn parse_args(mut args: Vec<String>) -> TildeRes<CliOperation> {
     args.reverse();
     args.pop();
-    let mut do_analyze = false;
-    let mut cli_op: Option<CliOperation> = None;
-    for arg in args {
-        match arg.as_ref() {
-            "-h" | "--help" => {
-                cli_op = Some(CliOperation::ShowHelp);
-                break;
-            },
-            "-f" | "--file" => {
-                let pth = arg.ok_or_else(|| "argument -f/--file expects a path to a source file".to_string())?;
-                tilde_log!("reading source from file {}", pth);
-                if cli_op.is_some() {
-                    return Err(format!("option --file conflicts with another argument"));
-                }
-                cli_op = Some(CliOperation::Run(read_to_string(pth).map_err(|err| format!("failed to read source file, err {err}"))?))
-            },
-            "-s" | "--source" => {
-                let src = args.pop().ok_or_else(|| "argument -s/--source expects a single argument containing source code".to_string())?;
-                tilde_log!("getting source from command line (length in utf8 bytes: {})", src.len());
-                if cli_op.is_some() {
-                    return Err(format!("option --source conflicts with another argument"));
-                }
-                cli_op = Some(CliOperation::Run(src))
-            },
-            "-a" | "--analyze" => do_analyze = true,
-            "doc-gen" => {
-                if cli_op.is_some() {
-                    return Err(format!("subcommand `doc-gen` conflicts with another argument"));
-                }
-                cli_op = Some(CliOperation::DocGen)
-            },
-            arg => {
-                let hint = if arg.contains('=') { "hint: --arg=value syntax is not supported, use '--arg value'\n" } else { "" };
-                return Err(format!("unknown argument '{arg}'\n{hint}try --help for options"));
-            },
-        }
-    }
-    if do_analyze {
-        if let Some(CliOperation::Run(code)) = cli_op {
-            tilde_log!("got --analyze option, switching run task to analyze task");
-            cli_op = Some(CliOperation::Analyze(code));
-        } else {
-            return Err(format!("option --analyze must be combined with --file or --source"));
-        }
-    }
+    let arg1 = args.pop();
+    let cli_op: CliOperation = match arg1.as_deref() {
+        Some("-h") | Some("--help") => Ok(CliOperation::ShowHelp),
+        Some("-f") | Some("--file") => {
+            let pth = args.pop().ok_or_else(|| "argument -f/--file expects a path to a source file".to_string())?;
+            tilde_log!("reading source from file {}", pth);
+            Ok(CliOperation::Run(read_to_string(pth).map_err(|err| format!("failed to read source file, err {err}"))?))
+        },
+        Some("-s") | Some("--source") => {
+            let src = args.pop().ok_or_else(|| "argument -s/--source expects a single argument containing source code".to_string())?;
+            tilde_log!("getting source from command line (length in utf8 bytes: {})", src.len());
+            Ok(CliOperation::Run(src))
+        },
+        Some("-F") | Some("--analyze-file") => {
+            let pth = args.pop().ok_or_else(|| "argument -F/--analyze-file expects a path to a source file".to_string())?;
+            tilde_log!("reading source from file {} for analysis", pth);
+            Ok(CliOperation::Analyze(read_to_string(pth).map_err(|err| format!("failed to read source file, err {err}"))?))
+        },
+        Some("-S") | Some("--analyze-source") => {
+            let src = args.pop().ok_or_else(|| "argument -S/--analyze-source expects a single argument containing source code".to_string())?;
+            tilde_log!("getting source from command line (length in utf8 bytes: {}) for analysis", src.len());
+            Ok(CliOperation::Analyze(src))
+        },
+        Some("doc-gen") => Ok(CliOperation::DocGen),
+        Some(arg) => {
+            let hint = if arg.contains('=') { "hint: --arg=value syntax is not supported, use '--arg value'\n" } else { "" };
+            Err(format!("unknown argument '{arg}'\n{hint}try --help for options"))
+        },
+        None => Err("expected at least one argument; try --help for options".to_string()),
+    }?;
     if !args.is_empty() {
         return Err(format!("cannot handle these arguments: {}\ntry --help for options", args.join(" ")));
     }
-    cli_op.ok_or_else(|| "expected at least one of --help, --file, --source or doc-gen; try --help for options".to_string())
+    Ok(cli_op)
 }
 
 fn gen_help() -> String {
@@ -121,13 +106,16 @@ fn gen_help() -> String {
         //TODO @mverleg: put better example source ^
         "".to_owned(),
         "OPTIONS:".to_owned(),
-        "    -h, --help        Show this help text".to_owned(),
-        "    -s, --source S    Run source string S (utf8)".to_owned(),
-        "    -f, --file P      Run source contained in file at path P (utf8)".to_owned(),
-        "    -a, --analyze     Show information about the program instead of running it".to_owned(),
+        "    -h, --help           Show this help text".to_owned(),
+        "    -s, --source S       Run source string S (utf8)".to_owned(),
+        "    -f, --file P         Run source contained in file at path P (utf8)".to_owned(),
+        "    -S, --analyze-source Show information about the program instead of running it".to_owned(),
+        "    -F, --analyze-file   Show information about the program instead of running it".to_owned(),
+        // "    --stats           Show stats (json) about the program instead of running it"
+        //     .to_owned(),
     ];
     if cfg!(feature = "gen") {
-        help.push("    doc-gen           Generate documentation (if built with `gen` feature)".to_owned());
+        help.push("    doc-gen              Generate documentation (if built with `gen` feature)".to_owned());
     }
     help.join("\n")
 }
