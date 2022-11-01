@@ -1,6 +1,5 @@
 use crate::ast::Math1Op;
 use crate::ast::Op;
-
 use crate::compile::Letter;
 use crate::compile::Word;
 use crate::compile::ALPHABET;

@@ -7,7 +7,6 @@ use ::std::sync::Arc;
 use ::std::thread;
 use ::std::thread::sleep;
 use ::std::time::Duration;
-
 use ::tilde::mddoc::tilde_gen_md_docs;
 use ::tilde::tilde_analyze;
 use ::tilde::tilde_log;

@@ -1,6 +1,7 @@
-use crate::ast::ValueOp;
 use ::std::fmt;
 use ::std::fmt::Formatter;
+
+use crate::ast::ValueOp;
 
 #[derive(Debug, PartialEq)]
 pub enum Value {
