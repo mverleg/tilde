@@ -15,7 +15,7 @@ use ::tilde::Value;
 
 pub fn run_tilde(args: Vec<String>) -> TildeRes<Value> {
     match parse_args(args)? {
-        CliOperation::Run(source) => {
+        CliOperation::Run(_source) => {
             todo!() //TODO @mark: TEMPORARY! REMOVE THIS!
                     //tilde_from();
                     // let inp = gather_input();
@@ -31,6 +31,7 @@ pub fn run_tilde(args: Vec<String>) -> TildeRes<Value> {
     }
 }
 
+#[allow(unused)] //TODO @mark: TEMPORARY! REMOVE THIS!
 fn gather_input() -> Vec<String> {
     let is_ready = Arc::new(AtomicBool::new(false));
     let is_ready_clone = is_ready.clone();

@@ -66,6 +66,6 @@ pub fn tilde_analyze(code: &str) -> TildeRes<String> {
     analysis.push_str("\"long_command_code\": \"\",\n");
     analysis.push_str("\"length_valid\": 0,\n");
     analysis.push_str("\"length_preview_features\": 0\n");
-    analysis.push_str("}");
+    analysis.push_str("}\n");
     Ok(analysis)
 }

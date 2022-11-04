@@ -9,7 +9,6 @@ use crate::op::typ::Typ;
 pub use crate::op::value::ValueOp;
 
 mod mathbool;
-mod optype;
 mod typ;
 mod value;
 
@@ -34,11 +33,11 @@ impl Prog {
 
 #[derive(Debug)]
 pub enum Op {
+    Value(ValueOp),
     Math1(Math1Op),
     Math2(Math2Op),
     Compare(CompareOp),
     Bool2(Bool2Op),
-    Value(ValueOp),
 }
 
 impl Op {
