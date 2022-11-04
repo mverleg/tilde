@@ -1,9 +1,9 @@
-use crate::ast::Math1Op;
-use crate::ast::Op;
 use crate::compile::Letter;
 use crate::compile::Word;
 use crate::compile::ALPHABET;
 use crate::gen::input::gen_inputs;
+use crate::op::Math1Op;
+use crate::op::Op;
 
 #[derive(Debug)]
 pub struct OpDoc {

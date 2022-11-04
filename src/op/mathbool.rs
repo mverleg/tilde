@@ -1,4 +1,4 @@
-use crate::ast::typ::Typ;
+use crate::op::typ::Typ;
 
 #[derive(Debug)]
 pub enum Math1Op {

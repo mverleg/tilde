@@ -12,12 +12,12 @@ pub use crate::common::log as tilde_log;
 use crate::exec::Text;
 pub use crate::exec::Value;
 
-mod ast;
 mod common;
 mod compile;
 mod exec;
 #[cfg(feature = "gen")]
 mod gen;
+mod op;
 #[cfg(feature = "gen")]
 pub use self::gen::mddoc;
 #[cfg(not(feature = "gen"))]

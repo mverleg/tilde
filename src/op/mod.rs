@@ -1,12 +1,12 @@
 pub use ::std::slice;
 use ::std::vec;
 
-pub use crate::ast::mathbool::Bool2Op;
-pub use crate::ast::mathbool::CompareOp;
-pub use crate::ast::mathbool::Math1Op;
-pub use crate::ast::mathbool::Math2Op;
-use crate::ast::typ::Typ;
-pub use crate::ast::value::ValueOp;
+pub use crate::op::mathbool::Bool2Op;
+pub use crate::op::mathbool::CompareOp;
+pub use crate::op::mathbool::Math1Op;
+pub use crate::op::mathbool::Math2Op;
+use crate::op::typ::Typ;
+pub use crate::op::value::ValueOp;
 
 mod mathbool;
 mod optype;

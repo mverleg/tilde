@@ -1,5 +1,5 @@
-use crate::ast::Prog;
 use crate::compile::Word;
+use crate::op::Prog;
 use crate::TildeRes;
 
 pub fn build_ast(words: &[Word]) -> TildeRes<Prog> {

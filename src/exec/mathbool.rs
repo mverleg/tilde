@@ -1,7 +1,7 @@
-use crate::ast::Math1Op;
-use crate::ast::Math2Op;
 use crate::exec::Number;
 use crate::exec::Value;
+use crate::op::Math1Op;
+use crate::op::Math2Op;
 
 pub fn exec_math1(
     op: &Math1Op,
