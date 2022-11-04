@@ -64,3 +64,19 @@ impl Op {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    macro_rules! test_str_repr_bijective {
+        ($enm:ident) => {
+            todo!()
+        };
+    }
+
+    #[test]
+    fn repr_is_bijective() {
+        test_str_repr_bijective!(Op);
+    }
+}
