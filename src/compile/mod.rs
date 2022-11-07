@@ -1,5 +1,7 @@
 //TODO @mverleg: for now, reject duplicate modifiers and enforce order - this way is can be relaxed later without breaking compatibility
 
+use ::std::env::current_exe;
+
 use crate::op::Op;
 use crate::op::Prog;
 use crate::op::ValueOp;
@@ -44,12 +46,14 @@ pub fn parse(src: &str) -> TildeRes<Prog> {
             tilde_log!("integer literal (long mode): \"{}\"", &buffer);
             let op = Op::Value(ValueOp::Number(buffer.parse::<f64>().map_err(|err| format!("invalid number '{}', err {}", buffer, err))?));
             ops.push(op)
-        } else if current.is_alphabetic() {
+        } else if current.is_alphabetic() || current == '-' {
             buffer.clear();
             buffer.push(current);
             while let Some(token) = tokens.pop() {
-                if !current.is_alphabetic() {
-                    tokens.push(token);
+                if !current.is_alphabetic() && current != '-' {
+                    if !current.is_whitespace() {
+                        tokens.push(token);
+                    }
                     break;
                 }
                 buffer.push(token)
@@ -57,6 +61,8 @@ pub fn parse(src: &str) -> TildeRes<Prog> {
             tilde_log!("operator by long name: \"{}\"", &buffer);
             let op = todo!("{}", current);
             ops.push(op)
+        } else if current.is_whitespace() {
+            tilde_log!("skipping whitespace");
         } else if current == '"' {
             tilde_log!("string lookup (short mode)");
             todo!(); //TODO @mark: TEMPORARY! REMOVE THIS!
@@ -108,5 +114,21 @@ mod tests {
     #[test]
     fn long_invalid_number() {
         assert!(parse("1.2.3").is_err());
+    }
+
+    #[test]
+    fn operator_by_name() {
+        assert_eq!(parse("myOpName").unwrap(), of(todo!()));
+        assert_eq!(parse("my-op-name").unwrap(), of(todo!()));
+    }
+
+    #[test]
+    fn split_on_whitespace() {
+        let op = Op::Value(ValueOp::Number(1.23));
+        assert_eq!(parse("'hello' 1.0").unwrap(), Prog::of(vec![Op::Value(ValueOp::Text("hello".to_string())), Op::Value(ValueOp::Number(1.0))]));
+        assert_eq!(
+            parse("my-op-name my-op-name   1.0").unwrap(),
+            Prog::of(vec![Op::Value(ValueOp::Text("hello".to_string())), Op::Value(ValueOp::Text("hello".to_string())), Op::Value(ValueOp::Number(1.0))])
+        );
     }
 }
