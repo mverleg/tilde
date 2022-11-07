@@ -30,11 +30,12 @@ pub fn parse(src: &str) -> TildeRes<Prog> {
             tilde_log!("string literal (long mode): \"{}\"", &buffer);
             let op = Op::Value(ValueOp::Text(buffer.clone()));
             ops.push(op)
-        } else if (current >= '1' && current <= '9') || current == '.' {
+        } else if (current >= '1' && current <= '9') || current == '.' || current == '-' {
             // note that short-mode numbers start with 0, long-mode ones cannot
             buffer.clear();
+            buffer.push(current);
             while let Some(token) = tokens.pop() {
-                if (token < '0' || token > '9') && token != '.' {
+                if (token < '0' || token > '9') && token != '.' && current != '-' {
                     tokens.push(token);
                     break;
                 }
@@ -57,15 +58,40 @@ pub fn parse(src: &str) -> TildeRes<Prog> {
 mod tests {
     use super::*;
 
+    fn of(op: Op) -> Prog {
+        Prog::of(vec![op])
+    }
+
     #[test]
     fn long_string_explicit_close() {
         let prog = parse(",hello world,").unwrap();
-        assert_eq!(prog, Prog::of(vec![Op::Value(ValueOp::Text("hello world".to_string()))]))
+        assert_eq!(prog, of(Op::Value(ValueOp::Text("hello world".to_string()))))
     }
 
     #[test]
     fn long_string_implicit_close() {
         let prog = parse(",hello world").unwrap();
-        assert_eq!(prog, Prog::of(vec![Op::Value(ValueOp::Text("hello world".to_string()))]))
+        assert_eq!(prog, of(Op::Value(ValueOp::Text("hello world".to_string()))))
+    }
+
+    #[test]
+    fn long_integer() {
+        assert_eq!(parse("123").unwrap(), of(Op::Value(ValueOp::Number(123.))));
+        assert_eq!(parse("-123").unwrap(), of(Op::Value(ValueOp::Number(-123.))));
+    }
+
+    #[test]
+    fn long_float() {
+        assert_eq!(parse("1.23").unwrap(), of(Op::Value(ValueOp::Number(1.23))));
+        assert_eq!(parse(".123").unwrap(), of(Op::Value(ValueOp::Number(0.123))));
+        assert_eq!(parse("123.").unwrap(), of(Op::Value(ValueOp::Number(123.))));
+        assert_eq!(parse("-1.23").unwrap(), of(Op::Value(ValueOp::Number(-1.23))));
+        assert_eq!(parse("-.123").unwrap(), of(Op::Value(ValueOp::Number(-0.123))));
+        assert_eq!(parse("-123.").unwrap(), of(Op::Value(ValueOp::Number(-123.))));
+    }
+
+    #[test]
+    fn long_invalid_number() {
+        assert!(parse("1.2.3").is_err());
     }
 }
