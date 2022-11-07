@@ -10,6 +10,7 @@ pub enum ValueOp {
 impl ValueOp {
     pub fn name(&self) -> &str {
         match self {
+            ValueOp::Text(txt) => "text",
             ValueOp::Number(nr) => "0-9",
         }
     }

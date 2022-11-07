@@ -5,10 +5,12 @@ use ::std::env;
 use ::std::io;
 use ::std::io::BufReader;
 use ::std::io::BufWriter;
+use ::std::io::Read;
 use ::std::path::Path;
 use ::std::process::ExitCode;
 
 pub use crate::common::log as tilde_log;
+use crate::compile::parse;
 use crate::exec::Text;
 pub use crate::exec::Value;
 
@@ -34,7 +36,9 @@ pub fn tilde_from<R: io::Read, W: io::Write>(
     reader: io::BufReader<R>,
     writer: io::BufWriter<W>,
 ) -> TildeRes<()> {
-    todo!() //TODO @mark:
+    let prog = parse(code)?;
+    todo!();
+    Ok(())
 }
 
 /// Run tilde with strings as input and output, useful for testing.

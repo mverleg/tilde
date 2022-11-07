@@ -14,10 +14,12 @@ mod parse;
 pub fn parse(src: &str) -> TildeRes<Prog> {
     let mut ops = vec![];
     let mut tokens = src.chars().collect::<Vec<_>>();
+    tokens.reverse();
+    tilde_log!("parsing {} tokens", tokens.len());
     let mut buffer = String::new();
     while let Some(current) = tokens.pop() {
         if current == ',' {
-            tilde_log!("string literal, long mode");
+            tilde_log!("string literal (long mode)");
             buffer.clear();
             while let Some(token) = tokens.pop() {
                 if token == ',' {
@@ -29,7 +31,7 @@ pub fn parse(src: &str) -> TildeRes<Prog> {
             let op = Op::Value(ValueOp::Text(buffer.clone()));
             ops.push(op)
         } else if current == '"' {
-            tilde_log!("string literal, short (lookup) mode");
+            tilde_log!("string lookup (short mode)");
             todo!(); //TODO @mark: TEMPORARY! REMOVE THIS!
         } else {
             todo!(); //TODO @mark: TEMPORARY! REMOVE THIS!

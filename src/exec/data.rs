@@ -14,6 +14,7 @@ pub enum Value {
 impl Value {
     pub fn of_op(op: &ValueOp) -> Self {
         match op {
+            ValueOp::Text(txt) => Value::Txt(Text::of(txt)),
             ValueOp::Number(nr) => Value::Num(Number::of(*nr)),
         }
     }
