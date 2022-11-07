@@ -19,7 +19,6 @@ pub fn parse(src: &str) -> TildeRes<Prog> {
     let mut buffer = String::new();
     while let Some(current) = tokens.pop() {
         if current == ',' {
-            tilde_log!("string literal (long mode)");
             buffer.clear();
             while let Some(token) = tokens.pop() {
                 if token == ',' {
@@ -28,6 +27,20 @@ pub fn parse(src: &str) -> TildeRes<Prog> {
                 }
                 buffer.push(token)
             }
+            tilde_log!("string literal (long mode): \"{}\"", &buffer);
+            let op = Op::Value(ValueOp::Text(buffer.clone()));
+            ops.push(op)
+        } else if (current >= '1' && current <= '9') || current == '.' {
+            // note that short-mode numbers start with 0, long-mode ones cannot
+            buffer.clear();
+            while let Some(token) = tokens.pop() {
+                if (token < '0' || token > '9') && token != '.' {
+                    tokens.push(token);
+                    break;
+                }
+                buffer.push(token)
+            }
+            tilde_log!("integer literal (long mode): \"{}\"", &buffer);
             let op = Op::Value(ValueOp::Text(buffer.clone()));
             ops.push(op)
         } else if current == '"' {
