@@ -2,6 +2,7 @@ use crate::op::typ::Typ;
 
 #[derive(Debug)]
 pub enum ValueOp {
+    Text(String),
     Number(f64),
     // TODO @mverleg: change to something exact
 }

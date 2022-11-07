@@ -1,19 +1,18 @@
-use crate::compile::Word;
 use crate::op::Prog;
 use crate::TildeRes;
 
-pub fn build_ast(words: &[Word]) -> TildeRes<Prog> {
-    // let mut ops = vec![];
-    // let mut missing = vec![];
-    for word in words {
-        unimplemented!();
-        // match link_op(token_group) {
-        //     Some(op) => ops.push(op),
-        //     None => missing.push(token_group),
-        // }
-    }
-    todo!()
-}
+// pub fn build_ast(words: &[Word]) -> TildeRes<Prog> {
+//     // let mut ops = vec![];
+//     // let mut missing = vec![];
+//     for word in words {
+//         unimplemented!();
+//         // match link_op(token_group) {
+//         //     Some(op) => ops.push(op),
+//         //     None => missing.push(token_group),
+//         // }
+//     }
+//     todo!()
+// }
 
 //// Try to link one token group to one Op, by adding some
 //// simple tokens behind it and seeing what the first Op is.
