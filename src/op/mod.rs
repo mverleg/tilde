@@ -1,35 +1,18 @@
 pub use ::std::slice;
 use ::std::vec;
 
-pub use crate::op::mathbool::Bool2Op;
-pub use crate::op::mathbool::CompareOp;
-pub use crate::op::mathbool::Math1Op;
-pub use crate::op::mathbool::Math2Op;
-use crate::op::typ::Typ;
-pub use crate::op::value::ValueOp;
+pub use self::mathbool::Bool2Op;
+pub use self::mathbool::CompareOp;
+pub use self::mathbool::Math1Op;
+pub use self::mathbool::Math2Op;
+pub use self::prog::Prog;
+use self::typ::Typ;
+pub use self::value::ValueOp;
 
 mod mathbool;
+mod prog;
 mod typ;
 mod value;
-
-#[derive(Debug)]
-pub struct Prog {
-    ops: Vec<Op>,
-}
-
-impl Prog {
-    pub fn of(ops: Vec<Op>) -> Self {
-        Prog { ops }
-    }
-
-    pub fn iter(&self) -> slice::Iter<Op> {
-        self.ops.iter()
-    }
-
-    pub fn into_iter(self) -> vec::IntoIter<Op> {
-        self.ops.into_iter()
-    }
-}
 
 #[derive(Debug)]
 pub enum Op {
@@ -62,21 +45,5 @@ impl Op {
             Op::Bool2(op) => op.description(typ),
             Op::Value(op) => op.description(typ),
         }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    macro_rules! test_str_repr_bijective {
-        ($enm:ident) => {
-            todo!()
-        };
-    }
-
-    #[test]
-    fn repr_is_bijective() {
-        test_str_repr_bijective!(Op);
     }
 }
