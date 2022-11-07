@@ -9,13 +9,27 @@ use crate::TildeRes;
 
 //TODO @mverleg: for now, reject duplicate modifiers and enforce order - this way is can be relaxed later without breaking compatibility
 
-mod alphabet;
-mod letter;
+// mod alphabet;
+// mod letter;
 mod parse;
-mod word;
+// mod word;
 
 pub fn parse(src: &str) -> TildeRes<Prog> {
-    //let words: Vec<Word> = lex_str(src)?;
-    //build_ast(&words)
-    //TODO @mark:
+    let mut ops = vec![];
+    let mut current_op_name = String::new();
+    let mut current_golfed_word = String::new();
+    for letter in src.chars() {
+        if letter.is_alphanumeric() {
+            current_op_name.push(letter);
+            if !current_golfed_word.is_empty() {
+                ops.push(golfed_word_to_op(&current_golfed_word));
+                current_golfed_word.clear()
+            }
+        } else if alphabet.contains(letter) {
+        }
+    }
+    if !current_golfed_word.is_empty() {
+        ops.push(golfed_word_to_op(&current_golfed_word))
+    }
+    Ok(Prog::of(ops))
 }
