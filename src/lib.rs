@@ -21,9 +21,9 @@ mod exec;
 mod gen;
 mod op;
 #[cfg(feature = "gen")]
-pub use self::gen::mddoc;
+pub use self::gen::mddoc::tilde_gen_md_docs;
 #[cfg(not(feature = "gen"))]
-fn tilde_gen_md_docs() -> TildeRes<()> {
+pub fn tilde_gen_md_docs() -> TildeRes<()> {
     Err("doc-gen can only be used if compiled with feature `gen`".to_owned())
 }
 

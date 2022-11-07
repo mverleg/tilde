@@ -60,12 +60,12 @@ mod tests {
     #[test]
     fn long_string_explicit_close() {
         let prog = parse(",hello world,").unwrap();
-        assert_eq!(prog, Prog::of(Op::Value(ValueOp::Text("hello world".to_string()))))
+        assert_eq!(prog, Prog::of(vec![Op::Value(ValueOp::Text("hello world".to_string()))]))
     }
 
     #[test]
     fn long_string_implicit_close() {
         let prog = parse(",hello world").unwrap();
-        assert_eq!(prog, Prog::of(Op::Value(ValueOp::Text("hello world".to_string()))))
+        assert_eq!(prog, Prog::of(vec![Op::Value(ValueOp::Text("hello world".to_string()))]))
     }
 }
