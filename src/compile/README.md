@@ -1,6 +1,8 @@
 
 # Tilde parsing
 
+[//]: # (TODO @mark: this is outdated
+
 ## Multiple formats
 
 Tilde has 16 characters, so that two of them fit into a byte, in order to make maximum use of bytes. These can be stored in two ways, which map one-to-one:

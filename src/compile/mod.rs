@@ -3,7 +3,6 @@ pub use self::letter::Letter;
 pub use self::letter::LetterType;
 pub use self::word::Modifiers;
 pub use self::word::Word;
-use crate::compile::lex::lex_str;
 use crate::compile::parse::build_ast;
 use crate::op::Prog;
 use crate::TildeRes;
@@ -12,11 +11,11 @@ use crate::TildeRes;
 
 mod alphabet;
 mod letter;
-mod lex;
 mod parse;
 mod word;
 
 pub fn parse(src: &str) -> TildeRes<Prog> {
-    let words: Vec<Word> = lex_str(src)?;
-    build_ast(&words)
+    //let words: Vec<Word> = lex_str(src)?;
+    //build_ast(&words)
+    //TODO @mark:
 }
