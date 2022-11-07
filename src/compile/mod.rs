@@ -41,7 +41,7 @@ pub fn parse(src: &str) -> TildeRes<Prog> {
                 buffer.push(token)
             }
             tilde_log!("integer literal (long mode): \"{}\"", &buffer);
-            let op = Op::Value(ValueOp::Text(buffer.clone()));
+            let op = Op::Value(ValueOp::Number(buffer.parse::<f64>().map_err(|err| format!("invalid number '{}', err {}", buffer, err))?));
             ops.push(op)
         } else if current == '"' {
             tilde_log!("string lookup (short mode)");
@@ -51,4 +51,21 @@ pub fn parse(src: &str) -> TildeRes<Prog> {
         }
     }
     Ok(Prog::of(ops))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn long_string_explicit_close() {
+        let prog = parse(",hello world,").unwrap();
+        assert_eq!(prog, Prog::of(Op::Value(ValueOp::Text("hello world".to_string()))))
+    }
+
+    #[test]
+    fn long_string_implicit_close() {
+        let prog = parse(",hello world").unwrap();
+        assert_eq!(prog, Prog::of(Op::Value(ValueOp::Text("hello world".to_string()))))
+    }
 }

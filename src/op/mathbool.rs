@@ -1,6 +1,6 @@
 use crate::op::typ::Typ;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum Math1Op {
     Neg,
     Abs,
@@ -26,7 +26,7 @@ impl Math1Op {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum Math2Op {
     Plus,
     Minus,
@@ -56,7 +56,7 @@ impl Math2Op {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum CompareOp {
     Eq,
     Neq,
@@ -86,7 +86,7 @@ impl CompareOp {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum Bool2Op {
     And,
     Or,

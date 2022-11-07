@@ -9,7 +9,7 @@ use crate::op::typ::Typ;
 use crate::op::value::ValueOp;
 use crate::op::Op;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct Prog {
     ops: Vec<Op>,
 }
