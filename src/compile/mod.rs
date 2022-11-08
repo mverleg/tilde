@@ -4,7 +4,6 @@ use ::std::env::current_exe;
 
 use crate::op::Op;
 use crate::op::Prog;
-use crate::op::ValueOp;
 use crate::tilde_log;
 use crate::TildeRes;
 
@@ -30,7 +29,7 @@ pub fn parse(src: &str) -> TildeRes<Prog> {
                 buffer.push(token)
             }
             tilde_log!("string literal (long mode): '{}'", &buffer);
-            let op = Op::Value(ValueOp::Text(buffer.clone()));
+            let op = Op::Text(buffer.clone());
             ops.push(op)
         } else if (current >= '1' && current <= '9') || current == '.' || current == '-' {
             // note that short-mode numbers start with 0, long-mode ones cannot
@@ -44,7 +43,7 @@ pub fn parse(src: &str) -> TildeRes<Prog> {
                 buffer.push(token)
             }
             tilde_log!("integer literal (long mode): \"{}\"", &buffer);
-            let op = Op::Value(ValueOp::Number(buffer.parse::<f64>().map_err(|err| format!("invalid number '{}', err {}", buffer, err))?));
+            let op = Op::Number(buffer.parse::<f64>().map_err(|err| format!("invalid number '{}', err {}", buffer, err))?);
             ops.push(op)
         } else if current.is_alphabetic() || current == '-' {
             buffer.clear();
@@ -83,32 +82,32 @@ mod tests {
 
     #[test]
     fn long_string_explicit_close() {
-        assert_eq!(parse(",hello world,").unwrap(), of(Op::Value(ValueOp::Text("hello world".to_string()))));
-        assert_eq!(parse(",hello world'").unwrap(), of(Op::Value(ValueOp::Text("hello world".to_string()))));
-        assert_eq!(parse("'hello world,").unwrap(), of(Op::Value(ValueOp::Text("hello world".to_string()))));
-        assert_eq!(parse("'hello world'").unwrap(), of(Op::Value(ValueOp::Text("hello world".to_string()))));
+        assert_eq!(parse(",hello world,").unwrap(), of(Op::Text("hello world".to_string())));
+        assert_eq!(parse(",hello world'").unwrap(), of(Op::Text("hello world".to_string())));
+        assert_eq!(parse("'hello world,").unwrap(), of(Op::Text("hello world".to_string())));
+        assert_eq!(parse("'hello world'").unwrap(), of(Op::Text("hello world".to_string())));
     }
 
     #[test]
     fn long_string_implicit_close() {
-        assert_eq!(parse(",hello world").unwrap(), of(Op::Value(ValueOp::Text("hello world".to_string()))));
-        assert_eq!(parse("'hello world").unwrap(), of(Op::Value(ValueOp::Text("hello world".to_string()))));
+        assert_eq!(parse(",hello world").unwrap(), of(Op::Text("hello world".to_string())));
+        assert_eq!(parse("'hello world").unwrap(), of(Op::Text("hello world".to_string())));
     }
 
     #[test]
     fn long_integer() {
-        assert_eq!(parse("123").unwrap(), of(Op::Value(ValueOp::Number(123.))));
-        assert_eq!(parse("-123").unwrap(), of(Op::Value(ValueOp::Number(-123.))));
+        assert_eq!(parse("123").unwrap(), of(Op::Number(123.)));
+        assert_eq!(parse("-123").unwrap(), of(Op::Number(-123.)));
     }
 
     #[test]
     fn long_float() {
-        assert_eq!(parse("1.23").unwrap(), of(Op::Value(ValueOp::Number(1.23))));
-        assert_eq!(parse(".123").unwrap(), of(Op::Value(ValueOp::Number(0.123))));
-        assert_eq!(parse("123.").unwrap(), of(Op::Value(ValueOp::Number(123.))));
-        assert_eq!(parse("-1.23").unwrap(), of(Op::Value(ValueOp::Number(-1.23))));
-        assert_eq!(parse("-.123").unwrap(), of(Op::Value(ValueOp::Number(-0.123))));
-        assert_eq!(parse("-123.").unwrap(), of(Op::Value(ValueOp::Number(-123.))));
+        assert_eq!(parse("1.23").unwrap(), of(Op::Number(1.23)));
+        assert_eq!(parse(".123").unwrap(), of(Op::Number(0.123)));
+        assert_eq!(parse("123.").unwrap(), of(Op::Number(123.)));
+        assert_eq!(parse("-1.23").unwrap(), of(Op::Number(-1.23)));
+        assert_eq!(parse("-.123").unwrap(), of(Op::Number(-0.123)));
+        assert_eq!(parse("-123.").unwrap(), of(Op::Number(-123.)));
     }
 
     #[test]
@@ -124,11 +123,8 @@ mod tests {
 
     #[test]
     fn split_on_whitespace() {
-        let op = Op::Value(ValueOp::Number(1.23));
-        assert_eq!(parse("'hello' 1.0").unwrap(), Prog::of(vec![Op::Value(ValueOp::Text("hello".to_string())), Op::Value(ValueOp::Number(1.0))]));
-        assert_eq!(
-            parse("my-op-name my-op-name   1.0").unwrap(),
-            Prog::of(vec![Op::Value(ValueOp::Text("hello".to_string())), Op::Value(ValueOp::Text("hello".to_string())), Op::Value(ValueOp::Number(1.0))])
-        );
+        let op = Op::Number(1.23);
+        assert_eq!(parse("'hello' 1.0").unwrap(), Prog::of(vec![Op::Text("hello".to_string()), Op::Number(1.0)]));
+        assert_eq!(parse("my-op-name my-op-name   1.0").unwrap(), Prog::of(vec![Op::Text("hello".to_string()), Op::Text("hello".to_string()), Op::Number(1.0)]),);
     }
 }
