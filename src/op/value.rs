@@ -1,6 +1,6 @@
 use crate::op::typ::Typ;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum ValueOp {
     Text(String),
     Number(f64),

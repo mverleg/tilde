@@ -14,7 +14,7 @@ mod prog;
 mod typ;
 mod value;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Op {
     Value(ValueOp),
     Math1(Math1Op),
