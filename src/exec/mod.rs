@@ -24,7 +24,7 @@ pub fn execute(
             Op::Math2(op) => exec_math2(op, stack.pop(), stack.pop()),
             Op::Compare(_compare) => todo!(),
             Op::Bool2(_bool2) => todo!(),
-            Op::Value(value) => Value::of_op(value),
+            Op::Value(value) => todo!(),
         };
         stack.push(res)
     }

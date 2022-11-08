@@ -1,12 +1,7 @@
 pub use ::std::slice;
 use ::std::vec;
 
-use crate::op::mathbool::Bool2Op;
-use crate::op::mathbool::CompareOp;
-use crate::op::mathbool::Math1Op;
-use crate::op::mathbool::Math2Op;
 use crate::op::typ::Typ;
-use crate::op::value::ValueOp;
 use crate::op::Op;
 
 #[derive(Debug, PartialEq)]
