@@ -201,7 +201,7 @@ mod static_width {
         assert_eq!(encode_positive_int_static_width_avoid_modifiers(40), vec![Number, Number, Right]);
         assert_eq!(encode_positive_int_static_width_avoid_modifiers(45), vec![Number, Io, Right]);
         assert_eq!(encode_positive_int_static_width_avoid_modifiers(1999), vec![Plus, Slash, Slash, Hash]);
-        //TODO @mark: is that last one right? ^
+        assert_eq!(encode_positive_int_static_width_avoid_modifiers(2000), vec![Number, Number, Number, Number, Right]);
     }
 
     #[test]
@@ -214,13 +214,20 @@ mod static_width {
         assert_eq!(decode_positive_int_static_width_avoid_modifiers(&[Plus, Hash, Io]).unwrap(), DecodedPositiveNumber { end_index: 1, number: 39 });
         assert_eq!(decode_positive_int_static_width_avoid_modifiers(&[Number, Number, Right, Io]).unwrap(), DecodedPositiveNumber { end_index: 2, number: 40 });
         assert_eq!(decode_positive_int_static_width_avoid_modifiers(&[Number, Io, Right]).unwrap(), DecodedPositiveNumber { end_index: 2, number: 45 });
-        assert_eq!(decode_positive_int_static_width_avoid_modifiers(&[Plus, Slash, Slash, Hash]).unwrap(), DecodedPositiveNumber { end_index: 3, number: 45 });
+        assert_eq!(
+            decode_positive_int_static_width_avoid_modifiers(&[Plus, Slash, Slash, Hash]).unwrap(),
+            DecodedPositiveNumber { end_index: 3, number: 1999 }
+        );
+        assert_eq!(
+            decode_positive_int_static_width_avoid_modifiers(&[Number, Number, Number, Number, Right]).unwrap(),
+            DecodedPositiveNumber { end_index: 4, number: 2000 }
+        );
     }
 
     #[test]
     fn tmp_for_log() {
         //TODO @mark: TEMPORARY! REMOVE THIS!
-        for nr in 0..=1000 {
+        for nr in 0..=2010 {
             let enc = encode_positive_int_static_width_avoid_modifiers(nr);
             println!(
                 "{}:  {}  ===  {}",
