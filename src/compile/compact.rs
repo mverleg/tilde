@@ -8,6 +8,8 @@ use crate::op::Op;
 
 const STRING_OPENERS: [Letter; 10] = [Number, Io, Seq, More, Plus, Asterisk, Slash, Right, Bracket, Colon];
 const STRING_FOLLOWERS: [Letter; 14] = [Number, Io, Seq, More, Plus, Asterisk, Slash, Right, Bracket, Colon, Hat, Exclamation, Question, Hash];
+const STRING_OPENERS_REV: [u8; 16] = [0, 255, 1, 2, 3, 4, 5, 6, 7, 8, 9, 255, 255, 255, 255, 255];
+const STRING_FOLLOWERS_REV: [u8; 16] = [0, 255, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 255];
 
 /// Encode a positive integer, using static width of 1 byte each, and
 /// do not allow modifiers in the first byte.
@@ -43,6 +45,9 @@ pub fn decode_positive_int_static_width_avoid_modifiers(ops: &[Letter]) -> Optio
     if Letter::modifiers().contains(opener) {
         return None;
     }
+    // for i in 1..ops.len() {
+    //     ops[i]
+    // }
     todo!();
 }
 
@@ -64,17 +69,44 @@ mod constants_in_sync {
         allowed
     }
 
+    fn reverse_letter_values(letters: &[Letter]) -> Vec<u8> {
+        let mut expected = vec![u8::MAX; 16];
+        for (value, letter) in letters.iter().enumerate() {
+            expected[letter.nr() as usize] = value.try_into().unwrap();
+        }
+        assert_eq!(
+            expected
+                .iter()
+                .filter(|val| **val < 16)
+                .count(),
+            letters.len()
+        );
+        expected
+    }
+
     /// The first text number cannot start with a modifier, because those can be used to modify
-    /// the text opener itself, thus not being part of the (first) number.
+    /// the text opener itself, thus not being part of the (first) number. Text token is also disallowed.
     #[test]
     fn openers() {
         assert_eq!(STRING_OPENERS, select_letters(|letter| letter.kind() != LetterKind::Modifier).as_slice());
     }
 
-    /// In the middle of numbers, all letters are allowed.
+    /// In the middle of numbers, text token is not allowed, but modifiers are okay.
     #[test]
     fn followers() {
         assert_eq!(STRING_FOLLOWERS, select_letters(|_letter| true).as_slice());
+    }
+
+    #[test]
+    fn reverse_openers() {
+        let expected = reverse_letter_values(&STRING_OPENERS);
+        assert_eq!(STRING_OPENERS_REV, expected.as_slice());
+    }
+
+    #[test]
+    fn reverse_followers() {
+        let expected = reverse_letter_values(&STRING_FOLLOWERS);
+        assert_eq!(STRING_FOLLOWERS_REV, expected.as_slice());
     }
 }
 
