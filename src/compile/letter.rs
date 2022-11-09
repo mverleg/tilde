@@ -17,6 +17,12 @@ pub enum Letter {
     More,
 
     // Variable
+    Plus,
+    Asterisk,
+    Slash,
+    Right,
+    Bracket,
+    Colon,
 
     // Modifiers
     Hat,
@@ -24,22 +30,6 @@ pub enum Letter {
     Question,
     Hash,
     Tilde,
-    // Letter::literal(0, '0', "num"),
-    // Letter::literal(1, '"', "str"),
-    // Letter::fixed(2, 'i', "inp"),
-    // Letter::fixed(3, 'n', "seq"),
-    // Letter::fixed(4, '.', "more"),
-    // Letter::var(5, '+', "plus"),
-    // Letter::var(6, 'x', "x"),
-    // Letter::var(7, '=', "eq"),
-    // Letter::var(8, '>', "gt"),
-    // Letter::var(9, '$', "var"),
-    // Letter::var(10, ':', "forall"),
-    // Letter::modi(11, '^', "hat"),
-    // Letter::modi(12, '!', "exclamation"),
-    // Letter::modi(13, '?', "question"),
-    // Letter::modi(14, '#', "hash"),
-    // Letter::modi(15, '~', "tilde"),
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EnumIter)]
@@ -56,26 +46,80 @@ pub enum LetterKind {
 
 impl Letter {
     pub fn nr(&self) -> u8 {
+        use self::Letter::*;
         match self {
-            Letter::Number => 0,
-            Letter::Text => 0,
-            Letter::Io => 0,
-            Letter::Seq => 0,
-            Letter::More => 0,
-            Letter::Hat => 0,
-            Letter::Exclamation => 0,
-            Letter::Question => 0,
-            Letter::Hash => 0,
-            Letter::Tilde => 0,
+            Number => 0,
+            Text => 1,
+
+            Io => 2,
+            Seq => 3,
+            More => 4,
+
+            Plus => 5,
+            Asterisk => 6,
+            Slash => 7,
+            Right => 8,
+            Bracket => 9,
+            Colon => 10,
+
+            Hat => 11,
+            Exclamation => 12,
+            Question => 13,
+            Hash => 14,
+            Tilde => 15,
         }
     }
 
     pub fn symbol(&self) -> char {
-        todo!(); //TODO @mark:
+        //TODO @mark: reconsider (except 0 and ")
+        use self::Letter::*;
+        match self {
+            Number => '0',
+            Text => '"',
+
+            Io => '$',
+            Seq => '%',
+            More => '&',
+
+            Plus => '+',
+            Asterisk => '*',
+            Slash => '/',
+            Right => '>',
+            Bracket => '[',
+            Colon => ':',
+
+            Hat => '^',
+            Exclamation => '!',
+            Question => '?',
+            Hash => '#',
+            Tilde => '~',
+        }
     }
 
     pub fn kind(&self) -> LetterKind {
-        todo!(); //TODO @mark:
+        use self::Letter::*;
+        use self::LetterKind::*;
+        match self {
+            Number => Literal,
+            Text => Literal,
+
+            Io => FixedOpen,
+            Seq => FixedOpen,
+            More => FixedOpen,
+
+            Plus => VariableOpen,
+            Asterisk => VariableOpen,
+            Slash => VariableOpen,
+            Right => VariableOpen,
+            Bracket => VariableOpen,
+            Colon => VariableOpen,
+
+            Hat => Modifier,
+            Exclamation => Modifier,
+            Question => Modifier,
+            Hash => Modifier,
+            Tilde => Modifier,
+        }
     }
 }
 
