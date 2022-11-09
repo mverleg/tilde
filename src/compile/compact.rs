@@ -14,15 +14,20 @@ pub fn encode_positive_int_static_width_avoid_modifiers(nr: u64) -> Vec<Letter> 
     let opener_n = (STRING_OPENERS.len() / 2) as u64;
     if nr < opener_n {
         bytes.push(STRING_OPENERS[(nr + opener_n) as usize]);
+        eprintln!("{nr}: ONLY = {}", nr + opener_n); //TODO @mark: TEMPORARY! REMOVE THIS!
     } else {
         bytes.push(STRING_OPENERS[(nr % opener_n) as usize]);
+        eprintln!("{nr}: FIRST = {}", nr % opener_n); //TODO @mark: TEMPORARY! REMOVE THIS!
     }
     let follow_n = (STRING_FOLLOWERS.len() / 2) as u64;
     debug_assert!(follow_n < 16 && (follow_n as usize) < usize::MAX);
     let mut rem = nr / opener_n;
+    eprintln!("{nr}: rem_i = {rem}"); //TODO @mark: TEMPORARY! REMOVE THIS!
     while rem > 0 {
-        bytes.push(STRING_FOLLOWERS[(rem % follow_n) as usize]);
-        rem /= follow_n;
+        let pos = if rem < follow_n { rem + follow_n } else { rem % follow_n };
+        bytes.push(STRING_FOLLOWERS[pos as usize]);
+        rem = rem / follow_n;
+        eprintln!("{nr}: val = {pos}, rem = {rem}"); //TODO @mark: TEMPORARY! REMOVE THIS!
     }
     bytes
 }
@@ -78,7 +83,11 @@ mod static_width {
         assert_eq!(encode_positive_int_static_width_avoid_modifiers(0), vec![Asterisk]);
         assert_eq!(encode_positive_int_static_width_avoid_modifiers(4), vec![Colon]);
         assert_eq!(encode_positive_int_static_width_avoid_modifiers(5), vec![Number, Right]);
-        assert_eq!(encode_positive_int_static_width_avoid_modifiers(5), vec![Number, Right]);
+        assert_eq!(encode_positive_int_static_width_avoid_modifiers(9), vec![Plus, Right]);
+        assert_eq!(encode_positive_int_static_width_avoid_modifiers(10), vec![Number, Bracket]);
+        assert_eq!(encode_positive_int_static_width_avoid_modifiers(39), vec![Plus, Hash]);
+        assert_eq!(encode_positive_int_static_width_avoid_modifiers(40), vec![Number, Number, Right]);
+        assert_eq!(encode_positive_int_static_width_avoid_modifiers(45), vec![Number, Io, Right]);
     }
 
     #[test]
