@@ -8,8 +8,8 @@ use crate::op::Op;
 
 const STRING_OPENERS: [Letter; 10] = [Number, Io, Seq, More, Plus, Asterisk, Slash, Right, Bracket, Colon];
 const STRING_FOLLOWERS: [Letter; 14] = [Number, Io, Seq, More, Plus, Asterisk, Slash, Right, Bracket, Colon, Hat, Exclamation, Question, Hash];
-const STRING_OPENERS_REV: [u8; 16] = [0, 255, 1, 2, 3, 4, 5, 6, 7, 8, 9, 255, 255, 255, 255, 255];
-const STRING_FOLLOWERS_REV: [u8; 16] = [0, 255, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 255];
+const STRING_OPENERS_REV: [u64; 16] = [0, u64::MAX, 1, 2, 3, 4, 5, 6, 7, 8, 9, u64::MAX, u64::MAX, u64::MAX, u64::MAX, u64::MAX];
+const STRING_FOLLOWERS_REV: [u64; 16] = [0, u64::MAX, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, u64::MAX];
 
 /// Encode a positive integer, using static width of 1 byte each, and
 /// do not allow modifiers in the first byte.
@@ -45,10 +45,24 @@ pub fn decode_positive_int_static_width_avoid_modifiers(ops: &[Letter]) -> Optio
     if Letter::modifiers().contains(opener) {
         return None;
     }
-    // for i in 1..ops.len() {
-    //     ops[i]
-    // }
-    todo!();
+    let value = STRING_OPENERS_REV[opener.nr() as usize];
+    debug_assert!(value < 16);
+    let mut nr = value;
+    let mut multiplier = 1u64;
+    for i in 1..ops.len() {
+        multiplier = multiplier
+            .checked_mul(STRING_FOLLOWERS_REV.len() as u64)
+            .expect("number is too large (in: multiplier)");
+        let value = STRING_OPENERS_REV[opener.nr() as usize];
+        debug_assert!(value < 16);
+        let scale = multiplier
+            .checked_mul(value)
+            .expect("number is too large (in: scale)");
+        nr = nr
+            .checked_add(scale)
+            .expect("number is too large (in: sum)");
+    }
+    Some(nr)
 }
 
 #[cfg(test)]
@@ -69,8 +83,8 @@ mod constants_in_sync {
         allowed
     }
 
-    fn reverse_letter_values(letters: &[Letter]) -> Vec<u8> {
-        let mut expected = vec![u8::MAX; 16];
+    fn reverse_letter_values(letters: &[Letter]) -> Vec<u64> {
+        let mut expected = vec![u64::MAX; 16];
         for (value, letter) in letters.iter().enumerate() {
             expected[letter.nr() as usize] = value.try_into().unwrap();
         }
@@ -116,7 +130,7 @@ mod static_width {
     use crate::compile::letter::LetterKind;
 
     #[test]
-    fn positive_int_avoided_modifiers__encoding_examples() {
+    fn positive_int_avoided_modifiers_encoding_examples() {
         assert_eq!(encode_positive_int_static_width_avoid_modifiers(0), vec![Asterisk]);
         assert_eq!(encode_positive_int_static_width_avoid_modifiers(4), vec![Colon]);
         assert_eq!(encode_positive_int_static_width_avoid_modifiers(5), vec![Number, Right]);
@@ -128,7 +142,7 @@ mod static_width {
     }
 
     #[test]
-    fn positive_int_avoided_modifiers__decoding_examples() {
+    fn positive_int_avoided_modifiers_decoding_examples() {
         assert_eq!(decode_positive_int_static_width_avoid_modifiers(&[Asterisk]).unwrap(), 0);
         assert_eq!(decode_positive_int_static_width_avoid_modifiers(&[Colon]).unwrap(), 4);
         assert_eq!(decode_positive_int_static_width_avoid_modifiers(&[Number, Right]).unwrap(), 5);
