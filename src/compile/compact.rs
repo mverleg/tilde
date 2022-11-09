@@ -169,10 +169,10 @@ mod static_width {
         assert_eq!(decode_positive_int_static_width_avoid_modifiers(&[Asterisk]).unwrap(), DecodedPositiveNumber { end_index: 0, number: 0 });
         assert_eq!(decode_positive_int_static_width_avoid_modifiers(&[Colon]).unwrap(), DecodedPositiveNumber { end_index: 0, number: 4 });
         assert_eq!(decode_positive_int_static_width_avoid_modifiers(&[Number, Right]).unwrap(), DecodedPositiveNumber { end_index: 1, number: 5 });
-        assert_eq!(decode_positive_int_static_width_avoid_modifiers(&[Plus, Right]).unwrap(), DecodedPositiveNumber { end_index: 1, number: 9 });
+        assert_eq!(decode_positive_int_static_width_avoid_modifiers(&[Plus, Right, Io]).unwrap(), DecodedPositiveNumber { end_index: 1, number: 9 });
         assert_eq!(decode_positive_int_static_width_avoid_modifiers(&[Number, Bracket]).unwrap(), DecodedPositiveNumber { end_index: 1, number: 10 });
-        assert_eq!(decode_positive_int_static_width_avoid_modifiers(&[Plus, Hash]).unwrap(), DecodedPositiveNumber { end_index: 1, number: 39 });
-        assert_eq!(decode_positive_int_static_width_avoid_modifiers(&[Number, Number, Right]).unwrap(), DecodedPositiveNumber { end_index: 2, number: 40 });
+        assert_eq!(decode_positive_int_static_width_avoid_modifiers(&[Plus, Hash, Io]).unwrap(), DecodedPositiveNumber { end_index: 1, number: 39 });
+        assert_eq!(decode_positive_int_static_width_avoid_modifiers(&[Number, Number, Right, Io]).unwrap(), DecodedPositiveNumber { end_index: 2, number: 40 });
         assert_eq!(decode_positive_int_static_width_avoid_modifiers(&[Number, Io, Right]).unwrap(), DecodedPositiveNumber { end_index: 2, number: 45 });
     }
 
@@ -208,6 +208,14 @@ mod static_width {
     #[test]
     fn positive_int_non_terminated_number() {
         let decode = decode_positive_int_static_width_avoid_modifiers(&[Io, Io, Io]);
+        assert!(decode.is_err());
+    }
+
+    #[test]
+    fn positive_int_decode_with_text_letter() {
+        let decode = decode_positive_int_static_width_avoid_modifiers(&[Text]);
+        assert!(decode.is_err());
+        let decode = decode_positive_int_static_width_avoid_modifiers(&[Io, Text]);
         assert!(decode.is_err());
     }
 
