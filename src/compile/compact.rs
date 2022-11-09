@@ -34,35 +34,38 @@ pub fn encode_positive_int_static_width_avoid_modifiers(nr: u64) -> Vec<Letter> 
 }
 
 /// Inverse of [encode_pos_int_static_width_avoid_modifiers].
-pub fn decode_positive_int_static_width_avoid_modifiers(ops: &[Letter]) -> Option<u64> {
+pub fn decode_positive_int_static_width_avoid_modifiers(ops: &[Letter]) -> Result<u64, &'static str> {
     if ops.is_empty() {
-        return None;
+        return Err("number to decode is empty");
     }
     let opener = &ops[0];
     if let Letter::Text = opener {
-        return None;
+        return Err("number contains text node as opener");
     }
     if Letter::modifiers().contains(opener) {
-        return None;
+        return Err("number starts with opener");
     }
     let value = STRING_OPENERS_REV[opener.nr() as usize];
     debug_assert!(value < 16);
     let mut nr = value;
     let mut multiplier = 1u64;
     for i in 1..ops.len() {
+        if let Letter::Text = opener {
+            return Err("number contains text node as non-opener");
+        }
         multiplier = multiplier
             .checked_mul(STRING_FOLLOWERS_REV.len() as u64)
-            .expect("number is too large (in: multiplier)");
+            .ok_or_else(|| "number is too large (in: multiplier)")?;
         let value = STRING_OPENERS_REV[opener.nr() as usize];
         debug_assert!(value < 16);
         let scale = multiplier
             .checked_mul(value)
-            .expect("number is too large (in: scale)");
+            .ok_or_else(|| "number is too large (in: scale)")?;
         nr = nr
             .checked_add(scale)
-            .expect("number is too large (in: sum)");
+            .ok_or_else(|| "number is too large (in: sum)")?;
     }
-    Some(nr)
+    Ok(nr)
 }
 
 #[cfg(test)]
@@ -165,7 +168,7 @@ mod static_width {
                     .collect::<Vec<_>>()
                     .join(", ")
             );
-            let dec = decode_positive_int_static_width_avoid_modifiers(&enc).unwrap_or_else(|| panic!("failed to decode {}", nr));
+            let dec = decode_positive_int_static_width_avoid_modifiers(&enc).unwrap_or_else(|_| panic!("failed to decode {}", nr));
             assert_eq!(nr, dec);
         }
     }
@@ -173,12 +176,18 @@ mod static_width {
     #[test]
     fn positive_int_avoid_modifiers_empty_input() {
         let decode = decode_positive_int_static_width_avoid_modifiers(&[]);
-        assert!(decode.is_none());
+        assert!(decode.is_err());
     }
 
     #[test]
-    fn positive_int_with_avoided_modifiers() {
-        let decode = decode_positive_int_static_width_avoid_modifiers(&[]);
-        assert!(decode.is_none());
+    fn positive_int_starting_with_modifiers() {
+        let decode = decode_positive_int_static_width_avoid_modifiers(&[Letter::modifiers()[0], Asterisk]);
+        assert!(decode.is_err());
+    }
+
+    #[test]
+    fn positive_int_overflow_in_decode() {
+        let decode = decode_positive_int_static_width_avoid_modifiers(&[Colon; 20]);
+        assert!(decode.is_err());
     }
 }
