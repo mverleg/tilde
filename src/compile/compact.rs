@@ -1,9 +1,11 @@
 use ::strum::IntoEnumIterator;
 
 use crate::compile::letter::Letter;
+use crate::compile::letter::Letter::*;
 use crate::op::Op;
 
-const STRING_OPENERS: [Letter; 10] = [Letter::Number, Letter::Io, Letter::Seq, Letter::More, Letter::Plus, Letter::Asterisk, Letter::Slash, Letter::Right, Letter::Bracket, Letter::Colon];
+const STRING_OPENERS: [Letter; 10] = [Number, Io, Seq, More, Plus, Asterisk, Slash, Right, Bracket, Colon];
+const STRING_FOLLOWERS: [Letter; 14] = [Number, Io, Seq, More, Plus, Asterisk, Slash, Right, Bracket, Colon, Hat, Exclamation, Question, Hash];
 
 /// Encode a positive integer, using static width of 1 byte each, and
 /// do not allow modifiers in the first byte.
@@ -44,8 +46,16 @@ mod static_width {
 
     #[test]
     fn string_openers_in_sync() {
-        let allowed_openers: Vec<Letter> = Letter::iter().filter(|letter| letter != &Letter::Text).filter(|letter| letter.kind() != LetterKind::Modifier).collect();
+        let mut allowed_followers: Vec<Letter> = Letter::iter().filter(|letter| letter != &Letter::Text).collect();
+        if allowed_followers.len() % 2 != 0 {
+            allowed_followers.pop();
+        }
+        let mut allowed_openers: Vec<Letter> = allowed_followers.iter().cloned().filter(|letter| letter.kind() != LetterKind::Modifier).collect();
+        if allowed_openers.len() % 2 != 0 {
+            allowed_openers.pop();
+        }
         assert_eq!(allowed_openers, &STRING_OPENERS);
+        assert_eq!(allowed_followers, &STRING_FOLLOWERS);
         assert!(STRING_OPENERS.len() >= 1);
     }
 
