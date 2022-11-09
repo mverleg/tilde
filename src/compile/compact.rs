@@ -49,7 +49,7 @@ pub fn decode_positive_int_static_width_avoid_modifiers(letters: &[Letter]) -> R
         return Err(DecodeError::StarsWithModifier);
     }
     let value = STRING_OPENERS_REV[opener.nr() as usize];
-    debug_assert!(value < 16);
+    debug_assert!(value < 16, "wrong value for opener {} (index {})", opener.symbol(), opener.nr());
     let open_n = (STRING_OPENERS.len() / 2) as u64;
     if value >= open_n {
         return Ok(DecodedPositiveNumber { end_index: 0, number: value - open_n });
@@ -66,10 +66,8 @@ pub fn decode_positive_int_static_width_avoid_modifiers(letters: &[Letter]) -> R
         if let Letter::Text = letter {
             return Err(DecodeError::TextNode);
         }
-        let value = STRING_OPENERS_REV[letter.nr() as usize]
-            .checked_add(1)
-            .ok_or(DecodeError::TooLarge)?;
-        debug_assert!(value < 16);
+        let value = STRING_FOLLOWERS_REV[letter.nr() as usize] + 1;
+        debug_assert!(value < 16, "wrong value for non-opener {} (index {})", letter.symbol(), letter.nr());
         if value >= follow_n {
             eprintln!("{} + {} * {} `{}` (last)", nr, multiplier, value - follow_n, letter.symbol()); //TODO @mark: TEMPORARY! REMOVE THIS!
             let scale = multiplier
@@ -202,31 +200,50 @@ mod static_width {
         assert_eq!(encode_positive_int_static_width_avoid_modifiers(39), vec![Plus, Hash]);
         assert_eq!(encode_positive_int_static_width_avoid_modifiers(40), vec![Number, Number, Right]);
         assert_eq!(encode_positive_int_static_width_avoid_modifiers(45), vec![Number, Io, Right]);
+        assert_eq!(encode_positive_int_static_width_avoid_modifiers(1999), vec![Plus, Slash, Slash, Hash]);
+        //TODO @mark: is that last one right? ^
     }
 
     #[test]
     fn positive_int_avoided_modifiers_decoding_examples() {
-        // assert_eq!(decode_positive_int_static_width_avoid_modifiers(&[Asterisk]).unwrap(), DecodedPositiveNumber { end_index: 0, number: 0 });
-        // assert_eq!(decode_positive_int_static_width_avoid_modifiers(&[Colon]).unwrap(), DecodedPositiveNumber { end_index: 0, number: 4 });
-        //TODO @mark: ^
+        assert_eq!(decode_positive_int_static_width_avoid_modifiers(&[Asterisk]).unwrap(), DecodedPositiveNumber { end_index: 0, number: 0 });
+        assert_eq!(decode_positive_int_static_width_avoid_modifiers(&[Colon]).unwrap(), DecodedPositiveNumber { end_index: 0, number: 4 });
         assert_eq!(decode_positive_int_static_width_avoid_modifiers(&[Number, Right]).unwrap(), DecodedPositiveNumber { end_index: 1, number: 5 });
         assert_eq!(decode_positive_int_static_width_avoid_modifiers(&[Plus, Right, Io]).unwrap(), DecodedPositiveNumber { end_index: 1, number: 9 });
         assert_eq!(decode_positive_int_static_width_avoid_modifiers(&[Number, Bracket]).unwrap(), DecodedPositiveNumber { end_index: 1, number: 10 });
         assert_eq!(decode_positive_int_static_width_avoid_modifiers(&[Plus, Hash, Io]).unwrap(), DecodedPositiveNumber { end_index: 1, number: 39 });
         assert_eq!(decode_positive_int_static_width_avoid_modifiers(&[Number, Number, Right, Io]).unwrap(), DecodedPositiveNumber { end_index: 2, number: 40 });
         assert_eq!(decode_positive_int_static_width_avoid_modifiers(&[Number, Io, Right]).unwrap(), DecodedPositiveNumber { end_index: 2, number: 45 });
+        assert_eq!(decode_positive_int_static_width_avoid_modifiers(&[Plus, Slash, Slash, Hash]).unwrap(), DecodedPositiveNumber { end_index: 3, number: 45 });
+    }
+
+    #[test]
+    fn tmp_for_log() {
+        //TODO @mark: TEMPORARY! REMOVE THIS!
+        for nr in 0..=1000 {
+            let enc = encode_positive_int_static_width_avoid_modifiers(nr);
+            println!(
+                "{}:  {}  ===  {}",
+                nr,
+                enc.iter()
+                    .map(|l| STRING_FOLLOWERS_REV[l.nr() as usize].to_string())
+                    .collect::<Vec<_>>()
+                    .join(" "),
+                enc.iter()
+                    .map(|l| l.symbol().to_string())
+                    .collect::<Vec<_>>()
+                    .join(" ")
+            )
+            //TODO @mark: TEMPORARY! REMOVE THIS!
+        }
+        panic!()
     }
 
     #[test]
     fn positive_int_without_avoided_modifiers() {
-        for nr in 0..=1000 {
+        let nrs = (0..100).chain((0..10).map(|n| n * 2 - n));
+        for nr in nrs {
             let enc = encode_positive_int_static_width_avoid_modifiers(nr);
-            let letters = enc
-                .iter()
-                .map(|letter| letter.symbol().to_string())
-                .collect::<Vec<_>>()
-                .join(", ");
-            println!("{} => [{}]", nr, letters);
             let dec = decode_positive_int_static_width_avoid_modifiers(&enc).unwrap_or_else(|_| panic!("failed to decode {}", nr));
             assert_eq!(nr, dec.number);
         }
