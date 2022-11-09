@@ -1,58 +1,123 @@
+use ::std::env::current_exe;
+
+use crate::op::Op;
 use crate::op::Prog;
+use crate::tilde_log;
 use crate::TildeRes;
 
-// pub fn build_ast(words: &[Word]) -> TildeRes<Prog> {
-//     // let mut ops = vec![];
-//     // let mut missing = vec![];
-//     for word in words {
-//         unimplemented!();
-//         // match link_op(token_group) {
-//         //     Some(op) => ops.push(op),
-//         //     None => missing.push(token_group),
-//         // }
-//     }
-//     todo!()
-// }
+pub fn parse(src: &str) -> TildeRes<Prog> {
+    let mut ops = vec![];
+    let mut tokens = src.chars().collect::<Vec<_>>();
+    tokens.reverse();
+    tilde_log!("parsing {} tokens", tokens.len());
+    let mut buffer = String::new();
+    while let Some(current) = tokens.pop() {
+        if current == ',' || current == '\'' {
+            buffer.clear();
+            while let Some(token) = tokens.pop() {
+                if token == ',' || token == '\'' {
+                    //TODO @mark: build a way to escape commas
+                    break;
+                }
+                buffer.push(token)
+            }
+            tilde_log!("string literal (long mode): '{}'", &buffer);
+            let op = Op::Text(buffer.clone());
+            ops.push(op)
+        } else if (current >= '1' && current <= '9') || current == '.' || current == '-' {
+            // note that short-mode numbers start with 0, long-mode ones cannot
+            buffer.clear();
+            buffer.push(current);
+            while let Some(token) = tokens.pop() {
+                if (token < '0' || token > '9') && token != '.' && current != '-' {
+                    tokens.push(token);
+                    break;
+                }
+                buffer.push(token)
+            }
+            tilde_log!("integer literal (long mode): \"{}\"", &buffer);
+            let op = Op::Number(buffer.parse::<f64>().map_err(|err| format!("invalid number '{}', err {}", buffer, err))?);
+            ops.push(op)
+        } else if current.is_alphabetic() || current == '-' {
+            buffer.clear();
+            buffer.push(current);
+            while let Some(token) = tokens.pop() {
+                if !current.is_alphabetic() && current != '-' {
+                    if !current.is_whitespace() {
+                        tokens.push(token);
+                    }
+                    break;
+                }
+                buffer.push(token)
+            }
+            tilde_log!("operator by long name: \"{}\"", &buffer);
+            let op = todo!("{}", current);
+            ops.push(op)
+        } else if current.is_whitespace() {
+            tilde_log!("skipping whitespace");
+        } else if current == '"' {
+            tilde_log!("string lookup (short mode)");
+            todo!(); //TODO @mark: TEMPORARY! REMOVE THIS!
+        } else {
+            todo!(); //TODO @mark: TEMPORARY! REMOVE THIS!
+        }
+    }
+    Ok(Prog::of(ops))
+}
 
-//// Try to link one token group to one Op, by adding some
-//// simple tokens behind it and seeing what the first Op is.
-////
-//// Might not work for some conceivable parsings, but should
-//// work for all currently implemented ones.
-// pub fn link_op(group: &TokenGroup) -> Option<Op> {
-//     let tokens: Vec<TokenGroup> = vec![group, TokenGroup::Number(0.), TokenGroup::Number(0.)];
-//     build_ast(&tokens).ok().and_then(|prog| prog.iter().next())
-// }
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-// fn compile(source: &str) -> TildeRes<Prog> {
-//     let mut ops = vec![];
-//     for c in source.chars() {
-//         ops.push(match c {
-//             '!' => Op::Math1(Math1Op::Neg),
-//             '‖' => Op::Math1(Math1Op::Abs),
-//             '↑' => Op::Math1(Math1Op::Incr),
-//             '↓' => Op::Math1(Math1Op::Decr),
-//             '+' => Op::Math2(Math2Op::Plus),
-//             '-' => Op::Math2(Math2Op::Minus),
-//             '*' => Op::Math2(Math2Op::Mul),
-//             '/' => Op::Math2(Math2Op::Div),
-//             '\\' => Op::Math2(Math2Op::IntDiv),
-//             '%' => Op::Math2(Math2Op::Mod),
-//             '=' => Op::Compare(CompareOp::Eq),
-//             '≠' => Op::Compare(CompareOp::Neq),
-//             '>' => Op::Compare(CompareOp::Gt),
-//             '≥' => Op::Compare(CompareOp::Gte),
-//             '<' => Op::Compare(CompareOp::Lt),
-//             '≤' => Op::Compare(CompareOp::Lte),
-//             '&' => Op::Bool2(Bool2Op::And),
-//             '|' => Op::Bool2(Bool2Op::Or),
-//             //'a' => Op::Bool2(Bool2Op::Nand),  //TODO @mverleg:
-//             '⊕' => Op::Bool2(Bool2Op::Xor),
-//             '→' => Op::Bool2(Bool2Op::Impl),
-//             '0'..='9' => Op::Value(ValueOp::Number(c.to_digit(10).unwrap() as f64)),
-//             '←' => unimplemented!(),
-//             sym => Err(format!("unknown source symbol: {sym}"))?,
-//         })
-//     }
-//     Ok(Prog::of(ops))
-// }
+    fn of(op: Op) -> Prog {
+        Prog::of(vec![op])
+    }
+
+    #[test]
+    fn long_string_explicit_close() {
+        assert_eq!(parse(",hello world,").unwrap(), of(Op::Text("hello world".to_string())));
+        assert_eq!(parse(",hello world'").unwrap(), of(Op::Text("hello world".to_string())));
+        assert_eq!(parse("'hello world,").unwrap(), of(Op::Text("hello world".to_string())));
+        assert_eq!(parse("'hello world'").unwrap(), of(Op::Text("hello world".to_string())));
+    }
+
+    #[test]
+    fn long_string_implicit_close() {
+        assert_eq!(parse(",hello world").unwrap(), of(Op::Text("hello world".to_string())));
+        assert_eq!(parse("'hello world").unwrap(), of(Op::Text("hello world".to_string())));
+    }
+
+    #[test]
+    fn long_integer() {
+        assert_eq!(parse("123").unwrap(), of(Op::Number(123.)));
+        assert_eq!(parse("-123").unwrap(), of(Op::Number(-123.)));
+    }
+
+    #[test]
+    fn long_float() {
+        assert_eq!(parse("1.23").unwrap(), of(Op::Number(1.23)));
+        assert_eq!(parse(".123").unwrap(), of(Op::Number(0.123)));
+        assert_eq!(parse("123.").unwrap(), of(Op::Number(123.)));
+        assert_eq!(parse("-1.23").unwrap(), of(Op::Number(-1.23)));
+        assert_eq!(parse("-.123").unwrap(), of(Op::Number(-0.123)));
+        assert_eq!(parse("-123.").unwrap(), of(Op::Number(-123.)));
+    }
+
+    #[test]
+    fn long_invalid_number() {
+        assert!(parse("1.2.3").is_err());
+    }
+
+    #[test]
+    fn operator_by_name() {
+        assert_eq!(parse("myOpName").unwrap(), of(todo!()));
+        assert_eq!(parse("my-op-name").unwrap(), of(todo!()));
+    }
+
+    #[test]
+    fn split_on_whitespace() {
+        let op = Op::Number(1.23);
+        assert_eq!(parse("'hello' 1.0").unwrap(), Prog::of(vec![Op::Text("hello".to_string()), Op::Number(1.0)]));
+        assert_eq!(parse("my-op-name my-op-name   1.0").unwrap(), Prog::of(vec![Op::Text("hello".to_string()), Op::Text("hello".to_string()), Op::Number(1.0)]),);
+    }
+}
