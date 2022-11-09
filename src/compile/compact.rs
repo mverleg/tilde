@@ -26,6 +26,7 @@ pub fn encode_positive_int_static_width_avoid_modifiers(nr: u64) -> Vec<Letter> 
     let mut rem = nr / opener_n;
     eprintln!("{nr}: rem_i = {rem}"); //TODO @mark: TEMPORARY! REMOVE THIS!
     while rem > 0 {
+        rem -= 1;
         let pos = if rem < middle_n { rem + middle_n } else { rem % middle_n };
         bytes.push(STRING_FOLLOWERS[pos as usize]);
         rem = rem / middle_n;
