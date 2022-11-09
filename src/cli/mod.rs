@@ -41,7 +41,11 @@ fn gather_input() -> Vec<String> {
             eprintln!("waiting for input on stdin; stdin needs to be closed before tilde can start")
         }
     });
-    let inp = stdin().lock().lines().map(|l| l.expect("cannot read line from stdin, not utf8?")).collect();
+    let inp = stdin()
+        .lock()
+        .lines()
+        .map(|l| l.expect("cannot read line from stdin, not utf8?"))
+        .collect();
     is_ready.store(true, Ordering::Release);
     inp
 }
@@ -61,22 +65,30 @@ fn parse_args(mut args: Vec<String>) -> TildeRes<CliOperation> {
     let cli_op: CliOperation = match arg1.as_deref() {
         Some("-h") | Some("--help") => Ok(CliOperation::ShowHelp),
         Some("-f") | Some("--file") => {
-            let pth = args.pop().ok_or_else(|| "argument -f/--file expects a path to a source file".to_string())?;
+            let pth = args
+                .pop()
+                .ok_or_else(|| "argument -f/--file expects a path to a source file".to_string())?;
             tilde_log!("reading source from file {}", pth);
             Ok(CliOperation::Run(read_to_string(pth).map_err(|err| format!("failed to read source file, err {err}"))?))
         },
         Some("-s") | Some("--source") => {
-            let src = args.pop().ok_or_else(|| "argument -s/--source expects a single argument containing source code".to_string())?;
+            let src = args
+                .pop()
+                .ok_or_else(|| "argument -s/--source expects a single argument containing source code".to_string())?;
             tilde_log!("getting source from command line (length in utf8 bytes: {})", src.len());
             Ok(CliOperation::Run(src))
         },
         Some("-F") | Some("--analyze-file") => {
-            let pth = args.pop().ok_or_else(|| "argument -F/--analyze-file expects a path to a source file".to_string())?;
+            let pth = args
+                .pop()
+                .ok_or_else(|| "argument -F/--analyze-file expects a path to a source file".to_string())?;
             tilde_log!("reading source from file {} for analysis", pth);
             Ok(CliOperation::Analyze(read_to_string(pth).map_err(|err| format!("failed to read source file, err {err}"))?))
         },
         Some("-S") | Some("--analyze-source") => {
-            let src = args.pop().ok_or_else(|| "argument -S/--analyze-source expects a single argument containing source code".to_string())?;
+            let src = args
+                .pop()
+                .ok_or_else(|| "argument -S/--analyze-source expects a single argument containing source code".to_string())?;
             tilde_log!("getting source from command line (length in utf8 bytes: {}) for analysis", src.len());
             Ok(CliOperation::Analyze(src))
         },

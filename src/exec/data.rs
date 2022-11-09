@@ -116,7 +116,12 @@ impl fmt::Display for Array {
 
 impl Array {
     pub fn of<V: Into<Value>>(vec: Vec<V>) -> Self {
-        Array { val: vec.into_iter().map(|v| v.into()).collect() }
+        Array {
+            val: vec
+                .into_iter()
+                .map(|v| v.into())
+                .collect(),
+        }
     }
 
     pub fn single<V: Into<Value>>(val: V) -> Self {

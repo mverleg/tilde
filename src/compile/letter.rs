@@ -138,19 +138,25 @@ mod tests {
 
     #[test]
     fn unique_nr() {
-        let unique = Letter::iter().map(|letter| letter.nr()).collect::<HashSet<_>>();
+        let unique = Letter::iter()
+            .map(|letter| letter.nr())
+            .collect::<HashSet<_>>();
         assert_eq!(unique.len(), Letter::iter().count());
     }
 
     #[test]
     fn unique_symbol() {
-        let unique = Letter::iter().map(|letter| letter.symbol()).collect::<HashSet<_>>();
+        let unique = Letter::iter()
+            .map(|letter| letter.symbol())
+            .collect::<HashSet<_>>();
         assert_eq!(unique.len(), Letter::iter().count());
     }
 
     #[test]
     fn all_kinds_present() {
-        let unique = Letter::iter().map(|letter| letter.kind()).collect::<HashSet<_>>();
+        let unique = Letter::iter()
+            .map(|letter| letter.kind())
+            .collect::<HashSet<_>>();
         for kind in LetterKind::iter() {
             assert!(unique.contains(&kind), "unused kind: {:?}", kind);
         }
@@ -158,8 +164,13 @@ mod tests {
 
     #[test]
     fn modifier_method() {
-        let expected_modifiers = Letter::iter().filter(|letter| letter.kind() == LetterKind::Modifier).collect::<HashSet<_>>();
-        let real_modifiers = Letter::modifiers().iter().cloned().collect::<HashSet<_>>();
+        let expected_modifiers = Letter::iter()
+            .filter(|letter| letter.kind() == LetterKind::Modifier)
+            .collect::<HashSet<_>>();
+        let real_modifiers = Letter::modifiers()
+            .iter()
+            .cloned()
+            .collect::<HashSet<_>>();
         assert_eq!(real_modifiers, expected_modifiers)
     }
 

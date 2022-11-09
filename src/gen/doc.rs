@@ -24,7 +24,10 @@ impl OpDoc {
 /// Generate document objects, grouped by opener and sorted.
 //TODO @mverleg: include standalone modifiers
 pub fn gen_grouped_docs() -> Vec<(Letter, Vec<OpDoc>)> {
-    let mut groups = ALPHABET.iter().map(|letter| (letter.clone(), vec![])).collect::<Vec<(Letter, Vec<OpDoc>)>>();
+    let mut groups = ALPHABET
+        .iter()
+        .map(|letter| (letter.clone(), vec![]))
+        .collect::<Vec<(Letter, Vec<OpDoc>)>>();
     for op_doc in gen_docs() {
         let index = op_doc.word.group().byte as usize;
         groups[index].1.push(op_doc);

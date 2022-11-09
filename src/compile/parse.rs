@@ -8,7 +8,9 @@ use crate::TildeRes;
 
 pub fn parse(src: &str) -> TildeRes<Prog> {
     let mut ops = vec![];
-    let mut tokens = src.chars().collect::<Vec<_>>();
+    let mut tokens = src
+        .chars()
+        .collect::<Vec<_>>();
     tokens.reverse();
     tilde_log!("parsing {} tokens", tokens.len());
     let mut buffer = String::new();
@@ -39,7 +41,11 @@ pub fn parse(src: &str) -> TildeRes<Prog> {
                 buffer.push(token)
             }
             tilde_log!("integer literal (long mode): \"{}\"", &buffer);
-            let op = Op::Number(buffer.parse::<f64>().map_err(|err| format!("invalid number '{}', err {}", buffer, err))?);
+            let op = Op::Number(
+                buffer
+                    .parse::<f64>()
+                    .map_err(|err| format!("invalid number '{}', err {}", buffer, err))?,
+            );
             ops.push(op)
         } else if current.is_alphabetic() || current == '-' {
             buffer.clear();

@@ -36,9 +36,15 @@ pub fn gen_inputs() -> Vec<Word> {
 }
 
 fn generate_modifiers() -> Vec<Modifiers> {
-    let modifier_letters = ALPHABET.iter().filter(|letter| letter.is_modifier()).collect::<Vec<_>>();
+    let modifier_letters = ALPHABET
+        .iter()
+        .filter(|letter| letter.is_modifier())
+        .collect::<Vec<_>>();
     let mut modifiers = vec![Modifiers::empty()];
-    for (n, modi1) in modifier_letters.iter().enumerate() {
+    for (n, modi1) in modifier_letters
+        .iter()
+        .enumerate()
+    {
         modifiers.push(Modifiers::of_single((*modi1).clone()));
         for modi2 in &modifier_letters[..n] {
             modifiers.push(Modifiers::of_double((*modi1).clone(), (*modi2).clone()).unwrap())
