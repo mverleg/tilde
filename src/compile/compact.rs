@@ -16,21 +16,17 @@ pub fn encode_positive_int_static_width_avoid_modifiers(nr: u64) -> Vec<Letter> 
     let opener_n = (STRING_OPENERS.len() / 2) as u64;
     if nr < opener_n {
         bytes.push(STRING_OPENERS[(nr + opener_n) as usize]);
-        eprintln!("{nr}: ONLY = {}", nr + opener_n); //TODO @mark: TEMPORARY! REMOVE THIS!
     } else {
         bytes.push(STRING_OPENERS[(nr % opener_n) as usize]);
-        eprintln!("{nr}: FIRST = {}", nr % opener_n); //TODO @mark: TEMPORARY! REMOVE THIS!
     }
     let middle_n = (STRING_FOLLOWERS.len() / 2) as u64;
     debug_assert!(middle_n < 16 && (middle_n as usize) < usize::MAX);
     let mut rem = nr / opener_n;
-    eprintln!("{nr}: rem_i = {rem}"); //TODO @mark: TEMPORARY! REMOVE THIS!
     while rem > 0 {
         rem -= 1;
         let pos = if rem < middle_n { rem + middle_n } else { rem % middle_n };
         bytes.push(STRING_FOLLOWERS[pos as usize]);
         rem = rem / middle_n;
-        eprintln!("{nr}: val = {pos}, rem = {rem}"); //TODO @mark: TEMPORARY! REMOVE THIS!
     }
     bytes
 }
@@ -100,6 +96,18 @@ mod static_width {
     }
 
     #[test]
+    fn positive_int_avoided_modifiers__decoding_examples() {
+        assert_eq!(decode_positive_int_static_width_avoid_modifiers(&[Asterisk]).unwrap(), 0);
+        assert_eq!(decode_positive_int_static_width_avoid_modifiers(&[Colon]).unwrap(), 4);
+        assert_eq!(decode_positive_int_static_width_avoid_modifiers(&[Number, Right]).unwrap(), 5);
+        assert_eq!(decode_positive_int_static_width_avoid_modifiers(&[Plus, Right]).unwrap(), 9);
+        assert_eq!(decode_positive_int_static_width_avoid_modifiers(&[Number, Bracket]).unwrap(), 10);
+        assert_eq!(decode_positive_int_static_width_avoid_modifiers(&[Plus, Hash]).unwrap(), 39);
+        assert_eq!(decode_positive_int_static_width_avoid_modifiers(&[Number, Number, Right]).unwrap(), 40);
+        assert_eq!(decode_positive_int_static_width_avoid_modifiers(&[Number, Io, Right]).unwrap(), 45);
+    }
+
+    #[test]
     fn positive_int_without_avoided_modifiers() {
         for nr in 0..=1000 {
             let enc = encode_positive_int_static_width_avoid_modifiers(nr);
@@ -111,11 +119,9 @@ mod static_width {
                     .collect::<Vec<_>>()
                     .join(", ")
             );
-            //TODO @mark: TEMPORARY! REMOVE THIS!
-            //let dec = decode_positive_int_static_width_avoid_modifiers(&enc).unwrap_or_else(|| panic!("failed to decode {}", nr));
-            //TODO @mark: ^
+            let dec = decode_positive_int_static_width_avoid_modifiers(&enc).unwrap_or_else(|| panic!("failed to decode {}", nr));
+            assert_eq!(nr, dec);
         }
-        todo!()
     }
 
     #[test]
@@ -128,6 +134,5 @@ mod static_width {
     fn positive_int_with_avoided_modifiers() {
         let decode = decode_positive_int_static_width_avoid_modifiers(&[]);
         assert!(decode.is_none());
-        todo!();
     }
 }
