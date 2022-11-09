@@ -8,7 +8,7 @@ use crate::TildeRes;
 
 //TODO @mark: remove unused modules
 // mod alphabet;
-// mod letter;
+mod letter;
 mod parse;
 // mod word;
 mod compact;

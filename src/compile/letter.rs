@@ -2,10 +2,48 @@ use ::std::fmt;
 use ::std::fmt::Formatter;
 use ::std::hash::Hash;
 use ::std::hash::Hasher;
+use ::strum_macros::EnumIter;
 
-#[derive(Debug, Clone, Copy)]
-//TODO @mark: remove?
-pub enum LetterType {
+//TODO @mark: meaningful names
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EnumIter)]
+pub enum Letter {
+    // Literals
+    Number,
+    Text,
+
+    // Fixed
+    Io,
+    Seq,
+    More,
+
+    // Variable
+
+    // Modifiers
+    Hat,
+    Exclamation,
+    Question,
+    Hash,
+    Tilde,
+    // Letter::literal(0, '0', "num"),
+    // Letter::literal(1, '"', "str"),
+    // Letter::fixed(2, 'i', "inp"),
+    // Letter::fixed(3, 'n', "seq"),
+    // Letter::fixed(4, '.', "more"),
+    // Letter::var(5, '+', "plus"),
+    // Letter::var(6, 'x', "x"),
+    // Letter::var(7, '=', "eq"),
+    // Letter::var(8, '>', "gt"),
+    // Letter::var(9, '$', "var"),
+    // Letter::var(10, ':', "forall"),
+    // Letter::modi(11, '^', "hat"),
+    // Letter::modi(12, '!', "exclamation"),
+    // Letter::modi(13, '?', "question"),
+    // Letter::modi(14, '#', "hash"),
+    // Letter::modi(15, '~', "tilde"),
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EnumIter)]
+pub enum LetterKind {
     /// Special letter that starts a number or text literal.
     Literal,
     /// Letter appears alone, or followed by modifiers.
@@ -16,121 +54,63 @@ pub enum LetterType {
     Modifier,
 }
 
-impl PartialEq for LetterType {
-    fn eq(
-        &self,
-        other: &Self,
-    ) -> bool {
-        use LetterType::*;
-        match (self, other) {
-            (VariableOpen, VariableOpen) => true,
-            (VariableOpen, _) => false,
-            (FixedOpen, FixedOpen) => true,
-            (FixedOpen, _) => false,
-            (Modifier, Modifier) => true,
-            (Modifier, _) => false,
-            (Literal, Literal) => true,
-            (Literal, _) => false,
+impl Letter {
+    pub fn nr(&self) -> u8 {
+        match self {
+            Letter::Number => 0,
+            Letter::Text => 0,
+            Letter::Io => 0,
+            Letter::Seq => 0,
+            Letter::More => 0,
+            Letter::Hat => 0,
+            Letter::Exclamation => 0,
+            Letter::Question => 0,
+            Letter::Hash => 0,
+            Letter::Tilde => 0,
         }
     }
-}
 
-#[derive(Debug, Clone)]
-pub struct Letter {
-    pub byte: u8,
-    pub chr: char,
-    pub long: &'static str,
-    pub typ: LetterType,
-}
-
-impl Letter {
-    pub const fn new(
-        byte: u8,
-        chr: char,
-        long: &'static str,
-        typ: LetterType,
-    ) -> Self {
-        Letter { byte, chr, long, typ }
+    pub fn symbol(&self) -> char {
+        todo!(); //TODO @mark:
     }
 
-    pub const fn literal(
-        byte: u8,
-        chr: char,
-        long: &'static str,
-    ) -> Self {
-        Letter::new(byte, chr, long, LetterType::Literal)
-    }
-
-    pub const fn var(
-        byte: u8,
-        chr: char,
-        long: &'static str,
-    ) -> Self {
-        Letter::new(byte, chr, long, LetterType::VariableOpen)
-    }
-
-    pub const fn fixed(
-        byte: u8,
-        chr: char,
-        long: &'static str,
-    ) -> Self {
-        Letter::new(byte, chr, long, LetterType::FixedOpen)
-    }
-
-    pub const fn modi(
-        byte: u8,
-        chr: char,
-        long: &'static str,
-    ) -> Self {
-        Letter::new(byte, chr, long, LetterType::Modifier)
-    }
-
-    pub fn is_literal(&self) -> bool {
-        self.typ == LetterType::Literal
-    }
-
-    pub fn is_variable(&self) -> bool {
-        self.typ == LetterType::VariableOpen
-    }
-
-    pub fn is_fixed(&self) -> bool {
-        self.typ == LetterType::FixedOpen
-    }
-
-    pub fn is_opener(&self) -> bool {
-        self.is_fixed() || self.is_variable()
-    }
-
-    pub fn is_modifier(&self) -> bool {
-        self.typ == LetterType::Modifier
+    pub fn kind(&self) -> LetterKind {
+        todo!(); //TODO @mark:
     }
 }
 
-impl fmt::Display for Letter {
-    fn fmt(
-        &self,
-        f: &mut Formatter<'_>,
-    ) -> fmt::Result {
-        write!(f, "{} (#{})", self.chr, self.byte)
+#[cfg(test)]
+mod tests {
+    use std::collections::HashSet;
+
+    use ::strum::IntoEnumIterator;
+
+    use super::*;
+
+    #[test]
+    fn unique_nr() {
+        let unique = Letter::iter().map(|letter| letter.nr()).collect::<HashSet<_>>();
+        assert_eq!(unique.len(), Letter::iter().count());
     }
-}
 
-impl PartialEq for Letter {
-    fn eq(
-        &self,
-        other: &Self,
-    ) -> bool {
-        self.byte == other.byte
+    #[test]
+    fn unique_symbol() {
+        let unique = Letter::iter().map(|letter| letter.symbol()).collect::<HashSet<_>>();
+        assert_eq!(unique.len(), Letter::iter().count());
     }
-}
 
-impl Eq for Letter {}
+    #[test]
+    fn all_kinds_present() {
+        let unique = Letter::iter().map(|letter| letter.kind()).collect::<HashSet<_>>();
+        for kind in LetterKind::iter() {
+            assert!(unique.contains(&kind), "unused kind: {:?}", kind);
+        }
+    }
 
-impl Hash for Letter {
-    fn hash<H: Hasher>(
-        &self,
-        state: &mut H,
-    ) {
-        self.byte.hash(state)
+    #[test]
+    fn letters_fit_in_half_byte() {
+        let count = Letter::iter().count();
+        assert!(count <= 16, "should fit in half byte (uses {})", count);
+        assert!(count >= 16, "should fully utilize all bits in half byte (uses {})", count);
     }
 }
