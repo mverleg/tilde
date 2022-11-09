@@ -10,7 +10,21 @@ const STRING_FOLLOWERS: [Letter; 14] = [Number, Io, Seq, More, Plus, Asterisk, S
 /// Encode a positive integer, using static width of 1 byte each, and
 /// do not allow modifiers in the first byte.
 pub fn encode_positive_int_static_width_avoid_modifiers(nr: u64) -> Vec<Letter> {
-    todo!();
+    //TODO @mark: lot of % with non-powers of two, so probably slow...
+    let mut bytes = vec![];
+    let n = (STRING_OPENERS.len() / 2) as u64;
+    bytes.push(STRING_FOLLOWERS[((nr % n) + n) as usize]);
+    let mut rem = nr / n;
+    debug_assert!(n < 16 && (n as usize) < usize::MAX);
+    while rem >= n {
+        let value = rem % n;
+        bytes.push(STRING_FOLLOWERS[value as usize]);
+        rem /= n;
+    }
+    debug_assert!(n < 16 && (n as usize) < usize::MAX);
+    bytes.push(STRING_OPENERS[rem as usize]);
+    bytes.reverse();
+    bytes
 }
 
 /// Inverse of [encode_pos_int_static_width_avoid_modifiers].
@@ -61,9 +75,11 @@ mod static_width {
 
     #[test]
     fn positive_int_without_avoided_modifiers() {
-        for nr in [0, 1, 100, 100_000] {
+        for nr in [0, 1, 5, 6, 10, 11, 100, 100_000] {
             let enc = encode_positive_int_static_width_avoid_modifiers(nr);
-            let dec = decode_positive_int_static_width_avoid_modifiers(&enc).unwrap_or_else(|| panic!("failed to decode {}", nr));
+            dbg!(&enc);
+            //let dec = decode_positive_int_static_width_avoid_modifiers(&enc).unwrap_or_else(|| panic!("failed to decode {}", nr));
+            //TODO @mark: ^
         }
         todo!()
     }
