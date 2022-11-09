@@ -11,4 +11,5 @@ use crate::TildeRes;
 // mod letter;
 mod parse;
 // mod word;
+mod compact;
 mod ops;

@@ -13,7 +13,9 @@ pub fn parse(src: &str) -> TildeRes<Prog> {
     tilde_log!("parsing {} tokens", tokens.len());
     let mut buffer = String::new();
     while let Some(current) = tokens.pop() {
-        if current == ',' || current == '\'' {
+        if current.is_whitespace() {
+            tilde_log!("skipping whitespace");
+        } else if current == ',' || current == '\'' {
             buffer.clear();
             while let Some(token) = tokens.pop() {
                 if token == ',' || token == '\'' {
@@ -54,8 +56,6 @@ pub fn parse(src: &str) -> TildeRes<Prog> {
             tilde_log!("operator by long name: \"{}\"", &buffer);
             let op = lookup_op_name(&buffer).ok_or_else(|| format!("could not find an identifier by name '{}'", &buffer))?;
             ops.push(op)
-        } else if current.is_whitespace() {
-            tilde_log!("skipping whitespace");
         } else if current == '"' {
             tilde_log!("string lookup (short mode)");
             todo!(); //TODO @mark: TEMPORARY! REMOVE THIS!
