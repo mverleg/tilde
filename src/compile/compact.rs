@@ -7,9 +7,7 @@ use crate::op::Op;
 //TODO @mark: any non-first number can start with openers, so make separate versions
 
 const STRING_OPENERS: [Letter; 10] = [Number, Io, Seq, More, Plus, Asterisk, Slash, Right, Bracket, Colon];
-const STRING_SINGLE: [Letter; 10] = STRING_OPENERS;
-const STRING_MIDDLE: [Letter; 16] = [Number, Text, Io, Seq, More, Plus, Asterisk, Slash, Right, Bracket, Colon, Hat, Exclamation, Question, Hash, Tilde];
-const STRING_CLOSER: [Letter; 14] = [Number, Io, Seq, More, Plus, Asterisk, Slash, Right, Bracket, Colon, Hat, Exclamation, Question, Hash];
+const STRING_FOLLOWERS: [Letter; 14] = [Number, Io, Seq, More, Plus, Asterisk, Slash, Right, Bracket, Colon, Hat, Exclamation, Question, Hash];
 
 /// Encode a positive integer, using static width of 1 byte each, and
 /// do not allow modifiers in the first byte.
@@ -23,13 +21,13 @@ pub fn encode_positive_int_static_width_avoid_modifiers(nr: u64) -> Vec<Letter> 
         bytes.push(STRING_OPENERS[(nr % opener_n) as usize]);
         eprintln!("{nr}: FIRST = {}", nr % opener_n); //TODO @mark: TEMPORARY! REMOVE THIS!
     }
-    let middle_n = (STRING_MIDDLE.len() / 2) as u64;
+    let middle_n = (STRING_FOLLOWERS.len() / 2) as u64;
     debug_assert!(middle_n < 16 && (middle_n as usize) < usize::MAX);
     let mut rem = nr / opener_n;
     eprintln!("{nr}: rem_i = {rem}"); //TODO @mark: TEMPORARY! REMOVE THIS!
     while rem > 0 {
         let pos = if rem < middle_n { rem + middle_n } else { rem % middle_n };
-        bytes.push(STRING_MIDDLE[pos as usize]);
+        bytes.push(STRING_FOLLOWERS[pos as usize]);
         rem = rem / middle_n;
         eprintln!("{nr}: val = {pos}, rem = {rem}"); //TODO @mark: TEMPORARY! REMOVE THIS!
     }
@@ -58,16 +56,11 @@ mod constants_in_sync {
 
     fn select_letters(predicate: impl Fn(&Letter) -> bool) -> Vec<Letter> {
         let mut allowed: Vec<Letter> = Letter::iter()
+            .filter(|letter| letter != &Text)
             .filter(predicate)
             .collect();
         if allowed.len() % 2 != 0 {
-            allowed = allowed
-                .into_iter()
-                .filter(|letter| letter != &Text)
-                .collect();
-            if allowed.len() % 2 != 0 {
-                allowed.pop();
-            }
+            allowed.pop();
         }
         assert_eq!(allowed.len() % 2, 0, "should be an even number of letters, because any odd tail will be ignored");
         assert!(allowed.len() >= 2, "must allow at least two letters, since half are used to indicate closing");
@@ -83,21 +76,8 @@ mod constants_in_sync {
 
     /// In the middle of numbers, all letters are allowed.
     #[test]
-    fn middles() {
-        assert_eq!(STRING_MIDDLE, select_letters(|_letter| true).as_slice());
-    }
-
-    /// A text number cannot end with a text token, as that would cause ambiguity between
-    /// continuing the number or closing the whole text.
-    #[test]
-    fn closers() {
-        assert_eq!(STRING_CLOSER, select_letters(|letter| letter != &Text).as_slice());
-    }
-
-    /// If there is a single byte (opener == closer), exclude Text and modifiers
-    #[test]
-    fn singles() {
-        assert_eq!(STRING_SINGLE, select_letters(|letter| letter != &Text && letter.kind() != LetterKind::Modifier).as_slice());
+    fn followers() {
+        assert_eq!(STRING_FOLLOWERS, select_letters(|_letter| true).as_slice());
     }
 }
 
@@ -120,7 +100,7 @@ mod static_width {
 
     #[test]
     fn positive_int_without_avoided_modifiers() {
-        for nr in [0, 1, 4, 5, 9, 10, 100, 100_000] {
+        for nr in 0..=1000 {
             let enc = encode_positive_int_static_width_avoid_modifiers(nr);
             println!(
                 "{} => [{}]",
