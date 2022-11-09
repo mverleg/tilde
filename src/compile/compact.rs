@@ -54,7 +54,7 @@ pub fn decode_positive_int_static_width_avoid_modifiers(ops: &[Letter]) -> Resul
     let value = STRING_OPENERS_REV[opener.nr() as usize];
     debug_assert!(value < 16);
     let open_n = (STRING_OPENERS.len() / 2) as u64;
-    if value > open_n {
+    if value >= open_n {
         return Ok(DecodedPositiveNumber { end_index: 0, number: value - open_n });
     };
     let mut nr = value;
@@ -69,7 +69,7 @@ pub fn decode_positive_int_static_width_avoid_modifiers(ops: &[Letter]) -> Resul
             .ok_or_else(|| "number is too large (in: multiplier)")?;
         let value = STRING_OPENERS_REV[opener.nr() as usize];
         debug_assert!(value < 16);
-        if value > follow_n {
+        if value >= follow_n {
             let scale = multiplier
                 .checked_mul(value - follow_n)
                 .ok_or_else(|| "number is too large (in: final scale)")?;
