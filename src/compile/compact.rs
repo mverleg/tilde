@@ -200,6 +200,8 @@ mod static_width {
         assert_eq!(encode_positive_int_static_width_avoid_modifiers(39), vec![Plus, Hash]);
         assert_eq!(encode_positive_int_static_width_avoid_modifiers(40), vec![Number, Number, Right]);
         assert_eq!(encode_positive_int_static_width_avoid_modifiers(45), vec![Number, Io, Right]);
+        assert_eq!(encode_positive_int_static_width_avoid_modifiers(69), vec![Plus, Asterisk, Right]);
+        assert_eq!(encode_positive_int_static_width_avoid_modifiers(70), vec![Number, Slash, Right]);
         assert_eq!(encode_positive_int_static_width_avoid_modifiers(1999), vec![Plus, Slash, Slash, Hash]);
         assert_eq!(encode_positive_int_static_width_avoid_modifiers(2000), vec![Number, Number, Number, Number, Right]);
     }
@@ -213,6 +215,8 @@ mod static_width {
         assert_eq!(decode_positive_int_static_width_avoid_modifiers(&[Number, Bracket]).unwrap(), DecodedPositiveNumber { end_index: 1, number: 10 });
         assert_eq!(decode_positive_int_static_width_avoid_modifiers(&[Plus, Hash, Io]).unwrap(), DecodedPositiveNumber { end_index: 1, number: 39 });
         assert_eq!(decode_positive_int_static_width_avoid_modifiers(&[Number, Number, Right, Io]).unwrap(), DecodedPositiveNumber { end_index: 2, number: 40 });
+        assert_eq!(decode_positive_int_static_width_avoid_modifiers(&[Plus, Asterisk, Right]).unwrap(), DecodedPositiveNumber { end_index: 2, number: 69 });
+        assert_eq!(decode_positive_int_static_width_avoid_modifiers(&[Number, Slash, Right]).unwrap(), DecodedPositiveNumber { end_index: 2, number: 70 });
         assert_eq!(decode_positive_int_static_width_avoid_modifiers(&[Number, Io, Right]).unwrap(), DecodedPositiveNumber { end_index: 2, number: 45 });
         assert_eq!(
             decode_positive_int_static_width_avoid_modifiers(&[Plus, Slash, Slash, Hash]).unwrap(),
@@ -250,6 +254,7 @@ mod static_width {
     fn positive_int_without_avoided_modifiers() {
         let nrs = (0..100).chain((0..10).map(|n| n * 2 - n));
         for nr in nrs {
+            eprintln!("== {} ==", nr); //TODO @mark: TEMPORARY! REMOVE THIS!
             let enc = encode_positive_int_static_width_avoid_modifiers(nr);
             let dec = decode_positive_int_static_width_avoid_modifiers(&enc).unwrap_or_else(|_| panic!("failed to decode {}", nr));
             assert_eq!(nr, dec.number);
