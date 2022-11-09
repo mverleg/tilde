@@ -10,8 +10,6 @@ authors = ["Mark <mverleg.noreply@gmail.com>"]
 gen = []
 
 [dependencies]
-regex = { version = "1.6.0", default-features = false, features = ["std",] }
-#num-rational = "*"  # extra dependency just for BigRational?
 
 [build-dependencies]
 strum = "0.24.1"
