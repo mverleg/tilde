@@ -43,7 +43,7 @@ pub fn parse(src: &str) -> TildeRes<Prog> {
             buffer.clear();
             buffer.push(current);
             while let Some(token) = tokens.pop() {
-                if !current.is_alphabetic() && current != '-' {
+                if !token.is_alphabetic() && token != '-' {
                     if !current.is_whitespace() {
                         tokens.push(token);
                     }
@@ -125,7 +125,7 @@ mod tests {
     fn split_on_whitespace() {
         let op = Op::Number(1.23);
         assert_eq!(parse("'hello' 1.0").unwrap(), Prog::of(vec![Op::Text("hello".to_string()), Op::Number(1.0)]));
+        assert_eq!(parse("div   1").unwrap(), Prog::of(vec![Op::Div, Op::Number(1.0)]),);
         assert_eq!(parse("int-div1.0").unwrap(), Prog::of(vec![Op::IntDiv, Op::Number(1.0)]),);
-        assert_eq!(parse("int1").unwrap(), Prog::of(vec![Op::Div, Op::Number(1.0)]),);
     }
 }
