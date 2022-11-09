@@ -10,18 +10,21 @@ const STRING_FOLLOWERS: [Letter; 14] = [Number, Io, Seq, More, Plus, Asterisk, S
 /// Encode a positive integer, using static width of 1 byte each, and
 /// do not allow modifiers in the first byte.
 pub fn encode_positive_int_static_width_avoid_modifiers(nr: u64) -> Vec<Letter> {
-    //TODO @mark: lot of % with non-powers of two, so probably slow...
     let mut bytes = vec![];
-    let n = (STRING_OPENERS.len() / 2) as u64;
-    bytes.push(STRING_FOLLOWERS[((nr % n) + n) as usize]);
-    let mut rem = nr / n;
-    debug_assert!(n < 16 && (n as usize) < usize::MAX);
-    while rem >= n {
-        let value = rem % n;
-        bytes.push(STRING_FOLLOWERS[value as usize]);
-        rem /= n;
+    let opener_n = (STRING_OPENERS.len() / 2) as u64;
+    if nr < opener_n {
+        return vec![STRING_OPENERS[(nr + opener_n) as usize]];
     }
-    debug_assert!(n < 16 && (n as usize) < usize::MAX);
+    let follow_n = (STRING_FOLLOWERS.len() / 2) as u64;
+    bytes.push(STRING_FOLLOWERS[((nr % follow_n) + follow_n) as usize]);
+    let mut rem = nr / follow_n;
+    debug_assert!(follow_n < 16 && (follow_n as usize) < usize::MAX);
+    while rem >= opener_n {
+        let value = rem % follow_n;
+        bytes.push(STRING_FOLLOWERS[value as usize]);
+        rem /= follow_n;
+    }
+    debug_assert!(follow_n < 16 && (follow_n as usize) < usize::MAX);
     bytes.push(STRING_OPENERS[rem as usize]);
     bytes.reverse();
     bytes
@@ -75,9 +78,10 @@ mod static_width {
 
     #[test]
     fn positive_int_without_avoided_modifiers() {
-        for nr in [0, 1, 5, 6, 10, 11, 100, 100_000] {
+        for nr in [0, 1, 4, 5, 9, 10, 100, 100_000] {
             let enc = encode_positive_int_static_width_avoid_modifiers(nr);
-            dbg!(&enc);
+            println!("{} => [{}]", nr, enc.iter().map(|letter| letter.symbol().to_string()).collect::<Vec<_>>().join(", "));
+            //TODO @mark: TEMPORARY! REMOVE THIS!
             //let dec = decode_positive_int_static_width_avoid_modifiers(&enc).unwrap_or_else(|| panic!("failed to decode {}", nr));
             //TODO @mark: ^
         }
