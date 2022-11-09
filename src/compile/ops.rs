@@ -13,7 +13,7 @@ pub fn lookup_op_name(op_name: &str) -> Option<Op> {
         "mul" => Op::Mul,
         "div" => Op::Div,
         "int-div" => Op::IntDiv,
-        "mod" => Op::Mod,
+        "modulo" => Op::Mod,
 
         "eq" => Op::Eq,
         "neq" => Op::Neq,
@@ -30,4 +30,23 @@ pub fn lookup_op_name(op_name: &str) -> Option<Op> {
 
         _ => return None,
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use ::strum::IntoEnumIterator;
+
+    use super::*;
+
+    #[test]
+    fn all_ops_parseable() {
+        for orig_op in Op::iter() {
+            let name = orig_op.name();
+            if name == "text" || name == "nr" {
+                continue;
+            }
+            let parse_op = lookup_op_name(name);
+            assert!(parse_op.is_some(), "could not parse op: {}, add it to `lookup_op_name`", name);
+        }
+    }
 }
