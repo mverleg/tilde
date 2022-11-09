@@ -9,9 +9,10 @@ use ::std::io::Read;
 use ::std::path::Path;
 use ::std::process::ExitCode;
 
+#[cfg(feature = "gen")]
+pub use self::gen::mddoc::tilde_gen_md_docs;
 pub use crate::common::log as tilde_log;
 use crate::compile::parse;
-use crate::exec::Text;
 pub use crate::exec::Value;
 
 mod common;
@@ -20,8 +21,7 @@ mod exec;
 #[cfg(feature = "gen")]
 mod gen;
 mod op;
-#[cfg(feature = "gen")]
-pub use self::gen::mddoc::tilde_gen_md_docs;
+
 #[cfg(not(feature = "gen"))]
 pub fn tilde_gen_md_docs() -> TildeRes<()> {
     Err("doc-gen can only be used if compiled with feature `gen`".to_owned())

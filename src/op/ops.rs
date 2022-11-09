@@ -40,30 +40,33 @@ pub enum Op {
 impl Op {
     pub fn name(&self) -> &str {
         match self {
-            Math1Op::Neg => "neg",
-            Math1Op::Abs => "abs",
-            Math1Op::Incr => "incr",
-            Math1Op::Decr => "decr",
+            Op::Text(_) => "text",
+            Op::Number(_) => "nr",
 
-            Math2Op::Plus => "plus",
-            Math2Op::Minus => "minus",
-            Math2Op::Mul => "mul",
-            Math2Op::Div => "div",
-            Math2Op::IntDiv => "intdiv",
-            Math2Op::Mod => "modulo",
+            Self::Neg => "neg",
+            Self::Abs => "abs",
+            Self::Incr => "incr",
+            Self::Decr => "decr",
 
-            CompareOp::Eq => "eq",
-            CompareOp::Neq => "neq",
-            CompareOp::Gt => "gt",
-            CompareOp::Gte => "gte",
-            CompareOp::Lt => "lt",
-            CompareOp::Lte => "lte",
+            Self::Plus => "plus",
+            Self::Minus => "minus",
+            Self::Mul => "mul",
+            Self::Div => "div",
+            Self::IntDiv => "intdiv",
+            Self::Mod => "modulo",
 
-            Bool2Op::And => "and",
-            Bool2Op::Or => "or",
-            Bool2Op::Nand => "nand",
-            Bool2Op::Xor => "xor",
-            Bool2Op::Impl => "impl",
+            Self::Eq => "eq",
+            Self::Neq => "neq",
+            Self::Gt => "gt",
+            Self::Gte => "gte",
+            Self::Lt => "lt",
+            Self::Lte => "lte",
+
+            Self::And => "and",
+            Self::Or => "or",
+            Self::Nand => "nand",
+            Self::Xor => "xor",
+            Self::Impl => "impl",
         }
     }
 }
