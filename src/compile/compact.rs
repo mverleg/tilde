@@ -206,6 +206,12 @@ mod static_width {
     }
 
     #[test]
+    fn positive_int_non_terminated_number() {
+        let decode = decode_positive_int_static_width_avoid_modifiers(&[Io, Io, Io]);
+        assert!(decode.is_err());
+    }
+
+    #[test]
     fn positive_int_overflow_in_decode() {
         let decode = decode_positive_int_static_width_avoid_modifiers(&[Io; 100]);
         assert!(decode.is_err());

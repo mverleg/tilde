@@ -38,7 +38,12 @@ fn gen_opener_doc(
     write_openers(docs, &mut openfmt, opener.byte);
     writeln!(openfmt, "* Character: **{}** (#{:x}/{})", opener.chr, opener.byte, ALPHABET.len()).unwrap();
     writeln!(openfmt, "* Name: \"{}\"", &opener.long).unwrap();
-    writeln!(openfmt, "* Type: {}", if opener.is_fixed() { "always 1 argument, and optional modifiers" } else { "no fixed argument, but allows optional modifiers" }).unwrap();
+    writeln!(
+        openfmt,
+        "* Type: {}",
+        if opener.is_fixed() { "always 1 argument, and optional modifiers" } else { "no fixed argument, but allows optional modifiers" }
+    )
+    .unwrap();
     writeln!(openfmt, "\n### Operations:\n").unwrap();
     for op in ops {
         writeln!(openfmt, "* [{}](./{}.md)", op.chars(), op.op_name()).unwrap();
