@@ -121,6 +121,11 @@ impl Letter {
             Tilde => Modifier,
         }
     }
+
+    pub const fn modifiers() -> [Letter; 5] {
+        use self::Letter::*;
+        [Hat, Exclamation, Question, Hash, Tilde]
+    }
 }
 
 #[cfg(test)]
@@ -149,6 +154,13 @@ mod tests {
         for kind in LetterKind::iter() {
             assert!(unique.contains(&kind), "unused kind: {:?}", kind);
         }
+    }
+
+    #[test]
+    fn modifier_method() {
+        let expected_modifiers = Letter::iter().filter(|letter| letter.kind() == LetterKind::Modifier).collect::<HashSet<_>>();
+        let real_modifiers = Letter::modifiers().iter().cloned().collect::<HashSet<_>>();
+        assert_eq!(real_modifiers, expected_modifiers)
     }
 
     #[test]
