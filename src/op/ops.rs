@@ -1,6 +1,8 @@
+use ::strum_macros::EnumIter;
+
 use crate::op::typ::Typ;
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, EnumIter)]
 pub enum Op {
     // Value
     Text(String),
@@ -68,5 +70,21 @@ impl Op {
             Self::Xor => "xor",
             Self::Impl => "impl",
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use ::strum::IntoEnumIterator;
+
+    use super::*;
+
+    #[test]
+    fn ops_iterable() {
+        let mut names = String::with_capacity(4096);
+        for op in Op::iter() {
+            names.push_str(op.name())
+        }
+        assert!(names.len() > 50);
     }
 }
