@@ -40,8 +40,8 @@ pub enum Op {
 impl Op {
     pub fn name(&self) -> &str {
         match self {
-            Op::Text(_) => "text",
-            Op::Number(_) => "nr",
+            Self::Text(_) => "text",
+            Self::Number(_) => "nr",
 
             Self::Neg => "neg",
             Self::Abs => "abs",
@@ -52,7 +52,7 @@ impl Op {
             Self::Minus => "minus",
             Self::Mul => "mul",
             Self::Div => "div",
-            Self::IntDiv => "intdiv",
+            Self::IntDiv => "int-div",
             Self::Mod => "modulo",
 
             Self::Eq => "eq",

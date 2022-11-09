@@ -1,5 +1,6 @@
 use ::std::env::current_exe;
 
+use crate::compile::ops::lookup_op_name;
 use crate::op::Op;
 use crate::op::Prog;
 use crate::tilde_log;
@@ -51,7 +52,7 @@ pub fn parse(src: &str) -> TildeRes<Prog> {
                 buffer.push(token)
             }
             tilde_log!("operator by long name: \"{}\"", &buffer);
-            let op = todo!("{}", current);
+            let op = lookup_op_name(&buffer).ok_or_else(|| format!("could not find an identifier by name '{}'", &buffer))?;
             ops.push(op)
         } else if current.is_whitespace() {
             tilde_log!("skipping whitespace");
@@ -110,14 +111,21 @@ mod tests {
 
     #[test]
     fn operator_by_name() {
-        assert_eq!(parse("myOpName").unwrap(), of(todo!()));
-        assert_eq!(parse("my-op-name").unwrap(), of(todo!()));
+        assert_eq!(parse("div").unwrap(), of(Op::Div));
+        assert_eq!(parse("int-div").unwrap(), of(Op::IntDiv));
+    }
+
+    #[test]
+    fn unknown_operator_by_name() {
+        assert!(parse("unknownOperator").is_err());
+        assert!(parse("unknown-operator").is_err());
     }
 
     #[test]
     fn split_on_whitespace() {
         let op = Op::Number(1.23);
         assert_eq!(parse("'hello' 1.0").unwrap(), Prog::of(vec![Op::Text("hello".to_string()), Op::Number(1.0)]));
-        assert_eq!(parse("my-op-name my-op-name   1.0").unwrap(), Prog::of(vec![Op::Text("hello".to_string()), Op::Text("hello".to_string()), Op::Number(1.0)]),);
+        assert_eq!(parse("int-div1.0").unwrap(), Prog::of(vec![Op::IntDiv, Op::Number(1.0)]),);
+        assert_eq!(parse("int1").unwrap(), Prog::of(vec![Op::Div, Op::Number(1.0)]),);
     }
 }
