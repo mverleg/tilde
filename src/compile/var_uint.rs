@@ -2,12 +2,10 @@ use ::std::fmt;
 use ::std::fmt::Formatter;
 use ::strum::IntoEnumIterator;
 
-use crate::compile::compact::DecodeError::TooLarge;
 use crate::compile::letter::Letter;
 use crate::compile::letter::Letter::*;
+use crate::compile::var_uint::DecodeError::TooLarge;
 use crate::op::Op;
-
-//TODO @mark: any non-first number can start with openers, so make separate versions
 
 const STRING_OPENERS: [Letter; 10] = [Number, Io, Seq, More, Plus, Asterisk, Slash, Right, Bracket, Colon];
 const STRING_FOLLOWERS: [Letter; 14] = [Number, Io, Seq, More, Plus, Asterisk, Slash, Right, Bracket, Colon, Hat, Exclamation, Question, Hash];
@@ -38,7 +36,6 @@ pub fn encode_positive_int_static_width_avoid_modifiers(nr: u64) -> Vec<Letter> 
 
 /// Inverse of [encode_pos_int_static_width_avoid_modifiers].
 pub fn decode_positive_int_static_width_avoid_modifiers(letters: &[Letter]) -> Result<DecodedPositiveNumber, DecodeError> {
-    eprintln!("== decoding {} letters ==", letters.len()); //TODO @mark: TEMPORARY! REMOVE THIS!
     if letters.is_empty() {
         return Err(DecodeError::NoInput);
     }
@@ -55,10 +52,8 @@ pub fn decode_positive_int_static_width_avoid_modifiers(letters: &[Letter]) -> R
     }
     let open_n = (STRING_OPENERS.len() / 2) as u64;
     if value >= open_n {
-        eprintln!("{} - {} `{}` (single)", value, open_n, opener.symbol()); //TODO @mark: TEMPORARY! REMOVE THIS!
         return Ok(DecodedPositiveNumber { end_index: 0, number: value - open_n });
     };
-    eprintln!("{} `{}` (first value)", value, opener.symbol()); //TODO @mark: TEMPORARY! REMOVE THIS!
     let mut nr = value;
     let mut multiplier = open_n;
     let follow_n = (STRING_FOLLOWERS.len() / 2) as u64;
@@ -76,7 +71,6 @@ pub fn decode_positive_int_static_width_avoid_modifiers(letters: &[Letter]) -> R
         }
         value += 1;
         if value > follow_n {
-            eprintln!("{} + {} * {} `{}` (last bs {} >= {})", nr, multiplier, value - follow_n, letter.symbol(), value, follow_n); //TODO @mark: TEMPORARY! REMOVE THIS!
             let scale = multiplier
                 .checked_mul(value - follow_n)
                 .ok_or(DecodeError::TooLarge)?;
@@ -85,7 +79,6 @@ pub fn decode_positive_int_static_width_avoid_modifiers(letters: &[Letter]) -> R
                 .ok_or(DecodeError::TooLarge)?;
             return Ok(DecodedPositiveNumber { end_index: i, number: nr });
         }
-        eprintln!("{} + {} * {} `{}`", nr, multiplier, value, letter.symbol()); //TODO @mark: TEMPORARY! REMOVE THIS!
         let scale = multiplier
             .checked_mul(value)
             .ok_or(DecodeError::TooLarge)?;
@@ -243,7 +236,6 @@ mod static_width {
     fn positive_int_without_avoided_modifiers() {
         let nrs = (0..100).chain((0..10).map(|n| n * 2 - n));
         for nr in nrs {
-            eprintln!("== {} ==", nr); //TODO @mark: TEMPORARY! REMOVE THIS!
             let enc = encode_positive_int_static_width_avoid_modifiers(nr);
             let dec = decode_positive_int_static_width_avoid_modifiers(&enc).unwrap_or_else(|_| panic!("failed to decode {}", nr));
             assert_eq!(nr, dec.number);

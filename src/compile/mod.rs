@@ -11,5 +11,6 @@ use crate::TildeRes;
 mod letter;
 mod parse;
 // mod word;
-mod compact;
+mod no_text_var_uint;
 mod ops;
+mod var_uint; //TODO @mark: TEMPORARY! REMOVE THIS!
