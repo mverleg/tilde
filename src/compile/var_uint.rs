@@ -287,18 +287,25 @@ mod static_width {
     /// Because the number of letters is even, and Text is not allowed at the end, (at least) one other letter
     /// should also not be allowed. This checks that that is handled gracefully.
     fn positive_int_decode_with_unused_letter() {
-        let mut unused = HashSet::new();
-        for letter in Letter::iter() {
-            unused.insert(letter);
-        }
-        unused.remove(&Text);
-        for letter in STRING_FOLLOWERS {
-            unused.remove(&letter);
-        }
-        assert!(!unused.is_empty());
-        for letter in unused {
-            let dec = decode_positive_int_static_width_avoid_modifiers(&[Number, letter, Hash]);
-            assert_eq!(dec, Err(DecodeError::UnexpectedNode));
+        for list in [STRING_OPENERS.as_slice(), STRING_FOLLOWERS.as_slice()] {
+            let mut unused = HashSet::new();
+            for letter in Letter::iter() {
+                unused.insert(letter);
+            }
+            unused.remove(&Text);
+            for letter in Letter::modifiers() {
+                unused.remove(&letter);
+            }
+            for letter in list {
+                unused.remove(&letter);
+            }
+            if unused.is_empty() {
+                eprintln!("no unused letters")
+            }
+            for letter in unused {
+                let dec = decode_positive_int_static_width_avoid_modifiers(&[Number, letter, Hash]);
+                assert_eq!(dec, Err(DecodeError::UnexpectedNode), "list len: {}, letter: {}", list.len(), letter.symbol());
+            }
         }
     }
 
