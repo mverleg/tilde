@@ -39,7 +39,7 @@ pub fn encode_uint_no_modifier_at_start(nr: u64) -> Vec<Letter> {
             if rem == 0 {
                 return letters;
             }
-            rem -= 1;
+            //rem -= 1;  //TODO @mark: TEMPORARY! REMOVE THIS!
             letters.push(if rem < follow_2n { STRING_FOLLOWERS[(rem % follow_1n) as usize] } else { STRING_FOLLOWERS[0] });
             rem = rem / follow_2n;
         }
@@ -234,24 +234,31 @@ mod static_width {
     #[test]
     fn tmp() {
         //TODO @mark: TEMPORARY! REMOVE THIS!
-        for i in 0..=100 {
+        for i in 0..=2900 {
             let enc = encode(i)
                 .iter()
                 .map(|l| l.symbol().to_string())
                 .collect::<Vec<_>>()
                 .join(" ");
-            println!("{i}  {enc}")
+            let digits = encode(i)
+                .iter()
+                .map(|l| STRING_FOLLOWER_VALUES[l.nr() as usize].to_string())
+                .collect::<Vec<_>>()
+                .join(" ");
+            println!("{i}  {enc}   {digits}")
         }
         todo!()
     }
 
     #[test]
-    fn check_encodings_unique() {
+    fn all_encodings_unique() {
         let n = 10_500_000;
         let mut seen = HashSet::with_capacity(n as usize);
         for i in 0..n {
             let enc = encode(i);
-            assert!(seen.insert(enc), "{i}");
+            assert!(enc.len() != 4);
+            assert!(enc.len() != 6);
+            assert!(seen.insert(enc), "nr {i} has same encoding as an earlier nr");
         }
     }
 
@@ -271,6 +278,7 @@ mod static_width {
         assert_eq!(encode(1091), vec![Io, Io, Seq, Hat]);
         assert_eq!(encode(1878), vec![More, Slash, Asterisk, Question]);
         assert_eq!(encode(2462), vec![Seq, More, Plus, Tilde]);
+        //TODO @mark: higher
     }
 
     #[test]
