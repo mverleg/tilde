@@ -38,6 +38,7 @@ pub fn encode_positive_int_static_width_avoid_modifiers(nr: u64) -> Vec<Letter> 
 
 /// Inverse of [encode_pos_int_static_width_avoid_modifiers].
 pub fn decode_positive_int_static_width_avoid_modifiers(letters: &[Letter]) -> Result<DecodedPositiveNumber, DecodeError> {
+    eprintln!("== decoding {} letters ==", letters.len()); //TODO @mark: TEMPORARY! REMOVE THIS!
     if letters.is_empty() {
         return Err(DecodeError::NoInput);
     }
@@ -49,9 +50,12 @@ pub fn decode_positive_int_static_width_avoid_modifiers(letters: &[Letter]) -> R
         return Err(DecodeError::StarsWithModifier);
     }
     let value = STRING_OPENERS_REV[opener.nr() as usize];
-    debug_assert!(value < 16, "wrong value for opener {} (index {})", opener.symbol(), opener.nr());
+    if value >= 16 {
+        return Err(DecodeError::UnexpectedNode);
+    }
     let open_n = (STRING_OPENERS.len() / 2) as u64;
     if value >= open_n {
+        eprintln!("{} - {} `{}` (single)", value, open_n, opener.symbol()); //TODO @mark: TEMPORARY! REMOVE THIS!
         return Ok(DecodedPositiveNumber { end_index: 0, number: value - open_n });
     };
     eprintln!("{} `{}` (first value)", value, opener.symbol()); //TODO @mark: TEMPORARY! REMOVE THIS!
@@ -66,8 +70,11 @@ pub fn decode_positive_int_static_width_avoid_modifiers(letters: &[Letter]) -> R
         if let Letter::Text = letter {
             return Err(DecodeError::TextNode);
         }
-        let value = STRING_FOLLOWERS_REV[letter.nr() as usize] + 1;
-        debug_assert!(value < 16, "wrong value for non-opener {} (index {})", letter.symbol(), letter.nr());
+        let mut value = STRING_FOLLOWERS_REV[letter.nr() as usize];
+        if value >= 16 {
+            return Err(DecodeError::UnexpectedNode);
+        }
+        value += 1;
         if value >= follow_n {
             eprintln!("{} + {} * {} `{}` (last)", nr, multiplier, value - follow_n, letter.symbol()); //TODO @mark: TEMPORARY! REMOVE THIS!
             let scale = multiplier
@@ -102,6 +109,7 @@ pub struct DecodedPositiveNumber {
 pub enum DecodeError {
     NoInput,
     TextNode,
+    UnexpectedNode,
     StarsWithModifier,
     TooLarge,
     NoEndMarker,
@@ -118,6 +126,7 @@ impl fmt::Display for DecodeError {
             match self {
                 DecodeError::NoInput => "number to decode is empty",
                 DecodeError::TextNode => "encountered unexpected text node while decoding number",
+                DecodeError::UnexpectedNode => "encountered unexpected (non-text) node while decoding number",
                 DecodeError::StarsWithModifier => "number to decode starts with a modifier, which is not allowed here",
                 DecodeError::TooLarge => "number to decode is too large",
                 DecodeError::NoEndMarker => "unexpected end while decoding number; last letter should be marked",
@@ -187,6 +196,8 @@ mod constants_in_sync {
 
 #[cfg(test)]
 mod static_width {
+    use std::collections::HashSet;
+
     use super::*;
     use crate::compile::letter::LetterKind;
 
@@ -287,6 +298,25 @@ mod static_width {
         assert_eq!(decode, Err(DecodeError::TextNode));
         let decode = decode_positive_int_static_width_avoid_modifiers(&[Io, Text, Hash]);
         assert_eq!(decode, Err(DecodeError::TextNode));
+    }
+
+    #[test]
+    /// Because the number of letters is even, and Text is not allowed at the end, (at least) one other letter
+    /// should also not be allowed. This checks that that is handled gracefully.
+    fn positive_int_decode_with_unused_letter() {
+        let mut unused = HashSet::new();
+        for letter in Letter::iter() {
+            unused.insert(letter);
+        }
+        unused.remove(&Text);
+        for letter in STRING_FOLLOWERS {
+            unused.remove(&letter);
+        }
+        assert!(!unused.is_empty());
+        for letter in unused {
+            let dec = decode_positive_int_static_width_avoid_modifiers(&[Number, letter, Hash]);
+            assert_eq!(dec, Err(DecodeError::UnexpectedNode));
+        }
     }
 
     #[test]
