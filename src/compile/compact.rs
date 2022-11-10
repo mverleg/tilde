@@ -75,8 +75,8 @@ pub fn decode_positive_int_static_width_avoid_modifiers(letters: &[Letter]) -> R
             return Err(DecodeError::UnexpectedNode);
         }
         value += 1;
-        if value >= follow_n {
-            eprintln!("{} + {} * {} `{}` (last)", nr, multiplier, value - follow_n, letter.symbol()); //TODO @mark: TEMPORARY! REMOVE THIS!
+        if value > follow_n {
+            eprintln!("{} + {} * {} `{}` (last bs {} >= {})", nr, multiplier, value - follow_n, letter.symbol(), value, follow_n); //TODO @mark: TEMPORARY! REMOVE THIS!
             let scale = multiplier
                 .checked_mul(value - follow_n)
                 .ok_or(DecodeError::TooLarge)?;
@@ -237,28 +237,6 @@ mod static_width {
             decode_positive_int_static_width_avoid_modifiers(&[Number, Number, Number, Number, Right]).unwrap(),
             DecodedPositiveNumber { end_index: 4, number: 2000 }
         );
-    }
-
-    #[test]
-    fn tmp_for_log() {
-        //TODO @mark: TEMPORARY! REMOVE THIS!
-        for nr in 0..=2010 {
-            let enc = encode_positive_int_static_width_avoid_modifiers(nr);
-            println!(
-                "{}:  {}  ===  {}",
-                nr,
-                enc.iter()
-                    .map(|l| STRING_FOLLOWERS_REV[l.nr() as usize].to_string())
-                    .collect::<Vec<_>>()
-                    .join(" "),
-                enc.iter()
-                    .map(|l| l.symbol().to_string())
-                    .collect::<Vec<_>>()
-                    .join(" ")
-            )
-            //TODO @mark: TEMPORARY! REMOVE THIS!
-        }
-        panic!()
     }
 
     #[test]
