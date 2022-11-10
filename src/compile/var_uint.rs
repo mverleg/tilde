@@ -18,25 +18,35 @@ const STRING_FOLLOWER_VALUES: [u64; 16] = [0, 15, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
 /// * The first letter is now allowed to be a modifier, because such modifiers apply to the string itself.
 /// * The value of lettere depends on position and is given by order in the constant arrays (different from `Letter.nr()`).
 /// * Any letter in the upper half marks the end of a number, and the real value is minus half the length.
-/// * Each position (half-byte) may mark the end of the number (i.e. blocks are always 1 letter).
+/// * The first three (opener+2) letters can close the number, then every 2nd of next two letters, then every 3rd for next two, etc.
+///   Letters that cannot close the number, can use the full range of values instead of just half.
 pub fn encode_uint_no_modifier_at_start(nr: u64) -> Vec<Letter> {
-    let mut bytes = vec![];
+    let mut letters = vec![];
     let opener_n = (STRING_OPENERS.len() / 2) as u64;
     if nr < opener_n {
-        bytes.push(STRING_OPENERS[(nr + opener_n) as usize]);
+        letters.push(STRING_OPENERS[(nr + opener_n) as usize]);
     } else {
-        bytes.push(STRING_OPENERS[(nr % opener_n) as usize]);
+        letters.push(STRING_OPENERS[(nr % opener_n) as usize]);
     }
-    let middle_n = (STRING_FOLLOWERS.len() / 2) as u64;
-    debug_assert!(middle_n < 16 && (middle_n as usize) < usize::MAX);
+    let mut non_close_letter_cnt_doubled = 0;
+    let follow_2n = STRING_FOLLOWERS.len() as u64;
+    let follow_1n = follow_2n / 2;
+    eprintln!("follow letter count {follow_2n} {follow_1n}"); //TODO @mark: TEMPORARY! REMOVE THIS!
+    debug_assert!(follow_1n <= 8 && (follow_1n as usize) < usize::MAX);
     let mut rem = nr / opener_n;
-    while rem > 0 {
+    loop {
+        if rem == 0 {
+            return letters;
+        }
+        for i in 0..(non_close_letter_cnt_doubled / 2) {
+            eprintln!("block! {i}, {non_close_letter_cnt_doubled}"); //TODO @mark: TEMPORARY! REMOVE THIS!
+        }
         rem -= 1;
-        let pos = if rem < middle_n { rem + middle_n } else { rem % middle_n };
-        bytes.push(STRING_FOLLOWERS[pos as usize]);
-        rem = rem / middle_n;
+        let pos = if rem < follow_1n { rem + follow_1n } else { rem % follow_1n };
+        letters.push(STRING_FOLLOWERS[pos as usize]);
+        rem = rem / follow_1n;
+        non_close_letter_cnt_doubled += 1;
     }
-    bytes
 }
 
 /// Inverse of [encode_pos_int_static_width_avoid_modifiers].
