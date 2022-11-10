@@ -205,55 +205,49 @@ mod static_width {
     use crate::compile::letter::LetterKind;
     use crate::compile::var_uint::DecodeError::TextNode;
 
+    pub fn encode(nr: u64) -> Vec<Letter> {
+        encode_positive_int_static_width_avoid_modifiers(nr)
+    }
+
+    /// Inverse of [encode_pos_int_static_width_avoid_modifiers].
+    pub fn decode(letters: &[Letter]) -> DecodedPositiveNumber {
+        decode_positive_int_static_width_avoid_modifiers(letters).unwrap()
+    }
+
     #[test]
     fn positive_int_avoided_modifiers_encoding_examples() {
-        assert_eq!(encode_positive_int_static_width_avoid_modifiers(0), vec![Asterisk]);
-        assert_eq!(encode_positive_int_static_width_avoid_modifiers(4), vec![Colon]);
-        assert_eq!(encode_positive_int_static_width_avoid_modifiers(5), vec![Number, Bracket]);
-        assert_eq!(encode_positive_int_static_width_avoid_modifiers(9), vec![Plus, Bracket]);
-        assert_eq!(encode_positive_int_static_width_avoid_modifiers(10), vec![Number, Colon]);
-        assert_eq!(encode_positive_int_static_width_avoid_modifiers(40), vec![Number, Text]);
-        assert_eq!(encode_positive_int_static_width_avoid_modifiers(44), vec![Plus, Text]);
-        assert_eq!(encode_positive_int_static_width_avoid_modifiers(45), vec![Number, Number, Bracket]);
-        assert_eq!(encode_positive_int_static_width_avoid_modifiers(85), vec![Number, Number, Colon]);
-        assert_eq!(encode_positive_int_static_width_avoid_modifiers(364), vec![Plus, Right, Text]);
-        assert_eq!(encode_positive_int_static_width_avoid_modifiers(365), vec![Number, Number, Number, Bracket]);
-        assert_eq!(encode_positive_int_static_width_avoid_modifiers(1091), vec![Io, Io, Seq, Hat]);
-        assert_eq!(encode_positive_int_static_width_avoid_modifiers(1878), vec![More, Slash, Asterisk, Question]);
-        assert_eq!(encode_positive_int_static_width_avoid_modifiers(2462), vec![Seq, More, Plus, Tilde]);
+        assert_eq!(encode(0), vec![Asterisk]);
+        assert_eq!(encode(4), vec![Colon]);
+        assert_eq!(encode(5), vec![Number, Bracket]);
+        assert_eq!(encode(9), vec![Plus, Bracket]);
+        assert_eq!(encode(10), vec![Number, Colon]);
+        assert_eq!(encode(40), vec![Number, Text]);
+        assert_eq!(encode(44), vec![Plus, Text]);
+        assert_eq!(encode(45), vec![Number, Number, Bracket]);
+        assert_eq!(encode(85), vec![Number, Number, Colon]);
+        assert_eq!(encode(364), vec![Plus, Right, Text]);
+        assert_eq!(encode(365), vec![Number, Number, Number, Bracket]);
+        assert_eq!(encode(1091), vec![Io, Io, Seq, Hat]);
+        assert_eq!(encode(1878), vec![More, Slash, Asterisk, Question]);
+        assert_eq!(encode(2462), vec![Seq, More, Plus, Tilde]);
     }
 
     #[test]
     fn positive_int_avoided_modifiers_decoding_examples() {
-        assert_eq!(decode_positive_int_static_width_avoid_modifiers(&[Asterisk]).unwrap(), DecodedPositiveNumber { end_index: 0, number: 0 });
-        assert_eq!(decode_positive_int_static_width_avoid_modifiers(&[Colon]).unwrap(), DecodedPositiveNumber { end_index: 0, number: 4 });
-        assert_eq!(decode_positive_int_static_width_avoid_modifiers(&[Number, Bracket, Text]).unwrap(), DecodedPositiveNumber { end_index: 1, number: 5 });
-        assert_eq!(decode_positive_int_static_width_avoid_modifiers(&[Plus, Bracket]).unwrap(), DecodedPositiveNumber { end_index: 1, number: 9 });
-        assert_eq!(decode_positive_int_static_width_avoid_modifiers(&[Number, Colon, Right]).unwrap(), DecodedPositiveNumber { end_index: 1, number: 10 });
-        assert_eq!(decode_positive_int_static_width_avoid_modifiers(&[Number, Text]).unwrap(), DecodedPositiveNumber { end_index: 1, number: 40 });
-        assert_eq!(decode_positive_int_static_width_avoid_modifiers(&[Plus, Text]).unwrap(), DecodedPositiveNumber { end_index: 1, number: 44 });
-        assert_eq!(
-            decode_positive_int_static_width_avoid_modifiers(&[Number, Number, Bracket, Hat]).unwrap(),
-            DecodedPositiveNumber { end_index: 2, number: 45 }
-        );
-        assert_eq!(
-            decode_positive_int_static_width_avoid_modifiers(&[Number, Number, Colon, Tilde, Io]).unwrap(),
-            DecodedPositiveNumber { end_index: 2, number: 85 }
-        );
-        assert_eq!(decode_positive_int_static_width_avoid_modifiers(&[Plus, Right, Text]).unwrap(), DecodedPositiveNumber { end_index: 2, number: 364 });
-        assert_eq!(
-            decode_positive_int_static_width_avoid_modifiers(&[Number, Number, Number, Bracket]).unwrap(),
-            DecodedPositiveNumber { end_index: 3, number: 365 }
-        );
-        assert_eq!(decode_positive_int_static_width_avoid_modifiers(&[Io, Io, Seq, Hat]).unwrap(), DecodedPositiveNumber { end_index: 3, number: 1091 });
-        assert_eq!(
-            decode_positive_int_static_width_avoid_modifiers(&[More, Slash, Asterisk, Question, Exclamation, Hash]).unwrap(),
-            DecodedPositiveNumber { end_index: 3, number: 1878 }
-        );
-        assert_eq!(
-            decode_positive_int_static_width_avoid_modifiers(&[Seq, More, Plus, Tilde, Io]).unwrap(),
-            DecodedPositiveNumber { end_index: 3, number: 2462 }
-        );
+        assert_eq!(decode(&[Asterisk]), DecodedPositiveNumber { end_index: 0, number: 0 });
+        assert_eq!(decode(&[Colon]), DecodedPositiveNumber { end_index: 0, number: 4 });
+        assert_eq!(decode(&[Number, Bracket, Text]), DecodedPositiveNumber { end_index: 1, number: 5 });
+        assert_eq!(decode(&[Plus, Bracket]), DecodedPositiveNumber { end_index: 1, number: 9 });
+        assert_eq!(decode(&[Number, Colon, Right]), DecodedPositiveNumber { end_index: 1, number: 10 });
+        assert_eq!(decode(&[Number, Text]), DecodedPositiveNumber { end_index: 1, number: 40 });
+        assert_eq!(decode(&[Plus, Text]), DecodedPositiveNumber { end_index: 1, number: 44 });
+        assert_eq!(decode(&[Number, Number, Bracket, Hat]), DecodedPositiveNumber { end_index: 2, number: 45 });
+        assert_eq!(decode(&[Number, Number, Colon, Tilde, Io]), DecodedPositiveNumber { end_index: 2, number: 85 });
+        assert_eq!(decode(&[Plus, Right, Text]), DecodedPositiveNumber { end_index: 2, number: 364 });
+        assert_eq!(decode(&[Number, Number, Number, Bracket]), DecodedPositiveNumber { end_index: 3, number: 365 });
+        assert_eq!(decode(&[Io, Io, Seq, Hat]), DecodedPositiveNumber { end_index: 3, number: 1091 });
+        assert_eq!(decode(&[More, Slash, Asterisk, Question, Exclamation, Hash]), DecodedPositiveNumber { end_index: 3, number: 1878 });
+        assert_eq!(decode(&[Seq, More, Plus, Tilde, Io]), DecodedPositiveNumber { end_index: 3, number: 2462 });
     }
 
     #[test]
