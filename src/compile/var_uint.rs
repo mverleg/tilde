@@ -8,9 +8,9 @@ use crate::compile::var_uint::DecodeError::TooLarge;
 use crate::op::Op;
 
 const STRING_OPENERS: [Letter; 10] = [Number, Io, Seq, More, Plus, Asterisk, Slash, Right, Bracket, Colon];
-const STRING_FOLLOWERS: [Letter; 14] = [Number, Io, Seq, More, Plus, Asterisk, Slash, Right, Bracket, Colon, Hat, Exclamation, Question, Hash];
-const STRING_OPENERS_REV: [u64; 16] = [0, u64::MAX, 1, 2, 3, 4, 5, 6, 7, 8, 9, u64::MAX, u64::MAX, u64::MAX, u64::MAX, u64::MAX];
-const STRING_FOLLOWERS_REV: [u64; 16] = [0, u64::MAX, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, u64::MAX];
+const STRING_FOLLOWERS: [Letter; 16] = [Number, Io, Seq, More, Plus, Asterisk, Slash, Right, Bracket, Colon, Hat, Exclamation, Question, Hash, Tilde, Text];
+const STRING_OPENERS_VALUES: [u64; 16] = [0, u64::MAX, 1, 2, 3, 4, 5, 6, 7, 8, 9, u64::MAX, u64::MAX, u64::MAX, u64::MAX, u64::MAX];
+const STRING_FOLLOWER_VALUES: [u64; 16] = [0, 15, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
 
 /// Encode a positive integer, using static width of 1 byte each, and
 /// do not allow modifiers in the first byte.
@@ -46,7 +46,7 @@ pub fn decode_positive_int_static_width_avoid_modifiers(letters: &[Letter]) -> R
     if Letter::modifiers().contains(opener) {
         return Err(DecodeError::StarsWithModifier);
     }
-    let value = STRING_OPENERS_REV[opener.nr() as usize];
+    let value = STRING_OPENERS_VALUES[opener.nr() as usize];
     if value >= 16 {
         return Err(DecodeError::UnexpectedNode);
     }
@@ -65,7 +65,7 @@ pub fn decode_positive_int_static_width_avoid_modifiers(letters: &[Letter]) -> R
         if let Letter::Text = letter {
             return Err(DecodeError::TextNode);
         }
-        let mut value = STRING_FOLLOWERS_REV[letter.nr() as usize];
+        let mut value = STRING_FOLLOWER_VALUES[letter.nr() as usize];
         if value >= 16 {
             return Err(DecodeError::UnexpectedNode);
         }
@@ -135,9 +135,19 @@ mod constants_in_sync {
 
     fn select_letters(predicate: impl Fn(&Letter) -> bool) -> Vec<Letter> {
         let mut allowed: Vec<Letter> = Letter::iter()
+            .filter(|letter| !Letter::modifiers().contains(letter))
             .filter(|letter| letter != &Text)
-            .filter(predicate)
+            .filter(&predicate)
             .collect();
+        // Put Text and modifiers in the second half (if allowed) to keep the order more stable.
+        for letter in Letter::modifiers()
+            .into_iter()
+            .chain(Some(Text).into_iter())
+        {
+            if predicate(&letter) {
+                allowed.push(letter);
+            }
+        }
         if allowed.len() % 2 != 0 {
             allowed.pop();
         }
@@ -161,14 +171,17 @@ mod constants_in_sync {
         expected
     }
 
-    /// The first text number cannot start with a modifier, because those can be used to modify
-    /// the text opener itself, thus not being part of the (first) number. Text token is also disallowed.
+    /// The first letter cannot start with a modifier, because those can be used to modify
+    /// the start of the string itself, thus not being part of the (first) letter.
+    /// It can also not contain a Text letter, because that may signal the end of the
+    /// series of numbers (i.e. after the last number, not to be confused with the next number).
     #[test]
     fn openers() {
         assert_eq!(STRING_OPENERS, select_letters(|letter| letter.kind() != LetterKind::Modifier).as_slice());
     }
 
-    /// In the middle of numbers, text token is not allowed, but modifiers are okay.
+    /// After the start of the number, everything is allowed - encoutnering any of the second
+    /// half of letters will signal the end of the number.
     #[test]
     fn followers() {
         assert_eq!(STRING_FOLLOWERS, select_letters(|_letter| true).as_slice());
@@ -177,13 +190,13 @@ mod constants_in_sync {
     #[test]
     fn reverse_openers() {
         let expected = reverse_letter_values(&STRING_OPENERS);
-        assert_eq!(STRING_OPENERS_REV, expected.as_slice());
+        assert_eq!(STRING_OPENERS_VALUES, expected.as_slice());
     }
 
     #[test]
     fn reverse_followers() {
         let expected = reverse_letter_values(&STRING_FOLLOWERS);
-        assert_eq!(STRING_FOLLOWERS_REV, expected.as_slice());
+        assert_eq!(STRING_FOLLOWER_VALUES, expected.as_slice());
     }
 }
 
