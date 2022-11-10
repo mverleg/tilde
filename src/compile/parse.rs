@@ -134,4 +134,13 @@ mod tests {
         assert_eq!(parse("div   1").unwrap(), Prog::of(vec![Op::Div, Op::Number(1.0)]),);
         assert_eq!(parse("int-div1.0").unwrap(), Prog::of(vec![Op::IntDiv, Op::Number(1.0)]),);
     }
+
+    #[test]
+    fn allow_newlines() {
+        let op = Op::Number(1.23);
+        assert_eq!(parse("'hello'\n1.0").unwrap(), Prog::of(vec![Op::Text("hello".to_string()), Op::Number(1.0)]));
+        assert_eq!(parse("div\n1").unwrap(), Prog::of(vec![Op::Div, Op::Number(1.0)]),);
+    }
+
+    //TODO @mark: add some golfed testcases to existing tests, like whitespace ones
 }
