@@ -31,15 +31,15 @@ pub fn encode_uint_no_modifier_at_start(nr: u64) -> Vec<Letter> {
     let mut non_close_letter_cnt_doubled = 0;
     let follow_2n = STRING_FOLLOWERS.len() as u64;
     let follow_1n = follow_2n / 2;
-    eprintln!("follow letter count {follow_2n} {follow_1n}"); //TODO @mark: TEMPORARY! REMOVE THIS!
     debug_assert!(follow_1n <= 8 && (follow_1n as usize) < usize::MAX);
     let mut rem = nr / opener_n;
     loop {
-        if rem == 0 {
-            return letters;
-        }
+        eprintln!("potential close {rem}"); //TODO @mark: TEMPORARY! REMOVE THIS!
         for i in 0..(non_close_letter_cnt_doubled / 2) {
-            eprintln!("block! {i}, {non_close_letter_cnt_doubled}"); //TODO @mark: TEMPORARY! REMOVE THIS!
+            eprintln!("non-close {rem} ({i})"); //TODO @mark: TEMPORARY! REMOVE THIS!
+            if rem == 0 {
+                return letters;
+            }
         }
         rem -= 1;
         let pos = if rem < follow_1n { rem + follow_1n } else { rem % follow_1n };
@@ -227,6 +227,12 @@ mod static_width {
     /// Inverse of [encode_pos_int_static_width_avoid_modifiers].
     pub fn decode(letters: &[Letter]) -> DecodedPositiveNumber {
         decode_positive_int_static_width_avoid_modifiers(letters).unwrap()
+    }
+
+    #[test]
+    fn tmp_dev() {
+        //TODO @mark: TEMPORARY! REMOVE THIS!
+        assert_eq!(encode(u32::MAX as u64), vec![Number, Seq, Asterisk, More, Number, Seq, Asterisk, More, Number, Seq, Hash]);
     }
 
     #[test]
