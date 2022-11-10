@@ -57,14 +57,11 @@ pub fn decode_positive_int_static_width_avoid_modifiers(letters: &[Letter]) -> R
     let mut nr = value;
     let mut multiplier = open_n;
     let follow_n = (STRING_FOLLOWERS.len() / 2) as u64;
-    for (i, letter) in letters
+    let follower_letters = letters
         .iter()
         .enumerate()
-        .skip(1)
-    {
-        if let Letter::Text = letter {
-            return Err(DecodeError::TextNode);
-        }
+        .skip(1);
+    for (i, letter) in follower_letters {
         let mut value = STRING_FOLLOWER_VALUES[letter.nr() as usize];
         if value >= 16 {
             return Err(DecodeError::UnexpectedNode);
@@ -276,10 +273,8 @@ mod static_width {
     }
 
     #[test]
-    fn positive_int_decode_with_text_letter() {
+    fn positive_int_decode_with_text_opener() {
         let decode = decode_positive_int_static_width_avoid_modifiers(&[Text, Hash]);
-        assert_eq!(decode, Err(DecodeError::TextNode));
-        let decode = decode_positive_int_static_width_avoid_modifiers(&[Io, Text, Hash]);
         assert_eq!(decode, Err(DecodeError::TextNode));
     }
 
