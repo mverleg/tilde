@@ -35,7 +35,7 @@ pub fn encode_uint_no_modifier_at_start(nr: u64) -> Vec<Letter> {
     let mut rem = nr / opener_n;
     loop {
         for i in 0..(non_close_letter_cnt_doubled / 2) {
-            eprintln!("non-close {rem} ({i})"); //TODO @mark: TEMPORARY! REMOVE THIS!
+            //eprintln!("non-close {rem} ({i})"); //TODO @mark: TEMPORARY! REMOVE THIS!
             if rem == 0 {
                 return letters;
             }
@@ -43,8 +43,8 @@ pub fn encode_uint_no_modifier_at_start(nr: u64) -> Vec<Letter> {
             letters.push(if rem < follow_2n { STRING_FOLLOWERS[(rem % follow_1n) as usize] } else { STRING_FOLLOWERS[0] });
             rem = rem / follow_2n;
         }
-        eprintln!("potential close {rem}"); //TODO @mark: TEMPORARY! REMOVE THIS!
-        rem -= 1;
+        //eprintln!("potential close {rem}"); //TODO @mark: TEMPORARY! REMOVE THIS!
+        rem.saturating_sub(1);
         let pos = if rem < follow_1n { rem + follow_1n } else { rem % follow_1n };
         letters.push(STRING_FOLLOWERS[pos as usize]);
         rem = rem / follow_1n;
@@ -232,9 +232,27 @@ mod static_width {
     }
 
     #[test]
-    fn tmp_dev() {
+    fn tmp() {
         //TODO @mark: TEMPORARY! REMOVE THIS!
-        assert_eq!(encode(u32::MAX as u64), vec![Number, Seq, Asterisk, Number, More, Number, Number, Number, Number, Hat]);
+        for i in 0..=100 {
+            let enc = encode(i)
+                .iter()
+                .map(|l| l.symbol().to_string())
+                .collect::<Vec<_>>()
+                .join(" ");
+            println!("{i}  {enc}")
+        }
+        todo!()
+    }
+
+    #[test]
+    fn check_encodings_unique() {
+        let n = 10_500_000;
+        let mut seen = HashSet::with_capacity(n as usize);
+        for i in 0..n {
+            let enc = encode(i);
+            assert!(seen.insert(enc), "{i}");
+        }
     }
 
     #[test]
