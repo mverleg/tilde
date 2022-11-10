@@ -11,6 +11,7 @@ use crate::TildeRes;
 mod letter;
 mod parse;
 // mod word;
-mod no_text_var_uint;
 mod ops;
-mod var_uint; //TODO @mark: TEMPORARY! REMOVE THIS!
+mod var_uint;
+mod var_uint_fixed_width; //TODO @mark: TEMPORARY! REMOVE THIS!
+mod var_uint_no_text; //TODO @mark: TEMPORARY! REMOVE THIS!
