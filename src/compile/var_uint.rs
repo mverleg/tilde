@@ -34,13 +34,16 @@ pub fn encode_uint_no_modifier_at_start(nr: u64) -> Vec<Letter> {
     debug_assert!(follow_1n <= 8 && (follow_1n as usize) < usize::MAX);
     let mut rem = nr / opener_n;
     loop {
-        eprintln!("potential close {rem}"); //TODO @mark: TEMPORARY! REMOVE THIS!
         for i in 0..(non_close_letter_cnt_doubled / 2) {
             eprintln!("non-close {rem} ({i})"); //TODO @mark: TEMPORARY! REMOVE THIS!
             if rem == 0 {
                 return letters;
             }
+            rem -= 1;
+            letters.push(if rem < follow_2n { STRING_FOLLOWERS[(rem % follow_1n) as usize] } else { STRING_FOLLOWERS[0] });
+            rem = rem / follow_2n;
         }
+        eprintln!("potential close {rem}"); //TODO @mark: TEMPORARY! REMOVE THIS!
         rem -= 1;
         let pos = if rem < follow_1n { rem + follow_1n } else { rem % follow_1n };
         letters.push(STRING_FOLLOWERS[pos as usize]);
@@ -214,7 +217,7 @@ mod constants_in_sync {
 
 #[cfg(test)]
 mod static_width {
-    use std::collections::HashSet;
+    use ::std::collections::HashSet;
 
     use super::*;
     use crate::compile::letter::LetterKind;
@@ -224,7 +227,6 @@ mod static_width {
         encode_uint_no_modifier_at_start(nr)
     }
 
-    /// Inverse of [encode_pos_int_static_width_avoid_modifiers].
     pub fn decode(letters: &[Letter]) -> DecodedPositiveNumber {
         decode_positive_int_static_width_avoid_modifiers(letters).unwrap()
     }
@@ -232,7 +234,7 @@ mod static_width {
     #[test]
     fn tmp_dev() {
         //TODO @mark: TEMPORARY! REMOVE THIS!
-        assert_eq!(encode(u32::MAX as u64), vec![Number, Seq, Asterisk, More, Number, Seq, Asterisk, More, Number, Seq, Hash]);
+        assert_eq!(encode(u32::MAX as u64), vec![Number, Seq, Asterisk, Number, More, Number, Number, Number, Number, Hat]);
     }
 
     #[test]

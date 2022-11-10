@@ -204,7 +204,7 @@ mod constants_in_sync {
 
 #[cfg(test)]
 mod static_width {
-    use std::collections::HashSet;
+    use ::std::collections::HashSet;
 
     use super::*;
     use crate::compile::letter::LetterKind;

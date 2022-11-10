@@ -130,8 +130,7 @@ impl Letter {
 
 #[cfg(test)]
 mod tests {
-    use std::collections::HashSet;
-
+    use ::std::collections::HashSet;
     use ::strum::IntoEnumIterator;
 
     use super::*;
