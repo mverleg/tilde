@@ -39,12 +39,15 @@ pub fn encode_uint_no_modifier_at_start(nr: u64) -> Vec<Letter> {
     let follow_1n = follow_2n / 2;
     debug_assert!(follow_1n <= 8 && (follow_1n as usize) < usize::MAX);
     let mut rem = nr / opener_n;
-    print!("rem.{rem}-1 "); //TODO @mark: TEMPORARY! REMOVE THIS!
+    print!("rem.{rem} "); //TODO @mark: TEMPORARY! REMOVE THIS!
     while rem > 0 {
         if rem.saturating_sub(1) / 2 != rem / 2 {
             print!("* ")
         }; //TODO @mark: TEMPORARY! REMOVE THIS!
-        rem = rem.saturating_sub(1);
+        if non_close_letter_cnt_doubled < 2 {
+            rem = rem.saturating_sub(1);
+            print!("rem-{rem} "); //TODO @mark: TEMPORARY! REMOVE THIS!
+        }
         for i in 0..(non_close_letter_cnt_doubled / 2) {
             //println!("{nr} non-close {rem} ({i})"); //TODO @mark: TEMPORARY! REMOVE THIS!
             rem = rem.saturating_sub(1);
@@ -58,7 +61,7 @@ pub fn encode_uint_no_modifier_at_start(nr: u64) -> Vec<Letter> {
         print!("pos;{pos} "); //TODO @mark: TEMPORARY! REMOVE THIS!
         letters.push(STRING_FOLLOWERS[pos as usize]);
         rem = rem / follow_1n;
-        print!("rem;{rem}-1 "); //TODO @mark: TEMPORARY! REMOVE THIS!
+        print!("rem;{rem} "); //TODO @mark: TEMPORARY! REMOVE THIS!
         non_close_letter_cnt_doubled += 1;
     }
     print!("| "); //TODO @mark: TEMPORARY! REMOVE THIS!
