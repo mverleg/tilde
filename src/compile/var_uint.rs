@@ -7,10 +7,15 @@ use crate::compile::letter::Letter::*;
 use crate::compile::var_uint::DecodeError::TooLarge;
 use crate::op::Op;
 
-const STRING_OPENERS: [Letter; 10] = [Number, Io, Seq, More, Plus, Asterisk, Slash, Right, Bracket, Colon];
-const STRING_FOLLOWERS: [Letter; 16] = [Number, Io, Seq, More, Plus, Asterisk, Slash, Right, Bracket, Colon, Hat, Exclamation, Question, Hash, Tilde, Text];
-const STRING_OPENERS_VALUES: [u64; 16] = [0, u64::MAX, 1, 2, 3, 4, 5, 6, 7, 8, 9, u64::MAX, u64::MAX, u64::MAX, u64::MAX, u64::MAX];
-const STRING_FOLLOWER_VALUES: [u64; 16] = [0, 15, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
+const STRING_OPENERS: [Letter; 4] = [Number, Io, Bracket, Colon];
+const STRING_FOLLOWERS: [Letter; 4] = [Number, Io, Bracket, Colon];
+const STRING_OPENERS_VALUES: [u64; 16] =
+    [0, u64::MAX, 1, u64::MAX, u64::MAX, u64::MAX, u64::MAX, u64::MAX, u64::MAX, 2, 3, u64::MAX, u64::MAX, u64::MAX, u64::MAX, u64::MAX];
+const STRING_FOLLOWER_VALUES: [u64; 16] =
+    [0, u64::MAX, 1, u64::MAX, u64::MAX, u64::MAX, u64::MAX, u64::MAX, u64::MAX, 2, 3, u64::MAX, u64::MAX, u64::MAX, u64::MAX, u64::MAX];
+// const STRING_OPENERS_VALUES: [u64; 16] = [0, u64::MAX, 1, 2, 3, 4, 5, 6, 7, 8, 9, u64::MAX, u64::MAX, u64::MAX, u64::MAX, u64::MAX];
+// const STRING_FOLLOWER_VALUES: [u64; 16] = [0, 15, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
+//TODO @mark: TEMPORARY! REMOVE THIS! ^^^^
 
 /// Encode a postive integer using variable length.
 /// * Each letter represents a half-byte. They do not follow default order.
@@ -33,23 +38,22 @@ pub fn encode_uint_no_modifier_at_start(nr: u64) -> Vec<Letter> {
     let follow_1n = follow_2n / 2;
     debug_assert!(follow_1n <= 8 && (follow_1n as usize) < usize::MAX);
     let mut rem = nr / opener_n;
-    loop {
+    while rem > 0 {
+        rem = rem.saturating_sub(1);
         for i in 0..(non_close_letter_cnt_doubled / 2) {
-            //eprintln!("non-close {rem} ({i})"); //TODO @mark: TEMPORARY! REMOVE THIS!
-            if rem == 0 {
-                return letters;
-            }
+            //println!("{nr} non-close {rem} ({i})"); //TODO @mark: TEMPORARY! REMOVE THIS!
             //rem -= 1;  //TODO @mark: TEMPORARY! REMOVE THIS!
-            letters.push(if rem < follow_2n { STRING_FOLLOWERS[(rem % follow_1n) as usize] } else { STRING_FOLLOWERS[0] });
+            rem = rem.saturating_sub(1);
+            letters.push(STRING_FOLLOWERS[(rem % follow_1n) as usize]);
             rem = rem / follow_2n;
         }
-        //eprintln!("potential close {rem}"); //TODO @mark: TEMPORARY! REMOVE THIS!
-        rem.saturating_sub(1);
+        //println!("{nr} potential close {rem}"); //TODO @mark: TEMPORARY! REMOVE THIS!
         let pos = if rem < follow_1n { rem + follow_1n } else { rem % follow_1n };
         letters.push(STRING_FOLLOWERS[pos as usize]);
         rem = rem / follow_1n;
         non_close_letter_cnt_doubled += 1;
     }
+    return letters;
 }
 
 /// Inverse of [encode_pos_int_static_width_avoid_modifiers].
@@ -234,7 +238,7 @@ mod static_width {
     #[test]
     fn tmp() {
         //TODO @mark: TEMPORARY! REMOVE THIS!
-        for i in 0..=2900 {
+        for i in 0..=500 {
             let enc = encode(i)
                 .iter()
                 .map(|l| l.symbol().to_string())
@@ -256,8 +260,7 @@ mod static_width {
         let mut seen = HashSet::with_capacity(n as usize);
         for i in 0..n {
             let enc = encode(i);
-            assert!(enc.len() != 4);
-            assert!(enc.len() != 6);
+            assert!(enc.len() != 4 && enc.len() != 6, "nr {i} has impossible length {}", enc.len());
             assert!(seen.insert(enc), "nr {i} has same encoding as an earlier nr");
         }
     }
