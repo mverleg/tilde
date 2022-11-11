@@ -51,8 +51,8 @@ pub fn encode_uint_no_modifier_at_start(nr: u64) -> Vec<Letter> {
         for i in 0..(non_close_letter_cnt_doubled / 2) {
             //println!("{nr} non-close {rem} ({i})"); //TODO @mark: TEMPORARY! REMOVE THIS!
             rem = rem.saturating_sub(1);
-            letters.push(STRING_FOLLOWERS[(rem % follow_1n) as usize]);
-            print!("pos:{} ", rem % follow_1n); //TODO @mark: TEMPORARY! REMOVE THIS!
+            letters.push(STRING_FOLLOWERS[(rem % follow_2n) as usize]);
+            print!("pos:{} ", rem % follow_2n); //TODO @mark: TEMPORARY! REMOVE THIS!
             rem = rem / follow_2n;
             print!("rem:{rem} "); //TODO @mark: TEMPORARY! REMOVE THIS!
         }
