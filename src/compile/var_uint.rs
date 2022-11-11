@@ -32,27 +32,36 @@ pub fn encode_uint_no_modifier_at_start(nr: u64) -> Vec<Letter> {
         letters.push(STRING_OPENERS[(nr + opener_n) as usize]);
     } else {
         letters.push(STRING_OPENERS[(nr % opener_n) as usize]);
+        print!("init:{} ", nr % opener_n); //TODO @mark: TEMPORARY! REMOVE THIS!
     }
     let mut non_close_letter_cnt_doubled = 0;
     let follow_2n = STRING_FOLLOWERS.len() as u64;
     let follow_1n = follow_2n / 2;
     debug_assert!(follow_1n <= 8 && (follow_1n as usize) < usize::MAX);
     let mut rem = nr / opener_n;
+    print!("rem.{rem}-1 "); //TODO @mark: TEMPORARY! REMOVE THIS!
     while rem > 0 {
+        if rem.saturating_sub(1) / 2 != rem / 2 {
+            print!("* ")
+        }; //TODO @mark: TEMPORARY! REMOVE THIS!
         rem = rem.saturating_sub(1);
         for i in 0..(non_close_letter_cnt_doubled / 2) {
             //println!("{nr} non-close {rem} ({i})"); //TODO @mark: TEMPORARY! REMOVE THIS!
-            //rem -= 1;  //TODO @mark: TEMPORARY! REMOVE THIS!
             rem = rem.saturating_sub(1);
             letters.push(STRING_FOLLOWERS[(rem % follow_1n) as usize]);
+            print!("pos:{} ", rem % follow_1n); //TODO @mark: TEMPORARY! REMOVE THIS!
             rem = rem / follow_2n;
+            print!("rem:{rem} "); //TODO @mark: TEMPORARY! REMOVE THIS!
         }
         //println!("{nr} potential close {rem}"); //TODO @mark: TEMPORARY! REMOVE THIS!
         let pos = if rem < follow_1n { rem + follow_1n } else { rem % follow_1n };
+        print!("pos;{pos} "); //TODO @mark: TEMPORARY! REMOVE THIS!
         letters.push(STRING_FOLLOWERS[pos as usize]);
         rem = rem / follow_1n;
+        print!("rem;{rem}-1 "); //TODO @mark: TEMPORARY! REMOVE THIS!
         non_close_letter_cnt_doubled += 1;
     }
+    print!("| "); //TODO @mark: TEMPORARY! REMOVE THIS!
     return letters;
 }
 
@@ -220,7 +229,7 @@ mod constants_in_sync {
 }
 
 #[cfg(test)]
-mod static_width {
+mod dynamic_width {
     use ::std::collections::HashSet;
 
     use super::*;
@@ -239,12 +248,13 @@ mod static_width {
     fn tmp() {
         //TODO @mark: TEMPORARY! REMOVE THIS!
         for i in 0..=500 {
-            let enc = encode(i)
+            let letters = encode(i);
+            let enc = letters
                 .iter()
                 .map(|l| l.symbol().to_string())
                 .collect::<Vec<_>>()
                 .join(" ");
-            let digits = encode(i)
+            let digits = letters
                 .iter()
                 .map(|l| STRING_FOLLOWER_VALUES[l.nr() as usize].to_string())
                 .collect::<Vec<_>>()

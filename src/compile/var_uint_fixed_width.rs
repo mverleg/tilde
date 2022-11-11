@@ -220,6 +220,16 @@ mod static_width {
     }
 
     #[test]
+    fn all_encodings_unique() {
+        let n = 1_000_000;
+        let mut seen = HashSet::with_capacity(n as usize);
+        for i in 0..n {
+            let enc = encode(i);
+            assert!(seen.insert(enc), "nr {i} has same encoding as an earlier nr");
+        }
+    }
+
+    #[test]
     fn positive_int_avoided_modifiers_encoding_examples() {
         assert_eq!(encode(0), vec![Asterisk]);
         assert_eq!(encode(4), vec![Colon]);
