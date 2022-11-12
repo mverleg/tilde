@@ -41,6 +41,7 @@ pub fn encode_uint_no_modifier_at_start(nr: u64) -> Vec<Letter> {
     let mut rem = nr / opener_n;
     print!("rem.{rem} "); //TODO @mark: TEMPORARY! REMOVE THIS!
     while rem > 0 {
+        print!("| ");
         if rem.saturating_sub(1) / 2 != rem / 2 {
             print!("* ")
         }; //TODO @mark: TEMPORARY! REMOVE THIS!
@@ -64,7 +65,7 @@ pub fn encode_uint_no_modifier_at_start(nr: u64) -> Vec<Letter> {
         print!("rem;{rem} "); //TODO @mark: TEMPORARY! REMOVE THIS!
         non_close_letter_cnt_doubled += 1;
     }
-    print!("| "); //TODO @mark: TEMPORARY! REMOVE THIS!
+    print!("2block:{non_close_letter_cnt_doubled} || "); //TODO @mark: TEMPORARY! REMOVE THIS!
     return letters;
 }
 
@@ -250,7 +251,7 @@ mod dynamic_width {
     #[test]
     fn tmp() {
         //TODO @mark: TEMPORARY! REMOVE THIS!
-        for i in 0..=500 {
+        for i in 0..=2638 {
             let letters = encode(i);
             let enc = letters
                 .iter()
