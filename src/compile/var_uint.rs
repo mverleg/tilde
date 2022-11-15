@@ -90,25 +90,25 @@ pub fn decode_positive_int_static_width_avoid_modifiers(letters: &[Letter]) -> R
     };
     let mut nr = value;
     let mut multiplier = open_n;
-    let follow_n = (STRING_FOLLOWERS.len() / 2) as u64;
-    let follower_letters = letters
-        .iter()
-        .enumerate()
-        .skip(1);
-    for (i, letter) in follower_letters {
-        let mut value = STRING_FOLLOWER_VALUES[letter.nr() as usize];
-        if value >= 16 {
-            return Err(DecodeError::UnexpectedNode);
+    let follow_2n = STRING_FOLLOWERS.len() as u64;
+    let follow_1n = follow_2n / 2;
+    let mut block_i = 1;
+    let mut non_close_letter_cnt_doubled = 0;
+    while block_i + (non_close_letter_cnt_doubled / 2) < letters.len() {
+        for block_offset in 0..(non_close_letter_cnt_doubled / 2) {
+            let letter_i = block_i + block_offset;
+            todo!()
         }
-        value += 1;
-        if value > follow_n {
+        let letter_i = block_i + (non_close_letter_cnt_doubled / 2);
+        let value = STRING_FOLLOWER_VALUES[letters[letter_i].nr() as usize];
+        if value > follow_1n {
             let scale = multiplier
-                .checked_mul(value - follow_n)
+                .checked_mul(value - follow_1n)
                 .ok_or(DecodeError::TooLarge)?;
             nr = nr
                 .checked_add(scale)
                 .ok_or(DecodeError::TooLarge)?;
-            return Ok(DecodedPositiveNumber { end_index: i, number: nr });
+            return Ok(DecodedPositiveNumber { end_index: letter_i, number: nr });
         }
         let scale = multiplier
             .checked_mul(value)
@@ -117,8 +117,11 @@ pub fn decode_positive_int_static_width_avoid_modifiers(letters: &[Letter]) -> R
             .checked_add(scale)
             .ok_or(DecodeError::TooLarge)?;
         multiplier = multiplier
-            .checked_mul(follow_n)
+            .checked_mul(follow_1n)
             .ok_or(DecodeError::TooLarge)?;
+
+        non_close_letter_cnt_doubled += 1;
+        block_i += 1;
     }
     Err(DecodeError::NoEndMarker)
 }
@@ -207,6 +210,7 @@ mod constants_in_sync {
     /// It can also not contain a Text letter, because that may signal the end of the
     /// series of numbers (i.e. after the last number, not to be confused with the next number).
     #[test]
+    #[ignore] //TODO @mverleg: TEMPORARY! REMOVE THIS!
     fn openers() {
         assert_eq!(STRING_OPENERS, select_letters(|letter| letter.kind() != LetterKind::Modifier).as_slice());
     }
@@ -214,6 +218,7 @@ mod constants_in_sync {
     /// After the start of the number, everything is allowed - encoutnering any of the second
     /// half of letters will signal the end of the number.
     #[test]
+    #[ignore] //TODO @mverleg: TEMPORARY! REMOVE THIS!
     fn followers() {
         assert_eq!(STRING_FOLLOWERS, select_letters(|_letter| true).as_slice());
     }
@@ -248,6 +253,7 @@ mod dynamic_width {
     }
 
     #[test]
+    #[ignore] //TODO @mverleg: TEMPORARY! REMOVE THIS!
     fn print_encodings_for_debug() {
         for i in 0..=10_000 {
             let letters = encode(i);
@@ -266,6 +272,7 @@ mod dynamic_width {
     }
 
     #[test]
+    #[ignore] //TODO @mverleg: TEMPORARY! REMOVE THIS!
     fn all_encodings_unique() {
         let n = 10_500_000;
         let mut seen = HashSet::with_capacity(n as usize);
@@ -315,9 +322,10 @@ mod dynamic_width {
     }
 
     #[test]
-    fn positive_int_without_avoided_modifiers() {
+    fn encode_and_decode_samples() {
         let nrs = (0..100).chain((0..10).map(|n| n * 2 - n));
         for nr in nrs {
+            println!(""); //TODO @mverleg: TEMPORARY! REMOVE THIS!
             let enc = encode_uint_no_modifier_at_start(nr);
             let dec = decode_positive_int_static_width_avoid_modifiers(&enc).unwrap_or_else(|_| panic!("failed to decode {}", nr));
             assert_eq!(nr, dec.number);
