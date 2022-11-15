@@ -96,9 +96,13 @@ pub fn decode_positive_int_static_width_avoid_modifiers(letters: &[Letter]) -> R
     let mut block_i = 1;
     let mut non_close_letter_cnt_doubled = 0;
     print!("{}<{}? ", block_i + (non_close_letter_cnt_doubled / 2), letters.len()); //TODO @mark: TEMPORARY! REMOVE THIS!
+    let mut block_addition = 1;
+    //TODO @mverleg: use saturating versions here?
     while block_i + (non_close_letter_cnt_doubled / 2) < letters.len() {
+        print!("nr+:{nr} "); //TODO @mverleg: TEMPORARY! REMOVE THIS!
         for block_offset in 0..(non_close_letter_cnt_doubled / 2) {
-            let value = STRING_FOLLOWER_VALUES[letters[block_i + block_offset].nr() as usize];
+            let value = STRING_FOLLOWER_VALUES[letters[block_i + block_offset].nr() as usize].saturating_add(block_addition);
+            block_addition = 0;
             print!("blok L:{}={} ", letters[block_i + block_offset].symbol(), value); //TODO @mverleg: TEMPORARY! REMOVE THIS!
             let addition = multiplier
                 .checked_mul(value)
@@ -112,7 +116,8 @@ pub fn decode_positive_int_static_width_avoid_modifiers(letters: &[Letter]) -> R
                 .ok_or(DecodeError::TooLarge)?;
         }
         let letter_i = block_i + (non_close_letter_cnt_doubled / 2);
-        let value = STRING_FOLLOWER_VALUES[letters[letter_i].nr() as usize];
+        let value = STRING_FOLLOWER_VALUES[letters[letter_i].nr() as usize].saturating_add(block_addition);
+        block_addition = 0;
         print!("L:{}={} ", letters[letter_i].symbol(), value); //TODO @mverleg: TEMPORARY! REMOVE THIS!
         if value >= follow_1n {
             print!("end {value}>={follow_1n} "); //TODO @mverleg: TEMPORARY! REMOVE THIS!
@@ -123,7 +128,7 @@ pub fn decode_positive_int_static_width_avoid_modifiers(letters: &[Letter]) -> R
                 .checked_add(addition)
                 .ok_or(DecodeError::TooLarge)?;
             print!("nr:{nr} "); //TODO @mverleg: TEMPORARY! REMOVE THIS!
-            println!("|| "); //TODO @mverleg: TEMPORARY! REMOVE THIS!
+            print!("|| "); //TODO @mverleg: TEMPORARY! REMOVE THIS!
             return Ok(DecodedPositiveNumber { end_index: letter_i, number: nr });
         }
         print!("tail {value}<{follow_1n} "); //TODO @mverleg: TEMPORARY! REMOVE THIS!
@@ -140,6 +145,7 @@ pub fn decode_positive_int_static_width_avoid_modifiers(letters: &[Letter]) -> R
 
         non_close_letter_cnt_doubled += 1;
         block_i += 1;
+        block_addition = 1;
     }
     print!("END-ERR:{}>={} ", block_i + (non_close_letter_cnt_doubled / 2), letters.len()); //TODO @mark: TEMPORARY! REMOVE THIS!
     Err(DecodeError::NoEndMarker)
@@ -346,7 +352,9 @@ mod dynamic_width {
         for nr in nrs {
             println!(""); //TODO @mverleg: TEMPORARY! REMOVE THIS!
             let enc = encode_uint_no_modifier_at_start(nr);
+            println!(""); //TODO @mverleg: TEMPORARY! REMOVE THIS!
             let dec = decode_positive_int_static_width_avoid_modifiers(&enc).unwrap_or_else(|err| panic!("failed to decode {}, err {}", nr, err));
+            println!(""); //TODO @mverleg: TEMPORARY! REMOVE THIS!
             assert_eq!(nr, dec.number);
         }
     }
