@@ -51,7 +51,6 @@ pub fn encode_uint_no_modifier_at_start(nr: u64) -> Vec<Letter> {
         }
         for i in 0..(non_close_letter_cnt_doubled / 2) {
             //println!("{nr} non-close {rem} ({i})"); //TODO @mark: TEMPORARY! REMOVE THIS!
-            rem = rem.saturating_sub(1);
             letters.push(STRING_FOLLOWERS[(rem % follow_2n) as usize]);
             print!("pos:{} ", rem % follow_2n); //TODO @mark: TEMPORARY! REMOVE THIS!
             rem = rem / follow_2n;
@@ -249,9 +248,8 @@ mod dynamic_width {
     }
 
     #[test]
-    fn tmp() {
-        //TODO @mark: TEMPORARY! REMOVE THIS!
-        for i in 0..=2638 {
+    fn print_encodings_for_debug() {
+        for i in 0..=10_000 {
             let letters = encode(i);
             let enc = letters
                 .iter()
@@ -265,7 +263,6 @@ mod dynamic_width {
                 .join(" ");
             println!("{i}  {enc}   {digits}")
         }
-        todo!()
     }
 
     #[test]
@@ -274,6 +271,7 @@ mod dynamic_width {
         let mut seen = HashSet::with_capacity(n as usize);
         for i in 0..n {
             let enc = encode(i);
+            println!(""); //TODO @mverleg: TEMPORARY! REMOVE THIS!
             assert!(enc.len() != 4 && enc.len() != 6, "nr {i} has impossible length {}", enc.len());
             assert!(seen.insert(enc), "nr {i} has same encoding as an earlier nr");
         }

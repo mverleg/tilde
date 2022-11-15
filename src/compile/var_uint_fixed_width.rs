@@ -7,6 +7,8 @@ use crate::compile::letter::Letter::*;
 use crate::compile::var_uint::DecodeError::TooLarge;
 use crate::op::Op;
 
+//TODO @mark: remove this whole file as it is superceded by var_uint
+
 const STRING_OPENERS: [Letter; 10] = [Number, Io, Seq, More, Plus, Asterisk, Slash, Right, Bracket, Colon];
 const STRING_FOLLOWERS: [Letter; 16] = [Number, Io, Seq, More, Plus, Asterisk, Slash, Right, Bracket, Colon, Hat, Exclamation, Question, Hash, Tilde, Text];
 const STRING_OPENERS_VALUES: [u64; 16] = [0, u64::MAX, 1, 2, 3, 4, 5, 6, 7, 8, 9, u64::MAX, u64::MAX, u64::MAX, u64::MAX, u64::MAX];
@@ -220,6 +222,7 @@ mod static_width {
     }
 
     #[test]
+    #[ignore]
     fn all_encodings_unique() {
         let n = 1_000_000;
         let mut seen = HashSet::with_capacity(n as usize);
