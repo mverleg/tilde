@@ -71,7 +71,9 @@ pub fn decode_positive_int_static_width_avoid_modifiers(letters: &[Letter]) -> R
     if letters.is_empty() {
         return Err(DecodeError::NoInput);
     }
+    print!("len={} ", letters.len()); //TODO @mverleg: TEMPORARY! REMOVE THIS!
     let opener = &letters[0];
+    print!("L:{}={} ", opener.symbol(), STRING_OPENERS_VALUES[opener.nr() as usize]); //TODO @mverleg: TEMPORARY! REMOVE THIS!
     if let Letter::Text = opener {
         return Err(DecodeError::TextNode);
     }
@@ -87,6 +89,7 @@ pub fn decode_positive_int_static_width_avoid_modifiers(letters: &[Letter]) -> R
         return Ok(DecodedPositiveNumber { end_index: 0, number: value - open_n });
     };
     let mut nr = value;
+    print!("nr:{nr} "); //TODO @mverleg: TEMPORARY! REMOVE THIS!
     let mut multiplier = open_n;
     let follow_2n = STRING_FOLLOWERS.len() as u64;
     let follow_1n = follow_2n / 2;
@@ -95,37 +98,42 @@ pub fn decode_positive_int_static_width_avoid_modifiers(letters: &[Letter]) -> R
     print!("{}<{}? ", block_i + (non_close_letter_cnt_doubled / 2), letters.len()); //TODO @mark: TEMPORARY! REMOVE THIS!
     while block_i + (non_close_letter_cnt_doubled / 2) < letters.len() {
         for block_offset in 0..(non_close_letter_cnt_doubled / 2) {
-            print!("blok "); //TODO @mverleg: TEMPORARY! REMOVE THIS!
             let value = STRING_FOLLOWER_VALUES[letters[block_i + block_offset].nr() as usize];
-            let scale = multiplier
+            print!("blok L:{}={} ", letters[block_i + block_offset].symbol(), value); //TODO @mverleg: TEMPORARY! REMOVE THIS!
+            let addition = multiplier
                 .checked_mul(value)
                 .ok_or(DecodeError::TooLarge)?;
             nr = nr
-                .checked_add(scale)
+                .checked_add(addition)
                 .ok_or(DecodeError::TooLarge)?;
+            print!("nr:{nr} "); //TODO @mverleg: TEMPORARY! REMOVE THIS!
             multiplier = multiplier
                 .checked_mul(follow_2n)
                 .ok_or(DecodeError::TooLarge)?;
         }
         let letter_i = block_i + (non_close_letter_cnt_doubled / 2);
         let value = STRING_FOLLOWER_VALUES[letters[letter_i].nr() as usize];
+        print!("L:{}={} ", letters[letter_i].symbol(), value); //TODO @mverleg: TEMPORARY! REMOVE THIS!
         if value >= follow_1n {
-            print!("end {value}>{follow_1n} "); //TODO @mverleg: TEMPORARY! REMOVE THIS!
-            let scale = multiplier
+            print!("end {value}>={follow_1n} "); //TODO @mverleg: TEMPORARY! REMOVE THIS!
+            let addition = multiplier
                 .checked_mul(value - follow_1n)
                 .ok_or(DecodeError::TooLarge)?;
             nr = nr
-                .checked_add(scale)
+                .checked_add(addition)
                 .ok_or(DecodeError::TooLarge)?;
+            print!("nr:{nr} "); //TODO @mverleg: TEMPORARY! REMOVE THIS!
+            println!("|| "); //TODO @mverleg: TEMPORARY! REMOVE THIS!
             return Ok(DecodedPositiveNumber { end_index: letter_i, number: nr });
         }
-        print!("tail {value}<={follow_1n} "); //TODO @mverleg: TEMPORARY! REMOVE THIS!
-        let scale = multiplier
+        print!("tail {value}<{follow_1n} "); //TODO @mverleg: TEMPORARY! REMOVE THIS!
+        let addition = multiplier
             .checked_mul(value)
             .ok_or(DecodeError::TooLarge)?;
         nr = nr
-            .checked_add(scale)
+            .checked_add(addition)
             .ok_or(DecodeError::TooLarge)?;
+        print!("nr:{nr} "); //TODO @mverleg: TEMPORARY! REMOVE THIS!
         multiplier = multiplier
             .checked_mul(follow_1n)
             .ok_or(DecodeError::TooLarge)?;
@@ -133,6 +141,7 @@ pub fn decode_positive_int_static_width_avoid_modifiers(letters: &[Letter]) -> R
         non_close_letter_cnt_doubled += 1;
         block_i += 1;
     }
+    print!("END-ERR:{}>={} ", block_i + (non_close_letter_cnt_doubled / 2), letters.len()); //TODO @mark: TEMPORARY! REMOVE THIS!
     Err(DecodeError::NoEndMarker)
 }
 
