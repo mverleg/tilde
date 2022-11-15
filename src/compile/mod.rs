@@ -13,5 +13,3 @@ mod parse;
 // mod word;
 mod ops;
 mod var_uint;
-mod var_uint_fixed_width; //TODO @mark: TEMPORARY! REMOVE THIS!
-mod var_uint_no_text; //TODO @mark: TEMPORARY! REMOVE THIS!
