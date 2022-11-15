@@ -73,7 +73,7 @@ pub fn decode_positive_int_static_width_avoid_modifiers(letters: &[Letter]) -> R
     }
     print!("len={} ", letters.len()); //TODO @mverleg: TEMPORARY! REMOVE THIS!
     let opener = &letters[0];
-    print!("L:{}={} ", opener.symbol(), STRING_OPENERS_VALUES[opener.nr() as usize]); //TODO @mverleg: TEMPORARY! REMOVE THIS!
+    print!("La:{}={} ", opener.symbol(), STRING_OPENERS_VALUES[opener.nr() as usize]); //TODO @mverleg: TEMPORARY! REMOVE THIS!
     if let Letter::Text = opener {
         return Err(DecodeError::TextNode);
     }
@@ -99,11 +99,10 @@ pub fn decode_positive_int_static_width_avoid_modifiers(letters: &[Letter]) -> R
     let mut block_addition = 1;
     //TODO @mverleg: use saturating versions here?
     while block_i + (non_close_letter_cnt_doubled / 2) < letters.len() {
-        print!("nr+:{nr} "); //TODO @mverleg: TEMPORARY! REMOVE THIS!
         for block_offset in 0..(non_close_letter_cnt_doubled / 2) {
             let value = STRING_FOLLOWER_VALUES[letters[block_i + block_offset].nr() as usize].saturating_add(block_addition);
             block_addition = 0;
-            print!("blok L:{}={} ", letters[block_i + block_offset].symbol(), value); //TODO @mverleg: TEMPORARY! REMOVE THIS!
+            print!("blok Lb:{}={} ", letters[block_i + block_offset].symbol(), value); //TODO @mverleg: TEMPORARY! REMOVE THIS!
             let addition = multiplier
                 .checked_mul(value)
                 .ok_or(DecodeError::TooLarge)?;
@@ -116,13 +115,12 @@ pub fn decode_positive_int_static_width_avoid_modifiers(letters: &[Letter]) -> R
                 .ok_or(DecodeError::TooLarge)?;
         }
         let letter_i = block_i + (non_close_letter_cnt_doubled / 2);
-        let value = STRING_FOLLOWER_VALUES[letters[letter_i].nr() as usize].saturating_add(block_addition);
-        block_addition = 0;
-        print!("L:{}={} ", letters[letter_i].symbol(), value); //TODO @mverleg: TEMPORARY! REMOVE THIS!
+        let value = STRING_FOLLOWER_VALUES[letters[letter_i].nr() as usize];
+        print!("Lc[{letter_i}]:{}={}+{} ", letters[letter_i].symbol(), STRING_FOLLOWER_VALUES[letters[letter_i].nr() as usize], block_addition); //TODO @mverleg: TEMPORARY! REMOVE THIS!
         if value >= follow_1n {
-            print!("end {value}>={follow_1n} "); //TODO @mverleg: TEMPORARY! REMOVE THIS!
+            print!("end {value}>={follow_1n} last={letter_i} "); //TODO @mverleg: TEMPORARY! REMOVE THIS!
             let addition = multiplier
-                .checked_mul(value - follow_1n)
+                .checked_mul(value.saturating_add(block_addition) - follow_1n)
                 .ok_or(DecodeError::TooLarge)?;
             nr = nr
                 .checked_add(addition)
@@ -133,7 +131,7 @@ pub fn decode_positive_int_static_width_avoid_modifiers(letters: &[Letter]) -> R
         }
         print!("tail {value}<{follow_1n} "); //TODO @mverleg: TEMPORARY! REMOVE THIS!
         let addition = multiplier
-            .checked_mul(value)
+            .checked_mul(value.saturating_add(block_addition))
             .ok_or(DecodeError::TooLarge)?;
         nr = nr
             .checked_add(addition)
@@ -277,22 +275,26 @@ mod dynamic_width {
         decode_positive_int_static_width_avoid_modifiers(letters).unwrap()
     }
 
+    fn encoding_to_str_for_debug(letters: &[Letter]) -> String {
+        let enc = letters
+            .iter()
+            .map(|l| l.symbol().to_string())
+            .collect::<Vec<_>>()
+            .join(" ");
+        let digits = letters
+            .iter()
+            .map(|l| STRING_FOLLOWER_VALUES[l.nr() as usize].to_string())
+            .collect::<Vec<_>>()
+            .join(" ");
+        format!("{enc}   {digits}")
+    }
+
     #[test]
     #[ignore] //TODO @mverleg: TEMPORARY! REMOVE THIS!
-    fn print_encodings_for_debug() {
+    fn print_all_encodings_for_debug() {
         for i in 0..=10_000 {
             let letters = encode(i);
-            let enc = letters
-                .iter()
-                .map(|l| l.symbol().to_string())
-                .collect::<Vec<_>>()
-                .join(" ");
-            let digits = letters
-                .iter()
-                .map(|l| STRING_FOLLOWER_VALUES[l.nr() as usize].to_string())
-                .collect::<Vec<_>>()
-                .join(" ");
-            println!("{i}  {enc}   {digits}")
+            println!("{i}  {}", encoding_to_str_for_debug(&letters))
         }
     }
 
@@ -352,7 +354,7 @@ mod dynamic_width {
         for nr in nrs {
             println!(""); //TODO @mverleg: TEMPORARY! REMOVE THIS!
             let enc = encode_uint_no_modifier_at_start(nr);
-            println!(""); //TODO @mverleg: TEMPORARY! REMOVE THIS!
+            println!("\n  {}", encoding_to_str_for_debug(&enc)); //TODO @mverleg: TEMPORARY! REMOVE THIS!
             let dec = decode_positive_int_static_width_avoid_modifiers(&enc).unwrap_or_else(|err| panic!("failed to decode {}, err {}", nr, err));
             println!(""); //TODO @mverleg: TEMPORARY! REMOVE THIS!
             assert_eq!(nr, dec.number);
