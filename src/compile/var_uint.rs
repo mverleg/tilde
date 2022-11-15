@@ -73,7 +73,7 @@ pub fn decode_positive_int_static_width_avoid_modifiers(letters: &[Letter]) -> R
     }
     print!("len={} ", letters.len()); //TODO @mverleg: TEMPORARY! REMOVE THIS!
     let opener = &letters[0];
-    print!("La:{}={} ", opener.symbol(), STRING_OPENERS_VALUES[opener.nr() as usize]); //TODO @mverleg: TEMPORARY! REMOVE THIS!
+    print!("La[0]:{}={} ", opener.symbol(), STRING_OPENERS_VALUES[opener.nr() as usize]); //TODO @mverleg: TEMPORARY! REMOVE THIS!
     if let Letter::Text = opener {
         return Err(DecodeError::TextNode);
     }
@@ -93,16 +93,21 @@ pub fn decode_positive_int_static_width_avoid_modifiers(letters: &[Letter]) -> R
     let mut multiplier = open_n;
     let follow_2n = STRING_FOLLOWERS.len() as u64;
     let follow_1n = follow_2n / 2;
-    let mut block_i = 1;
+    let mut letter_i = 0;
     let mut non_close_letter_cnt_doubled = 0;
-    print!("{}<{}? ", block_i + (non_close_letter_cnt_doubled / 2), letters.len()); //TODO @mark: TEMPORARY! REMOVE THIS!
     let mut block_addition = 1;
-    //TODO @mverleg: use saturating versions here?
-    while block_i + (non_close_letter_cnt_doubled / 2) < letters.len() {
-        for block_offset in 0..(non_close_letter_cnt_doubled / 2) {
-            let value = STRING_FOLLOWER_VALUES[letters[block_i + block_offset].nr() as usize].saturating_add(block_addition);
+    print!("{}<{}? ", letter_i + (non_close_letter_cnt_doubled / 2), letters.len()); //TODO @mark: TEMPORARY! REMOVE THIS!
+                                                                                     //TODO @mverleg: use saturating versions here?
+    while letter_i + (non_close_letter_cnt_doubled / 2) < letters.len() {
+        if (non_close_letter_cnt_doubled / 2) > 0 {
+            print!("headlen[{letter_i}]:{} ", non_close_letter_cnt_doubled / 2);
+            //TODO @mverleg: TEMPORARY! REMOVE THIS!
+        }
+        for _block_offset in 0..(non_close_letter_cnt_doubled / 2) {
+            letter_i += 1;
+            let value = STRING_FOLLOWER_VALUES[letters[letter_i].nr() as usize].saturating_add(block_addition);
             block_addition = 0;
-            print!("blok Lb:{}={} ", letters[block_i + block_offset].symbol(), value); //TODO @mverleg: TEMPORARY! REMOVE THIS!
+            print!("blok Lb[{}]:{}={} ", letter_i, letters[letter_i].symbol(), value); //TODO @mverleg: TEMPORARY! REMOVE THIS!
             let addition = multiplier
                 .checked_mul(value)
                 .ok_or(DecodeError::TooLarge)?;
@@ -114,7 +119,7 @@ pub fn decode_positive_int_static_width_avoid_modifiers(letters: &[Letter]) -> R
                 .checked_mul(follow_2n)
                 .ok_or(DecodeError::TooLarge)?;
         }
-        let letter_i = block_i + (non_close_letter_cnt_doubled / 2);
+        letter_i += 1;
         let value = STRING_FOLLOWER_VALUES[letters[letter_i].nr() as usize];
         print!("Lc[{letter_i}]:{}={}+{} ", letters[letter_i].symbol(), STRING_FOLLOWER_VALUES[letters[letter_i].nr() as usize], block_addition); //TODO @mverleg: TEMPORARY! REMOVE THIS!
         if value >= follow_1n {
@@ -142,10 +147,9 @@ pub fn decode_positive_int_static_width_avoid_modifiers(letters: &[Letter]) -> R
             .ok_or(DecodeError::TooLarge)?;
 
         non_close_letter_cnt_doubled += 1;
-        block_i += 1;
         block_addition = 1;
     }
-    print!("END-ERR:{}>={} ", block_i + (non_close_letter_cnt_doubled / 2), letters.len()); //TODO @mark: TEMPORARY! REMOVE THIS!
+    print!("END-ERR:{}>={} ", letter_i, letters.len()); //TODO @mark: TEMPORARY! REMOVE THIS!
     Err(DecodeError::NoEndMarker)
 }
 
