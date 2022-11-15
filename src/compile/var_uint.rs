@@ -45,10 +45,8 @@ pub fn encode_uint_no_modifier_at_start(nr: u64) -> Vec<Letter> {
         if rem.saturating_sub(1) / 2 != rem / 2 {
             print!("* ")
         }; //TODO @mark: TEMPORARY! REMOVE THIS!
-        if non_close_letter_cnt_doubled < 2 {
-            rem = rem.saturating_sub(1);
-            print!("rem-{rem} "); //TODO @mark: TEMPORARY! REMOVE THIS!
-        }
+        rem = rem.saturating_sub(1);
+        print!("rem-{rem} "); //TODO @mark: TEMPORARY! REMOVE THIS!
         for i in 0..(non_close_letter_cnt_doubled / 2) {
             //println!("{nr} non-close {rem} ({i})"); //TODO @mark: TEMPORARY! REMOVE THIS!
             letters.push(STRING_FOLLOWERS[(rem % follow_2n) as usize]);
