@@ -14,6 +14,8 @@ const STRING_FOLLOWERS: [Letter; 16] = [Number, Io, Seq, More, Plus, Asterisk, S
 const STRING_OPENERS_VALUES: [u64; 16] = [0, u64::MAX, 1, 2, 3, 4, 5, 6, 7, 8, 9, u64::MAX, u64::MAX, u64::MAX, u64::MAX, u64::MAX];
 const STRING_FOLLOWER_VALUES: [u64; 16] = [0, 15, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
 
+//TODO @mark: remove this whole file as it is superceded by var_uint
+
 /// Encode a postive integer using variable length.
 /// * Each letter represents a half-byte. They do not follow default order.
 /// * The first letter is not allowed to be Text, to distinguish end of text after previous number.

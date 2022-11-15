@@ -7,14 +7,10 @@ use crate::compile::letter::Letter::*;
 use crate::compile::var_uint::DecodeError::TooLarge;
 use crate::op::Op;
 
-const STRING_OPENERS: [Letter; 4] = [Number, Io, Bracket, Colon];
-const STRING_FOLLOWERS: [Letter; 4] = [Number, Io, Bracket, Colon];
-const STRING_OPENERS_VALUES: [u64; 16] =
-    [0, u64::MAX, 1, u64::MAX, u64::MAX, u64::MAX, u64::MAX, u64::MAX, u64::MAX, 2, 3, u64::MAX, u64::MAX, u64::MAX, u64::MAX, u64::MAX];
-const STRING_FOLLOWER_VALUES: [u64; 16] =
-    [0, u64::MAX, 1, u64::MAX, u64::MAX, u64::MAX, u64::MAX, u64::MAX, u64::MAX, 2, 3, u64::MAX, u64::MAX, u64::MAX, u64::MAX, u64::MAX];
-// const STRING_OPENERS_VALUES: [u64; 16] = [0, u64::MAX, 1, 2, 3, 4, 5, 6, 7, 8, 9, u64::MAX, u64::MAX, u64::MAX, u64::MAX, u64::MAX];
-// const STRING_FOLLOWER_VALUES: [u64; 16] = [0, 15, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
+const STRING_OPENERS: [Letter; 10] = [Number, Io, Seq, More, Plus, Asterisk, Slash, Right, Bracket, Colon];
+const STRING_FOLLOWERS: [Letter; 16] = [Number, Io, Seq, More, Plus, Asterisk, Slash, Right, Bracket, Colon, Hat, Exclamation, Question, Hash, Tilde, Text];
+const STRING_OPENERS_VALUES: [u64; 16] = [0, u64::MAX, 1, 2, 3, 4, 5, 6, 7, 8, 9, u64::MAX, u64::MAX, u64::MAX, u64::MAX, u64::MAX];
+const STRING_FOLLOWER_VALUES: [u64; 16] = [0, 15, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
 //TODO @mark: TEMPORARY! REMOVE THIS! ^^^^
 
 /// Encode a postive integer using variable length.
@@ -32,37 +28,27 @@ pub fn encode_uint_no_modifier_at_start(nr: u64) -> Vec<Letter> {
         letters.push(STRING_OPENERS[(nr + opener_n) as usize]);
     } else {
         letters.push(STRING_OPENERS[(nr % opener_n) as usize]);
-        print!("init:{} ", nr % opener_n); //TODO @mark: TEMPORARY! REMOVE THIS!
     }
     let mut non_close_letter_cnt_doubled = 0;
     let follow_2n = STRING_FOLLOWERS.len() as u64;
     let follow_1n = follow_2n / 2;
     debug_assert!(follow_1n <= 8 && (follow_1n as usize) < usize::MAX);
     let mut rem = nr / opener_n;
-    print!("rem.{rem} "); //TODO @mark: TEMPORARY! REMOVE THIS!
     while rem > 0 {
         print!("| ");
         if rem.saturating_sub(1) / 2 != rem / 2 {
             print!("* ")
         }; //TODO @mark: TEMPORARY! REMOVE THIS!
         rem = rem.saturating_sub(1);
-        print!("rem-{rem} "); //TODO @mark: TEMPORARY! REMOVE THIS!
         for i in 0..(non_close_letter_cnt_doubled / 2) {
-            //println!("{nr} non-close {rem} ({i})"); //TODO @mark: TEMPORARY! REMOVE THIS!
             letters.push(STRING_FOLLOWERS[(rem % follow_2n) as usize]);
-            print!("pos:{} ", rem % follow_2n); //TODO @mark: TEMPORARY! REMOVE THIS!
             rem = rem / follow_2n;
-            print!("rem:{rem} "); //TODO @mark: TEMPORARY! REMOVE THIS!
         }
-        //println!("{nr} potential close {rem}"); //TODO @mark: TEMPORARY! REMOVE THIS!
         let pos = if rem < follow_1n { rem + follow_1n } else { rem % follow_1n };
-        print!("pos;{pos} "); //TODO @mark: TEMPORARY! REMOVE THIS!
         letters.push(STRING_FOLLOWERS[pos as usize]);
         rem = rem / follow_1n;
-        print!("rem;{rem} "); //TODO @mark: TEMPORARY! REMOVE THIS!
         non_close_letter_cnt_doubled += 1;
     }
-    print!("2block:{non_close_letter_cnt_doubled} || "); //TODO @mark: TEMPORARY! REMOVE THIS!
     return letters;
 }
 
@@ -71,9 +57,7 @@ pub fn decode_positive_int_static_width_avoid_modifiers(letters: &[Letter]) -> R
     if letters.is_empty() {
         return Err(DecodeError::NoInput);
     }
-    print!("len={} ", letters.len()); //TODO @mverleg: TEMPORARY! REMOVE THIS!
     let opener = &letters[0];
-    print!("La[0]:{}={} ", opener.symbol(), STRING_OPENERS_VALUES[opener.nr() as usize]); //TODO @mverleg: TEMPORARY! REMOVE THIS!
     if let Letter::Text = opener {
         return Err(DecodeError::TextNode);
     }
@@ -89,59 +73,45 @@ pub fn decode_positive_int_static_width_avoid_modifiers(letters: &[Letter]) -> R
         return Ok(DecodedPositiveNumber { end_index: 0, number: value - open_n });
     };
     let mut nr = value;
-    print!("nr:{nr} "); //TODO @mverleg: TEMPORARY! REMOVE THIS!
     let mut multiplier = open_n;
     let follow_2n = STRING_FOLLOWERS.len() as u64;
     let follow_1n = follow_2n / 2;
     let mut letter_i = 0;
     let mut non_close_letter_cnt_doubled = 0;
     let mut block_addition = 1;
-    print!("{}<{}? ", letter_i + (non_close_letter_cnt_doubled / 2), letters.len()); //TODO @mark: TEMPORARY! REMOVE THIS!
-                                                                                     //TODO @mverleg: use saturating versions here?
+    //TODO @mverleg: use saturating versions here?
     while letter_i + (non_close_letter_cnt_doubled / 2) < letters.len() {
-        if (non_close_letter_cnt_doubled / 2) > 0 {
-            print!("headlen[{letter_i}]:{} ", non_close_letter_cnt_doubled / 2);
-            //TODO @mverleg: TEMPORARY! REMOVE THIS!
-        }
         for _block_offset in 0..(non_close_letter_cnt_doubled / 2) {
             letter_i += 1;
             let value = STRING_FOLLOWER_VALUES[letters[letter_i].nr() as usize].saturating_add(block_addition);
             block_addition = 0;
-            print!("blok Lb[{}]:{}={} ", letter_i, letters[letter_i].symbol(), value); //TODO @mverleg: TEMPORARY! REMOVE THIS!
             let addition = multiplier
                 .checked_mul(value)
                 .ok_or(DecodeError::TooLarge)?;
             nr = nr
                 .checked_add(addition)
                 .ok_or(DecodeError::TooLarge)?;
-            print!("nr:{nr} "); //TODO @mverleg: TEMPORARY! REMOVE THIS!
             multiplier = multiplier
                 .checked_mul(follow_2n)
                 .ok_or(DecodeError::TooLarge)?;
         }
         letter_i += 1;
         let value = STRING_FOLLOWER_VALUES[letters[letter_i].nr() as usize];
-        print!("Lc[{letter_i}]:{}={}+{} ", letters[letter_i].symbol(), STRING_FOLLOWER_VALUES[letters[letter_i].nr() as usize], block_addition); //TODO @mverleg: TEMPORARY! REMOVE THIS!
         if value >= follow_1n {
-            print!("end {value}>={follow_1n} last={letter_i} "); //TODO @mverleg: TEMPORARY! REMOVE THIS!
             let addition = multiplier
                 .checked_mul(value.saturating_add(block_addition) - follow_1n)
                 .ok_or(DecodeError::TooLarge)?;
             nr = nr
                 .checked_add(addition)
                 .ok_or(DecodeError::TooLarge)?;
-            print!("nr:{nr} "); //TODO @mverleg: TEMPORARY! REMOVE THIS!
-            print!("|| "); //TODO @mverleg: TEMPORARY! REMOVE THIS!
             return Ok(DecodedPositiveNumber { end_index: letter_i, number: nr });
         }
-        print!("tail {value}<{follow_1n} "); //TODO @mverleg: TEMPORARY! REMOVE THIS!
         let addition = multiplier
             .checked_mul(value.saturating_add(block_addition))
             .ok_or(DecodeError::TooLarge)?;
         nr = nr
             .checked_add(addition)
             .ok_or(DecodeError::TooLarge)?;
-        print!("nr:{nr} "); //TODO @mverleg: TEMPORARY! REMOVE THIS!
         multiplier = multiplier
             .checked_mul(follow_1n)
             .ok_or(DecodeError::TooLarge)?;
@@ -149,7 +119,6 @@ pub fn decode_positive_int_static_width_avoid_modifiers(letters: &[Letter]) -> R
         non_close_letter_cnt_doubled += 1;
         block_addition = 1;
     }
-    print!("END-ERR:{}>={} ", letter_i, letters.len()); //TODO @mark: TEMPORARY! REMOVE THIS!
     Err(DecodeError::NoEndMarker)
 }
 
@@ -237,7 +206,6 @@ mod constants_in_sync {
     /// It can also not contain a Text letter, because that may signal the end of the
     /// series of numbers (i.e. after the last number, not to be confused with the next number).
     #[test]
-    #[ignore] //TODO @mverleg: TEMPORARY! REMOVE THIS!
     fn openers() {
         assert_eq!(STRING_OPENERS, select_letters(|letter| letter.kind() != LetterKind::Modifier).as_slice());
     }
@@ -245,7 +213,6 @@ mod constants_in_sync {
     /// After the start of the number, everything is allowed - encoutnering any of the second
     /// half of letters will signal the end of the number.
     #[test]
-    #[ignore] //TODO @mverleg: TEMPORARY! REMOVE THIS!
     fn followers() {
         assert_eq!(STRING_FOLLOWERS, select_letters(|_letter| true).as_slice());
     }
@@ -294,7 +261,7 @@ mod dynamic_width {
     }
 
     #[test]
-    #[ignore] //TODO @mverleg: TEMPORARY! REMOVE THIS!
+    #[ignore]
     fn print_all_encodings_for_debug() {
         for i in 0..=10_000 {
             let letters = encode(i);
@@ -303,15 +270,14 @@ mod dynamic_width {
     }
 
     #[test]
-    #[ignore] //TODO @mverleg: TEMPORARY! REMOVE THIS!
     fn all_encodings_unique() {
-        let n = 10_500_000;
+        let n = 50_000;
         let mut seen = HashSet::with_capacity(n as usize);
         for i in 0..n {
             let enc = encode(i);
-            println!(""); //TODO @mverleg: TEMPORARY! REMOVE THIS!
             assert!(enc.len() != 4 && enc.len() != 6, "nr {i} has impossible length {}", enc.len());
-            assert!(seen.insert(enc), "nr {i} has same encoding as an earlier nr");
+            assert!(seen.insert(enc.clone()), "nr {i} has same encoding as an earlier nr");
+            assert_eq!(i, decode(&enc).number, "decode not same for nr {i}");
         }
     }
 
@@ -356,11 +322,8 @@ mod dynamic_width {
     fn encode_and_decode_samples() {
         let nrs = (0..100).chain((0..10).map(|n| n * 2 - n));
         for nr in nrs {
-            println!(""); //TODO @mverleg: TEMPORARY! REMOVE THIS!
             let enc = encode_uint_no_modifier_at_start(nr);
-            println!("\n  {}", encoding_to_str_for_debug(&enc)); //TODO @mverleg: TEMPORARY! REMOVE THIS!
             let dec = decode_positive_int_static_width_avoid_modifiers(&enc).unwrap_or_else(|err| panic!("failed to decode {}, err {}", nr, err));
-            println!(""); //TODO @mverleg: TEMPORARY! REMOVE THIS!
             assert_eq!(nr, dec.number);
         }
     }
