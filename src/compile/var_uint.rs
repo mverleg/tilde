@@ -243,7 +243,7 @@ mod constants_in_sync {
 }
 
 #[cfg(test)]
-mod dynamic_width {
+mod test_util {
     use ::std::collections::HashSet;
 
     use super::*;
@@ -258,7 +258,7 @@ mod dynamic_width {
         decode_uint_no_modifier_at_start(letters).unwrap()
     }
 
-    fn encoding_to_str_for_debug(letters: &[Letter]) -> String {
+    pub fn encoding_to_str_for_debug(letters: &[Letter]) -> String {
         let enc = letters
             .iter()
             .map(|l| l.symbol().to_string())
@@ -275,12 +275,23 @@ mod dynamic_width {
     #[test]
     #[ignore]
     fn print_all_encodings_for_debug() {
+        //TODO @mverleg: remove?
         for i in 0..=10_000 {
             let letters = encode(i);
             println!("{i}  {}", encoding_to_str_for_debug(&letters))
         }
         panic!()
     }
+}
+
+#[cfg(test)]
+mod dynamic_width {
+    use ::std::collections::HashSet;
+
+    use super::test_util::*;
+    use super::*;
+    use crate::compile::letter::LetterKind;
+    use crate::compile::var_uint::DecodeError::TextNode;
 
     #[test]
     fn all_encodings_unique() {
@@ -341,7 +352,7 @@ mod dynamic_width {
 
     #[test]
     fn encode_and_decode_samples() {
-        let nrs = (0..100).chain((0..10).map(|n| n * 2 - n));
+        let nrs = (0..100).chain((7..60).map(|n| 2u64.pow(n) - n as u64));
         for nr in nrs {
             let enc = encode_uint_no_modifier_at_start(nr);
             let dec = decode_uint_no_modifier_at_start(&enc).unwrap_or_else(|err| panic!("failed to decode {}, err {}", nr, err));
@@ -351,28 +362,28 @@ mod dynamic_width {
 
     #[test]
     fn positive_int_avoid_modifiers_empty_input() {
-        let decode = decode_uint_no_modifier_at_start(&[]);
-        assert_eq!(decode, Err(DecodeError::NoInput));
+        let dec = decode_uint_no_modifier_at_start(&[]);
+        assert_eq!(dec, Err(DecodeError::NoInput));
     }
 
     #[test]
     fn positive_int_starting_with_modifiers() {
-        let decode = decode_uint_no_modifier_at_start(&[Letter::modifiers()[0], Asterisk]);
-        assert_eq!(decode, Err(DecodeError::StarsWithModifier));
+        let dec = decode_uint_no_modifier_at_start(&[Letter::modifiers()[0], Asterisk]);
+        assert_eq!(dec, Err(DecodeError::StarsWithModifier));
     }
 
     #[test]
     fn positive_int_non_terminated_number() {
-        let decode = decode_uint_no_modifier_at_start(&[Io]);
-        assert_eq!(decode, Err(DecodeError::NoEndMarker));
-        let decode = decode_uint_no_modifier_at_start(&[Io, Io, Io]);
-        assert_eq!(decode, Err(DecodeError::NoEndMarker));
+        let dec = decode_uint_no_modifier_at_start(&[Io]);
+        assert_eq!(dec, Err(DecodeError::NoEndMarker));
+        let dec = decode_uint_no_modifier_at_start(&[Io, Io, Io]);
+        assert_eq!(dec, Err(DecodeError::NoEndMarker));
     }
 
     #[test]
     fn positive_int_decode_with_text_opener() {
-        let decode = decode_uint_no_modifier_at_start(&[Text, Hash]);
-        assert_eq!(decode, Err(DecodeError::TextNode));
+        let dec = decode_uint_no_modifier_at_start(&[Text, Hash]);
+        assert_eq!(dec, Err(DecodeError::TextNode));
     }
 
     #[test]
@@ -403,7 +414,7 @@ mod dynamic_width {
 
     #[test]
     fn positive_int_overflow_in_decode() {
-        let decode = decode_uint_no_modifier_at_start(&[Io; 100]);
-        assert_eq!(decode, Err(DecodeError::TooLarge));
+        let dec = decode_uint_no_modifier_at_start(&[Io; 100]);
+        assert_eq!(dec, Err(DecodeError::TooLarge));
     }
 }
