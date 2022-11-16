@@ -71,13 +71,12 @@ pub fn decode_positive_int_static_width_avoid_modifiers(letters: &[Letter]) -> R
     let mut multiplier = open_n;
     let follow_2n = STRING_FOLLOWERS.len() as u64;
     let follow_1n = follow_2n / 2;
-    let mut letter_i = 0;
+    let mut letter_i = 1;
     let mut non_close_letter_cnt_doubled = 0;
     let mut block_addition = 1;
     //TODO @mverleg: use saturating versions here?
     while letter_i + (non_close_letter_cnt_doubled / 2) < letters.len() {
         for _block_offset in 0..(non_close_letter_cnt_doubled / 2) {
-            letter_i += 1;
             let value = STRING_FOLLOWER_VALUES[letters[letter_i].nr() as usize].saturating_add(block_addition);
             block_addition = 0;
             let addition = multiplier
@@ -89,8 +88,8 @@ pub fn decode_positive_int_static_width_avoid_modifiers(letters: &[Letter]) -> R
             multiplier = multiplier
                 .checked_mul(follow_2n)
                 .ok_or(DecodeError::TooLarge)?;
+            letter_i += 1;
         }
-        letter_i += 1;
         let value = STRING_FOLLOWER_VALUES[letters[letter_i].nr() as usize];
         if value >= follow_1n {
             let addition = multiplier
@@ -113,6 +112,7 @@ pub fn decode_positive_int_static_width_avoid_modifiers(letters: &[Letter]) -> R
 
         non_close_letter_cnt_doubled += 1;
         block_addition = 1;
+        letter_i += 1;
     }
     Err(DecodeError::NoEndMarker)
 }
