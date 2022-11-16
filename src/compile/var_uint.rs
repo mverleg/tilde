@@ -293,6 +293,7 @@ mod dynamic_width {
         assert_eq!(encode(5_284_205), vec![Io, Io, Io, Io, Io, Io, Io, Io, Io, Colon]);
         assert_eq!(encode(10_742_702_444), vec![Asterisk, Bracket, Bracket, Text, Bracket, Text, Bracket, Text, Text, Text]);
         assert_eq!(encode(10_742_702_445), vec![Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Colon]);
+        assert_eq!(encode(18_873_338_202_050), vec![Io, Seq, More, Colon, Plus, Hat, Asterisk, Exclamation, Question, Slash, Hash, Tilde, Number]);
     }
 
     #[test]
@@ -310,6 +311,7 @@ mod dynamic_width {
         assert_eq!(decode(&[Io, Io, Io, Io, Io, Io, Io, Io, Io, Colon]).number, 5_284_205);
         assert_eq!(decode(&[Asterisk, Bracket, Bracket, Text, Bracket, Text, Bracket, Text, Text, Text]).number, 10_742_702_444);
         assert_eq!(decode(&[Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Colon]).number, 10_742_702_445);
+        assert_eq!(decode(&[Io, Seq, More, Colon, Plus, Hat, Asterisk, Exclamation, Question, Slash, Hash, Tilde, Number]).number, 18_873_338_202_050);
     }
 
     #[test]
