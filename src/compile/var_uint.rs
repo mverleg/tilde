@@ -263,6 +263,7 @@ mod dynamic_width {
             let letters = encode(i);
             println!("{i}  {}", encoding_to_str_for_debug(&letters))
         }
+        panic!()
     }
 
     #[test]
@@ -279,21 +280,19 @@ mod dynamic_width {
 
     #[test]
     fn positive_int_avoided_modifiers_encoding_examples() {
-        assert_eq!(encode(0), vec![Asterisk]);
-        assert_eq!(encode(4), vec![Colon]);
-        assert_eq!(encode(5), vec![Number, Bracket]);
-        assert_eq!(encode(9), vec![Plus, Bracket]);
-        assert_eq!(encode(10), vec![Number, Colon]);
-        assert_eq!(encode(40), vec![Number, Text]);
-        assert_eq!(encode(44), vec![Plus, Text]);
-        assert_eq!(encode(45), vec![Number, Number, Bracket]);
-        assert_eq!(encode(85), vec![Number, Number, Colon]);
-        assert_eq!(encode(364), vec![Plus, Right, Text]);
-        assert_eq!(encode(365), vec![Number, Number, Number, Bracket]);
-        assert_eq!(encode(1091), vec![Io, Io, Seq, Hat]);
-        assert_eq!(encode(1878), vec![More, Slash, Asterisk, Question]);
-        assert_eq!(encode(2462), vec![Seq, More, Plus, Tilde]);
-        //TODO @mark: higher
+        assert_eq!(encode(0), vec![Slash]);
+        assert_eq!(encode(4), vec![Number]);
+        assert_eq!(encode(5), vec![Io, Colon]);
+        assert_eq!(encode(44), vec![Asterisk, Text]);
+        assert_eq!(encode(45), vec![Io, Io, Colon]);
+        assert_eq!(encode(364), vec![Asterisk, Bracket, Text]);
+        assert_eq!(encode(365), vec![Io, Io, Io, Io, Colon]);
+        assert_eq!(encode(41_324), vec![Asterisk, Bracket, Bracket, Text, Text]);
+        assert_eq!(encode(41_325), vec![Io, Io, Io, Io, Io, Io, Colon]);
+        assert_eq!(encode(5_284_204), vec![Asterisk, Bracket, Bracket, Text, Bracket, Text, Text]);
+        assert_eq!(encode(5_284_205), vec![Io, Io, Io, Io, Io, Io, Io, Io, Io, Colon]);
+        assert_eq!(encode(10_742_702_444), vec![Asterisk, Bracket, Bracket, Text, Bracket, Text, Bracket, Text, Text, Text]);
+        assert_eq!(encode(10_742_702_445), vec![Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Colon]);
     }
 
     #[test]
