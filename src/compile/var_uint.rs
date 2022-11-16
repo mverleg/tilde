@@ -7,11 +7,10 @@ use crate::compile::letter::Letter::*;
 use crate::compile::var_uint::DecodeError::TooLarge;
 use crate::op::Op;
 
-const STRING_OPENERS: [Letter; 10] = [Number, Io, Seq, More, Plus, Asterisk, Slash, Right, Bracket, Colon];
-const STRING_FOLLOWERS: [Letter; 16] = [Number, Io, Seq, More, Plus, Asterisk, Slash, Right, Bracket, Colon, Hat, Exclamation, Question, Hash, Tilde, Text];
-const STRING_OPENERS_VALUES: [u64; 16] = [0, u64::MAX, 1, 2, 3, 4, 5, 6, 7, 8, 9, u64::MAX, u64::MAX, u64::MAX, u64::MAX, u64::MAX];
-const STRING_FOLLOWER_VALUES: [u64; 16] = [0, 15, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
-//TODO @mark: TEMPORARY! REMOVE THIS! ^^^^
+const STRING_OPENERS: [Letter; 10] = [Io, Seq, More, Plus, Asterisk, Slash, Right, Bracket, Colon, Number];
+const STRING_FOLLOWERS: [Letter; 16] = [Io, Seq, More, Plus, Asterisk, Slash, Right, Bracket, Colon, Hat, Exclamation, Question, Hash, Tilde, Number, Text];
+const STRING_OPENERS_VALUES: [u64; 16] = [0, 1, 2, 3, 4, 5, 6, 7, 8, u64::MAX, u64::MAX, u64::MAX, u64::MAX, u64::MAX, 9, u64::MAX];
+const STRING_FOLLOWER_VALUES: [u64; 16] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
 
 /// Encode a postive integer using variable length.
 /// * Each letter represents a half-byte. They do not follow default order.
@@ -35,10 +34,6 @@ pub fn encode_uint_no_modifier_at_start(nr: u64) -> Vec<Letter> {
     debug_assert!(follow_1n <= 8 && (follow_1n as usize) < usize::MAX);
     let mut rem = nr / opener_n;
     while rem > 0 {
-        print!("| ");
-        if rem.saturating_sub(1) / 2 != rem / 2 {
-            print!("* ")
-        }; //TODO @mark: TEMPORARY! REMOVE THIS!
         rem = rem.saturating_sub(1);
         for i in 0..(non_close_letter_cnt_doubled / 2) {
             letters.push(STRING_FOLLOWERS[(rem % follow_2n) as usize]);
@@ -166,12 +161,13 @@ mod constants_in_sync {
     fn select_letters(predicate: impl Fn(&Letter) -> bool) -> Vec<Letter> {
         let mut allowed: Vec<Letter> = Letter::iter()
             .filter(|letter| !Letter::modifiers().contains(letter))
-            .filter(|letter| letter != &Text)
+            .filter(|letter| letter != &Text && letter != &Number)
             .filter(&predicate)
             .collect();
         // Put Text and modifiers in the second half (if allowed) to keep the order more stable.
         for letter in Letter::modifiers()
             .into_iter()
+            .chain(Some(Number).into_iter())
             .chain(Some(Text).into_iter())
         {
             if predicate(&letter) {

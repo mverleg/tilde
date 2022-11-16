@@ -7,10 +7,6 @@ use ::strum_macros::EnumIter;
 //TODO @mark: meaningful names
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EnumIter)]
 pub enum Letter {
-    // Literals
-    Number,
-    Text,
-
     // Fixed
     Io,
     Seq,
@@ -30,6 +26,10 @@ pub enum Letter {
     Question,
     Hash,
     Tilde,
+
+    // Literals
+    Number,
+    Text,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EnumIter)]
@@ -48,25 +48,25 @@ impl Letter {
     pub fn nr(&self) -> u8 {
         use self::Letter::*;
         match self {
-            Number => 0,
-            Text => 1,
+            Io => 0,
+            Seq => 1,
+            More => 2,
 
-            Io => 2,
-            Seq => 3,
-            More => 4,
+            Plus => 3,
+            Asterisk => 4,
+            Slash => 5,
+            Right => 6,
+            Bracket => 7,
+            Colon => 8,
 
-            Plus => 5,
-            Asterisk => 6,
-            Slash => 7,
-            Right => 8,
-            Bracket => 9,
-            Colon => 10,
+            Hat => 9,
+            Exclamation => 10,
+            Question => 11,
+            Hash => 12,
+            Tilde => 13,
 
-            Hat => 11,
-            Exclamation => 12,
-            Question => 13,
-            Hash => 14,
-            Tilde => 15,
+            Number => 14,
+            Text => 15,
         }
     }
 
@@ -141,6 +141,13 @@ mod tests {
             .map(|letter| letter.nr())
             .collect::<HashSet<_>>();
         assert_eq!(unique.len(), Letter::iter().count());
+    }
+
+    #[test]
+    fn nr_follows_listing_order() {
+        for (index, letter) in Letter::iter().enumerate() {
+            assert_eq!(letter.nr() as usize, index)
+        }
     }
 
     #[test]
