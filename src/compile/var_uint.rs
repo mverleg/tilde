@@ -297,20 +297,22 @@ mod dynamic_width {
 
     #[test]
     fn positive_int_avoided_modifiers_decoding_examples() {
-        assert_eq!(decode(&[Asterisk]), DecodedPositiveNumber { end_index: 0, number: 0 });
-        assert_eq!(decode(&[Colon]), DecodedPositiveNumber { end_index: 0, number: 4 });
-        assert_eq!(decode(&[Number, Bracket, Text]), DecodedPositiveNumber { end_index: 1, number: 5 });
-        assert_eq!(decode(&[Plus, Bracket]), DecodedPositiveNumber { end_index: 1, number: 9 });
-        assert_eq!(decode(&[Number, Colon, Right]), DecodedPositiveNumber { end_index: 1, number: 10 });
-        assert_eq!(decode(&[Number, Text]), DecodedPositiveNumber { end_index: 1, number: 40 });
-        assert_eq!(decode(&[Plus, Text]), DecodedPositiveNumber { end_index: 1, number: 44 });
-        assert_eq!(decode(&[Number, Number, Bracket, Hat]), DecodedPositiveNumber { end_index: 2, number: 45 });
-        assert_eq!(decode(&[Number, Number, Colon, Tilde, Io]), DecodedPositiveNumber { end_index: 2, number: 85 });
-        assert_eq!(decode(&[Plus, Right, Text]), DecodedPositiveNumber { end_index: 2, number: 364 });
-        assert_eq!(decode(&[Number, Number, Number, Bracket]), DecodedPositiveNumber { end_index: 3, number: 365 });
-        assert_eq!(decode(&[Io, Io, Seq, Hat]), DecodedPositiveNumber { end_index: 3, number: 1091 });
-        assert_eq!(decode(&[More, Slash, Asterisk, Question, Exclamation, Hash]), DecodedPositiveNumber { end_index: 3, number: 1878 });
-        assert_eq!(decode(&[Seq, More, Plus, Tilde, Io]), DecodedPositiveNumber { end_index: 3, number: 2462 });
+        assert_eq!(decode(&[Slash]), DecodedPositiveNumber { end_index: 0, number: 0 });
+        assert_eq!(decode(&[Number]), DecodedPositiveNumber { end_index: 0, number: 4 });
+        assert_eq!(decode(&[Io, Colon]), DecodedPositiveNumber { end_index: 1, number: 5 });
+        assert_eq!(decode(&[Asterisk, Text]), DecodedPositiveNumber { end_index: 1, number: 44 });
+        assert_eq!(decode(&[Io, Io, Colon]), DecodedPositiveNumber { end_index: 2, number: 45 });
+        assert_eq!(decode(&[Asterisk, Bracket, Text]), DecodedPositiveNumber { end_index: 2, number: 364 });
+        assert_eq!(decode(&[Io, Io, Io, Io, Colon]), DecodedPositiveNumber { end_index: 4, number: 365 });
+        assert_eq!(decode(&[Asterisk, Bracket, Bracket, Text, Text]), DecodedPositiveNumber { end_index: 4, number: 41_324 });
+        assert_eq!(decode(&[Io, Io, Io, Io, Io, Io, Colon]), DecodedPositiveNumber { end_index: 6, number: 41_325 });
+        assert_eq!(decode(&[Asterisk, Bracket, Bracket, Text, Bracket, Text, Text]), DecodedPositiveNumber { end_index: 6, number: 5_284_204 });
+        assert_eq!(decode(&[Io, Io, Io, Io, Io, Io, Io, Io, Io, Colon]), DecodedPositiveNumber { end_index: 9, number: 5_284_205 });
+        assert_eq!(
+            decode(&[Asterisk, Bracket, Bracket, Text, Bracket, Text, Bracket, Text, Text, Text]),
+            DecodedPositiveNumber { end_index: 9, number: 10_742_702_444 }
+        );
+        assert_eq!(decode(&[Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Colon]), DecodedPositiveNumber { end_index: 12, number: 10_742_702_445 });
     }
 
     #[test]
