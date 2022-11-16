@@ -7,9 +7,9 @@ use crate::compile::letter::Letter::*;
 use crate::compile::var_uint::DecodeError::TooLarge;
 use crate::op::Op;
 
-const STRING_OPENERS: [Letter; 10] = [Io, Seq, More, Plus, Asterisk, Slash, Right, Bracket, Colon, Number];
+const STRING_NOMOD_OPENERS: [Letter; 10] = [Io, Seq, More, Plus, Asterisk, Slash, Right, Bracket, Colon, Number];
 const STRING_FOLLOWERS: [Letter; 16] = [Io, Seq, More, Plus, Asterisk, Slash, Right, Bracket, Colon, Hat, Exclamation, Question, Hash, Tilde, Number, Text];
-const STRING_OPENERS_VALUES: [u64; 16] = [0, 1, 2, 3, 4, 5, 6, 7, 8, u64::MAX, u64::MAX, u64::MAX, u64::MAX, u64::MAX, 9, u64::MAX];
+const STRING_NOMOD_OPENERS_VALUES: [u64; 16] = [0, 1, 2, 3, 4, 5, 6, 7, 8, u64::MAX, u64::MAX, u64::MAX, u64::MAX, u64::MAX, 9, u64::MAX];
 const STRING_FOLLOWER_VALUES: [u64; 16] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
 
 /// Encode a positive integer using variable length.
@@ -21,12 +21,20 @@ const STRING_FOLLOWER_VALUES: [u64; 16] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
 /// * The first three (opener+2) letters can mark the end of the number, then every 2nd of next two letters, then every 3rd for next two, etc.
 ///   Positions that cannot mark the end of a number, can use the full range of letters instead of just half.
 pub fn encode_uint_no_modifier_at_start(nr: u64) -> Vec<Letter> {
+    encode_uint_with_openers(nr, &STRING_NOMOD_OPENERS)
+}
+
+#[inline]
+fn encode_uint_with_openers(
+    nr: u64,
+    openers: &[Letter],
+) -> Vec<Letter> {
     let mut letters = vec![];
-    let opener_n = (STRING_OPENERS.len() / 2) as u64;
+    let opener_n = (openers.len() / 2) as u64;
     if nr < opener_n {
-        letters.push(STRING_OPENERS[(nr + opener_n) as usize]);
+        letters.push(openers[(nr + opener_n) as usize]);
     } else {
-        letters.push(STRING_OPENERS[(nr % opener_n) as usize]);
+        letters.push(openers[(nr % opener_n) as usize]);
     }
     let mut non_close_letter_cnt_doubled = 0;
     let follow_2n = STRING_FOLLOWERS.len() as u64;
@@ -48,7 +56,16 @@ pub fn encode_uint_no_modifier_at_start(nr: u64) -> Vec<Letter> {
 }
 
 /// Inverse of [encode_pos_int_static_width_avoid_modifiers].
-pub fn decode_positive_int_static_width_avoid_modifiers(letters: &[Letter]) -> Result<DecodedPositiveNumber, DecodeError> {
+pub fn decode_uint_no_modifier_at_start(letters: &[Letter]) -> Result<DecodedPositiveNumber, DecodeError> {
+    decode_uint_with_openers(letters, &STRING_NOMOD_OPENERS, &STRING_NOMOD_OPENERS_VALUES)
+}
+
+#[inline]
+fn decode_uint_with_openers(
+    letters: &[Letter],
+    openers: &[Letter],
+    opener_values: &[u64],
+) -> Result<DecodedPositiveNumber, DecodeError> {
     if letters.is_empty() {
         return Err(DecodeError::NoInput);
     }
@@ -59,11 +76,11 @@ pub fn decode_positive_int_static_width_avoid_modifiers(letters: &[Letter]) -> R
     if Letter::modifiers().contains(opener) {
         return Err(DecodeError::StarsWithModifier);
     }
-    let value = STRING_OPENERS_VALUES[opener.nr() as usize];
+    let value = opener_values[opener.nr() as usize];
     if value >= 16 {
         return Err(DecodeError::UnexpectedNode);
     }
-    let open_n = (STRING_OPENERS.len() / 2) as u64;
+    let open_n = (openers.len() / 2) as u64;
     if value >= open_n {
         return Ok(DecodedPositiveNumber { end_index: 0, number: value - open_n });
     };
@@ -202,7 +219,7 @@ mod constants_in_sync {
     /// series of numbers (i.e. after the last number, not to be confused with the next number).
     #[test]
     fn openers() {
-        assert_eq!(STRING_OPENERS, select_letters(|letter| letter.kind() != LetterKind::Modifier).as_slice());
+        assert_eq!(STRING_NOMOD_OPENERS, select_letters(|letter| letter.kind() != LetterKind::Modifier).as_slice());
     }
 
     /// After the start of the number, everything is allowed - encoutnering any of the second
@@ -214,8 +231,8 @@ mod constants_in_sync {
 
     #[test]
     fn reverse_openers() {
-        let expected = reverse_letter_values(&STRING_OPENERS);
-        assert_eq!(STRING_OPENERS_VALUES, expected.as_slice());
+        let expected = reverse_letter_values(&STRING_NOMOD_OPENERS);
+        assert_eq!(STRING_NOMOD_OPENERS_VALUES, expected.as_slice());
     }
 
     #[test]
@@ -238,7 +255,7 @@ mod dynamic_width {
     }
 
     pub fn decode(letters: &[Letter]) -> DecodedPositiveNumber {
-        decode_positive_int_static_width_avoid_modifiers(letters).unwrap()
+        decode_uint_no_modifier_at_start(letters).unwrap()
     }
 
     fn encoding_to_str_for_debug(letters: &[Letter]) -> String {
@@ -327,34 +344,34 @@ mod dynamic_width {
         let nrs = (0..100).chain((0..10).map(|n| n * 2 - n));
         for nr in nrs {
             let enc = encode_uint_no_modifier_at_start(nr);
-            let dec = decode_positive_int_static_width_avoid_modifiers(&enc).unwrap_or_else(|err| panic!("failed to decode {}, err {}", nr, err));
+            let dec = decode_uint_no_modifier_at_start(&enc).unwrap_or_else(|err| panic!("failed to decode {}, err {}", nr, err));
             assert_eq!(nr, dec.number);
         }
     }
 
     #[test]
     fn positive_int_avoid_modifiers_empty_input() {
-        let decode = decode_positive_int_static_width_avoid_modifiers(&[]);
+        let decode = decode_uint_no_modifier_at_start(&[]);
         assert_eq!(decode, Err(DecodeError::NoInput));
     }
 
     #[test]
     fn positive_int_starting_with_modifiers() {
-        let decode = decode_positive_int_static_width_avoid_modifiers(&[Letter::modifiers()[0], Asterisk]);
+        let decode = decode_uint_no_modifier_at_start(&[Letter::modifiers()[0], Asterisk]);
         assert_eq!(decode, Err(DecodeError::StarsWithModifier));
     }
 
     #[test]
     fn positive_int_non_terminated_number() {
-        let decode = decode_positive_int_static_width_avoid_modifiers(&[Io]);
+        let decode = decode_uint_no_modifier_at_start(&[Io]);
         assert_eq!(decode, Err(DecodeError::NoEndMarker));
-        let decode = decode_positive_int_static_width_avoid_modifiers(&[Io, Io, Io]);
+        let decode = decode_uint_no_modifier_at_start(&[Io, Io, Io]);
         assert_eq!(decode, Err(DecodeError::NoEndMarker));
     }
 
     #[test]
     fn positive_int_decode_with_text_opener() {
-        let decode = decode_positive_int_static_width_avoid_modifiers(&[Text, Hash]);
+        let decode = decode_uint_no_modifier_at_start(&[Text, Hash]);
         assert_eq!(decode, Err(DecodeError::TextNode));
     }
 
@@ -362,7 +379,7 @@ mod dynamic_width {
     /// Because the number of letters is even, and Text is not allowed at the end, (at least) one other letter
     /// should also not be allowed. This checks that that is handled gracefully.
     fn positive_int_decode_with_unused_letter() {
-        for list in [STRING_OPENERS.as_slice(), STRING_FOLLOWERS.as_slice()] {
+        for list in [STRING_NOMOD_OPENERS.as_slice(), STRING_FOLLOWERS.as_slice()] {
             let mut unused = HashSet::new();
             for letter in Letter::iter() {
                 unused.insert(letter);
@@ -378,7 +395,7 @@ mod dynamic_width {
                 eprintln!("no unused letters")
             }
             for letter in unused {
-                let dec = decode_positive_int_static_width_avoid_modifiers(&[Number, letter, Hash]);
+                let dec = decode_uint_no_modifier_at_start(&[Number, letter, Hash]);
                 assert_eq!(dec, Err(DecodeError::UnexpectedNode), "list len: {}, letter: {}", list.len(), letter.symbol());
             }
         }
@@ -386,7 +403,7 @@ mod dynamic_width {
 
     #[test]
     fn positive_int_overflow_in_decode() {
-        let decode = decode_positive_int_static_width_avoid_modifiers(&[Io; 100]);
+        let decode = decode_uint_no_modifier_at_start(&[Io; 100]);
         assert_eq!(decode, Err(DecodeError::TooLarge));
     }
 }
