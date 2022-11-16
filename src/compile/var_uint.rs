@@ -12,14 +12,14 @@ const STRING_FOLLOWERS: [Letter; 16] = [Io, Seq, More, Plus, Asterisk, Slash, Ri
 const STRING_OPENERS_VALUES: [u64; 16] = [0, 1, 2, 3, 4, 5, 6, 7, 8, u64::MAX, u64::MAX, u64::MAX, u64::MAX, u64::MAX, 9, u64::MAX];
 const STRING_FOLLOWER_VALUES: [u64; 16] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
 
-/// Encode a postive integer using variable length.
+/// Encode a positive integer using variable length.
 /// * Each letter represents a half-byte. They do not follow default order.
 /// * The first letter is not allowed to be Text, to distinguish end of text after previous number.
 /// * The first letter is now allowed to be a modifier, because such modifiers apply to the string itself.
-/// * The value of lettere depends on position and is given by order in the constant arrays (different from `Letter.nr()`).
+/// * The value of letters depends on position and is given by order in the constant arrays (possibly different from `Letter.nr()`).
 /// * Any letter in the upper half marks the end of a number, and the real value is minus half the length.
-/// * The first three (opener+2) letters can close the number, then every 2nd of next two letters, then every 3rd for next two, etc.
-///   Letters that cannot close the number, can use the full range of values instead of just half.
+/// * The first three (opener+2) letters can mark the end of the number, then every 2nd of next two letters, then every 3rd for next two, etc.
+///   Positions that cannot mark the end of a number, can use the full range of letters instead of just half.
 pub fn encode_uint_no_modifier_at_start(nr: u64) -> Vec<Letter> {
     let mut letters = vec![];
     let opener_n = (STRING_OPENERS.len() / 2) as u64;
@@ -71,11 +71,10 @@ pub fn decode_positive_int_static_width_avoid_modifiers(letters: &[Letter]) -> R
     let mut multiplier = open_n;
     let follow_2n = STRING_FOLLOWERS.len() as u64;
     let follow_1n = follow_2n / 2;
-    let mut letter_i = 1;
+    let mut letter_i: usize = 1;
     let mut non_close_letter_cnt_doubled = 0;
     let mut block_addition = 1;
-    //TODO @mverleg: use saturating versions here?
-    while letter_i + (non_close_letter_cnt_doubled / 2) < letters.len() {
+    while letter_i.saturating_add(non_close_letter_cnt_doubled / 2) < letters.len() {
         for _block_offset in 0..(non_close_letter_cnt_doubled / 2) {
             let value = STRING_FOLLOWER_VALUES[letters[letter_i].nr() as usize].saturating_add(block_addition);
             block_addition = 0;
