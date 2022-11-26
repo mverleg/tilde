@@ -65,12 +65,22 @@ fn encode_uint_with_openers(
 
 /// Inverse of [encode_pos_int_static_width_avoid_modifiers].
 pub fn decode_uint_no_modifier_at_start(letters: &[Letter]) -> Result<DecodedPositiveNumber, DecodeError> {
+    if letters.is_empty() {
+        return Err(DecodeError::NoInput);
+    }
+    let opener = &letters[0];
+    if Letter::modifiers().contains(opener) {
+        return Err(DecodeError::StarsWithModifier);
+    }
     decode_uint_with_openers(letters, &STRING_NOMOD_OPENERS, &STRING_NOMOD_OPENERS_VALUES)
 }
 
 /// Inverse of [encode_pos_int_static_width_avoid_modifiers].
-pub fn decode_uint_no_modifier_at_start(letters: &[Letter]) -> Result<DecodedPositiveNumber, DecodeError> {
-    decode_uint_with_openers(letters, &STRING_NOMOD_OPENERS, &STRING_NOMOD_OPENERS_VALUES)
+pub fn decode_uint_allow_modifiers(letters: &[Letter]) -> Result<DecodedPositiveNumber, DecodeError> {
+    if letters.is_empty() {
+        return Err(DecodeError::NoInput);
+    }
+    decode_uint_with_openers(letters, &STRING_WITHMOD_OPENERS, &STRING_WITHMOD_OPENERS_VALUES)
 }
 
 #[inline]
@@ -79,15 +89,12 @@ fn decode_uint_with_openers(
     openers: &[Letter],
     opener_values: &[u64],
 ) -> Result<DecodedPositiveNumber, DecodeError> {
-    if letters.is_empty() {
-        return Err(DecodeError::NoInput);
-    }
-    let opener = &letters[0];
+    let opener = &letters
+        .iter()
+        .next()
+        .expect("empty input when decoding int, should be checked before calling");
     if let Letter::Text = opener {
         return Err(DecodeError::TextNode);
-    }
-    if Letter::modifiers().contains(opener) {
-        return Err(DecodeError::StarsWithModifier);
     }
     let value = opener_values[opener.nr() as usize];
     if value >= 16 {
@@ -353,6 +360,13 @@ mod dynamic_width_common_without_modifiers {
         assert_eq!(decode(&[Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Colon, Hash]).end_index, 12);
     }
 
+    #[test]
+    fn positive_int_starting_with_modifiers() {
+        let letters = &[Letter::modifiers()[0], Asterisk];
+        let dec = decode_uint_no_modifier_at_start(letters);
+        assert_eq!(dec, Err(DecodeError::StarsWithModifier));
+    }
+
     common_tests!(encode_uint_no_modifier_at_start, decode_uint_no_modifier_at_start);
 }
 
@@ -372,7 +386,7 @@ mod dynamic_width_common_allow_modifiers {
     }
 
     pub fn decode(letters: &[Letter]) -> DecodedPositiveNumber {
-        decode_uint_no_modifier_at_start(letters).unwrap()
+        decode_uint_allow_modifiers(letters).unwrap()
     }
 
     #[test]
@@ -420,7 +434,14 @@ mod dynamic_width_common_allow_modifiers {
         assert_eq!(decode(&[Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Colon, Hash]).end_index, 12);
     }
 
-    common_tests!(encode_uint_allow_modifiers, decode_uint_no_modifier_at_start);
+    #[test]
+    fn positive_int_starting_with_modifiers() {
+        let letters = &[Letter::modifiers()[0], Asterisk];
+        let dec = decode_uint_allow_modifiers(letters);
+        assert!(dec.is_ok());
+    }
+
+    common_tests!(encode_uint_allow_modifiers, decode_uint_allow_modifiers);
 }
 
 macro_rules! common_tests {
@@ -451,12 +472,6 @@ macro_rules! common_tests {
         fn positive_int_avoid_modifiers_empty_input() {
             let dec = $decode(&[]);
             assert_eq!(dec, Err(DecodeError::NoInput));
-        }
-
-        #[test]
-        fn positive_int_starting_with_modifiers() {
-            let dec = $decode(&[Letter::modifiers()[0], Asterisk]);
-            assert_eq!(dec, Err(DecodeError::StarsWithModifier));
         }
 
         #[test]
