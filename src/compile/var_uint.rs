@@ -10,9 +10,9 @@ use crate::op::Op;
 const STRING_NOMOD_OPENERS: [Letter; 10] = [Io, Seq, More, Plus, Asterisk, Slash, Right, Bracket, Colon, Number];
 const STRING_WITHMOD_OPENERS: [Letter; 14] = [Io, Seq, More, Plus, Asterisk, Slash, Right, Bracket, Colon, Hat, Exclamation, Question, Hash, Tilde];
 const STRING_FOLLOWERS: [Letter; 16] = [Io, Seq, More, Plus, Asterisk, Slash, Right, Bracket, Colon, Hat, Exclamation, Question, Hash, Tilde, Number, Text];
-const STRING_NOMOD_OPENERS_VALUES: [u64; 16] = [0, 1, 2, 3, 4, 5, 6, 7, 8, u64::MAX, u64::MAX, u64::MAX, u64::MAX, u64::MAX, 9, u64::MAX];
-const STRING_WITHMOD_OPENERS_VALUES: [u64; 16] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, u64::MAX, u64::MAX];
-const STRING_FOLLOWER_VALUES: [u64; 16] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
+const STRING_NOMOD_OPENERS_VALUES: [UINT; 16] = [0, 1, 2, 3, 4, 5, 6, 7, 8, UINT::MAX, UINT::MAX, UINT::MAX, UINT::MAX, UINT::MAX, 9, UINT::MAX];
+const STRING_WITHMOD_OPENERS_VALUES: [UINT; 16] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, UINT::MAX, UINT::MAX];
+const STRING_FOLLOWER_VALUES: [UINT; 16] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
 
 /// Encode a positive integer using variable length.
 /// * Each letter represents a half-byte. They do not follow default order.
@@ -22,7 +22,7 @@ const STRING_FOLLOWER_VALUES: [u64; 16] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
 /// * Any letter in the upper half marks the end of a number, and the real value is minus half the length.
 /// * The first three (opener+2) letters can mark the end of the number, then every 2nd of next two letters, then every 3rd for next two, etc.
 ///   Positions that cannot mark the end of a number, can use the full range of letters instead of just half.
-pub fn encode_uint_no_modifier_at_start(nr: u64) -> Vec<Letter> {
+pub fn encode_uint_no_modifier_at_start(nr: UINT) -> Vec<Letter> {
     encode_uint_with_openers(nr, &STRING_NOMOD_OPENERS)
 }
 
@@ -30,24 +30,24 @@ pub fn encode_uint_no_modifier_at_start(nr: u64) -> Vec<Letter> {
 /// * The first letter is allowed to be a modifier. It is not allowed to be text token.
 /// * The first letter is also not allowed to be number token. The length has to be even, so we can
 ///   freely nominate one, which we pick to be number token, for use in closing special string literals.
-pub fn encode_uint_allow_modifiers(nr: u64) -> Vec<Letter> {
+pub fn encode_uint_allow_modifiers(nr: UINT) -> Vec<Letter> {
     encode_uint_with_openers(nr, &STRING_WITHMOD_OPENERS)
 }
 
 #[inline]
 fn encode_uint_with_openers(
-    nr: u64,
+    nr: UINT,
     openers: &[Letter],
 ) -> Vec<Letter> {
     let mut letters = vec![];
-    let opener_n = (openers.len() / 2) as u64;
+    let opener_n = (openers.len() / 2) as UINT;
     if nr < opener_n {
         letters.push(openers[(nr + opener_n) as usize]);
     } else {
         letters.push(openers[(nr % opener_n) as usize]);
     }
     let mut non_close_letter_cnt_doubled = 0;
-    let follow_2n = STRING_FOLLOWERS.len() as u64;
+    let follow_2n = STRING_FOLLOWERS.len() as UINT;
     let follow_1n = follow_2n / 2;
     debug_assert!(follow_1n <= 8 && (follow_1n as usize) < usize::MAX);
     let mut rem = nr / opener_n;
@@ -89,7 +89,7 @@ pub fn decode_uint_allow_modifiers(letters: &[Letter]) -> Result<DecodedPositive
 fn decode_uint_with_openers(
     letters: &[Letter],
     openers: &[Letter],
-    opener_values: &[u64],
+    opener_values: &[UINT],
 ) -> Result<DecodedPositiveNumber, DecodeError> {
     let opener = &letters
         .iter()
@@ -102,13 +102,13 @@ fn decode_uint_with_openers(
     if value >= 16 {
         return Err(DecodeError::UnexpectedNode);
     }
-    let open_n = (openers.len() / 2) as u64;
+    let open_n = (openers.len() / 2) as UINT;
     if value >= open_n {
         return Ok(DecodedPositiveNumber { end_index: 0, number: value - open_n });
     };
     let mut nr = value;
     let mut multiplier = open_n;
-    let follow_2n = STRING_FOLLOWERS.len() as u64;
+    let follow_2n = STRING_FOLLOWERS.len() as UINT;
     let follow_1n = follow_2n / 2;
     let mut letter_i: usize = 1;
     let mut non_close_letter_cnt_doubled = 0;
@@ -158,7 +158,7 @@ fn decode_uint_with_openers(
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct DecodedPositiveNumber {
     pub end_index: usize,
-    pub number: u64,
+    pub number: UINT,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -220,8 +220,8 @@ mod constants_in_sync {
         allowed
     }
 
-    fn reverse_letter_values(letters: &[Letter]) -> Vec<u64> {
-        let mut expected = vec![u64::MAX; 16];
+    fn reverse_letter_values(letters: &[Letter]) -> Vec<UINT> {
+        let mut expected = vec![UINT::MAX; 16];
         for (value, letter) in letters.iter().enumerate() {
             expected[letter.nr() as usize] = value.try_into().unwrap();
         }
@@ -309,7 +309,7 @@ mod dynamic_width_common_without_modifiers {
     use super::*;
     use super::test_util::*;
 
-    pub fn encode(nr: u64) -> Vec<Letter> {
+    pub fn encode(nr: UINT) -> Vec<Letter> {
         encode_uint_no_modifier_at_start(nr)
     }
 
@@ -383,7 +383,7 @@ mod dynamic_width_common_allow_modifiers {
     use super::*;
     use super::test_util::*;
 
-    pub fn encode(nr: u64) -> Vec<Letter> {
+    pub fn encode(nr: UINT) -> Vec<Letter> {
         encode_uint_allow_modifiers(nr)
     }
 
@@ -463,7 +463,7 @@ macro_rules! common_tests {
 
         #[test]
         fn encode_and_decode_samples() {
-            let nrs = (0..100).chain((7..60).map(|n| 2u64.pow(n) - n as u64));
+            let nrs = (0..100).chain((7..60).map(|n| (2 as UINT).pow(n) - n as UINT));
             for nr in nrs {
                 let enc = $encode(nr);
                 let dec = $decode(&enc).unwrap_or_else(|err| panic!("failed to decode {}, err {}", nr, err));
@@ -538,3 +538,5 @@ macro_rules! common_tests {
 }
 
 pub(self) use common_tests;
+
+use crate::UINT;

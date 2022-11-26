@@ -29,6 +29,7 @@ pub fn tilde_gen_md_docs() -> TildeRes<()> {
 
 pub type TildeRes<T> = Result<T, String>;
 pub type NR = f64;
+pub type UINT = u64;
 
 /// Run tilde with input lines produces by a reader, and results handled by a writer.
 pub fn tilde_from<R: io::Read, W: io::Write>(
