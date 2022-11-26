@@ -8,8 +8,10 @@ use crate::compile::var_uint::DecodeError::TooLarge;
 use crate::op::Op;
 
 const STRING_NOMOD_OPENERS: [Letter; 10] = [Io, Seq, More, Plus, Asterisk, Slash, Right, Bracket, Colon, Number];
+const STRING_WITHMOD_OPENERS: [Letter; 14] = [Io, Seq, More, Plus, Asterisk, Slash, Right, Bracket, Colon, Hat, Exclamation, Question, Hash, Tilde];
 const STRING_FOLLOWERS: [Letter; 16] = [Io, Seq, More, Plus, Asterisk, Slash, Right, Bracket, Colon, Hat, Exclamation, Question, Hash, Tilde, Number, Text];
 const STRING_NOMOD_OPENERS_VALUES: [u64; 16] = [0, 1, 2, 3, 4, 5, 6, 7, 8, u64::MAX, u64::MAX, u64::MAX, u64::MAX, u64::MAX, 9, u64::MAX];
+const STRING_WITHMOD_OPENERS_VALUES: [u64; 16] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, u64::MAX, u64::MAX];
 const STRING_FOLLOWER_VALUES: [u64; 16] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
 
 /// Encode a positive integer using variable length.
@@ -218,8 +220,13 @@ mod constants_in_sync {
     /// It can also not contain a Text letter, because that may signal the end of the
     /// series of numbers (i.e. after the last number, not to be confused with the next number).
     #[test]
-    fn openers() {
-        assert_eq!(STRING_NOMOD_OPENERS, select_letters(|letter| letter.kind() != LetterKind::Modifier).as_slice());
+    fn openers_nomod() {
+        assert_eq!(STRING_NOMOD_OPENERS, select_letters(|letter| letter.kind() != LetterKind::Modifier && letter != &Letter::Text).as_slice());
+    }
+
+    #[test]
+    fn openers_withmod() {
+        assert_eq!(STRING_WITHMOD_OPENERS, select_letters(|letter| letter.kind() != LetterKind::Literal).as_slice());
     }
 
     /// After the start of the number, everything is allowed - encoutnering any of the second
@@ -230,9 +237,15 @@ mod constants_in_sync {
     }
 
     #[test]
-    fn reverse_openers() {
+    fn reverse_openers_nomod() {
         let expected = reverse_letter_values(&STRING_NOMOD_OPENERS);
         assert_eq!(STRING_NOMOD_OPENERS_VALUES, expected.as_slice());
+    }
+
+    #[test]
+    fn reverse_openers_withmod() {
+        let expected = reverse_letter_values(&STRING_WITHMOD_OPENERS);
+        assert_eq!(STRING_WITHMOD_OPENERS_VALUES, expected.as_slice());
     }
 
     #[test]
