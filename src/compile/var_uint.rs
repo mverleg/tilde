@@ -285,7 +285,7 @@ mod test_util {
 }
 
 #[cfg(test)]
-mod dynamic_width {
+mod dynamic_width_common_without_modifiers {
     use ::std::collections::HashSet;
 
     use super::test_util::*;
@@ -349,6 +349,13 @@ mod dynamic_width {
         assert_eq!(decode(&[Io, Io, Plus, Io, Plus, Io, Io, Io, Plus, Colon, Hash]).end_index, 9);
         assert_eq!(decode(&[Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Colon, Hash]).end_index, 12);
     }
+}
+
+#[cfg(test)]
+mod dynamic_width_common {
+    use ::std::collections::HashSet;
+
+    use super::*;
 
     #[test]
     fn encode_and_decode_samples() {
