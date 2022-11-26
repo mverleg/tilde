@@ -4,8 +4,11 @@ use ::strum::IntoEnumIterator;
 
 use crate::compile::letter::Letter;
 use crate::compile::letter::Letter::*;
+use crate::compile::var_uint::encode_uint_allow_modifiers;
+use crate::compile::var_uint::encode_uint_no_modifier_at_start;
 use crate::compile::var_uint::DecodeError::TooLarge;
 use crate::op::Op;
+use crate::Value::Num;
 use crate::NR;
 use crate::UINT;
 
@@ -25,7 +28,16 @@ pub fn encode_uint_vec(
     if nrs.is_empty() {
         return vec![Text];
     }
-    unimplemented!()
+    let mut letters = vec![];
+    letters.extend(encode_uint_no_modifier_at_start(nrs[0]));
+    for nr in nrs.iter().skip(1) {
+        letters.extend(encode_uint_allow_modifiers(*nr));
+    }
+    letters.push(match closer {
+        Closer::Text => Text,
+        Closer::Number => Number,
+    });
+    letters
 }
 
 pub fn decode_uint_vec(letters: &[Letter]) -> (Vec<UINT>, Closer) {
@@ -46,5 +58,10 @@ mod tests {
     fn encode_empty_txt() {
         let enc = encode_uint_vec(&[], Closer::Text);
         assert_eq!(enc, vec![Text]);
+    }
+
+    #[test]
+    fn encode_examples_nr() {
+        unimplemented!() //TODO @mark: TEMPORARY! REMOVE THIS!
     }
 }
