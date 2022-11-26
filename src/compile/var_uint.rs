@@ -250,14 +250,6 @@ mod test_util {
     use crate::compile::letter::LetterKind;
     use crate::compile::var_uint::DecodeError::TextNode;
 
-    pub fn encode(nr: u64) -> Vec<Letter> {
-        encode_uint_no_modifier_at_start(nr)
-    }
-
-    pub fn decode(letters: &[Letter]) -> DecodedPositiveNumber {
-        decode_uint_no_modifier_at_start(letters).unwrap()
-    }
-
     pub fn encoding_to_str_for_debug(letters: &[Letter]) -> String {
         let enc = letters
             .iter()
@@ -271,38 +263,25 @@ mod test_util {
             .join(" ");
         format!("{enc}   {digits}")
     }
-
-    #[test]
-    #[ignore]
-    fn print_all_encodings_for_debug() {
-        //TODO @mverleg: remove?
-        for i in 0..=10_000 {
-            let letters = encode(i);
-            println!("{i}  {}", encoding_to_str_for_debug(&letters))
-        }
-        panic!()
-    }
 }
 
 #[cfg(test)]
 mod dynamic_width_common_without_modifiers {
     use ::std::collections::HashSet;
 
-    use super::test_util::*;
-    use super::*;
     use crate::compile::letter::LetterKind;
     use crate::compile::var_uint::DecodeError::TextNode;
 
-    #[test]
-    fn all_encodings_unique() {
-        let n = 50_000;
-        let mut seen = HashSet::with_capacity(n as usize);
-        for i in 0..n {
-            let enc = encode(i);
-            assert!(enc.len() != 4 && enc.len() != 6, "nr {i} has impossible length {}", enc.len());
-            assert!(seen.insert(enc.clone()), "nr {i} has same encoding as an earlier nr");
-            assert_eq!(i, decode(&enc).number, "decode not same for nr {i}");
-        }
+    #[macro_use]
+    use super::*;
+    use super::test_util::*;
+
+    pub fn encode(nr: u64) -> Vec<Letter> {
+        encode_uint_no_modifier_at_start(nr)
+    }
+
+    pub fn decode(letters: &[Letter]) -> DecodedPositiveNumber {
+        decode_uint_no_modifier_at_start(letters).unwrap()
     }
 
     #[test]
@@ -349,79 +328,104 @@ mod dynamic_width_common_without_modifiers {
         assert_eq!(decode(&[Io, Io, Plus, Io, Plus, Io, Io, Io, Plus, Colon, Hash]).end_index, 9);
         assert_eq!(decode(&[Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Colon, Hash]).end_index, 12);
     }
+
+    common_tests!(encode_uint_no_modifier_at_start, decode_uint_no_modifier_at_start);
 }
 
-#[cfg(test)]
-mod dynamic_width_common {
-    use ::std::collections::HashSet;
-
-    use super::*;
-
-    #[test]
-    fn encode_and_decode_samples() {
-        let nrs = (0..100).chain((7..60).map(|n| 2u64.pow(n) - n as u64));
-        for nr in nrs {
-            let enc = encode_uint_no_modifier_at_start(nr);
-            let dec = decode_uint_no_modifier_at_start(&enc).unwrap_or_else(|err| panic!("failed to decode {}, err {}", nr, err));
-            assert_eq!(nr, dec.number);
-        }
-    }
-
-    #[test]
-    fn positive_int_avoid_modifiers_empty_input() {
-        let dec = decode_uint_no_modifier_at_start(&[]);
-        assert_eq!(dec, Err(DecodeError::NoInput));
-    }
-
-    #[test]
-    fn positive_int_starting_with_modifiers() {
-        let dec = decode_uint_no_modifier_at_start(&[Letter::modifiers()[0], Asterisk]);
-        assert_eq!(dec, Err(DecodeError::StarsWithModifier));
-    }
-
-    #[test]
-    fn positive_int_non_terminated_number() {
-        let dec = decode_uint_no_modifier_at_start(&[Io]);
-        assert_eq!(dec, Err(DecodeError::NoEndMarker));
-        let dec = decode_uint_no_modifier_at_start(&[Io, Io, Io]);
-        assert_eq!(dec, Err(DecodeError::NoEndMarker));
-    }
-
-    #[test]
-    fn positive_int_decode_with_text_opener() {
-        let dec = decode_uint_no_modifier_at_start(&[Text, Hash]);
-        assert_eq!(dec, Err(DecodeError::TextNode));
-    }
-
-    #[test]
-    /// Because the number of letters is even, and Text is not allowed at the end, (at least) one other letter
-    /// should also not be allowed. This checks that that is handled gracefully.
-    fn positive_int_decode_with_unused_letter() {
-        for list in [STRING_NOMOD_OPENERS.as_slice(), STRING_FOLLOWERS.as_slice()] {
-            let mut unused = HashSet::new();
-            for letter in Letter::iter() {
-                unused.insert(letter);
-            }
-            unused.remove(&Text);
-            for letter in Letter::modifiers() {
-                unused.remove(&letter);
-            }
-            for letter in list {
-                unused.remove(&letter);
-            }
-            if unused.is_empty() {
-                eprintln!("no unused letters")
-            }
-            for letter in unused {
-                let dec = decode_uint_no_modifier_at_start(&[Number, letter, Hash]);
-                assert_eq!(dec, Err(DecodeError::UnexpectedNode), "list len: {}, letter: {}", list.len(), letter.symbol());
+macro_rules! common_tests {
+    ($encode: ident, $decode: ident) => {
+        #[test]
+        fn all_encodings_unique() {
+            let n = 50_000;
+            let mut seen = HashSet::with_capacity(n as usize);
+            for i in 0..n {
+                let enc = $encode(i);
+                assert!(enc.len() != 4 && enc.len() != 6, "nr {i} has impossible length {}", enc.len());
+                assert!(seen.insert(enc.clone()), "nr {i} has same encoding as an earlier nr");
+                assert_eq!(i, $decode(&enc).unwrap().number, "decode not same for nr {i}");
             }
         }
-    }
 
-    #[test]
-    fn positive_int_overflow_in_decode() {
-        let dec = decode_uint_no_modifier_at_start(&[Io; 100]);
-        assert_eq!(dec, Err(DecodeError::TooLarge));
-    }
+        #[test]
+        fn encode_and_decode_samples() {
+            let nrs = (0..100).chain((7..60).map(|n| 2u64.pow(n) - n as u64));
+            for nr in nrs {
+                let enc = $encode(nr);
+                let dec = $decode(&enc).unwrap_or_else(|err| panic!("failed to decode {}, err {}", nr, err));
+                assert_eq!(nr, dec.number);
+            }
+        }
+
+        #[test]
+        fn positive_int_avoid_modifiers_empty_input() {
+            let dec = $decode(&[]);
+            assert_eq!(dec, Err(DecodeError::NoInput));
+        }
+
+        #[test]
+        fn positive_int_starting_with_modifiers() {
+            let dec = $decode(&[Letter::modifiers()[0], Asterisk]);
+            assert_eq!(dec, Err(DecodeError::StarsWithModifier));
+        }
+
+        #[test]
+        fn positive_int_non_terminated_number() {
+            let dec = $decode(&[Io]);
+            assert_eq!(dec, Err(DecodeError::NoEndMarker));
+            let dec = $decode(&[Io, Io, Io]);
+            assert_eq!(dec, Err(DecodeError::NoEndMarker));
+        }
+
+        #[test]
+        fn positive_int_decode_with_text_opener() {
+            let dec = $decode(&[Text, Hash]);
+            assert_eq!(dec, Err(DecodeError::TextNode));
+        }
+
+        #[test]
+        /// Because the number of letters is even, and Text is not allowed at the end, (at least) one other letter
+        /// should also not be allowed. This checks that that is handled gracefully.
+        fn positive_int_decode_with_unused_letter() {
+            for list in [STRING_NOMOD_OPENERS.as_slice(), STRING_FOLLOWERS.as_slice()] {
+                let mut unused = HashSet::new();
+                for letter in Letter::iter() {
+                    unused.insert(letter);
+                }
+                unused.remove(&Text);
+                for letter in Letter::modifiers() {
+                    unused.remove(&letter);
+                }
+                for letter in list {
+                    unused.remove(&letter);
+                }
+                if unused.is_empty() {
+                    eprintln!("no unused letters")
+                }
+                for letter in unused {
+                    pub(self) use common_tests;
+                    let dec = $decode(&[Number, letter, Hash]);
+                    assert_eq!(dec, Err(DecodeError::UnexpectedNode), "list len: {}, letter: {}", list.len(), letter.symbol());
+                }
+            }
+        }
+
+        #[test]
+        fn positive_int_overflow_in_decode() {
+            let dec = $decode(&[Io; 100]);
+            assert_eq!(dec, Err(DecodeError::TooLarge));
+        }
+
+        #[test]
+        #[ignore]
+        fn print_all_encodings_for_debug() {
+            //TODO @mverleg: remove?
+            for i in 0..=10_000 {
+                let letters = encode(i);
+                println!("{i}  {}", encoding_to_str_for_debug(&letters))
+            }
+            panic!()
+        }
+    };
 }
+
+pub(self) use common_tests;
