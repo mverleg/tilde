@@ -27,7 +27,9 @@ pub fn encode_uint_no_modifier_at_start(nr: u64) -> Vec<Letter> {
 }
 
 /// Similar to [encode_uint_no_modifier_at_start], except:
-/// * The first letter is allowed to be a modifier. It is not allowed to be text.
+/// * The first letter is allowed to be a modifier. It is not allowed to be text token.
+/// * The first letter is also not allowed to be number token. The length has to be even, so we can
+///   freely nominate one, which we pick to be number token, for use in closing special string literals.
 pub fn encode_uint_allow_modifiers(nr: u64) -> Vec<Letter> {
     encode_uint_with_openers(nr, &STRING_WITHMOD_OPENERS)
 }
@@ -404,7 +406,7 @@ mod dynamic_width_common_allow_modifiers {
         assert_eq!(encode(7_397_887), vec![Io, Io, Io, Io, Io, Io, Io, Io, Io, Colon]);
         assert_eq!(encode(15_039_783_422), vec![Right, Bracket, Bracket, Text, Bracket, Text, Bracket, Text, Text, Text]);
         assert_eq!(encode(15_039_783_423), vec![Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Colon]);
-        //assert_eq!(encode(18_873_338_202_050), vec![Io, Seq, More, Colon, Plus, Hat, Asterisk, Exclamation, Question, Slash, Hash, Tilde, Number]);
+        assert_eq!(encode(26_422_676_238_522), vec![Asterisk, Seq, More, Text, Plus, Hat, Bracket, Exclamation, Question, Slash, Hash, Tilde, Number]);
     }
 
     #[test]
@@ -422,7 +424,7 @@ mod dynamic_width_common_allow_modifiers {
         assert_eq!(decode(&[Io, Io, Io, Io, Io, Io, Io, Io, Io, Colon]).number, 7_397_887);
         assert_eq!(decode(&[Right, Bracket, Bracket, Text, Bracket, Text, Bracket, Text, Text, Text]).number, 15_039_783_422);
         assert_eq!(decode(&[Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Colon]).number, 15_039_783_423);
-        // assert_eq!(decode(&[Io, Seq, More, Colon, Plus, Hat, Asterisk, Exclamation, Question, Slash, Hash, Tilde, Number]).number, 18_873_338_202_050);
+        assert_eq!(decode(&[Asterisk, Seq, More, Text, Plus, Hat, Bracket, Exclamation, Question, Slash, Hash, Tilde, Number]).number, 26_422_676_238_522);
     }
 
     #[test]
