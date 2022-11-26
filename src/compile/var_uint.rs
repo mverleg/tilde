@@ -429,11 +429,12 @@ mod dynamic_width_common_allow_modifiers {
 
     #[test]
     fn decode_end_index() {
-        assert_eq!(decode(&[Slash, Io, Seq, More, Plus, Asterisk, Slash, Right, Bracket]).end_index, 0);
-        assert_eq!(decode(&[Io, Colon]).end_index, 1);
-        assert_eq!(decode(&[Asterisk, Bracket, Bracket, Text, Text, Asterisk, Hash]).end_index, 4);
-        assert_eq!(decode(&[Io, Io, Plus, Io, Plus, Io, Io, Io, Plus, Colon, Hash]).end_index, 9);
-        assert_eq!(decode(&[Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Colon, Hash]).end_index, 12);
+        assert_eq!(decode(&[Bracket, Seq]).end_index, 0);
+        assert_eq!(decode(&[Io, Colon, Right, Seq]).end_index, 1);
+        assert_eq!(decode(&[Asterisk, Hash, More]).end_index, 1);
+        assert_eq!(decode(&[Right, Text, Asterisk, Exclamation]).end_index, 1);
+        assert_eq!(decode(&[Right, Bracket, Bracket, Text, Text, Exclamation, Number]).end_index, 4);
+        assert_eq!(decode(&[Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Colon, Io, Io, Io]).end_index, 12);
     }
 
     #[test]
