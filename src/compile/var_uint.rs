@@ -17,13 +17,19 @@ const STRING_FOLLOWER_VALUES: [u64; 16] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
 /// Encode a positive integer using variable length.
 /// * Each letter represents a half-byte. They do not follow default order.
 /// * The first letter is not allowed to be Text, to distinguish end of text after previous number.
-/// * The first letter is now allowed to be a modifier, because such modifiers apply to the string itself.
+/// * The first letter is not allowed to be a modifier, because such modifiers apply to the string itself.
 /// * The value of letters depends on position and is given by order in the constant arrays (possibly different from `Letter.nr()`).
 /// * Any letter in the upper half marks the end of a number, and the real value is minus half the length.
 /// * The first three (opener+2) letters can mark the end of the number, then every 2nd of next two letters, then every 3rd for next two, etc.
 ///   Positions that cannot mark the end of a number, can use the full range of letters instead of just half.
 pub fn encode_uint_no_modifier_at_start(nr: u64) -> Vec<Letter> {
     encode_uint_with_openers(nr, &STRING_NOMOD_OPENERS)
+}
+
+/// Similar to [encode_uint_no_modifier_at_start], except:
+/// * The first letter is allowed to be a modifier. It is not allowed to be text.
+pub fn encode_uint_allow_modifiers(nr: u64) -> Vec<Letter> {
+    encode_uint_with_openers(nr, &STRING_WITHMOD_OPENERS)
 }
 
 #[inline]
@@ -55,6 +61,11 @@ fn encode_uint_with_openers(
         non_close_letter_cnt_doubled += 1;
     }
     return letters;
+}
+
+/// Inverse of [encode_pos_int_static_width_avoid_modifiers].
+pub fn decode_uint_no_modifier_at_start(letters: &[Letter]) -> Result<DecodedPositiveNumber, DecodeError> {
+    decode_uint_with_openers(letters, &STRING_NOMOD_OPENERS, &STRING_NOMOD_OPENERS_VALUES)
 }
 
 /// Inverse of [encode_pos_int_static_width_avoid_modifiers].
@@ -298,7 +309,7 @@ mod dynamic_width_common_without_modifiers {
     }
 
     #[test]
-    fn positive_int_avoided_modifiers_encoding_examples() {
+    fn encoding_examples() {
         assert_eq!(encode(0), vec![Slash]);
         assert_eq!(encode(4), vec![Number]);
         assert_eq!(encode(5), vec![Io, Colon]);
@@ -316,7 +327,7 @@ mod dynamic_width_common_without_modifiers {
     }
 
     #[test]
-    fn positive_int_avoided_modifiers_decoding_examples() {
+    fn decoding_examples() {
         assert_eq!(decode(&[Slash]).number, 0);
         assert_eq!(decode(&[Number]).number, 4);
         assert_eq!(decode(&[Io, Colon]).number, 5);
@@ -343,6 +354,73 @@ mod dynamic_width_common_without_modifiers {
     }
 
     common_tests!(encode_uint_no_modifier_at_start, decode_uint_no_modifier_at_start);
+}
+
+#[cfg(test)]
+mod dynamic_width_common_allow_modifiers {
+    use ::std::collections::HashSet;
+
+    use crate::compile::letter::LetterKind;
+    use crate::compile::var_uint::DecodeError::TextNode;
+
+    #[macro_use]
+    use super::*;
+    use super::test_util::*;
+
+    pub fn encode(nr: u64) -> Vec<Letter> {
+        encode_uint_allow_modifiers(nr)
+    }
+
+    pub fn decode(letters: &[Letter]) -> DecodedPositiveNumber {
+        decode_uint_no_modifier_at_start(letters).unwrap()
+    }
+
+    #[test]
+    fn encoding_examples() {
+        assert_eq!(encode(0), vec![Slash]);
+        assert_eq!(encode(4), vec![Number]);
+        assert_eq!(encode(5), vec![Io, Colon]);
+        assert_eq!(encode(44), vec![Asterisk, Text]);
+        assert_eq!(encode(45), vec![Io, Io, Colon]);
+        assert_eq!(encode(364), vec![Asterisk, Bracket, Text]);
+        assert_eq!(encode(365), vec![Io, Io, Io, Io, Colon]);
+        assert_eq!(encode(41_324), vec![Asterisk, Bracket, Bracket, Text, Text]);
+        assert_eq!(encode(41_325), vec![Io, Io, Io, Io, Io, Io, Colon]);
+        assert_eq!(encode(5_284_204), vec![Asterisk, Bracket, Bracket, Text, Bracket, Text, Text]);
+        assert_eq!(encode(5_284_205), vec![Io, Io, Io, Io, Io, Io, Io, Io, Io, Colon]);
+        assert_eq!(encode(10_742_702_444), vec![Asterisk, Bracket, Bracket, Text, Bracket, Text, Bracket, Text, Text, Text]);
+        assert_eq!(encode(10_742_702_445), vec![Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Colon]);
+        assert_eq!(encode(18_873_338_202_050), vec![Io, Seq, More, Colon, Plus, Hat, Asterisk, Exclamation, Question, Slash, Hash, Tilde, Number]);
+    }
+
+    #[test]
+    fn decoding_examples() {
+        assert_eq!(decode(&[Slash]).number, 0);
+        assert_eq!(decode(&[Number]).number, 4);
+        assert_eq!(decode(&[Io, Colon]).number, 5);
+        assert_eq!(decode(&[Asterisk, Text]).number, 44);
+        assert_eq!(decode(&[Io, Io, Colon]).number, 45);
+        assert_eq!(decode(&[Asterisk, Bracket, Text]).number, 364);
+        assert_eq!(decode(&[Io, Io, Io, Io, Colon]).number, 365);
+        assert_eq!(decode(&[Asterisk, Bracket, Bracket, Text, Text]).number, 41_324);
+        assert_eq!(decode(&[Io, Io, Io, Io, Io, Io, Colon]).number, 41_325);
+        assert_eq!(decode(&[Asterisk, Bracket, Bracket, Text, Bracket, Text, Text]).number, 5_284_204);
+        assert_eq!(decode(&[Io, Io, Io, Io, Io, Io, Io, Io, Io, Colon]).number, 5_284_205);
+        assert_eq!(decode(&[Asterisk, Bracket, Bracket, Text, Bracket, Text, Bracket, Text, Text, Text]).number, 10_742_702_444);
+        assert_eq!(decode(&[Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Colon]).number, 10_742_702_445);
+        assert_eq!(decode(&[Io, Seq, More, Colon, Plus, Hat, Asterisk, Exclamation, Question, Slash, Hash, Tilde, Number]).number, 18_873_338_202_050);
+    }
+
+    #[test]
+    fn decode_end_index() {
+        assert_eq!(decode(&[Slash, Io, Seq, More, Plus, Asterisk, Slash, Right, Bracket]).end_index, 0);
+        assert_eq!(decode(&[Io, Colon]).end_index, 1);
+        assert_eq!(decode(&[Asterisk, Bracket, Bracket, Text, Text, Asterisk, Hash]).end_index, 4);
+        assert_eq!(decode(&[Io, Io, Plus, Io, Plus, Io, Io, Io, Plus, Colon, Hash]).end_index, 9);
+        assert_eq!(decode(&[Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Colon, Hash]).end_index, 12);
+    }
+
+    common_tests!(encode_uint_allow_modifiers, decode_uint_no_modifier_at_start);
 }
 
 macro_rules! common_tests {
