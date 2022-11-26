@@ -1,4 +1,5 @@
 use ::std::env::current_exe;
+use ::std::fmt::Debug;
 
 use crate::compile::ops::lookup_op_name;
 use crate::op::Op;
@@ -70,6 +71,12 @@ pub fn parse(src: &str) -> TildeRes<Prog> {
         }
     }
     Ok(Prog::of(ops))
+}
+
+#[derive(Debug, PartialEq)]
+pub struct Pos<T: Debug + PartialEq> {
+    pub value: T,
+    pub end_index: usize,
 }
 
 #[cfg(test)]

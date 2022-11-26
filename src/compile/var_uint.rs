@@ -66,7 +66,7 @@ fn encode_uint_with_openers(
 }
 
 /// Inverse of [encode_pos_int_static_width_avoid_modifiers].
-pub fn decode_uint_no_modifier_at_start(letters: &[Letter]) -> Result<DecodedPositiveNumber, DecodeError> {
+pub fn decode_uint_no_modifier_at_start(letters: &[Letter]) -> Result<Pos<UINT>, DecodeError> {
     if letters.is_empty() {
         return Err(DecodeError::NoInput);
     }
@@ -78,7 +78,7 @@ pub fn decode_uint_no_modifier_at_start(letters: &[Letter]) -> Result<DecodedPos
 }
 
 /// Inverse of [encode_pos_int_static_width_avoid_modifiers].
-pub fn decode_uint_allow_modifiers(letters: &[Letter]) -> Result<DecodedPositiveNumber, DecodeError> {
+pub fn decode_uint_allow_modifiers(letters: &[Letter]) -> Result<Pos<UINT>, DecodeError> {
     if letters.is_empty() {
         return Err(DecodeError::NoInput);
     }
@@ -90,7 +90,7 @@ fn decode_uint_with_openers(
     letters: &[Letter],
     openers: &[Letter],
     opener_values: &[UINT],
-) -> Result<DecodedPositiveNumber, DecodeError> {
+) -> Result<Pos<UINT>, DecodeError> {
     let opener = &letters
         .iter()
         .next()
@@ -104,7 +104,7 @@ fn decode_uint_with_openers(
     }
     let open_n = (openers.len() / 2) as UINT;
     if value >= open_n {
-        return Ok(DecodedPositiveNumber { end_index: 0, number: value - open_n });
+        return Ok(Pos { end_index: 0, value: value - open_n });
     };
     let mut nr = value;
     let mut multiplier = open_n;
@@ -136,7 +136,7 @@ fn decode_uint_with_openers(
             nr = nr
                 .checked_add(addition)
                 .ok_or(DecodeError::TooLarge)?;
-            return Ok(DecodedPositiveNumber { end_index: letter_i, number: nr });
+            return Ok(Pos { end_index: letter_i, value: nr });
         }
         let addition = multiplier
             .checked_mul(value.saturating_add(block_addition))
@@ -153,12 +153,6 @@ fn decode_uint_with_openers(
         letter_i += 1;
     }
     Err(DecodeError::NoEndMarker)
-}
-
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub struct DecodedPositiveNumber {
-    pub end_index: usize,
-    pub number: UINT,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -313,7 +307,7 @@ mod dynamic_width_common_without_modifiers {
         encode_uint_no_modifier_at_start(nr)
     }
 
-    pub fn decode(letters: &[Letter]) -> DecodedPositiveNumber {
+    pub fn decode(letters: &[Letter]) -> Pos<UINT> {
         decode_uint_no_modifier_at_start(letters).unwrap()
     }
 
@@ -337,20 +331,20 @@ mod dynamic_width_common_without_modifiers {
 
     #[test]
     fn decoding_examples() {
-        assert_eq!(decode(&[Slash]).number, 0);
-        assert_eq!(decode(&[Number]).number, 4);
-        assert_eq!(decode(&[Io, Colon]).number, 5);
-        assert_eq!(decode(&[Asterisk, Text]).number, 44);
-        assert_eq!(decode(&[Io, Io, Colon]).number, 45);
-        assert_eq!(decode(&[Asterisk, Bracket, Text]).number, 364);
-        assert_eq!(decode(&[Io, Io, Io, Io, Colon]).number, 365);
-        assert_eq!(decode(&[Asterisk, Bracket, Bracket, Text, Text]).number, 41_324);
-        assert_eq!(decode(&[Io, Io, Io, Io, Io, Io, Colon]).number, 41_325);
-        assert_eq!(decode(&[Asterisk, Bracket, Bracket, Text, Bracket, Text, Text]).number, 5_284_204);
-        assert_eq!(decode(&[Io, Io, Io, Io, Io, Io, Io, Io, Io, Colon]).number, 5_284_205);
-        assert_eq!(decode(&[Asterisk, Bracket, Bracket, Text, Bracket, Text, Bracket, Text, Text, Text]).number, 10_742_702_444);
-        assert_eq!(decode(&[Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Colon]).number, 10_742_702_445);
-        assert_eq!(decode(&[Io, Seq, More, Colon, Plus, Hat, Asterisk, Exclamation, Question, Slash, Hash, Tilde, Number]).number, 18_873_338_202_050);
+        assert_eq!(decode(&[Slash]).value, 0);
+        assert_eq!(decode(&[Number]).value, 4);
+        assert_eq!(decode(&[Io, Colon]).value, 5);
+        assert_eq!(decode(&[Asterisk, Text]).value, 44);
+        assert_eq!(decode(&[Io, Io, Colon]).value, 45);
+        assert_eq!(decode(&[Asterisk, Bracket, Text]).value, 364);
+        assert_eq!(decode(&[Io, Io, Io, Io, Colon]).value, 365);
+        assert_eq!(decode(&[Asterisk, Bracket, Bracket, Text, Text]).value, 41_324);
+        assert_eq!(decode(&[Io, Io, Io, Io, Io, Io, Colon]).value, 41_325);
+        assert_eq!(decode(&[Asterisk, Bracket, Bracket, Text, Bracket, Text, Text]).value, 5_284_204);
+        assert_eq!(decode(&[Io, Io, Io, Io, Io, Io, Io, Io, Io, Colon]).value, 5_284_205);
+        assert_eq!(decode(&[Asterisk, Bracket, Bracket, Text, Bracket, Text, Bracket, Text, Text, Text]).value, 10_742_702_444);
+        assert_eq!(decode(&[Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Colon]).value, 10_742_702_445);
+        assert_eq!(decode(&[Io, Seq, More, Colon, Plus, Hat, Asterisk, Exclamation, Question, Slash, Hash, Tilde, Number]).value, 18_873_338_202_050);
     }
 
     #[test]
@@ -387,7 +381,7 @@ mod dynamic_width_common_allow_modifiers {
         encode_uint_allow_modifiers(nr)
     }
 
-    pub fn decode(letters: &[Letter]) -> DecodedPositiveNumber {
+    pub fn decode(letters: &[Letter]) -> Pos<UINT> {
         decode_uint_allow_modifiers(letters).unwrap()
     }
 
@@ -411,20 +405,20 @@ mod dynamic_width_common_allow_modifiers {
 
     #[test]
     fn decoding_examples() {
-        assert_eq!(decode(&[Bracket]).number, 0);
-        assert_eq!(decode(&[Tilde]).number, 6);
-        assert_eq!(decode(&[Io, Colon]).number, 7);
-        assert_eq!(decode(&[Right, Text]).number, 62);
-        assert_eq!(decode(&[Io, Io, Colon]).number, 63);
-        assert_eq!(decode(&[Right, Bracket, Text]).number, 510);
-        assert_eq!(decode(&[Io, Io, Io, Io, Colon]).number, 511);
-        assert_eq!(decode(&[Right, Bracket, Bracket, Text, Text]).number, 57_854);
-        assert_eq!(decode(&[Io, Io, Io, Io, Io, Io, Colon]).number, 57_855);
-        assert_eq!(decode(&[Right, Bracket, Bracket, Text, Bracket, Text, Text]).number, 7_397_886);
-        assert_eq!(decode(&[Io, Io, Io, Io, Io, Io, Io, Io, Io, Colon]).number, 7_397_887);
-        assert_eq!(decode(&[Right, Bracket, Bracket, Text, Bracket, Text, Bracket, Text, Text, Text]).number, 15_039_783_422);
-        assert_eq!(decode(&[Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Colon]).number, 15_039_783_423);
-        assert_eq!(decode(&[Asterisk, Seq, More, Text, Plus, Hat, Bracket, Exclamation, Question, Slash, Hash, Tilde, Number]).number, 26_422_676_238_522);
+        assert_eq!(decode(&[Bracket]).value, 0);
+        assert_eq!(decode(&[Tilde]).value, 6);
+        assert_eq!(decode(&[Io, Colon]).value, 7);
+        assert_eq!(decode(&[Right, Text]).value, 62);
+        assert_eq!(decode(&[Io, Io, Colon]).value, 63);
+        assert_eq!(decode(&[Right, Bracket, Text]).value, 510);
+        assert_eq!(decode(&[Io, Io, Io, Io, Colon]).value, 511);
+        assert_eq!(decode(&[Right, Bracket, Bracket, Text, Text]).value, 57_854);
+        assert_eq!(decode(&[Io, Io, Io, Io, Io, Io, Colon]).value, 57_855);
+        assert_eq!(decode(&[Right, Bracket, Bracket, Text, Bracket, Text, Text]).value, 7_397_886);
+        assert_eq!(decode(&[Io, Io, Io, Io, Io, Io, Io, Io, Io, Colon]).value, 7_397_887);
+        assert_eq!(decode(&[Right, Bracket, Bracket, Text, Bracket, Text, Bracket, Text, Text, Text]).value, 15_039_783_422);
+        assert_eq!(decode(&[Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Colon]).value, 15_039_783_423);
+        assert_eq!(decode(&[Asterisk, Seq, More, Text, Plus, Hat, Bracket, Exclamation, Question, Slash, Hash, Tilde, Number]).value, 26_422_676_238_522);
     }
 
     #[test]
@@ -457,7 +451,7 @@ macro_rules! common_tests {
                 let enc = $encode(i);
                 assert!(enc.len() != 4 && enc.len() != 6, "nr {i} has impossible length {}", enc.len());
                 assert!(seen.insert(enc.clone()), "nr {i} has same encoding as an earlier nr");
-                assert_eq!(i, $decode(&enc).unwrap().number, "decode not same for nr {i}");
+                assert_eq!(i, $decode(&enc).unwrap().value, "decode not same for nr {i}");
             }
         }
 
@@ -467,7 +461,7 @@ macro_rules! common_tests {
             for nr in nrs {
                 let enc = $encode(nr);
                 let dec = $decode(&enc).unwrap_or_else(|err| panic!("failed to decode {}, err {}", nr, err));
-                assert_eq!(nr, dec.number);
+                assert_eq!(nr, dec.value);
             }
         }
 
@@ -539,4 +533,5 @@ macro_rules! common_tests {
 
 pub(self) use common_tests;
 
+use crate::compile::parse::Pos;
 use crate::UINT;
