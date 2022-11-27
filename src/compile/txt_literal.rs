@@ -16,7 +16,7 @@ use crate::Value::Num;
 use crate::NR;
 use crate::UINT;
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub enum Closer {
     Text,
     Number,
@@ -121,29 +121,42 @@ mod decoding {
     fn decode_empty_txt() {
         let enc = decode_uint_vec(&[Text]).unwrap();
         assert_eq!(enc.0.value, &[]);
+        assert_eq!(enc.0.end_index, 0);
+        assert_eq!(enc.1, Closer::Text);
     }
 
     #[test]
     fn decode_single_nr() {
         let enc = decode_uint_vec(&[Asterisk, Bracket, Text, Number]).unwrap();
         assert_eq!(enc.0.value, &[364]);
+        assert_eq!(enc.0.end_index, 1);
+        assert_eq!(enc.1, Closer::Number);
     }
 
     #[test]
     fn decode_single_txt() {
         let enc = decode_uint_vec(&[Asterisk, Bracket, Text, Text]).unwrap();
         assert_eq!(enc.0.value, &[364]);
+        assert_eq!(enc.0.end_index, 1);
+        assert_eq!(enc.1, Closer::Text);
     }
 
     #[test]
     fn decode_examples_nr() {
         let enc = decode_uint_vec(&[Asterisk, Text, Io, Io, Io, Io, Colon, Bracket, Number]).unwrap();
         assert_eq!(enc.0.value, &[44, 511, 0]);
+        assert_eq!(enc.0.end_index, 3);
+        assert_eq!(enc.1, Closer::Number);
     }
 
     #[test]
     fn decode_examples_txt() {
         let enc = decode_uint_vec(&[Asterisk, Text, Io, Io, Io, Io, Colon, Bracket, Text]).unwrap();
         assert_eq!(enc.0.value, &[44, 511, 0]);
+        assert_eq!(enc.0.end_index, 3);
+        assert_eq!(enc.1, Closer::Text);
     }
+
+    //TODO @mark: longer inputs
+    //TODO @mark: missing end token
 }
