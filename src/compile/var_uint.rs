@@ -104,7 +104,7 @@ fn decode_uint_with_openers(
     }
     let open_n = (openers.len() / 2) as UINT;
     if value >= open_n {
-        return Ok(Pos { end_index: 0, value: value - open_n });
+        return Ok(Pos { length: 1, value: value - open_n });
     };
     let mut nr = value;
     let mut multiplier = open_n;
@@ -136,7 +136,7 @@ fn decode_uint_with_openers(
             nr = nr
                 .checked_add(addition)
                 .ok_or(DecodeError::TooLarge)?;
-            return Ok(Pos { end_index: letter_i, value: nr });
+            return Ok(Pos { length: letter_i + 1, value: nr });
         }
         let addition = multiplier
             .checked_mul(value.saturating_add(block_addition))
@@ -349,11 +349,11 @@ mod dynamic_width_common_without_modifiers {
 
     #[test]
     fn decode_end_index() {
-        assert_eq!(decode(&[Slash, Io, Seq, More, Plus, Asterisk, Slash, Right, Bracket]).end_index, 0);
-        assert_eq!(decode(&[Io, Colon]).end_index, 1);
-        assert_eq!(decode(&[Asterisk, Bracket, Bracket, Text, Text, Asterisk, Hash]).end_index, 4);
-        assert_eq!(decode(&[Io, Io, Plus, Io, Plus, Io, Io, Io, Plus, Colon, Hash]).end_index, 9);
-        assert_eq!(decode(&[Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Colon, Hash]).end_index, 12);
+        assert_eq!(decode(&[Slash, Io, Seq, More, Plus, Asterisk, Slash, Right, Bracket]).length, 1);
+        assert_eq!(decode(&[Io, Colon]).length, 2);
+        assert_eq!(decode(&[Asterisk, Bracket, Bracket, Text, Text, Asterisk, Hash]).length, 5);
+        assert_eq!(decode(&[Io, Io, Plus, Io, Plus, Io, Io, Io, Plus, Colon, Hash]).length, 10);
+        assert_eq!(decode(&[Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Colon, Hash]).length, 13);
     }
 
     #[test]
@@ -423,12 +423,12 @@ mod dynamic_width_common_allow_modifiers {
 
     #[test]
     fn decode_end_index() {
-        assert_eq!(decode(&[Bracket, Seq]).end_index, 0);
-        assert_eq!(decode(&[Io, Colon, Right, Seq]).end_index, 1);
-        assert_eq!(decode(&[Asterisk, Hash, More]).end_index, 1);
-        assert_eq!(decode(&[Right, Text, Asterisk, Exclamation]).end_index, 1);
-        assert_eq!(decode(&[Right, Bracket, Bracket, Text, Text, Exclamation, Number]).end_index, 4);
-        assert_eq!(decode(&[Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Colon, Io, Io, Io]).end_index, 12);
+        assert_eq!(decode(&[Bracket, Seq]).length, 1);
+        assert_eq!(decode(&[Io, Colon, Right, Seq]).length, 2);
+        assert_eq!(decode(&[Asterisk, Hash, More]).length, 2);
+        assert_eq!(decode(&[Right, Text, Asterisk, Exclamation]).length, 2);
+        assert_eq!(decode(&[Right, Bracket, Bracket, Text, Text, Exclamation, Number]).length, 5);
+        assert_eq!(decode(&[Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Io, Colon, Io, Io, Io]).length, 13);
     }
 
     #[test]

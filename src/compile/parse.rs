@@ -76,7 +76,7 @@ pub fn parse(src: &str) -> TildeRes<Prog> {
 #[derive(Debug, PartialEq)]
 pub struct Pos<T: Debug + PartialEq> {
     pub value: T,
-    pub end_index: usize,
+    pub length: usize,
 }
 
 #[cfg(test)]
