@@ -106,3 +106,44 @@ mod encoding {
         assert_eq!(enc, vec![Asterisk, Text, Io, Io, Io, Io, Colon, Bracket, Text]);
     }
 }
+
+#[cfg(test)]
+mod decoding {
+    use super::*;
+
+    #[test]
+    fn decode_empty_nr() {
+        let enc = decode_uint_vec(&[Number]);
+        assert!(enc.is_err());
+    }
+
+    #[test]
+    fn decode_empty_txt() {
+        let enc = decode_uint_vec(&[Text]).unwrap();
+        assert_eq!(enc.0.value, &[]);
+    }
+
+    #[test]
+    fn decode_single_nr() {
+        let enc = decode_uint_vec(&[Asterisk, Bracket, Text, Number]).unwrap();
+        assert_eq!(enc.0.value, &[364]);
+    }
+
+    #[test]
+    fn decode_single_txt() {
+        let enc = decode_uint_vec(&[Asterisk, Bracket, Text, Text]).unwrap();
+        assert_eq!(enc.0.value, &[364]);
+    }
+
+    #[test]
+    fn decode_examples_nr() {
+        let enc = decode_uint_vec(&[Asterisk, Text, Io, Io, Io, Io, Colon, Bracket, Number]).unwrap();
+        assert_eq!(enc.0.value, &[44, 511, 0]);
+    }
+
+    #[test]
+    fn decode_examples_txt() {
+        let enc = decode_uint_vec(&[Asterisk, Text, Io, Io, Io, Io, Colon, Bracket, Text]).unwrap();
+        assert_eq!(enc.0.value, &[44, 511, 0]);
+    }
+}
