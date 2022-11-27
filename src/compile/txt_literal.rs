@@ -45,9 +45,9 @@ pub fn encode_uint_vec(
 }
 
 pub fn decode_uint_vec(letters: &[Letter]) -> Result<(Pos<Vec<UINT>>, Closer), DecodeError> {
-    let nr = decode_uint_no_modifier_at_start(letters)?;
-    let mut pos = nr.end_index + 1;
-    let mut nrs = vec![nr.value];
+    let mut is_first = true;
+    let mut pos = 0;
+    let mut nrs = vec![];
     loop {
         if pos >= letters.len() {
             tilde_log!("uint_vec without end marker, interpreting as text");
@@ -59,7 +59,12 @@ pub fn decode_uint_vec(letters: &[Letter]) -> Result<(Pos<Vec<UINT>>, Closer), D
         if letters[pos] == Number {
             return Ok((Pos { value: nrs, end_index: pos }, Closer::Number));
         }
-        let nr = decode_uint_no_modifier_at_start(&letters[pos..])?;
+        let nr = if is_first {
+            is_first = false;
+            decode_uint_no_modifier_at_start(letters)?
+        } else {
+            decode_uint_no_modifier_at_start(&letters[pos..])?
+        };
         debug_assert!(nr.end_index >= pos, "did not consume any letters while parsing uint_vec");
         pos = nr.end_index + 1;
         nrs.push(nr.value)
@@ -113,13 +118,22 @@ mod decoding {
 
     #[test]
     fn decode_empty_nr() {
-        let enc = decode_uint_vec(&[Number]);
-        assert!(enc.is_err());
+        let enc = decode_uint_vec(&[Number]).unwrap();
+        assert_eq!(enc.0.value.len(), 0);
+        assert_eq!(enc.0.end_index, 0);
     }
 
     #[test]
     fn decode_empty_txt() {
         let enc = decode_uint_vec(&[Text]).unwrap();
+        assert_eq!(enc.0.value, &[]);
+        assert_eq!(enc.0.end_index, 0);
+        assert_eq!(enc.1, Closer::Text);
+    }
+
+    #[test]
+    fn decode_empty_noend() {
+        let enc = decode_uint_vec(&[]).unwrap();
         assert_eq!(enc.0.value, &[]);
         assert_eq!(enc.0.end_index, 0);
         assert_eq!(enc.1, Closer::Text);
