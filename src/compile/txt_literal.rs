@@ -61,7 +61,26 @@ mod tests {
     }
 
     #[test]
+    fn encode_single_nr() {
+        let enc = encode_uint_vec(&[364], Closer::Number);
+        assert_eq!(enc, vec![Asterisk, Bracket, Text, Number]);
+    }
+
+    #[test]
+    fn encode_single_txt() {
+        let enc = encode_uint_vec(&[364], Closer::Text);
+        assert_eq!(enc, vec![Asterisk, Bracket, Text, Text]);
+    }
+
+    #[test]
     fn encode_examples_nr() {
-        unimplemented!() //TODO @mark: TEMPORARY! REMOVE THIS!
+        let enc = encode_uint_vec(&[44, 511, 0], Closer::Number);
+        assert_eq!(enc, vec![Asterisk, Text, Io, Io, Io, Io, Colon, Bracket, Number]);
+    }
+
+    #[test]
+    fn encode_examples_txt() {
+        let enc = encode_uint_vec(&[44, 511, 0], Closer::Text);
+        assert_eq!(enc, vec![Asterisk, Text, Io, Io, Io, Io, Colon, Bracket, Text]);
     }
 }
