@@ -72,7 +72,7 @@ pub fn decode_uint_vec(letters: &[Letter]) -> Result<(Pos<Vec<UINT>>, Closer), D
         };
         eprintln!(" {} ?= {} = {:?}", nr.length, pos, nr); //TODO @mark: TEMPORARY! REMOVE THIS!
         debug_assert!(nr.length > 0, "did not consume any letters while parsing uint_vec");
-        pos += nr.length + 1;
+        pos += nr.length;
         nrs.push(nr.value)
     }
 }
