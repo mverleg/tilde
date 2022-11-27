@@ -51,22 +51,28 @@ pub fn decode_uint_vec(letters: &[Letter]) -> Result<(Pos<Vec<UINT>>, Closer), D
     loop {
         if pos >= letters.len() {
             tilde_log!("uint_vec without end marker, interpreting as text");
+            eprintln!("IMPLICIT"); //TODO @mark: TEMPORARY! REMOVE THIS!
             return Ok((Pos { value: nrs, end_index: pos }, Closer::Text));
         }
+        eprintln!("[{}] {:?}", pos, letters[pos]); //TODO @mark: TEMPORARY! REMOVE THIS!
         if letters[pos] == Text {
+            eprintln!("TEXT"); //TODO @mark: TEMPORARY! REMOVE THIS!
             return Ok((Pos { value: nrs, end_index: pos }, Closer::Text));
         }
         if letters[pos] == Number {
+            eprintln!("NUMBER"); //TODO @mark: TEMPORARY! REMOVE THIS!
             return Ok((Pos { value: nrs, end_index: pos }, Closer::Number));
         }
         let nr = if is_first {
             is_first = false;
+            eprint!("FIRST "); //TODO @mark: TEMPORARY! REMOVE THIS!
             decode_uint_no_modifier_at_start(letters)?
         } else {
             decode_uint_no_modifier_at_start(&letters[pos..])?
         };
-        debug_assert!(nr.end_index >= pos, "did not consume any letters while parsing uint_vec");
-        pos = nr.end_index + 1;
+        eprintln!(" {} ?= {} = {:?}", nr.end_index, pos, nr); //TODO @mark: TEMPORARY! REMOVE THIS!
+        debug_assert!(nr.end_index > 0, "did not consume any letters while parsing uint_vec");
+        pos += nr.end_index + 1;
         nrs.push(nr.value)
     }
 }
@@ -143,7 +149,7 @@ mod decoding {
     fn decode_single_nr() {
         let enc = decode_uint_vec(&[Asterisk, Bracket, Text, Number]).unwrap();
         assert_eq!(enc.0.value, &[364]);
-        assert_eq!(enc.0.end_index, 1);
+        assert_eq!(enc.0.end_index, 3);
         assert_eq!(enc.1, Closer::Number);
     }
 
@@ -151,7 +157,7 @@ mod decoding {
     fn decode_single_txt() {
         let enc = decode_uint_vec(&[Asterisk, Bracket, Text, Text]).unwrap();
         assert_eq!(enc.0.value, &[364]);
-        assert_eq!(enc.0.end_index, 1);
+        assert_eq!(enc.0.end_index, 3);
         assert_eq!(enc.1, Closer::Text);
     }
 
@@ -159,7 +165,7 @@ mod decoding {
     fn decode_examples_nr() {
         let enc = decode_uint_vec(&[Asterisk, Text, Io, Io, Io, Io, Colon, Bracket, Number]).unwrap();
         assert_eq!(enc.0.value, &[44, 511, 0]);
-        assert_eq!(enc.0.end_index, 3);
+        assert_eq!(enc.0.end_index, 8);
         assert_eq!(enc.1, Closer::Number);
     }
 
@@ -167,7 +173,7 @@ mod decoding {
     fn decode_examples_txt() {
         let enc = decode_uint_vec(&[Asterisk, Text, Io, Io, Io, Io, Colon, Bracket, Text]).unwrap();
         assert_eq!(enc.0.value, &[44, 511, 0]);
-        assert_eq!(enc.0.end_index, 3);
+        assert_eq!(enc.0.end_index, 8);
         assert_eq!(enc.1, Closer::Text);
     }
 
