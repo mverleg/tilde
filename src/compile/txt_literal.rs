@@ -179,6 +179,24 @@ mod decoding {
         assert_eq!(enc.1, Closer::Text);
     }
 
+    #[test]
+    fn decode_short() {
+        let enc = decode_uint_vec(&[Slash, Colon, Hat, Exclamation, Question, Hash, Tilde]).unwrap();
+        assert_eq!(enc.0.value, &[0, 1, 2, 3, 4, 5, 6]);
+        assert_eq!(enc.0.length, 7);
+        assert_eq!(enc.1, Closer::Text);
+    }
+
+    #[test]
+    fn decode_complex() {
+        let enc = decode_uint_vec(&[Io, Seq, More, Colon, Plus, Hat, Asterisk,
+            Exclamation, Question, Slash, Hash, Tilde, Number, Asterisk, Seq, More, Text, Plus, Hat,
+            Bracket, Exclamation, Question, Slash, Hash, Tilde, Number, Number]).unwrap();
+        assert_eq!(enc.0.value, &[18_873_338_202_050, 26_422_676_238_522]);
+        assert_eq!(enc.0.length, 27);
+        assert_eq!(enc.1, Closer::Number);
+    }
+
     //TODO @mark: longer inputs
     //TODO @mark: missing end token
 }
