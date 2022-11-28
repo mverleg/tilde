@@ -5,6 +5,7 @@ use ::strum::IntoEnumIterator;
 use crate::compile::letter::Letter;
 use crate::compile::letter::Letter::*;
 use crate::compile::parse::Pos;
+use crate::compile::var_uint::decode_uint_allow_modifiers;
 use crate::compile::var_uint::decode_uint_no_modifier_at_start;
 use crate::compile::var_uint::encode_uint_allow_modifiers;
 use crate::compile::var_uint::encode_uint_no_modifier_at_start;
@@ -68,7 +69,8 @@ pub fn decode_uint_vec(letters: &[Letter]) -> Result<(Pos<Vec<UINT>>, Closer), D
             eprint!("FIRST "); //TODO @mark: TEMPORARY! REMOVE THIS!
             decode_uint_no_modifier_at_start(letters)?
         } else {
-            decode_uint_no_modifier_at_start(&letters[pos..])?
+            eprint!("NEXT "); //TODO @mark: TEMPORARY! REMOVE THIS!
+            decode_uint_allow_modifiers(&letters[pos..])?
         };
         eprintln!(" {} ?= {} = {:?}", nr.length, pos, nr); //TODO @mark: TEMPORARY! REMOVE THIS!
         debug_assert!(nr.length > 0, "did not consume any letters while parsing uint_vec");
