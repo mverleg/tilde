@@ -59,15 +59,24 @@ mod tests {
     #[test]
     fn empty() {
         let trie = Trie::new();
-        //TODO @mark: lookup
+        assert!(trie.contains_exactly("hello"));
     }
 
     #[test]
     fn build() {
         let mut trie = Trie::new();
         trie.push("hello");
+        assert!(trie.contains_exactly("hello"));
+        assert!(!trie.contains_exactly("he"));
         trie.push("he");
+        assert!(trie.contains_exactly("he"));
+        assert!(!trie.contains_exactly("hel"));
         trie.push("hell");
+        assert!(trie.contains_exactly("hell"));
+        assert!(!trie.contains_exactly("hel"));
         trie.push("hey");
+        assert!(trie.contains_exactly("hey"));
+        assert!(!trie.contains_exactly("h"));
+        assert!(!trie.contains_exactly("p"));
     }
 }
