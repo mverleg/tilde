@@ -12,7 +12,7 @@ use ::std::iter::FlatMap;
 static RAW_DICT: &'static str = include_str!("../../dictionary.txt");
 static DICT: LazyLock<DictContainer> = LazyLock::new(|| DictContainer::new());
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum DictEntry {
     Snippet(&'static str),
     Backspace,
@@ -34,7 +34,7 @@ impl DictContainer {
             snippet_lookup: RAW_DICT.split("\n")
                 .map(|line| match line {
                     "$magic-backspace$" => DictEntry::Backspace,
-                    "$magic-newline-value$" => DictEntry::Snippet("\n"),
+                    "$magic-newline$" => DictEntry::Snippet("\n"),
                     "$magic-capitalize-first$" => DictEntry::CapitalizeFirst,
                     "$magic-capitalize all$" => DictEntry::CapitalizeAll,
                     _ => DictEntry::Snippet(line),
@@ -49,9 +49,8 @@ impl Dictionary {
         Dictionary {}
     }
 
-    pub fn index(&self, position: usize) -> Option<&'static str> {
-        debug_assert!(position != 0, "cannot look up position 0, it is reserved (dict starts at 1)");
-        DICT.snippet_lookup.get(position - 1).map(|txt| *txt)
+    pub fn index(&self, position: usize) -> Option<DictEntry> {
+        DICT.snippet_lookup.get(position).copied()
     }
 
     fn iter(&self) -> impl Iterator<Item = DictEntry> {
@@ -74,13 +73,13 @@ use ::std::collections::HashSet;
     #[test]
     fn first_is_whitespace() {
         let dict = Dictionary::new();
-        assert_eq!(dict.index(1), Some(" "), "first entry should be space (maybe stripped by editor?)");
+        assert_eq!(dict.index(1), Some(DictEntry::Snippet(" ")), "first entry should be space (maybe stripped by editor?)");
     }
 
     #[test]
     fn trailing_whitespace() {
         let dict = Dictionary::new();
-        let trailing_whitespace_count = dict.iter()
+        let trailing_whitespace_count = dict.iter_snippets()
             .filter(|entry| entry.ends_with(" "))
             .count();
         assert!(trailing_whitespace_count > 10, "quite some entries should have trailing space (maybe stripped by editor?)");
@@ -98,8 +97,7 @@ use ::std::collections::HashSet;
     #[test]
     fn parsed_all_specials() {
         let dict = Dictionary::new();
-        let mut seen = HashSet::new();
-        for entry in dict.iter() {
+        for entry in dict.iter_snippets() {
             if entry.len() > 2 {
                 assert!(!(entry.starts_with("$") && entry.ends_with("$")), "unparsed magic value: {entry:?}")
             }
