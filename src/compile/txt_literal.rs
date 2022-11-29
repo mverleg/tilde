@@ -52,27 +52,20 @@ pub fn decode_uint_vec(letters: &[Letter]) -> Result<(Pos<Vec<UINT>>, Closer), D
     loop {
         if pos >= letters.len() {
             tilde_log!("uint_vec without end marker, interpreting as text");
-            eprintln!("IMPLICIT"); //TODO @mark: TEMPORARY! REMOVE THIS!
             return Ok((Pos { value: nrs, length: pos }, Closer::Text));
         }
-        eprintln!("[{}] {:?}", pos, letters[pos]); //TODO @mark: TEMPORARY! REMOVE THIS!
         if letters[pos] == Text {
-            eprintln!("TEXT"); //TODO @mark: TEMPORARY! REMOVE THIS!
             return Ok((Pos { value: nrs, length: pos + 1 }, Closer::Text));
         }
         if letters[pos] == Number {
-            eprintln!("NUMBER"); //TODO @mark: TEMPORARY! REMOVE THIS!
             return Ok((Pos { value: nrs, length: pos + 1 }, Closer::Number));
         }
         let nr = if is_first {
             is_first = false;
-            eprint!("FIRST "); //TODO @mark: TEMPORARY! REMOVE THIS!
             decode_uint_no_modifier_at_start(letters)?
         } else {
-            eprint!("NEXT "); //TODO @mark: TEMPORARY! REMOVE THIS!
             decode_uint_allow_modifiers(&letters[pos..])?
         };
-        eprintln!(" {} ?= {} = {:?}", nr.length, pos, nr); //TODO @mark: TEMPORARY! REMOVE THIS!
         debug_assert!(nr.length > 0, "did not consume any letters while parsing uint_vec");
         pos += nr.length;
         nrs.push(nr.value)
@@ -197,6 +190,9 @@ mod decoding {
         assert_eq!(enc.1, Closer::Number);
     }
 
-    //TODO @mark: longer inputs
-    //TODO @mark: missing end token
+    #[test]
+    fn decode_no_end_token() {
+        let res = decode_uint_vec(&[Slash, Colon, Hat, Io,]);
+        assert!(res.is_err())
+    }
 }
