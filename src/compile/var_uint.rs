@@ -65,6 +65,27 @@ fn encode_uint_with_openers(
     return letters;
 }
 
+/// Estimate the number of letters needed to encode the uint argument.
+#[inline]
+fn encode_uint_length_estimate(nr: UINT) -> usize {
+    let mut length = 1;
+    let follow_2n = STRING_FOLLOWERS.len() as UINT;
+    let follow_1n = follow_2n / 2;
+    let mut non_close_letter_cnt_doubled = 0;
+    let mut rem = nr / (STRING_WITHMOD_OPENERS.len() as UINT);
+    while rem > 0 {
+        rem = rem.saturating_sub(1);
+        for i in 0..(non_close_letter_cnt_doubled / 2) {
+            length += 1;
+            rem = rem / follow_2n;
+        }
+        length += 1;
+        rem = rem / follow_1n;
+        non_close_letter_cnt_doubled += 1;
+    }
+    return length;
+}
+
 /// Inverse of [encode_pos_int_static_width_avoid_modifiers].
 pub fn decode_uint_no_modifier_at_start(letters: &[Letter]) -> Result<Pos<UINT>, DecodeError> {
     if letters.is_empty() {
@@ -439,6 +460,21 @@ mod dynamic_width_common_allow_modifiers {
     }
 
     common_tests!(encode_uint_allow_modifiers, decode_uint_allow_modifiers);
+}
+
+#[cfg(test)]
+mod size_estimate {
+    use super::*;
+
+    #[test]
+    fn size_estimate_close_to_actual() {
+        let n = 50_000;
+        for i in 0..n {
+            let estimate = encode_uint_length_estimate(i);
+            let actual = encode_uint_allow_modifiers(i).len();
+            assert!(estimate == actual || estimate + 1 == actual, "size {estimate} vs {actual} for {i}");
+        }
+    }
 }
 
 macro_rules! common_tests {
