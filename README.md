@@ -21,4 +21,11 @@ To build the executable:
 
 The current goal is having only a single dependency (regex) and keep the binary size small, preferably under 0.5 MB.
 
+## Dictionary
+
+A dictionary is used for storing strings compactly (mapping positive ints to snippets by position).
+
+The current dictionary is experimental and may change (breaking existing programs). Once stabilized the dictionary will only grow.
+
+Sources for the (English) dictionary: [ps-kostikov](https://github.com/ps-kostikov/english-word-frequency), [wikipedia](https://en.wikipedia.org/wiki/Letter_frequency), [stackoverflow](https://stackoverflow.com/a/62766162), me.
 

@@ -17,6 +17,8 @@ use crate::Value::Num;
 use crate::NR;
 use crate::UINT;
 
+//TODO @mark: interpret 0 as backspace
+
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub enum Closer {
     Text,
