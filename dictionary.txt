@@ -34,7 +34,7 @@ v
 k
 $magic-newline$
 ,
-.
+.$capitalize-next$
 j
 x
 q
@@ -59,10 +59,10 @@ _
 [
 <
 %
-!
+!$capitalize-next$
 '
 |
-?
+?$capitalize-next$
 @
 $
 ^

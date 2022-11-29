@@ -15,10 +15,16 @@ static DICT: LazyLock<DictContainer> = LazyLock::new(|| DictContainer::new());
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EnumIter)]
 pub enum DictEntry {
-    Snippet(&'static str),
+    Snippet { text: &'static str, capitalize_next: bool },
     Backspace,
     CapitalizeFirst,
     CapitalizeAll,
+}
+
+impl DictEntry {
+    pub fn snip(text: &'static str, capitalize_next: bool) -> Self {
+        DictEntry::Snippet { text, capitalize_next }
+    }
 }
 
 struct DictContainer {
@@ -35,10 +41,14 @@ impl DictContainer {
             snippet_lookup: RAW_DICT.split("\n")
                 .map(|line| match line {
                     "$magic-backspace$" => DictEntry::Backspace,
-                    "$magic-newline$" => DictEntry::Snippet("\n"),
+                    "$magic-newline$" => DictEntry::snip("\n", true),
                     "$magic-capitalize-first$" => DictEntry::CapitalizeFirst,
                     "$magic-capitalize all$" => DictEntry::CapitalizeAll,
-                    _ => DictEntry::Snippet(line),
+                    _ => if line.ends_with("$capitalize-next$") {
+                        DictEntry::snip(line.strip_suffix("$capitalize-next$").unwrap(), true)
+                    } else {
+                        DictEntry::snip(line, false)
+                    },
                 })
                 .collect(),
         }
@@ -55,7 +65,7 @@ fn dict_iter() -> impl Iterator<Item = DictEntry> {
 
 fn dict_iter_snippets() -> impl Iterator<Item = &'static str> {
     dict_iter().flat_map(|entry| match entry {
-        DictEntry::Snippet(snip) => Some(snip),
+        DictEntry::Snippet { text: snip, capitalize_next: _ } => Some(snip),
         _ => None,
     }).into_iter()
 }
@@ -68,7 +78,7 @@ mod lookup {
 
     #[test]
     fn first_is_whitespace() {
-        assert_eq!(dict_index(1), Some(DictEntry::Snippet(" ")), "first entry should be space (maybe stripped by editor?)");
+        assert_eq!(dict_index(1), Some(DictEntry::snip(" ", false)), "first entry should be space (maybe stripped by editor?)");
     }
 
     #[test]
@@ -90,8 +100,8 @@ mod lookup {
     #[test]
     fn no_leftover_specials() {
         for entry in dict_iter_snippets() {
-            if entry.len() > 2 {
-                assert!(!(entry.starts_with("$") && entry.ends_with("$")), "unparsed magic value: {entry:?}")
+            if entry.matches("$").count() >= 2 {
+                panic!("unparsed magic value: {entry:?}")
             }
         }
     }
@@ -99,15 +109,13 @@ mod lookup {
     #[test]
     fn all_specials_encountered() {
         let seen = dict_iter()
-            .filter(|entry| !matches!(entry, DictEntry::Snippet(_)))
+            .filter(|entry| !matches!(entry, DictEntry::Snippet { .. }))
             .collect::<HashSet<_>>();
         for expect in DictEntry::iter() {
-            if matches!(expect, DictEntry::Snippet(_)) {
+            if matches!(expect, DictEntry::Snippet { .. }) {
                 continue
             }
             assert!(seen.contains(&expect), "expected in dict: {expect:?}");
         }
     }
-
-    //TODO @mark: all special values encountered
 }
