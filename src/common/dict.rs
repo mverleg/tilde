@@ -1,18 +1,19 @@
 
-//TODO @mark: $magic-newline-value$
-//TODO @mark: 0 is reserved (for backspace)
 //TODO @mark: fallback to full unicode after end?
 
-use ::std::sync::{Arc, Mutex, RwLock};
-use ::std::sync::LazyLock;
-use ::std::slice::Iter;
 use ::std::iter::Cloned;
 use ::std::iter::FlatMap;
+use ::std::slice::Iter;
+use ::std::sync::{Arc, Mutex, RwLock};
+use ::std::sync::LazyLock;
+
+use ::strum::IntoEnumIterator;
+use ::strum_macros::EnumIter;
 
 static RAW_DICT: &'static str = include_str!("../../dictionary.txt");
 static DICT: LazyLock<DictContainer> = LazyLock::new(|| DictContainer::new());
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EnumIter)]
 pub enum DictEntry {
     Snippet(&'static str),
     Backspace,
@@ -61,7 +62,8 @@ fn dict_iter_snippets() -> impl Iterator<Item = &'static str> {
 
 #[cfg(test)]
 mod lookup {
-use ::std::collections::HashSet;
+    use ::std::collections::HashSet;
+
     use super::*;
 
     #[test]
@@ -86,11 +88,24 @@ use ::std::collections::HashSet;
     }
 
     #[test]
-    fn parsed_all_specials() {
+    fn no_leftover_specials() {
         for entry in dict_iter_snippets() {
             if entry.len() > 2 {
                 assert!(!(entry.starts_with("$") && entry.ends_with("$")), "unparsed magic value: {entry:?}")
             }
+        }
+    }
+
+    #[test]
+    fn all_specials_encountered() {
+        let seen = dict_iter()
+            .filter(|entry| !matches!(entry, DictEntry::Snippet(_)))
+            .collect::<HashSet<_>>();
+        for expect in DictEntry::iter() {
+            if matches!(expect, DictEntry::Snippet(_)) {
+                continue
+            }
+            assert!(seen.contains(&expect), "expected in dict: {expect:?}");
         }
     }
 
