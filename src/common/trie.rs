@@ -49,7 +49,7 @@ impl TrieNode {
         }
     }
 
-    pub fn lookup_exactly(&self, value: &str) -> TrieLookup {
+    pub fn lookup(&self, value: &str) -> TrieLookup {
         let head = match value.chars().next() {
             Some(chr) => chr,
             None => return if self.is_word {
@@ -62,13 +62,13 @@ impl TrieNode {
         // https://doc.rust-lang.org/std/primitive.char.html#method.len_utf8
         let tail = &value[head.len_utf8()..];
         return match self.children.get(&head) {
-            Some(child) => child.lookup_exactly(tail),
+            Some(child) => child.lookup(tail),
             None => TrieLookup::NotFound,
         }
     }
 
     pub fn contains_exactly(&self, value: &str) -> bool {
-        matches!(self.lookup_exactly(value), TrieLookup::IsWord)
+        self.lookup(value) == TrieLookup::IsWord
     }
 }
 
@@ -88,8 +88,12 @@ impl Trie {
         self.root.push(value)
     }
 
+    pub fn lookup(&self, value: &str) -> TrieLookup {
+        self.root.lookup(value)
+    }
+
     pub fn contains_exactly(&self, value: &str) -> bool {
-        self.root.contains_exactly(value)
+        self.root.lookup(value) == TrieLookup::IsWord
     }
 }
 
@@ -107,17 +111,18 @@ mod tests {
     fn build() {
         let mut trie = Trie::new();
         trie.push("hello");
-        assert!(trie.contains_exactly("hello"));
-        assert!(!trie.contains_exactly("he"));
+        assert_eq!(trie.lookup("hello"), TrieLookup::IsWord);
+        assert_eq!(trie.lookup("he"), TrieLookup::IsPrefix);
+        assert_eq!(trie.lookup("eh"), TrieLookup::NotFound);
         trie.push("he");
-        assert!(trie.contains_exactly("he"));
-        assert!(!trie.contains_exactly("hel"));
+        assert_eq!(trie.lookup("he"), TrieLookup::IsWord);
+        assert_eq!(trie.lookup("hel"), TrieLookup::IsPrefix);
         trie.push("hell");
-        assert!(trie.contains_exactly("hell"));
-        assert!(!trie.contains_exactly("hel"));
+        assert_eq!(trie.lookup("hell"), TrieLookup::IsWord);
+        assert_eq!(trie.lookup("hel"), TrieLookup::IsPrefix);
         trie.push("hey");
-        assert!(trie.contains_exactly("hey"));
-        assert!(!trie.contains_exactly("h"));
-        assert!(!trie.contains_exactly("p"));
+        assert_eq!(trie.lookup("hey"), TrieLookup::IsWord);
+        assert_eq!(trie.lookup("h"), TrieLookup::IsPrefix);
+        assert_eq!(trie.lookup("p"), TrieLookup::NotFound);
     }
 }
