@@ -46,13 +46,13 @@ fn encode_uint_with_openers(
     } else {
         letters.push(openers[(nr % opener_n) as usize]);
     }
-    let mut non_close_letter_cnt_doubled = 0;
     let follow_2n = STRING_FOLLOWERS.len() as UINT;
     let follow_1n = follow_2n / 2;
     debug_assert!(follow_1n <= 8 && (follow_1n as usize) < usize::MAX);
+    let mut non_close_letter_cnt_doubled = 0;
     let mut rem = nr / opener_n;
     while rem > 0 {
-        rem = rem.saturating_sub(1);
+        rem -= 1;
         for i in 0..(non_close_letter_cnt_doubled / 2) {
             letters.push(STRING_FOLLOWERS[(rem % follow_2n) as usize]);
             rem = rem / follow_2n;
@@ -66,21 +66,19 @@ fn encode_uint_with_openers(
 }
 
 /// Estimate the number of letters needed to encode the uint argument.
-#[inline]
 fn encode_uint_length_estimate(nr: UINT) -> usize {
-    let mut length = 1;
+    let mut length: usize = 1;
+    let opener_n = (STRING_WITHMOD_OPENERS.len() / 2) as UINT;
     let follow_2n = STRING_FOLLOWERS.len() as UINT;
     let follow_1n = follow_2n / 2;
     let mut non_close_letter_cnt_doubled = 0;
-    let mut rem = nr / (STRING_WITHMOD_OPENERS.len() as UINT);
+    let mut rem = nr / opener_n;
     while rem > 0 {
-        rem = rem.saturating_sub(1);
-        for i in 0..(non_close_letter_cnt_doubled / 2) {
-            length += 1;
-            rem = rem / follow_2n;
-        }
-        length += 1;
-        rem = rem / follow_1n;
+        rem -= 1;
+        let block_extra = non_close_letter_cnt_doubled / 2;
+        length += block_extra + 1;
+        let div = follow_1n * follow_2n.pow(block_extra as u32);
+        rem = rem / div;
         non_close_letter_cnt_doubled += 1;
     }
     return length;
@@ -472,7 +470,8 @@ mod size_estimate {
         for i in 0..n {
             let estimate = encode_uint_length_estimate(i);
             let actual = encode_uint_allow_modifiers(i).len();
-            assert!(estimate == actual || estimate + 1 == actual, "size {estimate} vs {actual} for {i}");
+            //assert!(estimate == actual || estimate + 1 == actual, "size {estimate} vs {actual} for {i}");
+            assert!(estimate == actual, "size {estimate} vs {actual} for {i}");
         }
     }
 }
