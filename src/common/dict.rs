@@ -44,25 +44,19 @@ impl DictContainer {
     }
 }
 
-impl Dictionary {
-    pub fn new() -> Self {
-        Dictionary {}
-    }
+pub fn dict_index(position: usize) -> Option<DictEntry> {
+    DICT.snippet_lookup.get(position).copied()
+}
 
-    pub fn index(&self, position: usize) -> Option<DictEntry> {
-        DICT.snippet_lookup.get(position).copied()
-    }
+fn dict_iter() -> impl Iterator<Item = DictEntry> {
+    DICT.snippet_lookup.iter().cloned()
+}
 
-    fn iter(&self) -> impl Iterator<Item = DictEntry> {
-        DICT.snippet_lookup.iter().cloned()
-    }
-
-    fn iter_snippets(&self) -> impl Iterator<Item = &'static str> {
-        self.iter().flat_map(|entry| match entry {
-            DictEntry::Snippet(snip) => Some(snip),
-            _ => None,
-        }).into_iter()
-    }
+fn dict_iter_snippets() -> impl Iterator<Item = &'static str> {
+    dict_iter().flat_map(|entry| match entry {
+        DictEntry::Snippet(snip) => Some(snip),
+        _ => None,
+    }).into_iter()
 }
 
 #[cfg(test)]
@@ -72,14 +66,12 @@ use ::std::collections::HashSet;
 
     #[test]
     fn first_is_whitespace() {
-        let dict = Dictionary::new();
-        assert_eq!(dict.index(1), Some(DictEntry::Snippet(" ")), "first entry should be space (maybe stripped by editor?)");
+        assert_eq!(dict_index(1), Some(DictEntry::Snippet(" ")), "first entry should be space (maybe stripped by editor?)");
     }
 
     #[test]
     fn trailing_whitespace() {
-        let dict = Dictionary::new();
-        let trailing_whitespace_count = dict.iter_snippets()
+        let trailing_whitespace_count = dict_iter_snippets()
             .filter(|entry| entry.ends_with(" "))
             .count();
         assert!(trailing_whitespace_count > 10, "quite some entries should have trailing space (maybe stripped by editor?)");
@@ -87,17 +79,15 @@ use ::std::collections::HashSet;
 
     #[test]
     fn no_duplicates() {
-        let dict = Dictionary::new();
         let mut seen = HashSet::new();
-        for entry in dict.iter() {
+        for entry in dict_iter() {
             assert!(seen.insert(entry), "duplicate: {entry:?}");
         }
     }
 
     #[test]
     fn parsed_all_specials() {
-        let dict = Dictionary::new();
-        for entry in dict.iter_snippets() {
+        for entry in dict_iter_snippets() {
             if entry.len() > 2 {
                 assert!(!(entry.starts_with("$") && entry.ends_with("$")), "unparsed magic value: {entry:?}")
             }
