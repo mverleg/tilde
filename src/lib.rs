@@ -74,19 +74,5 @@ pub fn tilde_analyze(code: &str) -> TildeRes<String> {
     analysis.push_str("\"length_valid\": 0,\n");
     analysis.push_str("\"length_preview_features\": 0\n");
     analysis.push_str("}\n");
-
-use ::trie_rs::TrieBuilder;
-    let mut builder = TrieBuilder::new();  // Inferred `TrieBuilder<u8>` automatically
-    builder.push("すし");
-    builder.push("すしや");
-    builder.push("すしだね");
-    builder.push("すしづめ");
-    builder.push("すしめし");
-    builder.push("すしをにぎる");
-    builder.push("すし");  // Word `push`ed twice is just ignored.
-    builder.push("🍣");
-
-    let trie = builder.build();
-
     Ok(analysis)
 }

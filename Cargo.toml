@@ -12,7 +12,6 @@ gen = []
 [dependencies]
 strum = "0.24"
 strum_macros = "0.24"
-trie-rs = "0.1.1"
 
 [build-dependencies]
 
