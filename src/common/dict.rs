@@ -7,11 +7,12 @@ use ::std::sync::{Arc, Mutex, RwLock};
 use ::std::sync::LazyLock;
 use ::std::slice::Iter;
 use ::std::iter::Cloned;
+use ::std::iter::FlatMap;
 
 static RAW_DICT: &'static str = include_str!("../../dictionary.txt");
 static DICT: LazyLock<DictContainer> = LazyLock::new(|| DictContainer::new());
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum DictEntry {
     Snippet(&'static str),
     Backspace,
@@ -53,8 +54,15 @@ impl Dictionary {
         DICT.snippet_lookup.get(position - 1).map(|txt| *txt)
     }
 
-    fn iter(&self) -> Cloned<Iter<'_, &'static str>> {
+    fn iter(&self) -> impl Iterator<Item = DictEntry> {
         DICT.snippet_lookup.iter().cloned()
+    }
+
+    fn iter_snippets(&self) -> impl Iterator<Item = &'static str> {
+        self.iter().flat_map(|entry| match entry {
+            DictEntry::Snippet(snip) => Some(snip),
+            _ => None,
+        }).into_iter()
     }
 }
 
@@ -83,7 +91,7 @@ use ::std::collections::HashSet;
         let dict = Dictionary::new();
         let mut seen = HashSet::new();
         for entry in dict.iter() {
-            assert!(seen.insert(entry), "duplicate: {entry}");
+            assert!(seen.insert(entry), "duplicate: {entry:?}");
         }
     }
 
@@ -93,8 +101,10 @@ use ::std::collections::HashSet;
         let mut seen = HashSet::new();
         for entry in dict.iter() {
             if entry.len() > 2 {
-                assert!(!(entry.starts_with("$") && entry.ends_with("$")), "unparsed magic value: {entry}")
+                assert!(!(entry.starts_with("$") && entry.ends_with("$")), "unparsed magic value: {entry:?}")
             }
         }
     }
+
+    //TODO @mark: all special values encountered
 }
