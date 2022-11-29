@@ -5,32 +5,13 @@
     "dockerfile": false
   },
   "check_dependencies": {},
-  "test_lint": {
-    "lint_strict": false
-  },
+  "test_lint": false,
   "release": {
     "artifact": {
       "targets": [
         { "target": "x86_64-unknown-linux-musl", "asset_postfix": "linux-x86-64" }
       ],
       "bins": [
-        "cmadd",
-        "cmdo",
-        "cmlist",
-        "cmdrop",
-        "cmbuf",
-        "cached",
-        "unique",
-        "filter",
-        "grab",
-        "dir_with",
-        "locked",
-        "namesafe",
-        "mvnw",
-        "mon",
-        "piped",
-        "rsh",
-        "rusht"
       ]
     }
   }
