@@ -38,7 +38,9 @@ impl TrieNode {
             Some(chr) => chr,
             None => return self.is_word,
         };
-        let tail = &value[head.to_string().len()..];
+        // based on the promise that str is utf8
+        // https://doc.rust-lang.org/std/primitive.char.html#method.len_utf8
+        let tail = &value[head.len_utf8()..];
         return match self.children.get(&head) {
             Some(child) => child.contains_exactly(tail),
             None => false,
@@ -75,7 +77,7 @@ mod tests {
     #[test]
     fn empty() {
         let trie = Trie::new();
-        assert!(trie.contains_exactly("hello"));
+        assert!(!trie.contains_exactly("hello"));
     }
 
     #[test]
