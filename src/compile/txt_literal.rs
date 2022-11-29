@@ -1,5 +1,8 @@
 use ::std::fmt;
 use ::std::fmt::Formatter;
+use ::std::convert::TryInto;
+use ::std::iter::Iterator;
+
 use ::strum::IntoEnumIterator;
 
 use crate::compile::letter::Letter;
@@ -7,15 +10,15 @@ use crate::compile::letter::Letter::*;
 use crate::compile::parse::Pos;
 use crate::compile::var_uint::decode_uint_allow_modifiers;
 use crate::compile::var_uint::decode_uint_no_modifier_at_start;
-use crate::compile::var_uint::encode_uint_allow_modifiers;
-use crate::compile::var_uint::encode_uint_no_modifier_at_start;
 use crate::compile::var_uint::DecodeError;
 use crate::compile::var_uint::DecodeError::TooLarge;
+use crate::compile::var_uint::encode_uint_allow_modifiers;
+use crate::compile::var_uint::encode_uint_no_modifier_at_start;
+use crate::NR;
 use crate::op::Op;
 use crate::tilde_log;
-use crate::Value::Num;
-use crate::NR;
 use crate::UINT;
+use crate::Value::Num;
 
 //TODO @mark: interpret 0 as backspace
 
