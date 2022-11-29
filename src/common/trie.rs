@@ -1,4 +1,5 @@
 use ::std::collections::HashMap;
+use ::std::collections::hash_map::Entry;
 
 #[derive(Debug)]
 struct TrieNode {
@@ -11,6 +12,24 @@ impl TrieNode {
         TrieNode {
             children: HashMap::with_capacity(0),
             is_word: false
+        }
+    }
+
+    pub fn push(&mut self, chars: &[char]) {
+        let (head, tail) = match chars.split_first() {
+            Some(split) => split,
+            None => {
+                eprintln!("reached end!");  //TODO @mark: TEMPORARY! REMOVE THIS!
+                return
+            },
+        };
+        match self.children.entry(*head) {
+            Entry::Occupied(mut child) => child.get_mut().push(tail),
+            Entry::Vacant(mut entry) => {
+                let mut child = TrieNode::new_empty();
+                child.push(tail);
+                entry.insert(child);
+            }
         }
     }
 }
@@ -28,7 +47,8 @@ impl Trie {
     }
 
     pub fn push(&mut self, value: &str) {
-        todo!()
+        let chars = value.chars().collect::<Vec<_>>();
+        self.root.push(&chars)
     }
 }
 
