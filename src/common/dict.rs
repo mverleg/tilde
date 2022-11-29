@@ -31,10 +31,6 @@ struct DictContainer {
     snippet_lookup: Vec<DictEntry>,
 }
 
-#[derive(Clone)]
-pub struct Dictionary {
-}
-
 impl DictContainer {
     fn new() -> Self {
         DictContainer {
