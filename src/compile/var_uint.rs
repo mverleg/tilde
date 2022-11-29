@@ -7,6 +7,8 @@ use crate::compile::letter::Letter::*;
 use crate::compile::var_uint::DecodeError::TooLarge;
 use crate::op::Op;
 
+//TODO: maybe make this a separate crate, if it can be decoupled from Letter?
+
 const STRING_NOMOD_OPENERS: [Letter; 10] = [Io, Seq, More, Plus, Asterisk, Slash, Right, Bracket, Colon, Number];
 const STRING_WITHMOD_OPENERS: [Letter; 14] = [Io, Seq, More, Plus, Asterisk, Slash, Right, Bracket, Colon, Hat, Exclamation, Question, Hash, Tilde];
 const STRING_FOLLOWERS: [Letter; 16] = [Io, Seq, More, Plus, Asterisk, Slash, Right, Bracket, Colon, Hat, Exclamation, Question, Hash, Tilde, Number, Text];

@@ -1,4 +1,6 @@
 
+//TODO: maybe make this a separate crate, perhaps together with variable encoding?
+
 //TODO @mark: fallback to full unicode after end?
 
 use ::std::iter::Cloned;

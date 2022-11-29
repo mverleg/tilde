@@ -1,6 +1,8 @@
 use ::std::collections::HashMap;
 use ::std::collections::hash_map::Entry;
 
+//TODO: maybe make this a separate crate (but there are already 2 - one has too many dependencies for my taste, and the other seems dead)
+
 #[derive(Debug)]
 struct TrieNode {
     children: HashMap<char, TrieNode>,
@@ -18,8 +20,12 @@ impl TrieNode {
     pub fn push(&mut self, value: &str) {
         let head = match value.chars().next() {
             Some(chr) => chr,
-            None => return,
+            None => {
+                self.is_word = true;
+                return
+            },
         };
+        eprintln!("push: {head}");  //TODO @mark: TEMPORARY! REMOVE THIS!
         // based on the promise that str is utf8
         // https://doc.rust-lang.org/std/primitive.char.html#method.len_utf8
         let tail = &value[head.len_utf8()..];
@@ -27,7 +33,11 @@ impl TrieNode {
             Entry::Occupied(mut child) => child.get_mut().push(tail),
             Entry::Vacant(mut entry) => {
                 let mut child = TrieNode::new_empty();
-                child.push(tail);
+                if tail.is_empty() {
+                    child.is_word = true;
+                } else {
+                    child.push(tail);
+                }
                 entry.insert(child);
             }
         }
@@ -36,8 +46,12 @@ impl TrieNode {
     pub fn contains_exactly(&self, value: &str) -> bool {
         let head = match value.chars().next() {
             Some(chr) => chr,
-            None => return self.is_word,
+            None => {
+                eprintln!("check: no head, is_word={}", self.is_word);  //TODO @mark: TEMPORARY! REMOVE THIS!
+                return self.is_word
+            },
         };
+        eprintln!("check: {head}");  //TODO @mark: TEMPORARY! REMOVE THIS!
         // based on the promise that str is utf8
         // https://doc.rust-lang.org/std/primitive.char.html#method.len_utf8
         let tail = &value[head.len_utf8()..];
