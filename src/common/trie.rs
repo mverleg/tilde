@@ -9,6 +9,13 @@ struct TrieNode {
     is_word: bool,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum TrieLookup {
+    IsWord,
+    IsPrefix,
+    NotFound,
+}
+
 impl TrieNode {
     pub fn new_empty() -> Self {
         TrieNode {
@@ -25,7 +32,6 @@ impl TrieNode {
                 return
             },
         };
-        eprintln!("push: {head}");  //TODO @mark: TEMPORARY! REMOVE THIS!
         // based on the promise that str is utf8
         // https://doc.rust-lang.org/std/primitive.char.html#method.len_utf8
         let tail = &value[head.len_utf8()..];
@@ -43,22 +49,26 @@ impl TrieNode {
         }
     }
 
-    pub fn contains_exactly(&self, value: &str) -> bool {
+    pub fn lookup_exactly(&self, value: &str) -> TrieLookup {
         let head = match value.chars().next() {
             Some(chr) => chr,
-            None => {
-                eprintln!("check: no head, is_word={}", self.is_word);  //TODO @mark: TEMPORARY! REMOVE THIS!
-                return self.is_word
+            None => return if self.is_word {
+                TrieLookup::IsWord
+            } else {
+                TrieLookup::IsPrefix
             },
         };
-        eprintln!("check: {head}");  //TODO @mark: TEMPORARY! REMOVE THIS!
         // based on the promise that str is utf8
         // https://doc.rust-lang.org/std/primitive.char.html#method.len_utf8
         let tail = &value[head.len_utf8()..];
         return match self.children.get(&head) {
-            Some(child) => child.contains_exactly(tail),
-            None => false,
+            Some(child) => child.lookup_exactly(tail),
+            None => TrieLookup::NotFound,
         }
+    }
+
+    pub fn contains_exactly(&self, value: &str) -> bool {
+        matches!(self.lookup_exactly(value), TrieLookup::IsWord)
     }
 }
 
