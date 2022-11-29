@@ -32,6 +32,18 @@ impl TrieNode {
             }
         }
     }
+
+    pub fn contains_exactly(&self, value: &str) -> bool {
+        let head = match value.chars().next() {
+            Some(chr) => chr,
+            None => return self.is_word,
+        };
+        let tail = &value[head.to_string().len()..];
+        return match self.children.get(&head) {
+            Some(child) => child.contains_exactly(tail),
+            None => false,
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -49,6 +61,10 @@ impl Trie {
     pub fn push(&mut self, value: &str) {
         let chars = value.chars().collect::<Vec<_>>();
         self.root.push(&chars)
+    }
+
+    pub fn contains_exactly(&self, value: &str) -> bool {
+        self.root.contains_exactly(value)
     }
 }
 
