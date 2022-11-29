@@ -6,12 +6,21 @@
 use ::std::sync::{Arc, Mutex, RwLock};
 use ::std::sync::LazyLock;
 use ::std::slice::Iter;
+use ::std::iter::Cloned;
 
 static RAW_DICT: &'static str = include_str!("../../dictionary.txt");
 static DICT: LazyLock<DictContainer> = LazyLock::new(|| DictContainer::new());
 
+#[derive(Debug, Clone)]
+pub enum DictEntry {
+    Snippet(&'static str),
+    Backspace,
+    CapitalizeFirst,
+    CapitalizeAll,
+}
+
 struct DictContainer {
-    snippet_lookup: Vec<&'static str>,
+    snippet_lookup: Vec<DictEntry>,
 }
 
 #[derive(Clone)]
@@ -22,7 +31,13 @@ impl DictContainer {
     fn new() -> Self {
         DictContainer {
             snippet_lookup: RAW_DICT.split("\n")
-                .map(|line| if line != "$magic-newline-value$" { line } else { "\n" })
+                .map(|line| match line {
+                    "$magic-backspace$" => DictEntry::Backspace,
+                    "$magic-newline-value$" => DictEntry::Snippet("\n"),
+                    "$magic-capitalize-first$" => DictEntry::CapitalizeFirst,
+                    "$magic-capitalize all$" => DictEntry::CapitalizeAll,
+                    _ => DictEntry::Snippet(line),
+                })
                 .collect(),
         }
     }
@@ -38,8 +53,8 @@ impl Dictionary {
         DICT.snippet_lookup.get(position - 1).map(|txt| *txt)
     }
 
-    fn iter(&self) -> Iter<'_, &'static str> {
-        DICT.snippet_lookup.iter()
+    fn iter(&self) -> Cloned<Iter<'_, &'static str>> {
+        DICT.snippet_lookup.iter().cloned()
     }
 }
 
@@ -58,7 +73,7 @@ use ::std::collections::HashSet;
     fn trailing_whitespace() {
         let dict = Dictionary::new();
         let trailing_whitespace_count = dict.iter()
-            .filter(|entry| entry.ends)
+            .filter(|entry| entry.ends_with(" "))
             .count();
         assert!(trailing_whitespace_count > 10, "quite some entries should have trailing space (maybe stripped by editor?)");
     }
@@ -69,6 +84,17 @@ use ::std::collections::HashSet;
         let mut seen = HashSet::new();
         for entry in dict.iter() {
             assert!(seen.insert(entry), "duplicate: {entry}");
+        }
+    }
+
+    #[test]
+    fn parsed_all_specials() {
+        let dict = Dictionary::new();
+        let mut seen = HashSet::new();
+        for entry in dict.iter() {
+            if entry.len() > 2 {
+                assert!(!(entry.starts_with("$") && entry.ends_with("$")), "unparsed magic value: {entry}")
+            }
         }
     }
 }

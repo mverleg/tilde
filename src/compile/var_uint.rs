@@ -518,10 +518,7 @@ macro_rules! common_tests {
             assert_eq!(dec, Err(DecodeError::TooLarge));
         }
 
-        #[test]
-        #[ignore]
         fn print_all_encodings_for_debug() {
-            //TODO @mverleg: remove?
             for i in 0..=10_000 {
                 let letters = $encode(i);
                 println!("{i}  {}", encoding_to_str_for_debug(&letters))
