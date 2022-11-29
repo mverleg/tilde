@@ -15,15 +15,15 @@ impl TrieNode {
         }
     }
 
-    pub fn push(&mut self, chars: &[char]) {
-        let (head, tail) = match chars.split_first() {
-            Some(split) => split,
-            None => {
-                eprintln!("reached end!");  //TODO @mark: TEMPORARY! REMOVE THIS!
-                return
-            },
+    pub fn push(&mut self, value: &str) {
+        let head = match value.chars().next() {
+            Some(chr) => chr,
+            None => return,
         };
-        match self.children.entry(*head) {
+        // based on the promise that str is utf8
+        // https://doc.rust-lang.org/std/primitive.char.html#method.len_utf8
+        let tail = &value[head.len_utf8()..];
+        match self.children.entry(head) {
             Entry::Occupied(mut child) => child.get_mut().push(tail),
             Entry::Vacant(mut entry) => {
                 let mut child = TrieNode::new_empty();
@@ -61,8 +61,7 @@ impl Trie {
     }
 
     pub fn push(&mut self, value: &str) {
-        let chars = value.chars().collect::<Vec<_>>();
-        self.root.push(&chars)
+        self.root.push(value)
     }
 
     pub fn contains_exactly(&self, value: &str) -> bool {
