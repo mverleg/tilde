@@ -1,4 +1,5 @@
 #![feature(fmt_internals)]
+#![feature(once_cell)]
 #![allow(unused)] //TODO @mark: TEMPORARY! REMOVE THIS!
 
 use ::std::env;

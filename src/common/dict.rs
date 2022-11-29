@@ -4,9 +4,11 @@
 //TODO @mark: fallback to full unicode after end?
 
 use ::std::sync::{Arc, Mutex, RwLock};
+use ::std::sync::LazyLock;
+use ::std::slice::Iter;
 
 static RAW_DICT: &'static str = include_str!("../../dictionary.txt");
-static DICT: Arc<RwLock<DictContainer>> = Arc::new(RwLock::new(DictContainer::new()));
+static DICT: LazyLock<DictContainer> = LazyLock::new(|| DictContainer::new());
 
 struct DictContainer {
     snippet_lookup: Vec<&'static str>,
@@ -14,41 +16,59 @@ struct DictContainer {
 
 #[derive(Clone)]
 pub struct Dictionary {
-    container: Arc<RwLock<DictContainer>>,
 }
 
 impl DictContainer {
-    const fn new() -> Self {
+    fn new() -> Self {
         DictContainer {
-            snippet_lookup: vec![],
+            snippet_lookup: RAW_DICT.split("\n")
+                .map(|line| if line != "$magic-newline-value$" { line } else { "\n" })
+                .collect(),
         }
     }
 }
 
 impl Dictionary {
-    fn new() -> Self {
-        Dictionary {
-            container: DICT.clone(),
-        }
+    pub fn new() -> Self {
+        Dictionary {}
     }
 
-    fn index(&self, position: usize) -> Option<&'static str> {
-        assert!(position != 0, "cannot look up position 0, it is reserved (dict starts at 1)");
-        let read_container = self.container.read().expect("RwLock poisoned");
-        if ! read_container.snippet_lookup.is_empty() {
-            return read_container.snippet_lookup.get(position).map(|txt| *txt)
-        }
-        todo!()
+    pub fn index(&self, position: usize) -> Option<&'static str> {
+        debug_assert!(position != 0, "cannot look up position 0, it is reserved (dict starts at 1)");
+        DICT.snippet_lookup.get(position - 1).map(|txt| *txt)
+    }
+
+    fn iter(&self) -> Iter<'_, &'static str> {
+        DICT.snippet_lookup.iter()
     }
 }
 
 #[cfg(test)]
 mod lookup {
+use ::std::collections::HashSet;
     use super::*;
 
     #[test]
-    fn test_whitespace() {
+    fn first_is_whitespace() {
         let dict = Dictionary::new();
-        assert_eq!(dict.index(0), Some(" "), "first entry should be space");
+        assert_eq!(dict.index(1), Some(" "), "first entry should be space (maybe stripped by editor?)");
+    }
+
+    #[test]
+    fn trailing_whitespace() {
+        let dict = Dictionary::new();
+        let trailing_whitespace_count = dict.iter()
+            .filter(|entry| entry.ends)
+            .count();
+        assert!(trailing_whitespace_count > 10, "quite some entries should have trailing space (maybe stripped by editor?)");
+    }
+
+    #[test]
+    fn no_duplicates() {
+        let dict = Dictionary::new();
+        let mut seen = HashSet::new();
+        for entry in dict.iter() {
+            assert!(seen.insert(entry), "duplicate: {entry}");
+        }
     }
 }
