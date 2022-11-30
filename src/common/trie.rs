@@ -1,5 +1,10 @@
-use ::std::collections::HashMap;
+
+// This files uses len_utf8 for char length, based on the promise that str is utf8
+// https://doc.rust-lang.org/std/primitive.char.html#method.len_utf8
+
 use ::std::collections::hash_map::Entry;
+use ::std::collections::HashMap;
+use ::std::collections::VecDeque;
 
 //TODO: maybe make this a separate crate (but there are already 2 - one has too many dependencies for my taste, and the other seems dead)
 
@@ -32,8 +37,6 @@ impl TrieNode {
                 return
             },
         };
-        // based on the promise that str is utf8
-        // https://doc.rust-lang.org/std/primitive.char.html#method.len_utf8
         let tail = &value[head.len_utf8()..];
         match self.children.entry(head) {
             Entry::Occupied(mut child) => child.get_mut().push(tail),
@@ -58,8 +61,6 @@ impl TrieNode {
                 TrieLookup::IsPrefix
             },
         };
-        // based on the promise that str is utf8
-        // https://doc.rust-lang.org/std/primitive.char.html#method.len_utf8
         let tail = &value[head.len_utf8()..];
         return match self.children.get(&head) {
             Some(child) => child.lookup(tail),
@@ -70,11 +71,51 @@ impl TrieNode {
     pub fn contains_exactly(&self, value: &str) -> bool {
         self.lookup(value) == TrieLookup::IsWord
     }
+
+    pub fn iterator_at_prefix(&self, prefix: &str) -> TrieIterator {
+        let head = match prefix.chars().next() {
+            Some(chr) => chr,
+            None => return TrieIterator::new_at(self),
+        };
+        let tail = &prefix[head.len_utf8()..];
+        return match self.children.get(&head) {
+            Some(child) => child.iterator_at_prefix(tail),
+            None => TrieIterator::new_empty(),
+        }
+    }
 }
 
 #[derive(Debug)]
 pub struct Trie {
     root: TrieNode
+}
+
+// Breadth-first iterator, ordering of elements is undefined (depends on hashes).
+#[derive(Debug)]
+pub struct TrieIterator<'a> {
+    nodes: VecDeque<&'a TrieNode>,
+}
+
+impl <'a> TrieIterator<'a> {
+    fn new_at(elem: &'a TrieNode) -> Self {
+        let mut nodes = VecDeque::new();
+        nodes.push_front(elem);
+        TrieIterator {
+            nodes,
+        }
+    }
+    
+    fn new_empty() -> Self {
+        TrieIterator { nodes: VecDeque::new() }
+    }
+}
+
+impl <'a> Iterator for TrieIterator<'a> {
+    type Item = &'a str;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        todo!()
+    }
 }
 
 impl Trie {
@@ -96,8 +137,8 @@ impl Trie {
         self.root.lookup(value) == TrieLookup::IsWord
     }
 
-    pub fn iter_prefix(&self, prefix: &str) -> () {
-        todo!()
+    pub fn iter_prefix(&self, prefix: &str) -> TrieIterator {
+        self.root.iterator_at_prefix(prefix)
     }
 }
 
@@ -140,7 +181,6 @@ mod tests {
         trie.push("hey");
         trie.push("potato");
         let matches = trie.iter_prefix("hel")
-            .sort()
             .collect::<Vec<_>>();
         assert_eq!(matches, vec!["hell", "hello", "help"]);
     }
