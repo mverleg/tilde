@@ -267,4 +267,22 @@ mod tests {
         matches.sort();
         assert_eq!(matches, vec!["hell", "help"]);
     }
+
+    #[test]
+    fn longest_prefix_match() {
+        let mut trie = build_test_trie();
+        assert_eq!(trie.longest_prefix("hell"), "hell");
+    }
+
+    #[test]
+    fn longest_prefix_partial() {
+        let mut trie = build_test_trie();
+        assert_eq!(trie.longest_prefix("helpless"), "help");
+    }
+
+    #[test]
+    fn longest_prefix_unknown() {
+        let mut trie = build_test_trie();
+        assert_eq!(trie.longest_prefix("abacus"), "");
+    }
 }
