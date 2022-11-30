@@ -285,19 +285,31 @@ mod tests {
     }
 
     #[test]
-    fn longest_prefix_match() {
+    fn longest_prefix_out_of_input_while_at_word() {
         let mut trie = build_test_trie();
         assert_eq!(trie.longest_prefix("hell"), "hell");
     }
 
     #[test]
-    fn longest_prefix_partial() {
+    fn longest_prefix_out_of_input_while_not_at_word() {
+        let mut trie = build_test_trie();
+        assert_eq!(trie.longest_prefix("her"), "he");
+    }
+
+    #[test]
+    fn longest_prefix_out_of_matches_while_deepest_is_word() {
         let mut trie = build_test_trie();
         assert_eq!(trie.longest_prefix("helpless"), "help");
     }
 
     #[test]
-    fn longest_prefix_unknown() {
+    fn longest_prefix_out_of_matches_while_deepest_is_not_word() {
+        let mut trie = build_test_trie();
+        assert_eq!(trie.longest_prefix("helve"), "he");
+    }
+
+    #[test]
+    fn longest_prefix_unknown_prefix() {
         let mut trie = build_test_trie();
         assert_eq!(trie.longest_prefix("abacus"), "");
     }
