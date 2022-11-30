@@ -77,22 +77,31 @@ impl TrieNode {
     }
 
     fn longest_prefix(&self, value_remaining: &str, mut longest_word: String, mut post_word: String) -> String {
+        if self.is_word {
+            eprintln!("  merge {}/{}", &longest_word, &post_word);
+            longest_word.push_str(&post_word);
+            post_word.clear();
+        } else {
+            eprintln!("  not a word {}/{}", &longest_word, &post_word);
+        }
         let head = match value_remaining.chars().next() {
             Some(chr) => chr,
-            None => return longest_word.to_owned(),
+            None => {
+                eprintln!("  end of input {} for {}/{}", value_remaining, &longest_word, &post_word);
+                return longest_word.to_owned()
+            },
         };
         eprintln!("for {} head {} add to {}/{}", value_remaining, head, &longest_word, &post_word);
         let tail = &value_remaining[head.len_utf8()..];
         return match self.children.get(&head) {
             Some(child) => {
                 post_word.push(head);
-                if self.is_word {
-                    longest_word.push_str(&post_word);
-                    post_word.clear();
-                }
                 child.longest_prefix(tail, longest_word, post_word)
             },
-            None => return longest_word.to_owned(),
+            None => {
+                eprintln!("  end of trie {}/{}", &longest_word, &post_word);
+                return longest_word.to_owned()
+            },
         }
     }
 
