@@ -14,6 +14,7 @@ use ::strum::IntoEnumIterator;
 use ::strum_macros::EnumIter;
 
 use crate::common::trie::Trie;
+use crate::UINT;
 
 static RAW_DICT: &'static str = include_str!("../../dictionary.txt");
 static DICT: LazyLock<DictContainer> = LazyLock::new(|| DictContainer::new());
@@ -90,6 +91,11 @@ fn dict_iter_snippets() -> impl Iterator<Item = &'static str> {
     }).into_iter()
 }
 
+pub fn compress_with_dict(text: &str) -> Vec<UINT> {
+    let prefix = DICT.prefix_tree.longest_prefix(text);
+    todo!()
+}
+
 #[cfg(test)]
 mod lookup {
     use ::std::collections::HashSet;
@@ -146,6 +152,7 @@ mod compression {
 
     #[test]
     fn implement_test() {
-        unimplemented!();  //TODO @mark
+        compress_with_dict("Hello world, this is a test");
+        //TODO @mark: test more
     }
 }

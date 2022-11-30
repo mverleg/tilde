@@ -76,6 +76,10 @@ impl TrieNode {
         self.lookup(value) == TrieLookup::IsWord
     }
 
+    fn longest_prefix(&self, value: &str) -> String {
+        todo!()
+    }
+
     fn iterator_at_prefix(&self, initial_prefix: &str, remaining_value: &str) -> TrieIterator {
         eprintln!("iterator_at_prefix: {}", initial_prefix);  //TODO @mark: TEMPORARY! REMOVE THIS!
         let head = match remaining_value.chars().next() {
@@ -189,6 +193,10 @@ impl Trie {
 
     pub fn contains_exactly(&self, value: &str) -> bool {
         self.root.lookup(value) == TrieLookup::IsWord
+    }
+
+    pub fn longest_prefix(&self, value: &str) -> String {
+        self.root.longest_prefix(value)
     }
 
     pub fn iter_prefix(&self, prefix: &str) -> TrieIterator {
