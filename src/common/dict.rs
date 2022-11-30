@@ -3,6 +3,7 @@
 
 //TODO @mark: fallback to full unicode after end?
 
+use ::std::collections::HashMap;
 use ::std::iter::Cloned;
 use ::std::iter::FlatMap;
 use ::std::slice::Iter;
@@ -11,6 +12,8 @@ use ::std::sync::LazyLock;
 
 use ::strum::IntoEnumIterator;
 use ::strum_macros::EnumIter;
+
+use crate::common::trie::Trie;
 
 static RAW_DICT: &'static str = include_str!("../../dictionary.txt");
 static DICT: LazyLock<DictContainer> = LazyLock::new(|| DictContainer::new());
@@ -24,35 +27,46 @@ pub enum DictEntry {
 }
 
 impl DictEntry {
-    pub fn snip(text: &'static str, capitalize_next: bool) -> Self {
+    pub fn new_snippet(text: &'static str, capitalize_next: bool) -> Self {
         DictEntry::Snippet { text, capitalize_next }
+    }
+
+    pub fn get_snippet(&self) -> Option<&'static str> {
+        match self {
+            DictEntry::Snippet { text: snip, capitalize_next: _ } => Some(*snip),
+            _ => None,
+        }
     }
 }
 
 struct DictContainer {
     snippet_lookup: Vec<DictEntry>,
-}
-
-#[derive(Clone)]
-pub struct Dictionary {
+    position_lookup: HashMap<&'static str, usize>,
+    prefix_tree: Trie,
 }
 
 impl DictContainer {
     fn new() -> Self {
+        let list: Vec<DictEntry> = RAW_DICT.split("\n")
+            .map(|line| match line {
+                "$magic-backspace$" => DictEntry::Backspace,
+                "$magic-newline$" => DictEntry::new_snippet("\n", true),
+                "$magic-capitalize-first$" => DictEntry::CapitalizeFirst,
+                "$magic-capitalize all$" => DictEntry::CapitalizeAll,
+                _ => if line.ends_with("$capitalize-next$") {
+                    DictEntry::new_snippet(line.strip_suffix("$capitalize-next$").unwrap(), true)
+                } else {
+                    DictEntry::new_snippet(line, false)
+                },
+            })
+            .collect();
+        let position_lookup = list.iter().enumerate()
+            .flat_map(|(pos, entry)| entry.get_snippet().map(|text| (text, pos)).into_iter())
+            .collect::<HashMap<&'static str, usize>>();
         DictContainer {
-            snippet_lookup: RAW_DICT.split("\n")
-                .map(|line| match line {
-                    "$magic-backspace$" => DictEntry::Backspace,
-                    "$magic-newline$" => DictEntry::snip("\n", true),
-                    "$magic-capitalize-first$" => DictEntry::CapitalizeFirst,
-                    "$magic-capitalize all$" => DictEntry::CapitalizeAll,
-                    _ => if line.ends_with("$capitalize-next$") {
-                        DictEntry::snip(line.strip_suffix("$capitalize-next$").unwrap(), true)
-                    } else {
-                        DictEntry::snip(line, false)
-                    },
-                })
-                .collect(),
+            snippet_lookup: list,
+            position_lookup: position_lookup,
+            prefix_tree: Trie::new(),
         }
     }
 }
@@ -80,7 +94,7 @@ mod lookup {
 
     #[test]
     fn first_is_whitespace() {
-        assert_eq!(dict_index(1), Some(DictEntry::snip(" ", false)), "first entry should be space (maybe stripped by editor?)");
+        assert_eq!(dict_index(1), Some(DictEntry::new_snippet(" ", false)), "first entry should be space (maybe stripped by editor?)");
     }
 
     #[test]
@@ -119,5 +133,15 @@ mod lookup {
             }
             assert!(seen.contains(&expect), "expected in dict: {expect:?}");
         }
+    }
+}
+
+#[cfg(test)]
+mod compression {
+    use super::*;
+
+    #[test]
+    fn implement_test() {
+        unimplemented!();  //TODO @mark
     }
 }
