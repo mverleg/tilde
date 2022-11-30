@@ -99,7 +99,7 @@ pub struct TrieIterator<'a> {
 impl <'a> TrieIterator<'a> {
     fn new_at(elem: &'a TrieNode) -> Self {
         let mut nodes = VecDeque::new();
-        nodes.push_front(elem);
+        nodes.push_back(elem);
         TrieIterator {
             nodes,
         }
@@ -114,7 +114,15 @@ impl <'a> Iterator for TrieIterator<'a> {
     type Item = &'a str;
 
     fn next(&mut self) -> Option<Self::Item> {
-        todo!()
+        while let Some(elem) = self.nodes.pop_front() {
+            for child in elem.children {
+                self.nodes.push_back(&child.1)
+            }
+            if elem.is_word {
+                return Some(elem)
+            }
+        }
+        None
     }
 }
 
