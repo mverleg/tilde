@@ -95,6 +95,10 @@ impl Trie {
     pub fn contains_exactly(&self, value: &str) -> bool {
         self.root.lookup(value) == TrieLookup::IsWord
     }
+
+    pub fn iter_prefix(&self, prefix: &str) -> () {
+        todo!()
+    }
 }
 
 #[cfg(test)]
@@ -124,5 +128,20 @@ mod tests {
         assert_eq!(trie.lookup("hey"), TrieLookup::IsWord);
         assert_eq!(trie.lookup("h"), TrieLookup::IsPrefix);
         assert_eq!(trie.lookup("p"), TrieLookup::NotFound);
+    }
+
+    #[test]
+    fn prefix_iter() {
+        let mut trie = Trie::new();
+        trie.push("hello");
+        trie.push("he");
+        trie.push("hell");
+        trie.push("help");
+        trie.push("hey");
+        trie.push("potato");
+        let matches = trie.iter_prefix("hel")
+            .sort()
+            .collect::<Vec<_>>();
+        assert_eq!(matches, vec!["hell", "hello", "help"]);
     }
 }
