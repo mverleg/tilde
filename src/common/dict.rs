@@ -63,10 +63,14 @@ impl DictContainer {
         let position_lookup = list.iter().enumerate()
             .flat_map(|(pos, entry)| entry.get_snippet().map(|text| (text, pos)).into_iter())
             .collect::<HashMap<&'static str, usize>>();
+        let mut trie = Trie::new();
+        for (text, _) in &position_lookup {
+            trie.push(*text)
+        }
         DictContainer {
             snippet_lookup: list,
             position_lookup: position_lookup,
-            prefix_tree: Trie::new(),
+            prefix_tree: trie,
         }
     }
 }
