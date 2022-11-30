@@ -2,6 +2,9 @@
 // This files uses len_utf8 for char length, based on the promise that str is utf8
 // https://doc.rust-lang.org/std/primitive.char.html#method.len_utf8
 
+//TODO @mark: iteration allocates a lot of strings, since each node only stores char
+//TODO @mark: it would be possible to make iteration cheaper, if we'd store the whole text for each node
+
 use ::std::collections::hash_map::Entry;
 use ::std::collections::HashMap;
 use ::std::collections::VecDeque;
@@ -75,7 +78,7 @@ impl TrieNode {
     pub fn iterator_at_prefix(&self, prefix: &str) -> TrieIterator {
         let head = match prefix.chars().next() {
             Some(chr) => chr,
-            None => return TrieIterator::new_at(self),
+            None => return TrieIterator::new_at(prefix.to_owned(), self),
         };
         let tail = &prefix[head.len_utf8()..];
         return match self.children.get(&head) {
@@ -90,16 +93,28 @@ pub struct Trie {
     root: TrieNode
 }
 
+#[derive(Debug)]
+struct TrieNodePrefix<'a> {
+    prefix: String,
+    node: &'a TrieNode,
+}
+
+impl <'a> TrieNodePrefix<'a> {
+    pub fn new(prefix: String, node: &'a TrieNode) -> Self {
+        TrieNodePrefix { prefix, node }
+    }
+}
+
 // Breadth-first iterator, ordering of elements is undefined (depends on hashes).
 #[derive(Debug)]
 pub struct TrieIterator<'a> {
-    nodes: VecDeque<&'a TrieNode>,
+    nodes: VecDeque<TrieNodePrefix<'a>>,
 }
 
 impl <'a> TrieIterator<'a> {
-    fn new_at(elem: &'a TrieNode) -> Self {
+    fn new_at(prefix: String, elem: &'a TrieNode) -> Self {
         let mut nodes = VecDeque::new();
-        nodes.push_back(elem);
+        nodes.push_back(TrieNodePrefix::new(prefix, elem));
         TrieIterator {
             nodes,
         }
@@ -111,15 +126,17 @@ impl <'a> TrieIterator<'a> {
 }
 
 impl <'a> Iterator for TrieIterator<'a> {
-    type Item = &'a str;
+    type Item = String;
 
     fn next(&mut self) -> Option<Self::Item> {
         while let Some(elem) = self.nodes.pop_front() {
-            for child in elem.children {
-                self.nodes.push_back(&child.1)
+            for child in &elem.node.children {
+                let mut text = elem.prefix.to_owned();
+                text.push(*child.0);
+                self.nodes.push_back(TrieNodePrefix::new(text, child.1))
             }
-            if elem.is_word {
-                return Some(elem)
+            if elem.node.is_word {
+                return Some(elem.prefix)
             }
         }
         None
