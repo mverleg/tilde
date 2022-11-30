@@ -75,14 +75,15 @@ impl TrieNode {
         self.lookup(value) == TrieLookup::IsWord
     }
 
-    pub fn iterator_at_prefix(&self, prefix: &str) -> TrieIterator {
-        let head = match prefix.chars().next() {
+    pub fn iterator_at_prefix(&self, initial_prefix: &str, remaining_value: &str) -> TrieIterator {
+        eprintln!("iterator_at_prefix: {}", initial_prefix);  //TODO @mark: TEMPORARY! REMOVE THIS!
+        let head = match remaining_value.chars().next() {
             Some(chr) => chr,
-            None => return TrieIterator::new_at(prefix.to_owned(), self),
+            None => return TrieIterator::new_at(initial_prefix.to_owned(), self),
         };
-        let tail = &prefix[head.len_utf8()..];
+        let tail = &remaining_value[head.len_utf8()..];
         return match self.children.get(&head) {
-            Some(child) => child.iterator_at_prefix(tail),
+            Some(child) => child.iterator_at_prefix(initial_prefix, tail),
             None => TrieIterator::new_empty(),
         }
     }
@@ -114,6 +115,7 @@ pub struct TrieIterator<'a> {
 impl <'a> TrieIterator<'a> {
     fn new_at(prefix: String, elem: &'a TrieNode) -> Self {
         let mut nodes = VecDeque::new();
+        eprintln!("pushing initial: {}", &prefix);  //TODO @mark: TEMPORARY! REMOVE THIS!
         nodes.push_back(TrieNodePrefix::new(prefix, elem));
         TrieIterator {
             nodes,
@@ -132,6 +134,7 @@ impl <'a> Iterator for TrieIterator<'a> {
         while let Some(elem) = self.nodes.pop_front() {
             for child in &elem.node.children {
                 let mut text = elem.prefix.to_owned();
+                eprintln!("pushing child: {} + {}", &text, child.0);  //TODO @mark: TEMPORARY! REMOVE THIS!
                 text.push(*child.0);
                 self.nodes.push_back(TrieNodePrefix::new(text, child.1))
             }
@@ -163,7 +166,7 @@ impl Trie {
     }
 
     pub fn iter_prefix(&self, prefix: &str) -> TrieIterator {
-        self.root.iterator_at_prefix(prefix)
+        self.root.iterator_at_prefix(prefix, prefix)
     }
 }
 
@@ -205,8 +208,9 @@ mod tests {
         trie.push("help");
         trie.push("hey");
         trie.push("potato");
-        let matches = trie.iter_prefix("hel")
+        let mut matches = trie.iter_prefix("hel")
             .collect::<Vec<_>>();
+        matches.sort();
         assert_eq!(matches, vec!["hell", "hello", "help"]);
     }
 }
