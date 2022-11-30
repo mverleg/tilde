@@ -8,6 +8,7 @@
 use ::std::collections::hash_map::Entry;
 use ::std::collections::HashMap;
 use ::std::collections::VecDeque;
+use ::std::vec::IntoIter;
 
 //TODO: maybe make this a separate crate (but there are already 2 - one has too many dependencies for my taste, and the other seems dead)
 
@@ -25,14 +26,14 @@ pub enum TrieLookup {
 }
 
 impl TrieNode {
-    pub fn new_empty() -> Self {
+    fn new_empty() -> Self {
         TrieNode {
             children: HashMap::with_capacity(0),
             is_word: false
         }
     }
 
-    pub fn push(&mut self, value: &str) {
+    fn push(&mut self, value: &str) {
         let head = match value.chars().next() {
             Some(chr) => chr,
             None => {
@@ -55,7 +56,7 @@ impl TrieNode {
         }
     }
 
-    pub fn lookup(&self, value: &str) -> TrieLookup {
+    fn lookup(&self, value: &str) -> TrieLookup {
         let head = match value.chars().next() {
             Some(chr) => chr,
             None => return if self.is_word {
@@ -71,11 +72,11 @@ impl TrieNode {
         }
     }
 
-    pub fn contains_exactly(&self, value: &str) -> bool {
+    fn contains_exactly(&self, value: &str) -> bool {
         self.lookup(value) == TrieLookup::IsWord
     }
 
-    pub fn iterator_at_prefix(&self, initial_prefix: &str, remaining_value: &str) -> TrieIterator {
+    fn iterator_at_prefix(&self, initial_prefix: &str, remaining_value: &str) -> TrieIterator {
         eprintln!("iterator_at_prefix: {}", initial_prefix);  //TODO @mark: TEMPORARY! REMOVE THIS!
         let head = match remaining_value.chars().next() {
             Some(chr) => chr,
@@ -85,6 +86,31 @@ impl TrieNode {
         return match self.children.get(&head) {
             Some(child) => child.iterator_at_prefix(initial_prefix, tail),
             None => TrieIterator::new_empty(),
+        }
+    }
+
+    fn level_iterator_at_prefix(&self, initial_prefix: &str, remaining_value: &str) -> impl Iterator<Item = String> {
+        eprintln!("level_iterator_at_prefix: {}", initial_prefix);  //TODO @mark: TEMPORARY! REMOVE THIS!
+        let head = match remaining_value.chars().next() {
+            Some(chr) => chr,
+            None => {
+                let mut child_texts = vec![];
+                for child in &self.children {
+                    if ! child.1.is_word {
+                        continue
+                    }
+                    let mut text = initial_prefix.to_owned();
+                    eprintln!("pushing level child: {} + {}", &text, child.0);  //TODO @mark: TEMPORARY! REMOVE THIS!
+                    text.push(*child.0);
+                    child_texts.push(text)
+                }
+                return child_texts.into_iter()
+            },
+        };
+        let tail = &remaining_value[head.len_utf8()..];
+        return match self.children.get(&head) {
+            Some(child) => child.level_iterator_at_prefix(initial_prefix, tail),
+            None => vec![].into_iter(),
         }
     }
 }
@@ -121,7 +147,7 @@ impl <'a> TrieIterator<'a> {
             nodes,
         }
     }
-    
+
     fn new_empty() -> Self {
         TrieIterator { nodes: VecDeque::new() }
     }
@@ -168,6 +194,10 @@ impl Trie {
     pub fn iter_prefix(&self, prefix: &str) -> TrieIterator {
         self.root.iterator_at_prefix(prefix, prefix)
     }
+
+    pub fn iter_one_extra_letter(&self, prefix: &str) -> impl Iterator<Item = String> {
+        self.root.level_iterator_at_prefix(prefix, prefix)
+    }
 }
 
 #[cfg(test)]
@@ -199,18 +229,34 @@ mod tests {
         assert_eq!(trie.lookup("p"), TrieLookup::NotFound);
     }
 
-    #[test]
-    fn prefix_iter() {
+    fn build_test_trie() -> Trie {
         let mut trie = Trie::new();
         trie.push("hello");
         trie.push("he");
         trie.push("hell");
         trie.push("help");
         trie.push("hey");
+        trie.push("hero");
+        trie.push("helvetica");
         trie.push("potato");
+        trie
+    }
+
+    #[test]
+    fn prefix_iter_deep() {
+        let trie = build_test_trie();
         let mut matches = trie.iter_prefix("hel")
             .collect::<Vec<_>>();
         matches.sort();
-        assert_eq!(matches, vec!["hell", "hello", "help"]);
+        assert_eq!(matches, vec!["hell", "hello", "help", "helvetica"]);
+    }
+
+    #[test]
+    fn prefix_iter_shallow() {
+        let mut trie = build_test_trie();
+        let mut matches = trie.iter_one_extra_letter("hel")
+            .collect::<Vec<_>>();
+        matches.sort();
+        assert_eq!(matches, vec!["hell", "help"]);
     }
 }
