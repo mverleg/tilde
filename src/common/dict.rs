@@ -92,8 +92,19 @@ fn dict_iter_snippets() -> impl Iterator<Item = &'static str> {
 }
 
 pub fn compress_with_dict(text: &str) -> Vec<UINT> {
-    let prefix = DICT.prefix_tree.longest_prefix(text);
-    todo!()
+    let mut rem = text;
+    let mut nrs = vec![];
+    while !rem.is_empty() {
+        let prefix = DICT.prefix_tree.longest_prefix(rem);
+        if prefix.is_empty() {
+            //TODO @mark: return Err instead of panic?
+            panic!("cannot encode string because dictionary does not contain '{}'", rem.chars().next().unwrap())
+        }
+        rem = &rem[prefix.len()..];
+        let nr = *DICT.position_lookup.get(prefix.as_str()).expect("prefix not in dictionary") as UINT;
+        nrs.push(nr)
+    }
+    nrs
 }
 
 #[cfg(test)]
@@ -151,8 +162,9 @@ mod compression {
     use super::*;
 
     #[test]
-    fn implement_test() {
-        compress_with_dict("Hello world, this is a test");
+    fn simple_text_compression() {
+        let nrs = compress_with_dict("hello world, this is a test");
+        assert_eq!(nrs.len(), 16);
         //TODO @mark: test more
     }
 }
