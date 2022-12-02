@@ -76,6 +76,7 @@ impl TrieNode {
         self.lookup(value) == TrieLookup::IsWord
     }
 
+    //TODO @mark: pass a string in
     fn longest_prefix(&self, value_remaining: &str, mut longest_word: String, mut post_word: String) -> String {
         if self.is_word {
             longest_word.push_str(&post_word);

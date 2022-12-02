@@ -91,6 +91,28 @@ fn dict_iter_snippets() -> impl Iterator<Item = &'static str> {
     }).into_iter()
 }
 
+pub fn decode_with_dict(nrs: &[UINT]) -> String {
+    let mut buffer = String::new();
+    let mut cap_next = false;  //TODO @mark: true?
+    for nr in nrs {
+        let snippet = DICT.snippet_lookup.get(*nr as usize)
+            .unwrap_or_else(|| panic!("dictionary has no item nr {nr}"));
+        match snippet {
+            DictEntry::Snippet { text, capitalize_next } => {
+                if cap_next {
+                    todo!()
+                }
+                buffer.push_str(*text);
+                cap_next = *capitalize_next;
+            },
+            DictEntry::Backspace => { buffer.pop(); },
+            DictEntry::CapitalizeFirst => todo!(),  //TODO @mark:
+            DictEntry::CapitalizeAll => todo!(),  //TODO @mark:
+        }
+    }
+    buffer
+}
+
 pub fn compress_with_dict(text: &str) -> Vec<UINT> {
     let mut rem = text;
     let mut nrs = vec![];
@@ -101,7 +123,8 @@ pub fn compress_with_dict(text: &str) -> Vec<UINT> {
             panic!("cannot encode string because dictionary does not contain '{}'", rem.chars().next().unwrap())
         }
         rem = &rem[prefix.len()..];
-        let nr = *DICT.position_lookup.get(prefix.as_str()).expect("prefix not in dictionary") as UINT;
+        let nr = *DICT.position_lookup.get(prefix.as_str())
+            .unwrap_or_else(|| panic!("prefix not in dictionary: '{prefix}'")) as UINT;
         nrs.push(nr)
     }
     nrs
