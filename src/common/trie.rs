@@ -76,7 +76,7 @@ impl TrieNode {
         self.lookup(value) == TrieLookup::IsWord
     }
 
-    fn longest_prefix(&self, value_remaining: &str, longest_word: &mut String, mut post_word: String) {
+    fn longest_prefix(&self, value_remaining: &str, longest_word: &mut String, post_word: &mut String) {
         if self.is_word {
             longest_word.push_str(&post_word);
             post_word.clear();
@@ -138,7 +138,7 @@ impl TrieNode {
 
 #[derive(Debug)]
 pub struct Trie {
-    root: TrieNode
+    root: TrieNode,
 }
 
 #[derive(Debug)]
@@ -196,7 +196,7 @@ impl <'a> Iterator for TrieIterator<'a> {
 impl Trie {
     pub fn new() -> Self {
         Trie {
-            root:TrieNode::new_empty()
+            root:TrieNode::new_empty(),
         }
     }
 
@@ -213,14 +213,16 @@ impl Trie {
     }
 
     pub fn longest_prefix(&self, value: &str) -> String {
-        let mut buffer = String::new();
-        self.longest_prefix_with(value, &mut buffer);
-        buffer
+        let mut result_buffer = String::new();
+        let mut postfix_buffer = String::new();
+        self.longest_prefix_with(value, &mut result_buffer, &mut postfix_buffer);
+        result_buffer
     }
 
-    pub fn longest_prefix_with(&self, value: &str, buffer: &mut String) {
-        buffer.clear();
-        self.root.longest_prefix(value, buffer, "".to_owned());
+    pub fn longest_prefix_with(&self, value: &str, result_buffer: &mut String, postfix_buffer: &mut String) {
+        result_buffer.clear();
+        postfix_buffer.clear();
+        self.root.longest_prefix(value, result_buffer, postfix_buffer);
     }
 
     pub fn iter_prefix(&self, prefix: &str) -> TrieIterator {
@@ -324,9 +326,11 @@ mod tests {
 
     #[test]
     fn longest_prefix_with_buffer() {
-        let mut buffer = "clear this".to_owned();
+        let mut result_buffer = "clear this".to_owned();
+        let mut postfix_buffer = "clear this".to_owned();
         let mut trie = build_test_trie();
-        trie.longest_prefix_with("abacus", &mut buffer);
-        assert_eq!(buffer, "");
+        trie.longest_prefix_with("her", &mut result_buffer, &mut postfix_buffer);
+        assert_eq!(result_buffer, "he");
+        assert_eq!(postfix_buffer, "r");
     }
 }
