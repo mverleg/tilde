@@ -133,6 +133,35 @@ pub fn compress_with_dict(text: &str) -> Vec<UINT> {
 }
 
 #[cfg(test)]
+static TEST_POEM: &'static str = "
+When you get what you want in your struggle for pelf,
+And the world makes you King for a day,
+Then go to the mirror and look at yourself,
+And see what that guy has to say.
+
+For it isn't your Father, or Mother, or Wife,
+Who judgement upon you must pass.
+The feller whose verdict counts most in your life
+Is the guy staring back from the glass.
+
+He's the feller to please, never mind all the rest,
+For he's with you clear up to the end,
+And you've passed your most dangerous, difficult test
+If the guy in the glass is your friend.
+
+You may be like Jack Horner and 'chisel' a plum,
+And think you're a wonderful guy,
+But the man in the glass says you're only a bum
+If you can't look him straight in the eye.
+
+You can fool the whole world down the pathway of years,
+And get pats on the back as you pass,
+But your final reward will be heartaches and tears
+If you've cheated the guy in the glass.
+
+© 1934 - Dale Wimbrow (1895-1954)";
+
+#[cfg(test)]
 mod lookup {
     use ::std::collections::HashSet;
 
@@ -193,6 +222,14 @@ mod compress_decode {
         let compress = compress_with_dict(&text);
         assert!(compress.len() < nrs.len())
     }
+
+    #[test]
+    fn compress_poem() {
+        let nrs = compress_with_dict(TEST_POEM);
+        assert!(nrs.len() < 1);
+        let text = decode_with_dict(&nrs);
+        assert_eq!(text, TEST_POEM);
+    }
 }
 
 #[cfg(test)]
@@ -203,6 +240,7 @@ mod compression {
     fn simple_text_compression() {
         let nrs = compress_with_dict("hello world, this is a test");
         assert_eq!(nrs.len(), 16);
-        //TODO @mark: test more
     }
+
+    //TODO @mark: test more, e.g. symbols, caps
 }
