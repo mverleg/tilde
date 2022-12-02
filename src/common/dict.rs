@@ -115,9 +115,11 @@ pub fn decode_with_dict(nrs: &[UINT]) -> String {
 
 pub fn compress_with_dict(text: &str) -> Vec<UINT> {
     let mut rem = text;
-    let mut nrs = vec![];
+    let mut numbers = vec![];
+    let mut prefix = String::new();
+    let mut buffer = String::new();
     while !rem.is_empty() {
-        let prefix = DICT.prefix_tree.longest_prefix(rem);
+        DICT.prefix_tree.longest_prefix_with(rem, &mut prefix, &mut buffer);
         if prefix.is_empty() {
             //TODO @mark: return Err instead of panic?
             panic!("cannot encode string because dictionary does not contain '{}'", rem.chars().next().unwrap())
@@ -125,9 +127,9 @@ pub fn compress_with_dict(text: &str) -> Vec<UINT> {
         rem = &rem[prefix.len()..];
         let nr = *DICT.position_lookup.get(prefix.as_str())
             .unwrap_or_else(|| panic!("prefix not in dictionary: '{prefix}'")) as UINT;
-        nrs.push(nr)
+        numbers.push(nr)
     }
-    nrs
+    numbers
 }
 
 #[cfg(test)]
@@ -177,6 +179,19 @@ mod lookup {
             }
             assert!(seen.contains(&expect), "expected in dict: {expect:?}");
         }
+    }
+}
+
+#[cfg(test)]
+mod compress_decode {
+    use super::*;
+
+    #[test]
+    fn decode_random_nrs() {
+        let mut nrs = (0 .. 1000).collect::<Vec<_>>();
+        let text = decode_with_dict(&nrs);
+        let compress = compress_with_dict(&text);
+        assert!(compress.len() < nrs.len())
     }
 }
 
