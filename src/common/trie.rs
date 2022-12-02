@@ -76,15 +76,16 @@ impl TrieNode {
         self.lookup(value) == TrieLookup::IsWord
     }
 
-    //TODO @mark: pass a string in
-    fn longest_prefix(&self, value_remaining: &str, mut longest_word: String, mut post_word: String) -> String {
+    fn longest_prefix(&self, value_remaining: &str, longest_word: &mut String, mut post_word: String) {
         if self.is_word {
             longest_word.push_str(&post_word);
             post_word.clear();
         }
         let head = match value_remaining.chars().next() {
             Some(chr) => chr,
-            None => return longest_word.to_owned(),
+            None => {
+                return
+            },
         };
         let tail = &value_remaining[head.len_utf8()..];
         return match self.children.get(&head) {
@@ -92,7 +93,7 @@ impl TrieNode {
                 post_word.push(head);
                 child.longest_prefix(tail, longest_word, post_word)
             },
-            None => return longest_word.to_owned(),
+            None => return,
         }
     }
 
@@ -212,7 +213,14 @@ impl Trie {
     }
 
     pub fn longest_prefix(&self, value: &str) -> String {
-        self.root.longest_prefix(value, "".to_owned(), "".to_owned())
+        let mut buffer = String::new();
+        self.longest_prefix_with(value, &mut buffer);
+        buffer
+    }
+
+    pub fn longest_prefix_with(&self, value: &str, buffer: &mut String) {
+        buffer.clear();
+        self.root.longest_prefix(value, buffer, "".to_owned());
     }
 
     pub fn iter_prefix(&self, prefix: &str) -> TrieIterator {
@@ -312,5 +320,13 @@ mod tests {
     fn longest_prefix_unknown_prefix() {
         let mut trie = build_test_trie();
         assert_eq!(trie.longest_prefix("abacus"), "");
+    }
+
+    #[test]
+    fn longest_prefix_with_buffer() {
+        let mut buffer = "clear this".to_owned();
+        let mut trie = build_test_trie();
+        trie.longest_prefix_with("abacus", &mut buffer);
+        assert_eq!(buffer, "");
     }
 }
