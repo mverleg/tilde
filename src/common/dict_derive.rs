@@ -1,3 +1,4 @@
+use ::std::borrow::Cow;
 
 pub const MAX_BACKSPACE: u8 = 3;
 
@@ -6,6 +7,35 @@ pub enum CapitalizeKind {
     None,
     First,
     All,
+}
+
+impl CapitalizeKind {
+    pub fn apply(&self, input: &str) -> String {
+        match self {
+            CapitalizeKind::None => input.to_owned(),
+            CapitalizeKind::First => {
+                let mut iter = input.chars();
+                let mut text = match iter.next() {
+                    Some(c) => toggle_case(c),
+                    None => return input.to_owned(),
+                };
+                iter.for_each(|c| text.push(c));
+                text
+            }
+            CapitalizeKind::All => input.chars()
+                .map(toggle_case)
+                .collect(),
+        }
+    }
+}
+
+fn toggle_case(input: char) -> String {
+    //TODO @mark: so many allocations... (because upper case may be several chars long)
+    let up = input.to_uppercase().collect();
+    if input.to_string() != up {
+        return up;
+    }
+    input.to_lowercase().collect()
 }
 
 #[derive(Debug, Clone)]
@@ -24,7 +54,7 @@ pub fn derivations(base_text: &str) -> Vec<DictDerivation> {
             let text = base_text.to_owned();
             deriv.push(DictDerivation {
                 text,
-                base_snippet: todo!(), //base_text,
+                base_snippet: todo!(),
                 capitalize_self: *cap,
                 capitalize_next: false,
                 backspace_count: bs,

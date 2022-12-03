@@ -1,7 +1,7 @@
 use ::std::fs::read_to_string;
 
 fn main() {
-
+    derived_dict_entries();
 }
 
 fn derived_dict_entries() {
