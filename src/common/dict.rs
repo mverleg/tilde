@@ -14,8 +14,6 @@ use ::std::sync::LazyLock;
 use ::strum::IntoEnumIterator;
 use ::strum_macros::EnumIter;
 
-use ::ustr::Ustr;
-
 use crate::common::trie::Trie;
 use crate::UINT;
 
@@ -24,7 +22,7 @@ pub(crate) static DICT: LazyLock<DictContainer> = LazyLock::new(|| DictContainer
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EnumIter)]
 pub enum DictEntry {
-    Snippet { text: Ustr, capitalize_next: bool },
+    Snippet { text: &'static str, capitalize_next: bool },
     Backspace,
     CapitalizeFirst,
     CapitalizeAll,
@@ -40,8 +38,8 @@ pub enum CapitalizeKind {
 
 #[derive(Debug, Clone)]
 pub struct DictCombi {
-    text: Ustr,
-    base_snippet: Ustr,
+    text: String,
+    base_snippet: &'static str,
     capitalize_self: CapitalizeKind,
     capitalize_next: bool,
     backspaced: u8,

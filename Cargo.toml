@@ -12,7 +12,6 @@ gen = []
 [dependencies]
 strum = { version = "0.24", default-features = false }
 strum_macros = { version = "0.24", default-features = false }
-ustr = { version = "0.9.0", default-features = false, features = ["parkinglot"] }
 
 [build-dependencies]
 
