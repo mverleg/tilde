@@ -63,3 +63,39 @@ pub fn derivations(base_text: &str) -> Vec<DictDerivation> {
     }
     deriv
 }
+
+#[cfg(test)]
+mod capitalize {
+    use super::*;
+
+    #[test]
+    fn empty() {
+        assert_eq!(CapitalizeKind::None.apply(""), "");
+        assert_eq!(CapitalizeKind::First.apply(""), "");
+        assert_eq!(CapitalizeKind::All.apply(""), "");
+    }
+
+    #[test]
+    fn none() {
+        assert_eq!(CapitalizeKind::None.apply("a"), "a");
+        assert_eq!(CapitalizeKind::None.apply("abc"), "abc");
+        assert_eq!(CapitalizeKind::None.apply("ABC"), "ABC");
+        assert_eq!(CapitalizeKind::None.apply("🦀"), "🦀");
+    }
+
+    #[test]
+    fn first() {
+        assert_eq!(CapitalizeKind::First.apply("a"), "A");
+        assert_eq!(CapitalizeKind::First.apply("abc"), "Abc");
+        assert_eq!(CapitalizeKind::First.apply("ABC"), "aBC");
+        assert_eq!(CapitalizeKind::First.apply("🦀"), "🦀");
+    }
+
+    #[test]
+    fn all() {
+        assert_eq!(CapitalizeKind::All.apply("A"), "A");
+        assert_eq!(CapitalizeKind::All.apply("abc"), "ABC");
+        assert_eq!(CapitalizeKind::All.apply("ABC"), "abc");
+        assert_eq!(CapitalizeKind::All.apply("🦀"), "🦀");
+    }
+}
