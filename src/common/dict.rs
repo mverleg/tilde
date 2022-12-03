@@ -28,25 +28,6 @@ pub enum DictEntry {
     CapitalizeAll,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, EnumIter)]
-pub enum CapitalizeKind {
-    None,
-    First,
-    All,
-}
-//TODO @mark: used?
-
-#[derive(Debug, Clone)]
-pub struct DictCombi {
-    text: String,
-    base_snippet: &'static str,
-    capitalize_self: CapitalizeKind,
-    capitalize_next: bool,
-    backspaced: u8,
-    cost: u8,
-}
-//TODO @mark: used?
-
 impl DictEntry {
     pub fn new_snippet(text: &'static str, capitalize_next: bool) -> Self {
         DictEntry::Snippet { text, capitalize_next }
