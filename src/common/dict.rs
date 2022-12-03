@@ -14,6 +14,7 @@ use ::std::sync::LazyLock;
 use ::strum::IntoEnumIterator;
 use ::strum_macros::EnumIter;
 
+use crate::common::dict_derive::CapitalizeKind;
 use crate::common::trie::Trie;
 use crate::UINT;
 
