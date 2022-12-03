@@ -5,6 +5,7 @@ homepage = "tbd"
 version = "0.1.0"
 edition = "2021"
 authors = ["Mark <mverleg.noreply@gmail.com>"]
+build = "build.rs"
 
 [features]
 gen = []

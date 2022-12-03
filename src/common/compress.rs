@@ -15,17 +15,12 @@ use crate::UINT;
 
 pub fn decode_with_dict(nrs: &[UINT]) -> String {
     let mut buffer = String::new();
-    let mut cap_next = false;  //TODO @mark: true?
     for nr in nrs {
         let snippet = DICT.snippet_index.get(*nr as usize)
             .unwrap_or_else(|| panic!("dictionary has no item nr {nr}"));
         match snippet {
-            DictEntry::Snippet { text, capitalize_next } => {
-                if cap_next {
-                    todo!()
-                }
+            DictEntry::Snippet(text) => {
                 buffer.push_str(*text);
-                cap_next = *capitalize_next;
             },
             DictEntry::Backspace => { buffer.pop(); },
             DictEntry::CapitalizeFirst => todo!(),  //TODO @mark:

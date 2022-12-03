@@ -23,7 +23,7 @@ pub(crate) static DICT: LazyLock<DictContainer> = LazyLock::new(|| DictContainer
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EnumIter)]
 pub enum DictEntry {
-    Snippet { text: &'static str, capitalize_next: bool },
+    Snippet(&'static str),
     Backspace,
     CapitalizeFirst,
     CapitalizeAll,
@@ -31,12 +31,12 @@ pub enum DictEntry {
 
 impl DictEntry {
     pub fn new_snippet(text: &'static str, capitalize_next: bool) -> Self {
-        DictEntry::Snippet { text, capitalize_next }
+        DictEntry::Snippet(text)
     }
 
     pub fn get_snippet(&self) -> Option<&'static str> {
         match self {
-            DictEntry::Snippet { text: snip, capitalize_next: _ } => Some(*snip),
+            DictEntry::Snippet(snip) => Some(*snip),
             _ => None,
         }
     }
@@ -84,7 +84,7 @@ pub fn dict_iter() -> impl Iterator<Item = DictEntry> {
 
 pub fn dict_iter_snippets() -> impl Iterator<Item = &'static str> {
     dict_iter().flat_map(|entry| match entry {
-        DictEntry::Snippet { text: snip, capitalize_next: _ } => Some(snip),
+        DictEntry::Snippet(snip) => Some(snip),
         _ => None,
     }).into_iter()
 }
