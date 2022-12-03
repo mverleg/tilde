@@ -10,8 +10,9 @@ authors = ["Mark <mverleg.noreply@gmail.com>"]
 gen = []
 
 [dependencies]
-strum = "0.24"
-strum_macros = "0.24"
+strum = { version = "0.24", default-features = false }
+strum_macros = { version = "0.24", default-features = false }
+ustr = { version = "0.9.0", default-features = false, features = ["parkinglot"] }
 
 [build-dependencies]
 
