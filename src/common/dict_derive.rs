@@ -1,5 +1,3 @@
-use ::std::borrow::Cow;
-
 pub const MAX_BACKSPACE: u8 = 3;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -41,21 +39,28 @@ fn toggle_case(input: char) -> String {
 #[derive(Debug, Clone)]
 pub struct DictDerivation {
     text: String,
-    base_snippet: &'static str,
+    base_snippet: String,
     capitalize_self: CapitalizeKind,
     capitalize_next: bool,
     backspace_count: u8,
 }
 
-pub fn derivations(base_text: &str) -> Vec<DictDerivation> {
+pub fn derivations(base_text: String) -> Vec<DictDerivation> {
+    //TODO @mark: base_Text borrow? can DictDerivation still be without lifetime?
     let mut deriv = vec![];
-    for cap in &[] {
+    for cap in [CapitalizeKind::None, CapitalizeKind::First, CapitalizeKind::All] {
+        let cap_text = cap.apply(&base_text);
         for bs in 0 ..= MAX_BACKSPACE {
-            let text = base_text.to_owned();
+            let mut bs_test = cap_text.clone();
+            for _ in 0 .. bs {
+                if let None = bs_test.pop() {
+                    break
+                }
+            }
             deriv.push(DictDerivation {
-                text,
-                base_snippet: todo!(),
-                capitalize_self: *cap,
+                text: bs_test,
+                base_snippet: base_text.clone(),
+                capitalize_self: cap,
                 capitalize_next: false,
                 backspace_count: bs,
             });
@@ -93,7 +98,7 @@ mod capitalize {
 
     #[test]
     fn all() {
-        assert_eq!(CapitalizeKind::All.apply("A"), "A");
+        assert_eq!(CapitalizeKind::All.apply("A"), "a");
         assert_eq!(CapitalizeKind::All.apply("abc"), "ABC");
         assert_eq!(CapitalizeKind::All.apply("ABC"), "abc");
         assert_eq!(CapitalizeKind::All.apply("🦀"), "🦀");
