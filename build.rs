@@ -1,5 +1,7 @@
-use ::std::fs;
 use ::std::collections::HashSet;
+use ::std::env;
+use ::std::fs;
+use ::std::path::PathBuf;
 
 include!("src/common/dict_derive.rs");
 
@@ -11,8 +13,9 @@ fn main() {
 fn derived_dict_entries() {
     println!("cargo:rerun-if-changed=src/common/dict_derive.rs");
     println!("cargo:rerun-if-changed=dictionary.txt");
-    let out_file = concat!(env!("OUT_DIR"), "/dictionary_extended.txt");
-    println!("cargo:rerun-if-changed={out_file}");
+    let mut out_file = PathBuf::from(env::var("OUT_DIR").unwrap());
+    out_file.push("dictionary_extended.txt");
+    println!("cargo:rerun-if-changed={}", out_file.to_str().unwrap());
     println!("cargo:rerun-if-changed=dictionary.txt");
     let base_dict = fs::read_to_string("./dictionary.txt").unwrap();
     let original = base_dict.lines()
