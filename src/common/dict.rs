@@ -14,9 +14,13 @@ use ::std::sync::LazyLock;
 use ::strum::IntoEnumIterator;
 use ::strum_macros::EnumIter;
 
+use ::smallvec::SmallVec;
+
 use crate::common::dict_derive::CapitalizeKind;
 use crate::common::trie::Trie;
 use crate::UINT;
+
+type SnipCombi = SmallVec<[usize; 4]>;
 
 static RAW_DICT: &'static str = include_str!("../../dictionary.txt");
 static DERIVED_DICT: &'static str = include_str!(concat!(env!("OUT_DIR"), "/dictionary_extended.txt"));
@@ -44,9 +48,13 @@ impl DictEntry {
 }
 
 pub(crate) struct DictContainer {
+    /// Find snippets by index in the raw dictionary.
     pub snippet_index: Vec<DictEntry>,
-    pub snippet_positions: HashMap<&'static str, usize>,
-    pub prefix_tree: Trie,
+    /// Find positions of the (multiple) operations to create a derived snippet.
+    pub ext_snippet_positions: HashMap<&'static str, SnipCombi>,
+    //TODO @mark: optimize smallvec size
+    /// Prefix-tree (trie) of all derived snippets.
+    pub ext_prefix_tree: Trie,
 }
 
 impl DictContainer {
@@ -71,10 +79,11 @@ impl DictContainer {
         for (text, _) in &position_lookup {
             trie.push(*text)
         }
+        let position_lookup = todo!();  //TODO @mark: TEMPORARY! REMOVE THIS!
         DictContainer {
             snippet_index: list,
-            snippet_positions: position_lookup,
-            prefix_tree: trie,
+            ext_snippet_positions: position_lookup,
+            ext_prefix_tree: trie,
         }
     }
 }

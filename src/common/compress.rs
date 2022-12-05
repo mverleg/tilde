@@ -36,15 +36,16 @@ pub fn compress_with_dict(text: &str) -> Vec<UINT> {
     let mut prefix = String::new();
     let mut buffer = String::new();
     while !rem.is_empty() {
-        DICT.prefix_tree.longest_prefix_with(rem, &mut prefix, &mut buffer);
+        DICT.ext_prefix_tree.longest_prefix_with(rem, &mut prefix, &mut buffer);
         if prefix.is_empty() {
             //TODO @mark: return Err instead of panic?
             panic!("cannot encode string because dictionary does not contain '{}'", rem.chars().next().unwrap())
         }
         rem = &rem[prefix.len()..];
-        let nr = *DICT.snippet_positions.get(prefix.as_str())
-            .unwrap_or_else(|| panic!("prefix not in dictionary: '{prefix}'")) as UINT;
-        numbers.push(nr)
+        let nrs = *DICT.ext_snippet_positions.get(prefix.as_str())
+            .unwrap_or_else(|| panic!("prefix not in dictionary: '{prefix}'"))
+            .into_iter().map(|nr| nr as UINT).collect::<SnipCombi>();
+        numbers.extend(nrs)
     }
     numbers
 }

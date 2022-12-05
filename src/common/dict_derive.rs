@@ -1,5 +1,7 @@
 pub const MAX_BACKSPACE: u8 = 3;
 
+//TODO @mark: reverse
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CapitalizeKind {
     None,
@@ -47,6 +49,7 @@ pub struct DictDerivation {
 pub fn cap_derivations(base_text: String) -> Vec<DictDerivation> {
     //TODO @mark: base_Text borrow? can DictDerivation still be without lifetime?
     let mut deriv = vec![];
+    eprintln!("todo remove CapitalizeKind::None here");
     for cap in [CapitalizeKind::None, CapitalizeKind::First, CapitalizeKind::All] {
         let mut cap_text = cap.apply(&base_text).clone();
         deriv.push(DictDerivation {
