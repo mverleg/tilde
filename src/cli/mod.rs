@@ -121,8 +121,8 @@ fn gen_help() -> String {
         "    -h, --help           Show this help text".to_owned(),
         "    -s, --source S       Run source string S (utf8)".to_owned(),
         "    -f, --file P         Run source contained in file at path P (utf8)".to_owned(),
-        "    -S, --analyze-source Show information about the program instead of running it".to_owned(),
-        "    -F, --analyze-file   Show information about the program instead of running it".to_owned(),
+        "    -S, --analyze-source Show information about the source string instead of running it".to_owned(),
+        "    -F, --analyze-file   Show information about the source file instead of running it".to_owned(),
         // "    --stats           Show stats (json) about the program instead of running it"
         //     .to_owned(),
     ];

@@ -19,6 +19,7 @@ use crate::common::trie::Trie;
 use crate::UINT;
 
 static RAW_DICT: &'static str = include_str!("../../dictionary.txt");
+static DERIVED_DICT: &'static str = include_str!(concat!(env!("OUT_DIR"), "/dictionary_extended.txt"));
 pub(crate) static DICT: LazyLock<DictContainer> = LazyLock::new(|| DictContainer::new());
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EnumIter)]

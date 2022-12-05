@@ -42,29 +42,19 @@ pub struct DictDerivation {
     base_snippet: String,
     capitalize_self: CapitalizeKind,
     capitalize_next: bool,
-    backspace_count: u8,
 }
 
-pub fn derivations(base_text: String) -> Vec<DictDerivation> {
+pub fn cap_derivations(base_text: String) -> Vec<DictDerivation> {
     //TODO @mark: base_Text borrow? can DictDerivation still be without lifetime?
     let mut deriv = vec![];
     for cap in [CapitalizeKind::None, CapitalizeKind::First, CapitalizeKind::All] {
-        let cap_text = cap.apply(&base_text);
-        for bs in 0 ..= MAX_BACKSPACE {
-            let mut bs_test = cap_text.clone();
-            for _ in 0 .. bs {
-                if let None = bs_test.pop() {
-                    break
-                }
-            }
-            deriv.push(DictDerivation {
-                text: bs_test,
-                base_snippet: base_text.clone(),
-                capitalize_self: cap,
-                capitalize_next: false,
-                backspace_count: bs,
-            });
-        }
+        let mut cap_text = cap.apply(&base_text).clone();
+        deriv.push(DictDerivation {
+            text: cap_text,
+            base_snippet: base_text.clone(),
+            capitalize_self: cap,
+            capitalize_next: false,
+        });
     }
     deriv
 }
