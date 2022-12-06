@@ -10,6 +10,7 @@ use ::std::iter::FlatMap;
 use ::std::slice::Iter;
 use ::std::sync::{Arc, Mutex, RwLock};
 use ::std::sync::LazyLock;
+use ::std::collections::HashSet;
 
 use ::strum::IntoEnumIterator;
 use ::strum_macros::EnumIter;
@@ -73,21 +74,37 @@ impl DictContainer {
                 },
             })
             .collect();
-        let position_lookup = list.iter().enumerate()
-            .flat_map(|(pos, entry)| entry.get_snippet()
-                .map(|text| (text, pos.try_into().expect("positions exceeded INDX"))).into_iter())
-            .collect::<HashMap<&'static str, INDX>>();
+        let derivations = DERIVED_DICT.split("\n").collect::<HashSet<&'static str>>();
+        let mut position_lookup = HashMap::with_capacity(derivations.len());
+        for (pos, entry) in list.iter().enumerate() {
+            generate_extended_snippet_combis(pos, entry, &derivations,
+                |text, combi| { position_lookup.insert(text, combi); })
+        }
+        // let snippet_positions = list.iter().enumerate()
+        //     .flat_map(|(pos, entry)| generate_extended_snippet_combis(pos, entry, &derivations))
+        //     .collect::<HashMap<&'static str, SnipCombi>>();
         let mut trie = Trie::new();
-        for (text, _) in &position_lookup {
+        for (text, _) in &snippet_positions {
             trie.push(*text)
         }
-        let position_lookup = todo!();  //TODO @mark: TEMPORARY! REMOVE THIS!
         DictContainer {
             snippet_index: list,
-            ext_snippet_positions: position_lookup,
+            ext_snippet_positions: snippet_positions,
             ext_prefix_tree: trie,
         }
     }
+}
+
+fn generate_extended_snippet_combis(
+    pos: usize,
+    entry: &DictEntry,
+    derivations: &HashSet<&'static str>,
+    entry_handler: impl FnMut(&'static str, SnipCombi)
+) {
+    todo!()
+    // entry.get_snippet()
+    //                 .map(|text| (text, pos.try_into().expect("positions exceeded INDX"))).into_iter()
+    //TODO @mark: ^
 }
 
 pub fn dict_iter() -> impl Iterator<Item = DictEntry> {
