@@ -11,16 +11,15 @@ use ::std::slice::Iter;
 use ::std::sync::{Arc, Mutex, RwLock};
 use ::std::sync::LazyLock;
 
+use ::smallvec::SmallVec;
 use ::strum::IntoEnumIterator;
 use ::strum_macros::EnumIter;
 
-use ::smallvec::SmallVec;
-
 use crate::common::dict_derive::CapitalizeKind;
 use crate::common::trie::Trie;
-use crate::UINT;
 
-pub type SnipCombi = SmallVec<[usize; 4]>;
+pub type INDX = u16;
+pub type SnipCombi = SmallVec<[INDX; 4]>;
 
 static RAW_DICT: &'static str = include_str!("../../dictionary.txt");
 static DERIVED_DICT: &'static str = include_str!(concat!(env!("OUT_DIR"), "/dictionary_extended.txt"));
@@ -73,8 +72,9 @@ impl DictContainer {
             })
             .collect();
         let position_lookup = list.iter().enumerate()
-            .flat_map(|(pos, entry)| entry.get_snippet().map(|text| (text, pos)).into_iter())
-            .collect::<HashMap<&'static str, usize>>();
+            .flat_map(|(pos, entry)| entry.get_snippet()
+                .map(|text| (text, pos.try_into().expect("positions exceeded INDX"))).into_iter())
+            .collect::<HashMap<&'static str, INDX>>();
         let mut trie = Trie::new();
         for (text, _) in &position_lookup {
             trie.push(*text)

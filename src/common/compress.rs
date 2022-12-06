@@ -9,12 +9,12 @@ use ::std::sync::LazyLock;
 use ::strum::IntoEnumIterator;
 use ::strum_macros::EnumIter;
 
-use crate::common::dict::{DICT, DictEntry, SnipCombi};
+use crate::common::dict::{DICT, DictEntry, INDX, SnipCombi};
 use crate::common::trie::Trie;
-use crate::UINT;
+
 //TODO @mark: change to smaller index type
 
-pub fn decode_with_dict(nrs: &[UINT]) -> String {
+pub fn decode_with_dict(nrs: &[INDX]) -> String {
     let mut buffer = String::new();
     for nr in nrs {
         let snippet = DICT.snippet_index.get(*nr as usize)
@@ -31,7 +31,7 @@ pub fn decode_with_dict(nrs: &[UINT]) -> String {
     buffer
 }
 
-pub fn compress_with_dict(text: &str) -> Vec<UINT> {
+pub fn compress_with_dict(text: &str) -> Vec<INDX> {
     let mut rem = text;
     let mut numbers = vec![];
     let mut prefix = String::new();
