@@ -20,7 +20,7 @@ use crate::common::dict_derive::CapitalizeKind;
 use crate::common::trie::Trie;
 use crate::UINT;
 
-type SnipCombi = SmallVec<[usize; 4]>;
+pub type SnipCombi = SmallVec<[usize; 4]>;
 
 static RAW_DICT: &'static str = include_str!("../../dictionary.txt");
 static DERIVED_DICT: &'static str = include_str!(concat!(env!("OUT_DIR"), "/dictionary_extended.txt"));

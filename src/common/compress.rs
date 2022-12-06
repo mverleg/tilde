@@ -9,9 +9,10 @@ use ::std::sync::LazyLock;
 use ::strum::IntoEnumIterator;
 use ::strum_macros::EnumIter;
 
-use crate::common::dict::{DICT, DictEntry};
+use crate::common::dict::{DICT, DictEntry, SnipCombi};
 use crate::common::trie::Trie;
 use crate::UINT;
+//TODO @mark: change to smaller index type
 
 pub fn decode_with_dict(nrs: &[UINT]) -> String {
     let mut buffer = String::new();
@@ -42,12 +43,13 @@ pub fn compress_with_dict(text: &str) -> Vec<UINT> {
             panic!("cannot encode string because dictionary does not contain '{}'", rem.chars().next().unwrap())
         }
         rem = &rem[prefix.len()..];
-        let nrs = *DICT.ext_snippet_positions.get(prefix.as_str())
+        let nrs = DICT.ext_snippet_positions.get(prefix.as_str())
             .unwrap_or_else(|| panic!("prefix not in dictionary: '{prefix}'"))
-            .into_iter().map(|nr| nr as UINT).collect::<SnipCombi>();
+            .into_iter().map(|nr| *nr).collect::<SnipCombi>();
         numbers.extend(nrs)
     }
-    numbers
+    //numbers
+    todo!()  //TODO @mark: TEMPORARY! REMOVE THIS!
 }
 
 #[cfg(test)]
