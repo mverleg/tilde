@@ -13,7 +13,7 @@ gen = []
 [dependencies]
 strum = { version = "0.24", default-features = false }
 strum_macros = { version = "0.24", default-features = false }
-smallvec = { version = "1.10.0", default-features = false }
+tinyvec = { version = "1.6.0", default-features = false }
 
 [build-dependencies]
 

@@ -11,15 +11,17 @@ use ::std::slice::Iter;
 use ::std::sync::{Arc, Mutex, RwLock};
 use ::std::sync::LazyLock;
 
-use ::smallvec::SmallVec;
 use ::strum::IntoEnumIterator;
 use ::strum_macros::EnumIter;
+use ::tinyvec::ArrayVec;
 
 use crate::common::dict_derive::CapitalizeKind;
 use crate::common::trie::Trie;
 
 pub type INDX = u16;
-pub type SnipCombi = SmallVec<[INDX; 4]>;
+//TODO @mark: unit test to see if index can be narrower?
+pub type SnipCombi = ArrayVec<[INDX; 4]>;
+//TODO @mark: unit test to see if array can be smaller
 
 static RAW_DICT: &'static str = include_str!("../../dictionary.txt");
 static DERIVED_DICT: &'static str = include_str!(concat!(env!("OUT_DIR"), "/dictionary_extended.txt"));
