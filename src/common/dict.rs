@@ -24,6 +24,8 @@ pub type INDX = u16;
 pub type SnipCombi = ArrayVec<[INDX; 4]>;
 //TODO @mark: unit test to see if array can be smaller
 
+//TODO @mark: memoize hashes of dict entries with some wrapper
+
 static RAW_DICT: &'static str = include_str!("../../dictionary.txt");
 static DERIVED_DICT: &'static str = include_str!(concat!(env!("OUT_DIR"), "/dictionary_extended.txt"));
 pub(crate) static DICT: LazyLock<DictContainer> = LazyLock::new(|| DictContainer::new());
@@ -84,12 +86,12 @@ impl DictContainer {
         //     .flat_map(|(pos, entry)| generate_extended_snippet_combis(pos, entry, &derivations))
         //     .collect::<HashMap<&'static str, SnipCombi>>();
         let mut trie = Trie::new();
-        for (text, _) in &snippet_positions {
+        for text in position_lookup.keys() {
             trie.push(*text)
         }
         DictContainer {
             snippet_index: list,
-            ext_snippet_positions: snippet_positions,
+            ext_snippet_positions: position_lookup,
             ext_prefix_tree: trie,
         }
     }
