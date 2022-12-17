@@ -16,7 +16,7 @@ use ::strum::IntoEnumIterator;
 use ::strum_macros::EnumIter;
 use ::tinyvec::ArrayVec;
 
-use crate::common::dict_derive::CapitalizeKind;
+use crate::common::dict_derive::{cap_derivations, CapitalizeKind};
 use crate::common::trie::Trie;
 
 pub type INDX = u16;
@@ -101,12 +101,18 @@ fn generate_extended_snippet_combis(
     pos: usize,
     entry: &DictEntry,
     derivations: &HashSet<&'static str>,
-    entry_handler: impl FnMut(&'static str, SnipCombi)
+    mut entry_handler: impl FnMut(&'static str, SnipCombi)
 ) {
-    todo!()
-    // entry.get_snippet()
-    //                 .map(|text| (text, pos.try_into().expect("positions exceeded INDX"))).into_iter()
-    //TODO @mark: ^
+    if let DictEntry::Snippet(base_snippet) = *entry {
+        for cap_deriv in cap_derivations(base_snippet) {
+            let deriv_text: &'static str = *derivations.get(cap_deriv.text.as_str()).expect("not found in pre-computed derivations");
+            let deriv_ops: SnipCombi;
+            entry_handler(deriv_text, deriv_ops);
+            eprintln!("add backspaces")
+        }
+        //let q: INDX = pos.try_into().expect("positions exceeded INDX");
+        //let immortal_snippet = derivations.get(base_snippet).expect("");
+    }
 }
 
 pub fn dict_iter() -> impl Iterator<Item = DictEntry> {

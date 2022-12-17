@@ -40,21 +40,21 @@ fn toggle_case(input: char) -> String {
 
 #[derive(Debug, Clone)]
 pub struct DictDerivation {
-    text: String,
+    pub text: String,
     base_snippet: String,
     capitalize_self: CapitalizeKind,
     capitalize_next: bool,
 }
 
-pub fn cap_derivations(base_text: String) -> Vec<DictDerivation> {
+pub fn cap_derivations(base_text: &str) -> Vec<DictDerivation> {
     //TODO @mark: base_Text borrow? can DictDerivation still be without lifetime?
     let mut deriv = vec![];
     eprintln!("todo remove CapitalizeKind::None here");
     for cap in [CapitalizeKind::None, CapitalizeKind::First, CapitalizeKind::All] {
-        let mut cap_text = cap.apply(&base_text).clone();
+        let cap_text = cap.apply(base_text).clone();
         deriv.push(DictDerivation {
             text: cap_text,
-            base_snippet: base_text.clone(),
+            base_snippet: base_text.to_owned(),
             capitalize_self: cap,
             capitalize_next: false,
         });

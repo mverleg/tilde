@@ -31,7 +31,7 @@ fn collect_cap_derivations(original: &Vec<&str>) -> HashSet<String> {
         .map(|s| (*s).to_owned())
         .collect::<HashSet<String>>();
     for line in original.iter() {
-        for deriv in cap_derivations((*line).to_owned()) {
+        for deriv in cap_derivations(line) {
             derived.insert(deriv.text.clone());
         }
     }
