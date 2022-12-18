@@ -1,4 +1,3 @@
-
 //TODO: maybe make this a separate crate, perhaps together with variable encoding?
 
 //TODO @mark: fallback to full unicode after end?
@@ -80,7 +79,7 @@ impl DictContainer {
         let mut position_lookup = HashMap::with_capacity(derivations.len());
         for (pos, entry) in list.iter().enumerate() {
             generate_extended_snippet_combis(pos, entry, &derivations,
-                |text, combi| { position_lookup.insert(text, combi); })
+                                             |text, combi| { position_lookup.insert(text, combi); })
         }
         // let snippet_positions = list.iter().enumerate()
         //     .flat_map(|(pos, entry)| generate_extended_snippet_combis(pos, entry, &derivations))
@@ -101,25 +100,26 @@ fn generate_extended_snippet_combis(
     pos: usize,
     entry: &DictEntry,
     derivations: &HashSet<&'static str>,
-    mut entry_handler: impl FnMut(&'static str, SnipCombi)
+    mut entry_handler: impl FnMut(&'static str, SnipCombi),
 ) {
-    if let DictEntry::Snippet(base_snippet) = *entry {
-        for cap_deriv in cap_derivations(base_snippet) {
-            let deriv_text: &'static str = *derivations.get(cap_deriv.text.as_str()).expect("not found in pre-computed derivations");
-            let deriv_ops: SnipCombi;
-            entry_handler(deriv_text, deriv_ops);
-            eprintln!("add backspaces")
-        }
-        //let q: INDX = pos.try_into().expect("positions exceeded INDX");
-        //let immortal_snippet = derivations.get(base_snippet).expect("");
+    let DictEntry::Snippet(base_snippet) = *entry else {
+        return;
+    };
+    for cap_deriv in cap_derivations(base_snippet) {
+        let deriv_text: &'static str = *derivations.get(cap_deriv.text.as_str()).expect("not found in pre-computed derivations");
+        let deriv_ops: SnipCombi;
+        entry_handler(deriv_text, deriv_ops);
+        eprintln!("add backspaces")
     }
+    //let q: INDX = pos.try_into().expect("positions exceeded INDX");
+    //let immortal_snippet = derivations.get(base_snippet).expect("");
 }
 
-pub fn dict_iter() -> impl Iterator<Item = DictEntry> {
+pub fn dict_iter() -> impl Iterator<Item=DictEntry> {
     DICT.snippet_index.iter().cloned()
 }
 
-pub fn dict_iter_snippets() -> impl Iterator<Item = &'static str> {
+pub fn dict_iter_snippets() -> impl Iterator<Item=&'static str> {
     dict_iter().flat_map(|entry| match entry {
         DictEntry::Snippet(snip) => Some(snip),
         _ => None,

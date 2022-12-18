@@ -64,11 +64,12 @@ impl Modifiers {
         &self,
         f: &mut fmt::Formatter<'_>,
     ) -> fmt::Result {
-        if let Some(m) = &self.first {
-            write!(f, ",{:x}", m.byte)?;
-            if let Some(m) = &self.second {
-                write!(f, ",{:x}", m.byte)?
-            }
+        let Some(m) = &self.first else {
+            return Ok(());
+        };
+        write!(f, ",{:x}", m.byte)?;
+        if let Some(m) = &self.second {
+            write!(f, ",{:x}", m.byte)?
         }
         Ok(())
     }
@@ -91,7 +92,7 @@ impl Word {
             Word::Var(open, modi) => format!("{}{}", open.chr, modi.chars()),
             Word::Fixed(open, second, modi) => {
                 format!("{}{}{}", open.chr, second.chr, modi.chars())
-            },
+            }
             Word::JustMod(modi) => modi.chars(),
         }
     }
