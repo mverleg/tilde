@@ -108,7 +108,7 @@ fn generate_extended_snippet_combis(
     for cap_deriv in cap_derivations(base_snippet) {
         let deriv_text: &'static str = *derivations.get(cap_deriv.text.as_str()).expect("not found in pre-computed derivations");
         let deriv_ops: SnipCombi;
-        entry_handler(deriv_text, deriv_ops);
+        //entry_handler(deriv_text, deriv_ops);
         eprintln!("add backspaces")
     }
     //let q: INDX = pos.try_into().expect("positions exceeded INDX");

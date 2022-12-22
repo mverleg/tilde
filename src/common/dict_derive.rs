@@ -2,7 +2,7 @@ pub const MAX_BACKSPACE: u8 = 3;
 
 //TODO @mark: reverse
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum CapitalizeKind {
     None,
     First,
@@ -38,12 +38,17 @@ fn toggle_case(input: char) -> String {
     input.to_lowercase().collect()
 }
 
-#[derive(Debug, Clone)]
-pub struct DictDerivation {
-    pub text: String,
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct DerivationSteps {
     base_snippet: String,
     capitalize_self: CapitalizeKind,
     capitalize_next: bool,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct DictDerivation {
+    pub text: String,
+    steps: DerivationSteps,
 }
 
 pub fn cap_derivations(base_text: &str) -> Vec<DictDerivation> {
@@ -54,9 +59,11 @@ pub fn cap_derivations(base_text: &str) -> Vec<DictDerivation> {
         let cap_text = cap.apply(base_text).clone();
         deriv.push(DictDerivation {
             text: cap_text,
-            base_snippet: base_text.to_owned(),
-            capitalize_self: cap,
-            capitalize_next: false,
+            steps: DerivationSteps {
+                base_snippet: base_text.to_owned(),
+                capitalize_self: cap,
+                capitalize_next: false,
+            }
         });
     }
     deriv

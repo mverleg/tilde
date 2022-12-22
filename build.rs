@@ -26,16 +26,10 @@ fn derived_dict_entries() {
     fs::write(out_file, dict_str).expect("failed to write");
 }
 
-fn collect_cap_derivations(original: &Vec<&str>) -> HashSet<String> {
-    let mut derived = original.iter()
-        .map(|s| (*s).to_owned())
-        .collect::<HashSet<String>>();
-    for line in original.iter() {
-        for deriv in cap_derivations(line) {
-            derived.insert(deriv.text.clone());
-        }
-    }
-    derived
+fn collect_cap_derivations(original: &Vec<&str>) -> HashSet<DictDerivation> {
+    original.iter()
+        .flat_map(|line| cap_derivations(*line).iter())
+        .collect::<HashSet<_>>()
 }
 
 fn sorted_join(derived: HashSet<String>) -> String {
