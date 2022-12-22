@@ -4,6 +4,8 @@ use ::std::convert::TryInto;
 use ::std::iter::Iterator;
 
 use ::strum::IntoEnumIterator;
+use crate::common::lookup_buffer;
+use crate::common::INDX;
 
 use crate::compile::letter::Letter;
 use crate::compile::letter::Letter::*;
@@ -50,6 +52,16 @@ pub fn encode_uint_vec(
     letters
 }
 
+///
+/// String buffer is NOT cleared (can expand), decode buffer IS overwritten.
+pub fn decode_str(letters: &[Letter], string_buffer: &mut String, char_buffer: &mut Vec<char>, decode_buffer: &mut Vec<UINT>) -> Result<Pos<()>, DecodeError> {
+    let closer = decode_uint_vec_buffer(letters, decode_buffer)?;
+    assert!(Closer::Text == closer.value);  //TODO @mark: for now only decodes strings, not int arrays
+    let indices = decode_buffer.into_iter().map(|nr| *nr as INDX).collect::<Vec<_>>();
+    lookup_buffer(&indices, string_buffer, char_buffer);
+    Ok(Pos { value: (), length: closer.length })
+}
+
 pub fn decode_uint_vec(letters: &[Letter]) -> Result<(Pos<Vec<UINT>>, Closer), DecodeError> {
     let mut buffer: Vec<UINT> = Vec::new();
     let closer = decode_uint_vec_buffer(letters, &mut buffer)?;
@@ -63,6 +75,7 @@ pub fn decode_uint_vec(letters: &[Letter]) -> Result<(Pos<Vec<UINT>>, Closer), D
 pub fn decode_uint_vec_buffer(letters: &[Letter], nrs_buffer: &mut Vec<UINT>) -> Result<Pos<Closer>, DecodeError> {
     let mut is_first = true;
     let mut pos = 0;
+    nrs_buffer.clear();
     loop {
         if pos >= letters.len() {
             tilde_log!("uint_vec without end marker, interpreting as text");

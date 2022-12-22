@@ -98,7 +98,6 @@ impl TrieNode {
     }
 
     fn iterator_at_prefix(&self, initial_prefix: &str, remaining_value: &str) -> TrieIterator {
-        eprintln!("iterator_at_prefix: {}", initial_prefix);  //TODO @mark: TEMPORARY! REMOVE THIS!
         let head = match remaining_value.chars().next() {
             Some(chr) => chr,
             None => return TrieIterator::new_at(initial_prefix.to_owned(), self),
@@ -111,7 +110,6 @@ impl TrieNode {
     }
 
     fn level_iterator_at_prefix(&self, initial_prefix: &str, remaining_value: &str) -> impl Iterator<Item = String> {
-        eprintln!("level_iterator_at_prefix: {}", initial_prefix);  //TODO @mark: TEMPORARY! REMOVE THIS!
         let head = match remaining_value.chars().next() {
             Some(chr) => chr,
             None => {
@@ -121,7 +119,6 @@ impl TrieNode {
                         continue
                     }
                     let mut text = initial_prefix.to_owned();
-                    eprintln!("pushing level child: {} + {}", &text, child.0);  //TODO @mark: TEMPORARY! REMOVE THIS!
                     text.push(*child.0);
                     child_texts.push(text)
                 }
