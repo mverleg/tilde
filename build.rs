@@ -22,7 +22,7 @@ fn main() {
 
 fn generate_base_dict_code(base_dict_entries: &[&str]) -> String {
     let mut buffer = format!("");
-    buffer.push_str(&format!("const DICT: [&'static str; {}] = [\n", base_dict_entries.len()));
+    buffer.push_str(&format!("pub const DICT: [DictEntry; {}] = [\n", base_dict_entries.len()));
     for entry in base_dict_entries {
         let creator = match *entry {
             "$magic-backspace$" => "DictEntry::Backspace".to_owned(),
