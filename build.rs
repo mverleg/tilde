@@ -10,17 +10,45 @@ use ::std::fs;
 //
 fn main() {
     println!("cargo:rerun-if-changed=Cargo.toml");
-    write_dict_code();
+    println!("cargo:rerun-if-changed=dictionary.txt");
+    let base_dict_str = fs::read_to_string("./dictionary.txt").unwrap();
+    let base_dict_entries = base_dict_str.lines()
+        .collect::<Vec<_>>();
+    let code = generate_base_dict_code(&base_dict_entries);
+    write_dict_code(&code);
 
 //     derived_dict_entries();
 }
 
-fn write_dict_code() {
+fn generate_base_dict_code(base_dict_entries: &[&str]) -> String {
+    let mut buffer = format!("");
+    buffer.push_str(&format!("const DICT: [&'static str; {}] = [\n", base_dict_entries.len()));
+    for entry in base_dict_entries {
+        let creator = match *entry {
+            "$magic-backspace$" => "DictEntry::Backspace".to_owned(),
+            "$magic-newline$" => "s(\"\\n\")".to_owned(),
+            "$magic-capitalize-first$" => "DictEntry::CapitalizeFirst".to_owned(),
+            "$magic-capitalize all$" => "DictEntry::CapitalizeAll".to_owned(),
+            "\"" => "s(\"\\\"\")".to_owned(),
+            _ => if entry.ends_with("$capitalize-next$") {
+                format!("S(\"{}\")", entry.strip_suffix("$capitalize-next$").unwrap())
+            } else {
+                format!("s(\"{}\")", entry)
+            },
+        };
+        buffer.push_str(&format!("\t{creator},\n"))
+    }
+    buffer.push_str("];\n\n");
+    buffer
+}
+
+fn write_dict_code(code: &str) {
     let mut out_file = PathBuf::from(env::var("OUT_DIR").unwrap());
     out_file.push("dict_init.rs");
     println!("cargo:rerun-if-changed={}", out_file.to_str().unwrap());
-    fs::write(out_file, "").expect("failed to write");
+    fs::write(out_file, code).expect("failed to write");
 }
+
 //
 // pub const MAX_BACKSPACE: u8 = 3;
 //
