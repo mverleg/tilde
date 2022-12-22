@@ -43,36 +43,67 @@ pub fn lookup_buffer(indices: &[INDX], buffer: &mut String, char_buffer: &mut Ve
                 char_buffer.pop();
             }
             DictEntry::CapitalizeFirst => {
-                let Some(orig_first) = char_buffer.first_mut() else {
-                    continue
-                };
-                let mut upper = orig_first.to_uppercase();
-                match upper.nth(0) {
-                    Some(switch_first) => {
-                        if switch_first != *orig_first {
-                            assert!(upper.nth(1).is_none(), "multi-char uppercase representations not yet supported");  //TODO @mark
-                            *orig_first = switch_first;
-                            continue;
-                        }
-                    },
-                    None => {}
-                };
-                let mut lower = orig_first.to_uppercase();
-                match lower.nth(0) {
-                    Some(switch_first) => {
-                        if switch_first != *orig_first {
-                            assert!(lower.nth(1).is_none(), "multi-char lowercase representations not yet supported");  //TODO @mark
-                            *orig_first = switch_first;
-                            continue;
-                        }
-                    },
-                    None => {}
+                if let Some(first) = char_buffer.first_mut() {
+                    switch_capitalization(first);
                 }
             }
             DictEntry::CapitalizeAll => {}
         }
     }
 }
+
+fn switch_capitalization(orig_first: &mut char) {
+    //TODO @mark: move this functions? add tests
+    let mut upper = orig_first.to_uppercase();
+    match upper.nth(0) {
+        Some(switch_first) => {
+            if switch_first != *orig_first {
+                assert!(upper.nth(1).is_none(), "multi-char uppercase representations not yet supported");  //TODO @mark
+                *orig_first = switch_first;
+                return;
+            }
+        },
+        None => {}
+    };
+    let mut lower = orig_first.to_uppercase();
+    match lower.nth(0) {
+        Some(switch_first) => {
+            if switch_first != *orig_first {
+                assert!(lower.nth(1).is_none(), "multi-char lowercase representations not yet supported");  //TODO @mark
+                *orig_first = switch_first;
+                return;
+            }
+        },
+        None => {}
+    }
+}
+
+#[cfg(test)]
+mod capitalisation {
+    use super::*;
+
+    #[test]
+    fn to_upper() {
+        let mut letter = 'a';
+        switch_capitalization(&mut letter);
+        assert_eq!(letter, 'A');
+    }
+
+    #[test]
+    fn to_lower() {
+        let mut letter = 'A';
+        switch_capitalization(&mut letter);
+        assert_eq!(letter, 'a');
+    }
+
+    #[test]
+    fn no_case() {
+        let mut letter = '.';
+        switch_capitalization(&mut letter);
+        assert_eq!(letter, '.');
+    }
+}
+
 
 include!(concat!(env!("OUT_DIR"), "/dict_init.rs"));
 
