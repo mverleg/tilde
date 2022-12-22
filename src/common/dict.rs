@@ -20,3 +20,13 @@ const fn S(snip: &'static str) -> DictEntry {
 }
 
 include!(concat!(env!("OUT_DIR"), "/dict_init.rs"));
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn dict_index_width() {
+        assert!((DICT.len() as u64) < (INDX::MAX as u64));
+    }
+}

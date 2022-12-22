@@ -51,19 +51,28 @@ pub fn encode_uint_vec(
 }
 
 pub fn decode_uint_vec(letters: &[Letter]) -> Result<(Pos<Vec<UINT>>, Closer), DecodeError> {
+    let mut buffer: Vec<UINT> = Vec::new();
+    let closer = decode_uint_vec_buffer(letters, &mut buffer)?;
+    Ok((Pos {
+        value: buffer,
+        length: closer.length,
+    }, closer.value))
+}
+
+//TODO @mark: buffer version used?
+pub fn decode_uint_vec_buffer(letters: &[Letter], nrs_buffer: &mut Vec<UINT>) -> Result<Pos<Closer>, DecodeError> {
     let mut is_first = true;
     let mut pos = 0;
-    let mut nrs = vec![];
     loop {
         if pos >= letters.len() {
             tilde_log!("uint_vec without end marker, interpreting as text");
-            return Ok((Pos { value: nrs, length: pos }, Closer::Text));
+            return Ok(Pos { value: Closer::Text, length: pos });
         }
         if letters[pos] == Text {
-            return Ok((Pos { value: nrs, length: pos + 1 }, Closer::Text));
+            return Ok(Pos { value: Closer::Text, length: pos + 1 });
         }
         if letters[pos] == Number {
-            return Ok((Pos { value: nrs, length: pos + 1 }, Closer::Number));
+            return Ok(Pos { value: Closer::Number, length: pos + 1 });
         }
         let nr = if is_first {
             is_first = false;
@@ -73,7 +82,7 @@ pub fn decode_uint_vec(letters: &[Letter]) -> Result<(Pos<Vec<UINT>>, Closer), D
         };
         debug_assert!(nr.length > 0, "did not consume any letters while parsing uint_vec");
         pos += nr.length;
-        nrs.push(nr.value)
+        nrs_buffer.push(nr.value)
     }
 }
 
