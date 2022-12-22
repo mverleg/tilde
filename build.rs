@@ -23,22 +23,24 @@ fn derived_dict_entries() {
     let derived = collect_cap_derivations(&original);
     println!("would count: {} -> {}", original.len(), derived.len());
     let dict_str = sorted_join(derived);
+    println!("{dict_str}");  //TODO @mark: TEMPORARY! REMOVE THIS!
+    panic!();  //TODO @mark: TEMPORARY! REMOVE THIS!
     fs::write(out_file, dict_str).expect("failed to write");
 }
 
 fn collect_cap_derivations(original: &Vec<&str>) -> HashSet<DictDerivation> {
     original.iter()
-        .flat_map(|line| cap_derivations(*line).iter())
+        .flat_map(|line| cap_derivations(*line).into_iter())
         .collect::<HashSet<_>>()
 }
 
-fn sorted_join(derived: HashSet<String>) -> String {
+fn sorted_join(derived: HashSet<DictDerivation>) -> String {
     let mut derived = derived.into_iter()
-        .collect::<Vec<_>>();
-    derived.sort();
+        .collect::<Vec<DictDerivation>>();
+    derived.sort_by(|left, right| left.text.cmp(&right.text));
     let mut dict_str = String::with_capacity(derived.len() * 16);
     for deriv in derived {
-        dict_str.push_str(&deriv);
+        dict_str.push_str(&deriv.text);
         dict_str.push('\n')
     }
     dict_str

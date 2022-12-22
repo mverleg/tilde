@@ -1,3 +1,6 @@
+use ::std::hash;
+use ::std::hash::Hasher;
+
 pub const MAX_BACKSPACE: u8 = 3;
 
 //TODO @mark: reverse
@@ -38,17 +41,29 @@ fn toggle_case(input: char) -> String {
     input.to_lowercase().collect()
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct DerivationSteps {
     base_snippet: String,
     capitalize_self: CapitalizeKind,
     capitalize_next: bool,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Eq)]
 pub struct DictDerivation {
     pub text: String,
     steps: DerivationSteps,
+}
+
+impl PartialEq for DictDerivation {
+    fn eq(&self, other: &Self) -> bool {
+        self.text.eq(&other.text)
+    }
+}
+
+impl hash::Hash for DictDerivation {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        state.write(self.text.as_bytes())
+    }
 }
 
 pub fn cap_derivations(base_text: &str) -> Vec<DictDerivation> {
