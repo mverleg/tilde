@@ -1,6 +1,3 @@
-use ::std::hash;
-use ::std::hash::Hasher;
-
 pub const MAX_BACKSPACE: u8 = 3;
 
 //TODO @mark: reverse
@@ -42,27 +39,30 @@ fn toggle_case(input: char) -> String {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct DerivationSteps {
-    base_snippet: String,
+pub struct CapDerivationSteps {
     capitalize_self: CapitalizeKind,
-    capitalize_next: bool,
 }
 
-#[derive(Debug, Clone, Eq)]
-pub struct DictDerivation {
-    pub text: String,
-    steps: DerivationSteps,
-}
-
-impl PartialEq for DictDerivation {
-    fn eq(&self, other: &Self) -> bool {
-        self.text.eq(&other.text)
+impl CapDerivationSteps {
+    pub fn from_repr(repr: char) -> Self {
+        match repr {
+            'a' => CapDerivationSteps { capitalize_self : CapitalizeKind::None },
+            'b' => CapDerivationSteps { capitalize_self : CapitalizeKind::First },
+            'c' => CapDerivationSteps { capitalize_self : CapitalizeKind::All },
+            _ => unimplemented!(),
+        }
     }
-}
 
-impl hash::Hash for DictDerivation {
-    fn hash<H: Hasher>(&self, state: &mut H) {
-        state.write(self.text.as_bytes())
+    pub fn cost(&self) -> usize {
+        1  //TODO @mark: TEMPORARY! REMOVE THIS!
+    }
+
+    pub fn to_repr(&self) -> char {
+        match self.capitalize_self {
+            CapitalizeKind::None => 'a',
+            CapitalizeKind::First => 'b',
+            CapitalizeKind::All => 'c',
+        }
     }
 }
 
@@ -74,10 +74,8 @@ pub fn cap_derivations(base_text: &str) -> Vec<DictDerivation> {
         let cap_text = cap.apply(base_text).clone();
         deriv.push(DictDerivation {
             text: cap_text,
-            steps: DerivationSteps {
-                base_snippet: base_text.to_owned(),
+            steps: CapDerivationSteps {
                 capitalize_self: cap,
-                capitalize_next: false,
             }
         });
     }
@@ -117,5 +115,24 @@ mod capitalize {
         assert_eq!(CapitalizeKind::All.apply("abc"), "ABC");
         assert_eq!(CapitalizeKind::All.apply("ABC"), "abc");
         assert_eq!(CapitalizeKind::All.apply("🦀"), "🦀");
+    }
+}
+
+#[cfg(test)]
+mod encoding {
+use ::strum::IntoEnumIterator;
+
+    use crate::common::dict::DictEntry;
+
+    use super::*;
+
+    #[test]
+    fn all_specials_encountered() {
+        for expect in CapDerivationSteps::iter() {
+            if matches!(expect, DictEntry::Snippet { .. }) {
+                continue
+            }
+            assert!(seen.contains(&expect), "expected in dict: {expect:?}");
+        }
     }
 }

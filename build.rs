@@ -23,8 +23,6 @@ fn derived_dict_entries() {
     let derived = collect_cap_derivations(&original);
     println!("would count: {} -> {}", original.len(), derived.len());
     let dict_str = sorted_join(derived);
-    println!("{dict_str}");  //TODO @mark: TEMPORARY! REMOVE THIS!
-    panic!();  //TODO @mark: TEMPORARY! REMOVE THIS!
     fs::write(out_file, dict_str).expect("failed to write");
 }
 
