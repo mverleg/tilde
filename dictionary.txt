@@ -60,10 +60,10 @@ _
 [
 <
 %
-!$capitalize-next$
+! $capitalize-next$
 '
 |
-?$capitalize-next$
+? $capitalize-next$
 @
 $
 ^

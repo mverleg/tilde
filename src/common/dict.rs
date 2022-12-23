@@ -91,7 +91,7 @@ mod tests {
     #[test]
     fn lookup_with_magic() {
         let mut out = String::new();
-        lookup_buffer(&[89, 70, 2542, 0, 836, 0], &mut out, &mut vec![]);
-        assert_eq!(&out, "Asterisk")
+        lookup_buffer(&[89, 70, 2542, 0, 836, 0, 62, 754, 0], &mut out, &mut vec![]);
+        assert_eq!(&out, "Asterisk! Capital")
     }
 }
