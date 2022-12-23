@@ -36,6 +36,7 @@ impl TextTransformation {
             }
             assert!(!self.case_all, "not impl");
             if self.case_first {
+                println!("cap first for '{input}'"); //TODO @mark: TEMPORARY! REMOVE THIS!
                 switch_capitalization_char(&mut chars[0])
             }
             return Cow::Owned(chars.into_iter().collect::<String>())

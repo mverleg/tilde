@@ -30,6 +30,7 @@ const fn S(snip: &'static str) -> DictEntry {
 pub fn lookup_buffer(indices: &[INDX], buffer: &mut String, char_buffer: &mut Vec<char>) {
     //TODO @mark: remove `char_buffer` arg and rustdoc
     let mut current_snip = "";
+    let mut current_capitalize_next = false;
     let mut transform = TextTransformation::new_noop();
     for indx in indices {
         // if current_capitalize_next {
@@ -41,9 +42,9 @@ pub fn lookup_buffer(indices: &[INDX], buffer: &mut String, char_buffer: &mut Ve
                 buffer.push_str(transform.apply(current_snip).as_ref());
                 current_snip = snip;
                 transform = TextTransformation::new_noop();
-                if capitalize_next {
-                    transform.case_first = true;
-                }
+                transform.case_first = current_capitalize_next;
+                current_capitalize_next = capitalize_next;
+                //TODO @mark: do not count the capitalize next if it doesn't do anything? like on whitespace
             }
             DictEntry::Backspace => {
                 transform.pop_end += 1;
