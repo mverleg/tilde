@@ -65,7 +65,7 @@ fn switch_capitalization(orig_first: &mut char) {
         },
         None => {}
     };
-    let mut lower = orig_first.to_uppercase();
+    let mut lower = orig_first.to_lowercase();
     match lower.nth(0) {
         Some(switch_first) => {
             if switch_first != *orig_first {
