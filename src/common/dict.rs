@@ -28,7 +28,6 @@ const fn S(snip: &'static str) -> DictEntry {
 /// String buffer is NOT cleared (can expand), char buffer IS overwritten.
 pub fn lookup_buffer(indices: &[INDX], buffer: &mut String, char_buffer: &mut Vec<char>) {
     //TODO @mark: remove `char_buffer` arg and rustdoc
-    let mut current_capitalize_next = true;
     let mut current_snip = "";
     let mut transform = TextTransformation::new_noop();
     for indx in indices {
@@ -41,6 +40,9 @@ pub fn lookup_buffer(indices: &[INDX], buffer: &mut String, char_buffer: &mut Ve
                 buffer.push_str(transform.apply(current_snip).as_ref());
                 current_snip = snip;
                 transform = TextTransformation::new_noop();
+                if capitalize_next {
+                    transform.case_first = true;
+                }
             }
             DictEntry::Backspace => {
                 transform.pop_end += 1;
@@ -53,6 +55,7 @@ pub fn lookup_buffer(indices: &[INDX], buffer: &mut String, char_buffer: &mut Ve
             }
         }
     }
+    buffer.push_str(transform.apply(current_snip).as_ref());
 }
 
 include!(concat!(env!("OUT_DIR"), "/dict_init.rs"));
@@ -64,5 +67,19 @@ mod tests {
     #[test]
     fn dict_index_width() {
         assert!((DICT.len() as u64) < (INDX::MAX as u64));
+    }
+
+    #[test]
+    fn lookup_simple() {
+        let mut out = String::new();
+        lookup_buffer(&[9, 2, 12, 12, 5, 1, 224], &mut out, &mut vec![]);
+        assert_eq!(&out, "hello world ")
+    }
+
+    #[test]
+    fn lookup_with_magic() {
+        let mut out = String::new();
+        lookup_buffer(&[89, 70, 2542, 0, 836], &mut out, &mut vec![]);
+        assert_eq!(&out, "Asterisk ")
     }
 }
