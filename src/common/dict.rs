@@ -7,6 +7,7 @@
 use crate::common::TextTransformation;
 
 pub type INDX = u16;
+pub const LONGEST_DICT_ENTRY_BYTES: usize = 22;
 
 #[derive(Debug, Clone, Copy)]
 pub enum DictEntry {
@@ -70,6 +71,17 @@ mod tests {
     }
 
     #[test]
+    fn longest_dict_entry_const() {
+        let longest_dict_entry = DICT.iter()
+            .map(|entry| match entry {
+                DictEntry::Snippet { snip, .. } => snip.len(),
+                _ => 0,
+            })
+            .max().unwrap();
+        assert_eq!(longest_dict_entry, LONGEST_DICT_ENTRY_BYTES);
+    }
+
+    #[test]
     fn lookup_simple() {
         let mut out = String::new();
         lookup_buffer(&[9, 2, 12, 12, 5, 1, 224], &mut out, &mut vec![]);
@@ -79,7 +91,7 @@ mod tests {
     #[test]
     fn lookup_with_magic() {
         let mut out = String::new();
-        lookup_buffer(&[89, 70, 2542, 0, 836], &mut out, &mut vec![]);
-        assert_eq!(&out, "Asterisk ")
+        lookup_buffer(&[89, 70, 2542, 0, 836, 0], &mut out, &mut vec![]);
+        assert_eq!(&out, "Asterisk")
     }
 }

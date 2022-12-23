@@ -1,5 +1,8 @@
 use ::std::borrow::Cow;
 
+use ::tinyvec::ArrayVec;
+
+use crate::common::dict::LONGEST_DICT_ENTRY_BYTES;
 use crate::exec::Text;
 
 #[derive(Debug, Clone, PartialEq)]
@@ -25,7 +28,7 @@ impl TextTransformation {
         if input.len() <= self.pop_end as usize {
             return Cow::Borrowed(input);
         }
-        let mut chars = input.chars().collect::<Vec<_>>();
+        let mut chars = input.chars().collect::<ArrayVec<[char; LONGEST_DICT_ENTRY_BYTES]>>();
         if self.case_all || self.case_first {
             // need to alloc string
             for _ in 0..self.pop_end {
@@ -37,6 +40,7 @@ impl TextTransformation {
             }
             return Cow::Owned(chars.into_iter().collect::<String>())
         }
+        // slice without alloc
         let mut end_index = input.len();
         for _ in 0..self.pop_end {
             let Some(chr) = chars.pop() else {
