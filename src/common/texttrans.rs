@@ -20,9 +20,31 @@ impl TextTransformation {
 
     pub fn apply<'a>(&self, input: &'a str) -> Cow<'a, str> {
         if self == &Self::new_noop() {
-            return Cow::Borrowed(input)
+            return Cow::Borrowed(input);
         }
-        todo!()
+        if input.len() <= self.pop_end as usize {
+            return Cow::Borrowed(input);
+        }
+        let mut chars = input.chars().collect::<Vec<_>>();
+        if self.case_all || self.case_first {
+            // need to alloc string
+            for _ in 0..self.pop_end {
+                chars.pop();
+            }
+            assert!(!self.case_all, "not impl");
+            if self.case_first {
+                switch_capitalization_char(&mut chars[0])
+            }
+            return Cow::Owned(chars.into_iter().collect::<String>())
+        }
+        let mut end_index = input.len();
+        for _ in 0..self.pop_end {
+            let Some(chr) = chars.pop() else {
+                return return Cow::Borrowed("");
+            };
+            end_index -= chr.len_utf8();
+        }
+        Cow::Borrowed(&input[0..end_index])
     }
 }
 
@@ -36,7 +58,7 @@ fn switch_capitalization_char(orig_first: &mut char) {
                 *orig_first = switch_first;
                 return;
             }
-        },
+        }
         None => {}
     };
     let mut lower = orig_first.to_lowercase();
@@ -47,7 +69,7 @@ fn switch_capitalization_char(orig_first: &mut char) {
                 *orig_first = switch_first;
                 return;
             }
-        },
+        }
         None => {}
     }
 }
