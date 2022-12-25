@@ -1,3 +1,4 @@
+
 /// Dictionary entry transformations.
 /// This file is also included from `build.rs`
 
@@ -5,6 +6,7 @@ use ::std::borrow::Cow;
 
 use ::tinyvec::ArrayVec;
 
+#[allow(dead_code)]
 pub const LONGEST_DICT_ENTRY_BYTES: usize = 22;  // located in this file because of build.rs
 
 #[derive(Debug, Clone, PartialEq)]
@@ -61,6 +63,7 @@ impl TextTransformation {
     }
 }
 
+#[allow(dead_code)]
 fn switch_capitalization_char(orig_first: &mut char) {
     //TODO @mark: move this functions? add tests
     let mut upper = orig_first.to_uppercase();

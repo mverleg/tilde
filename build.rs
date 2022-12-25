@@ -9,13 +9,16 @@ use ::std::fs;
 mod texttrans {
     include!("src/common/text_trans.rs");
 }
+mod build_text {
+    include!("src/common/build_text.rs");
+}
 
 fn main() {
     println!("cargo:rerun-if-changed=Cargo.toml");
+    println!("cargo:rerun-if-changed=build.rs");
     println!("cargo:rerun-if-changed=dictionary.txt");
     let base_dict_str = fs::read_to_string("./dictionary.txt").unwrap();
-    let base_dict_entries = base_dict_str.lines().enumerate()
-        .map(|(indx, word)| (word))
+    let base_dict_entries = base_dict_str.lines()
         .collect::<Vec<_>>();
     let code = generate_base_dict_code(&base_dict_entries);
     write_dict_code(&code);
@@ -26,7 +29,7 @@ fn main() {
 fn generate_base_dict_code(base_dict_entries: &[&str]) -> String {
     let mut buffer = format!("");
     buffer.push_str(&format!("pub const DICT: [DictEntry; {}] = [\n", base_dict_entries.len()));
-    for (index, entry) in base_dict_entries.iter().enumerate() {
+    for entry in base_dict_entries.iter() {
         let creator = match *entry {
             "$magic-backspace$" => "DictEntry::Backspace".to_owned(),
             "$magic-newline$" => "s(\"\\n\")".to_owned(),

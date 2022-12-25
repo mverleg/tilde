@@ -70,25 +70,6 @@ fn encode_uint_with_openers(
     return letters;
 }
 
-/// Estimate the number of letters needed to encode the uint argument.
-pub fn encode_uint_length_estimate(nr: UINT) -> usize {
-    let mut length: usize = 1;
-    let opener_n = (STRING_WITHMOD_OPENERS.len() / 2) as UINT;
-    let follow_2n = STRING_FOLLOWERS.len() as UINT;
-    let follow_1n = follow_2n / 2;
-    let mut non_close_letter_cnt_doubled = 0;
-    let mut rem = nr / opener_n;
-    while rem > 0 {
-        rem -= 1;
-        let block_extra = non_close_letter_cnt_doubled / 2;
-        length += block_extra + 1;
-        let div = follow_1n * follow_2n.pow(block_extra as u32);
-        rem = rem / div;
-        non_close_letter_cnt_doubled += 1;
-    }
-    return length;
-}
-
 /// Inverse of [encode_pos_int_static_width_avoid_modifiers].
 pub fn decode_uint_no_modifier_at_start(letters: &[Letter]) -> Result<Pos<UINT>, DecodeError> {
     if letters.is_empty() {
@@ -206,6 +187,23 @@ impl fmt::Display for DecodeError {
                 DecodeError::NoEndMarker => "unexpected end while decoding number; last letter should be marked",
             }
         )
+    }
+}
+
+#[cfg(test)]
+mod size_estimate {
+    use crate::common::encode_snippet_len_estimate;
+
+    use super::*;
+
+    #[test]
+    fn size_estimate_close_to_actual() {
+        let n = 50_000;
+        for i in 0..n {
+            let estimate = encode_snippet_len_estimate(i);
+            let actual = encode_uint_allow_modifiers(i).len();
+            assert!(estimate == actual, "size {estimate} vs {actual} for {i}");
+        }
     }
 }
 
@@ -465,21 +463,6 @@ mod dynamic_width_common_allow_modifiers {
     }
 
     common_tests!(encode_uint_allow_modifiers, decode_uint_allow_modifiers);
-}
-
-#[cfg(test)]
-mod size_estimate {
-    use super::*;
-
-    #[test]
-    fn size_estimate_close_to_actual() {
-        let n = 50_000;
-        for i in 0..n {
-            let estimate = encode_uint_length_estimate(i);
-            let actual = encode_uint_allow_modifiers(i).len();
-            assert!(estimate == actual, "size {estimate} vs {actual} for {i}");
-        }
-    }
 }
 
 macro_rules! common_tests {
