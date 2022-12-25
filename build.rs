@@ -6,7 +6,6 @@ use ::std::fmt::Write;
 use ::std::fs;
 use ::std::path::PathBuf;
 
-use crate::text_trans::DerivationInfo;
 use crate::text_trans::TextTransformation;
 
 // use ::std::path::PathBuf;
@@ -57,7 +56,15 @@ fn generate_base_dict_code(base_dict_entries: &[&str]) -> String {
     buffer
 }
 
-fn generate_derived_dict_code(derivations: &[DerivationInfo]) -> String {
+#[derive(Debug)]
+pub struct BuildDerivationInfo {
+    pub derived_text: String,
+    pub original_index: usize,
+    pub transformation: TextTransformation,
+    pub cost: usize,
+}
+
+fn generate_derived_dict_code(derivations: &[BuildDerivationInfo]) -> String {
     let mut buffer = String::new();
     let mut derivation_options = derivations.iter()
         .map(|deriv| (deriv.transformation.name(), &deriv.transformation))
@@ -66,14 +73,19 @@ fn generate_derived_dict_code(derivations: &[DerivationInfo]) -> String {
         .collect::<Vec<_>>();
     derivation_options.sort_by(|entry1, entry2| entry1.0.cmp(&entry2.0));
     for (tt_name, tt) in derivation_options {
-        write!(buffer, "#[inline]\nfn {}() -> TextTransformation {{ \
-        TextTransformation {{ case_first: {}, case_all: {}, reverse: {}, pop_start: {}, pop_end: {} }} }}\n\n",
+        write!(buffer, "#[inline]\nconst fn {}(derived_text: &'static str, original_index: usize, cost: usize) -> DerivationInfo {{
+            let transformation = TextTransformation {{ case_first: {}, case_all: {}, reverse: {}, pop_start: {}, pop_end: {} }};
+            DerivationInfo {{ derived_text, original_index, transformation, cost }} }}\n\n",
                tt_name, tt.case_first, tt.case_all, tt.reverse, tt.pop_start, tt.pop_end).unwrap();
     }
 
-    write!(buffer, "pub const DICT: [DerivationInfo; {}] = [\n", derivations.len()).unwrap();
+    write!(buffer, "pub const DERIVED: [DerivationInfo; {}] = [\n", derivations.len()).unwrap();
     for deriv in derivations.iter() {
-        todo!();
+        write!(buffer, "\t{}(", deriv.transformation.name()).unwrap();
+        write!(buffer, "\"{}\", ", deriv.derived_text.replace("\"", "\\\"")).unwrap();
+        write!(buffer, "{}, ", deriv.original_index).unwrap();
+        write!(buffer, "{}", deriv.cost).unwrap();
+        write!(buffer, "),\n").unwrap();
         //write!(buffer, "\t{creator},\n").unwrap();
     }
     write!(buffer, "];\n\n").unwrap();
@@ -128,7 +140,7 @@ fn generate_derivation_options() -> Vec<TextTransformation> {
 fn collect_cheapest_derivations<'a>(
     base_dict_entries: &[&'a str],
     transformations: &'a [TextTransformation]
-) -> Vec<DerivationInfo> {
+) -> Vec<BuildDerivationInfo> {
     let mut min_costs: HashMap<Cow<str>, (usize, Cost, &TextTransformation)> = HashMap::new();
     for (index, entry) in base_dict_entries.iter().enumerate() {
         if entry.starts_with("$magic-") {
@@ -150,7 +162,7 @@ fn collect_cheapest_derivations<'a>(
         }
     }
     let mut result = min_costs.into_iter()
-        .map(|(key, value)| DerivationInfo {
+        .map(|(key, value)| BuildDerivationInfo {
             original_index: value.0,
             derived_text: key.into_owned(),
             cost: value.1,

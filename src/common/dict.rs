@@ -17,10 +17,11 @@ pub enum DictEntry {
 }
 
 #[derive(Debug)]
-pub struct DerivedEntry {
-    base_entry: DictEntry,
-    transform: TextTransformation,
-    cost: usize,
+pub struct DerivationInfo {
+    pub derived_text: &'static str,
+    pub original_index: usize,
+    pub transformation: TextTransformation,
+    pub cost: usize,
 }
 
 #[inline]

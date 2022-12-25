@@ -106,14 +106,6 @@ fn switch_capitalization_char(orig_first: &mut char) {
     }
 }
 
-#[derive(Debug)]
-pub struct DerivationInfo {
-    pub original_index: usize,
-    pub derived_text: String,
-    pub cost: usize,
-    pub transformation: TextTransformation,
-}
-
 #[cfg(test)]
 mod capitalisation {
     use super::*;
