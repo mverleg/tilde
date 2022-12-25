@@ -1,4 +1,4 @@
-pub use self::texttrans::TextTransformation;
+pub use self::text_trans::TextTransformation;
 pub use self::dict::INDX;
 pub use self::dict::lookup_buffer;
 pub use self::log::log;
@@ -8,4 +8,4 @@ mod log;
 //mod compress;
 //TODO @mark: ^
 mod trie;
-mod texttrans;
+mod text_trans;

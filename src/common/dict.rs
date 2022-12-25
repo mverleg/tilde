@@ -63,7 +63,7 @@ include!(concat!(env!("OUT_DIR"), "/dict_init.rs"));
 
 #[cfg(test)]
 mod tests {
-    use crate::common::texttrans::LONGEST_DICT_ENTRY_BYTES;
+    use crate::common::text_trans::LONGEST_DICT_ENTRY_BYTES;
     use super::*;
 
     #[test]

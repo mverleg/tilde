@@ -6,7 +6,9 @@ use ::std::fs;
 
 // use ::std::path::PathBuf;
 
-include!("src/common/texttrans.rs");
+mod texttrans {
+    include!("src/common/text_trans.rs");
+}
 
 fn main() {
     println!("cargo:rerun-if-changed=Cargo.toml");
@@ -23,7 +25,7 @@ fn main() {
 fn generate_base_dict_code(base_dict_entries: &[&str]) -> String {
     let mut buffer = format!("");
     buffer.push_str(&format!("pub const DICT: [DictEntry; {}] = [\n", base_dict_entries.len()));
-    for entry in base_dict_entries {
+    for (index, entry) in base_dict_entries.iter().enumerate() {
         let creator = match *entry {
             "$magic-backspace$" => "DictEntry::Backspace".to_owned(),
             "$magic-newline$" => "s(\"\\n\")".to_owned(),
@@ -33,6 +35,7 @@ fn generate_base_dict_code(base_dict_entries: &[&str]) -> String {
             _ => if entry.ends_with("$capitalize-next$") {
                 format!("S(\"{}\")", entry.strip_suffix("$capitalize-next$").unwrap())
             } else {
+                assert!(!entry.contains("$magic"));
                 format!("s(\"{}\")", entry)
             },
         };

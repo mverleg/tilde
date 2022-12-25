@@ -22,8 +22,6 @@ use crate::tilde_log;
 use crate::UINT;
 use crate::Value::Num;
 
-//TODO @mark: interpret 0 as backspace
-
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub enum Closer {
     Text,
