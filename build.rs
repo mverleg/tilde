@@ -2,6 +2,8 @@ use ::std::env;
 use ::std::fs;
 use ::std::path::PathBuf;
 
+use crate::text_trans::TextTransformation;
+
 // use ::std::path::PathBuf;
 
 mod text_trans {
@@ -18,7 +20,10 @@ fn main() {
     let base_dict_str = fs::read_to_string("./dictionary.txt").unwrap();
     let base_dict_entries = base_dict_str.lines()
         .collect::<Vec<_>>();
-    let code = generate_base_dict_code(&base_dict_entries);
+    let mut code = generate_base_dict_code(&base_dict_entries);
+    let derivation_options = generate_derivation_options();
+    let derivations = collect_cheapest_derivations(&base_dict_entries, &derivation_options);
+    code.push_str(&generate_derived_dict_code());
     write_dict_code(&code);
 }
 
@@ -43,6 +48,62 @@ fn generate_base_dict_code(base_dict_entries: &[&str]) -> String {
     }
     buffer.push_str("];\n\n");
     buffer
+}
+
+fn generate_derived_dict_code() -> String {
+    todo!()
+    // let mut buffer = String::new();
+    // buffer.push_str(&format!("pub const DERIVED_DICT: [DictEntry; {}] = [\n", base_dict_entries.len()));
+    // for entry in base_dict_entries.iter() {
+    //     let creator = match *entry {
+    //         "$magic-backspace$" => "DictEntry::Backspace".to_owned(),
+    //         "$magic-newline$" => "s(\"\\n\")".to_owned(),
+    //         "$magic-capitalize-first$" => "DictEntry::CapitalizeFirst".to_owned(),
+    //         "$magic-capitalize all$" => "DictEntry::CapitalizeAll".to_owned(),
+    //         "\"" => "s(\"\\\"\")".to_owned(),
+    //         _ => if entry.ends_with("$capitalize-next$") {
+    //             format!("S(\"{}\")", entry.strip_suffix("$capitalize-next$").unwrap())
+    //         } else {
+    //             assert!(!entry.contains("$magic"));
+    //             format!("s(\"{}\")", entry)
+    //         },
+    //     };
+    //     buffer.push_str(&format!("\t{creator},\n"))
+    // }
+    // buffer.push_str("];\n\n");
+    // buffer
+}
+
+fn generate_derivation_options() -> Vec<TextTransformation> {
+    let mut transformations = vec![];
+    for case_first in [true, false] {
+        for case_all in [true, false] {
+            for reverse in [true, false] {
+                for pop_start in [0, 1, 2] {
+                    for pop_end in [0, 1, 2, 3] {
+                        transformations.push(TextTransformation {
+                            case_first,
+                            case_all,
+                            reverse,
+                            pop_start,
+                            pop_end,
+                        })
+                    }
+                }
+            }
+        }
+    }
+    assert!(transformations.len() < 10);
+    transformations
+}
+
+fn collect_cheapest_derivations(base_dict_entries: &[&str], transformations: &[TextTransformation]) -> Vec<()> {
+    for entry in base_dict_entries {
+        for trans in transformations {
+            let deriv = trans.apply(entry);
+        }
+    }
+    todo!()
 }
 
 fn write_dict_code(code: &str) {
