@@ -1,14 +1,19 @@
+
+/// Dictionary entry transformations.
+/// This file is also included from `build.rs`
+
 use ::std::borrow::Cow;
 
 use ::tinyvec::ArrayVec;
 
-use crate::common::dict::LONGEST_DICT_ENTRY_BYTES;
-use crate::exec::Text;
+pub const LONGEST_DICT_ENTRY_BYTES: usize = 22;  // located in this file because of build.rs
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct TextTransformation {
     pub case_first: bool,
     pub case_all: bool,
+    pub reverse: bool,
+    pub pop_start: u8,
     pub pop_end: u8,
 }
 
@@ -17,6 +22,8 @@ impl TextTransformation {
         TextTransformation {
             case_first: false,
             case_all: false,
+            reverse: false,
+            pop_start: 0,
             pop_end: 0,
         }
     }
@@ -25,16 +32,18 @@ impl TextTransformation {
         if self == &Self::new_noop() {
             return Cow::Borrowed(input);
         }
-        if input.len() <= self.pop_end as usize {
+        if input.len() <= self.pop_start as usize + self.pop_end as usize {
             return Cow::Borrowed(input);
         }
+        assert!(self.pop_start == 0, "pop_start not impl");
+        assert!(!self.reverse, "reverse not impl");
         let mut chars = input.chars().collect::<ArrayVec<[char; LONGEST_DICT_ENTRY_BYTES]>>();
         if self.case_all || self.case_first {
             // need to alloc string
             for _ in 0..self.pop_end {
                 chars.pop();
             }
-            assert!(!self.case_all, "not impl");
+            assert!(!self.case_all, "case_all not impl");
             if self.case_first {
                 println!("cap first for '{input}'"); //TODO @mark: TEMPORARY! REMOVE THIS!
                 switch_capitalization_char(&mut chars[0])
@@ -45,7 +54,7 @@ impl TextTransformation {
         let mut end_index = input.len();
         for _ in 0..self.pop_end {
             let Some(chr) = chars.pop() else {
-                return return Cow::Borrowed("");
+                return Cow::Borrowed("");
             };
             end_index -= chr.len_utf8();
         }

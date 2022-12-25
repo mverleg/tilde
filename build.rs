@@ -5,9 +5,9 @@ use ::std::path::PathBuf;
 use ::std::fs;
 
 // use ::std::path::PathBuf;
-//
-// include!("src/common/dict_derive.rs");
-//
+
+include!("src/common/texttrans.rs");
+
 fn main() {
     println!("cargo:rerun-if-changed=Cargo.toml");
     println!("cargo:rerun-if-changed=dictionary.txt");

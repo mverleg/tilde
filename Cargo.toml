@@ -16,6 +16,7 @@ strum_macros = { version = "0.24", default-features = false }
 tinyvec = { version = "1.6.0", default-features = false, features = ["rustc_1_57"] }
 
 [build-dependencies]
+tinyvec = { version = "1.6.0", default-features = false, features = ["rustc_1_57"] }
 
 [profile.release]
 opt-level = 'z'     # Optimize for size.

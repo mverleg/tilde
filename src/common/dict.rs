@@ -7,7 +7,6 @@
 use crate::common::TextTransformation;
 
 pub type INDX = u16;
-pub const LONGEST_DICT_ENTRY_BYTES: usize = 22;
 
 #[derive(Debug, Clone, Copy)]
 pub enum DictEntry {
@@ -50,10 +49,10 @@ pub fn lookup_buffer(indices: &[INDX], buffer: &mut String, char_buffer: &mut Ve
                 transform.pop_end += 1;
             }
             DictEntry::CapitalizeFirst => {
-                transform.case_first = true;
+                transform.case_first = !transform.case_first;
             }
             DictEntry::CapitalizeAll => {
-                transform.case_all = true;
+                transform.case_all = !transform.case_all;
             }
         }
     }
@@ -64,6 +63,7 @@ include!(concat!(env!("OUT_DIR"), "/dict_init.rs"));
 
 #[cfg(test)]
 mod tests {
+    use crate::common::texttrans::LONGEST_DICT_ENTRY_BYTES;
     use super::*;
 
     #[test]
