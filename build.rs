@@ -2,9 +2,14 @@ use ::std::env;
 use ::std::fs;
 use ::std::path::PathBuf;
 use ::std::fmt::Write;
+use ::std::borrow::Cow;
+use ::std::collections::hash_map::Entry;
+use ::std::collections::HashMap;
 use crate::text_trans::TextTransformation;
 
 // use ::std::path::PathBuf;
+
+type Cost = usize;
 
 mod text_trans {
     include!("src/common/text_trans.rs");
@@ -29,7 +34,7 @@ fn main() {
 
 fn generate_base_dict_code(base_dict_entries: &[&str]) -> String {
     let mut buffer = format!("");
-    buffer.push_str(&format!("pub const DICT: [DictEntry; {}] = [\n", base_dict_entries.len()));
+    write!(buffer, "pub const DICT: [DictEntry; {}] = [\n", base_dict_entries.len()).unwrap();
     for entry in base_dict_entries.iter() {
         let creator = match *entry {
             "$magic-backspace$" => "DictEntry::Backspace".to_owned(),
@@ -44,23 +49,18 @@ fn generate_base_dict_code(base_dict_entries: &[&str]) -> String {
                 format!("s(\"{}\")", entry)
             },
         };
-        buffer.push_str(&format!("\t{creator},\n"))
+        write!(buffer, "\t{creator},\n").unwrap();
     }
-    buffer.push_str("];\n\n");
+    write!(buffer, "];\n\n").unwrap();
     buffer
 }
 
 fn generate_derived_dict_code(derivations: &Vec<()>, derivation_options: &Vec<TextTransformation>) -> String {
     let mut buffer = String::new();
     for tt in derivation_options {
-        write!(buffer, "#[inline]\nfn {}() -> TextTransformation {{
-TextTransformation {{
-case_first: {}
-case_all: {}
-reverse: {}
-pop_start: {}
-pop_end: {} }}
-}}\n\n", tt.name(), tt.case_first, tt.case_all, tt.reverse, tt.pop_start, tt.pop_end).unwrap();
+        write!(buffer, "#[inline]\nfn {}() -> TextTransformation {{ \
+        TextTransformation {{ case_first: {}, case_all: {}, reverse: {}, pop_start: {}, pop_end: {} }} }}\n\n",
+               tt.name(), tt.case_first, tt.case_all, tt.reverse, tt.pop_start, tt.pop_end).unwrap();
     }
     todo!()
     // buffer.push_str(&format!("pub const DERIVED_DICT: [DictEntry; {}] = [\n", base_dict_entries.len()));
@@ -111,9 +111,25 @@ fn generate_derivation_options() -> Vec<TextTransformation> {
 }
 
 fn collect_cheapest_derivations(base_dict_entries: &[&str], transformations: &[TextTransformation]) -> Vec<()> {
+    let mut min_costs: HashMap<Cow<str>, (Cost, &TextTransformation)> = HashMap::new();
     for entry in base_dict_entries {
+        if entry.starts_with("$magic-") {
+            continue
+        }
         for trans in transformations {
             let deriv = trans.apply(entry);
+            let cost: Cost = 1;  //TODO @mark:
+            match min_costs.entry(deriv) {
+                Entry::Occupied(mut prev) => {
+                    if cost < prev.get().0 {
+                        prev.insert((cost, trans));
+                    }
+                }
+                Entry::Vacant(prev) => {
+                    prev.insert((cost, trans));
+                },
+            }
+            //TODO @mark:
         }
     }
     todo!()
