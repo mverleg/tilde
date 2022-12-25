@@ -5,6 +5,7 @@ use ::std::fmt::Write;
 use ::std::borrow::Cow;
 use ::std::collections::hash_map::Entry;
 use ::std::collections::HashMap;
+use ::std::collections::HashSet;
 use crate::text_trans::TextTransformation;
 
 // use ::std::path::PathBuf;
@@ -28,7 +29,7 @@ fn main() {
     let mut code = generate_base_dict_code(&base_dict_entries);
     let derivation_options = generate_derivation_options();
     let derivations = collect_cheapest_derivations(&base_dict_entries, &derivation_options);
-    code.push_str(&generate_derived_dict_code(&derivations, &derivation_options));
+    code.push_str(&generate_derived_dict_code(&derivations));
     write_dict_code(&code);
 }
 
@@ -55,8 +56,14 @@ fn generate_base_dict_code(base_dict_entries: &[&str]) -> String {
     buffer
 }
 
-fn generate_derived_dict_code(derivations: &Vec<()>, derivation_options: &Vec<TextTransformation>) -> String {
+fn generate_derived_dict_code(derivations: &[DerivationInfo]) -> String {
     let mut buffer = String::new();
+    let mut derivation_options = derivations.iter()
+        .map(|deriv| deriv.transformation)
+        .collect::<HashSet<_>>()
+        .into_iter()
+        .collect::<Vec<_>>();
+    derivation_options.sort();
     for tt in derivation_options {
         write!(buffer, "#[inline]\nfn {}() -> TextTransformation {{ \
         TextTransformation {{ case_first: {}, case_all: {}, reverse: {}, pop_start: {}, pop_end: {} }} }}\n\n",
@@ -110,9 +117,20 @@ fn generate_derivation_options() -> Vec<TextTransformation> {
     transformations
 }
 
-fn collect_cheapest_derivations(base_dict_entries: &[&str], transformations: &[TextTransformation]) -> Vec<()> {
-    let mut min_costs: HashMap<Cow<str>, (Cost, &TextTransformation)> = HashMap::new();
-    for entry in base_dict_entries {
+#[derive(Debug)]
+struct DerivationInfo<'a> {
+    original_index: usize,
+    derived_text: String,
+    cost: Cost,
+    transformation: &'a TextTransformation,
+}
+
+fn collect_cheapest_derivations<'a>(
+    base_dict_entries: &[&'a str],
+    transformations: &'a [TextTransformation]
+) -> Vec<DerivationInfo<'a>> {
+    let mut min_costs: HashMap<Cow<str>, (usize, Cost, &TextTransformation)> = HashMap::new();
+    for (index, entry) in base_dict_entries.iter().enumerate() {
         if entry.starts_with("$magic-") {
             continue
         }
@@ -122,17 +140,25 @@ fn collect_cheapest_derivations(base_dict_entries: &[&str], transformations: &[T
             match min_costs.entry(deriv) {
                 Entry::Occupied(mut prev) => {
                     if cost < prev.get().0 {
-                        prev.insert((cost, trans));
+                        prev.insert((index, cost, trans));
                     }
                 }
                 Entry::Vacant(prev) => {
-                    prev.insert((cost, trans));
+                    prev.insert((index, cost, trans));
                 },
             }
-            //TODO @mark:
         }
     }
-    todo!()
+    let mut result = min_costs.into_iter()
+        .map(|(key, value)| DerivationInfo {
+            original_index: value.0,
+            derived_text: key.into_owned(),
+            cost: value.1,
+            transformation: value.2,
+        })
+        .collect::<Vec<_>>();
+    result.sort_by(|deriv1, deriv2| deriv1.derived_text.cmp(&deriv2.derived_text));
+    result
 }
 
 fn write_dict_code(code: &str) {

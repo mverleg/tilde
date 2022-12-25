@@ -9,7 +9,7 @@ use ::tinyvec::ArrayVec;
 #[allow(dead_code)]
 pub const LONGEST_DICT_ENTRY_BYTES: usize = 22;  // located in this file because of build.rs
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct TextTransformation {
     pub case_first: bool,
     pub case_all: bool,
