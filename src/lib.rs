@@ -10,11 +10,12 @@ use ::std::io::Read;
 use ::std::path::Path;
 use ::std::process::ExitCode;
 
-#[cfg(feature = "gen")]
-pub use self::gen::mddoc::tilde_gen_md_docs;
 pub use crate::common::log as tilde_log;
 use crate::compile::parse;
 pub use crate::exec::Value;
+
+#[cfg(feature = "gen")]
+pub use self::gen::mddoc::tilde_gen_md_docs;
 
 mod common;
 mod compile;

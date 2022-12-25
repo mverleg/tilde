@@ -1,13 +1,14 @@
-pub use self::data::Array;
-pub use self::data::Number;
-pub use self::data::Text;
-pub use self::data::Value;
 use crate::common::log;
 // use crate::exec::mathbool::exec_math1;
 // use crate::exec::mathbool::exec_math2;
 use crate::op::Op;
 use crate::op::Prog;
 use crate::TildeRes;
+
+pub use self::data::Array;
+pub use self::data::Number;
+pub use self::data::Text;
+pub use self::data::Value;
 
 mod data;
 // mod mathbool;

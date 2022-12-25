@@ -14,7 +14,8 @@ fn main() {
     println!("cargo:rerun-if-changed=Cargo.toml");
     println!("cargo:rerun-if-changed=dictionary.txt");
     let base_dict_str = fs::read_to_string("./dictionary.txt").unwrap();
-    let base_dict_entries = base_dict_str.lines()
+    let base_dict_entries = base_dict_str.lines().enumerate()
+        .map(|(indx, word)| (word))
         .collect::<Vec<_>>();
     let code = generate_base_dict_code(&base_dict_entries);
     write_dict_code(&code);

@@ -1,8 +1,8 @@
 pub use ::std::slice;
 use ::std::vec;
 
-use crate::op::typ::Typ;
 use crate::op::Op;
+use crate::op::typ::Typ;
 
 #[derive(Debug, PartialEq)]
 pub struct Prog {

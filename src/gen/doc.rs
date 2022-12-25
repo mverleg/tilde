@@ -1,6 +1,6 @@
+use crate::compile::ALPHABET;
 use crate::compile::Letter;
 use crate::compile::Word;
-use crate::compile::ALPHABET;
 use crate::gen::input::gen_inputs;
 use crate::op::Math1Op;
 use crate::op::Op;

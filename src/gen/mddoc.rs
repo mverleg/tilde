@@ -1,8 +1,8 @@
 use ::std::fmt::Formatter;
 use ::std::fs;
 
-use crate::compile::Letter;
 use crate::compile::ALPHABET;
+use crate::compile::Letter;
 use crate::gen::doc::gen_grouped_docs;
 use crate::gen::doc::OpDoc;
 use crate::TildeRes;

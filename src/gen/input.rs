@@ -1,7 +1,7 @@
+use crate::compile::ALPHABET;
 use crate::compile::LetterType;
 use crate::compile::Modifiers;
 use crate::compile::Word;
-use crate::compile::ALPHABET;
 
 /// Generate all possible input starters with up to N modifiers.
 pub fn gen_inputs() -> Vec<Word> {

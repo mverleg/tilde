@@ -2,6 +2,7 @@ use ::std::fmt;
 use ::std::fmt::Formatter;
 use ::std::hash::Hash;
 use ::std::hash::Hasher;
+
 use ::strum_macros::EnumIter;
 
 //TODO @mark: meaningful names
@@ -131,6 +132,7 @@ impl Letter {
 #[cfg(test)]
 mod tests {
     use ::std::collections::HashSet;
+
     use ::strum::IntoEnumIterator;
 
     use super::*;

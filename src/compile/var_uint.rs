@@ -1,11 +1,14 @@
 use ::std::fmt;
 use ::std::fmt::Formatter;
+
 use ::strum::IntoEnumIterator;
 
 use crate::compile::letter::Letter;
 use crate::compile::letter::Letter::*;
+use crate::compile::parse::Pos;
 use crate::compile::var_uint::DecodeError::TooLarge;
 use crate::op::Op;
+use crate::UINT;
 
 //TODO: maybe make this a separate crate, if it can be decoupled from Letter?
 
@@ -68,7 +71,7 @@ fn encode_uint_with_openers(
 }
 
 /// Estimate the number of letters needed to encode the uint argument.
-fn encode_uint_length_estimate(nr: UINT) -> usize {
+pub fn encode_uint_length_estimate(nr: UINT) -> usize {
     let mut length: usize = 1;
     let opener_n = (STRING_WITHMOD_OPENERS.len() / 2) as UINT;
     let follow_2n = STRING_FOLLOWERS.len() as UINT;
@@ -208,8 +211,9 @@ impl fmt::Display for DecodeError {
 
 #[cfg(test)]
 mod constants_in_sync {
-    use super::*;
     use crate::compile::letter::LetterKind;
+
+    use super::*;
 
     fn select_letters(predicate: impl Fn(&Letter) -> bool) -> Vec<Letter> {
         let mut allowed: Vec<Letter> = Letter::iter()
@@ -294,9 +298,10 @@ mod constants_in_sync {
 mod test_util {
     use ::std::collections::HashSet;
 
-    use super::*;
     use crate::compile::letter::LetterKind;
     use crate::compile::var_uint::DecodeError::TextNode;
+
+    use super::*;
 
     pub fn encoding_to_str_for_debug(letters: &[Letter]) -> String {
         let enc = letters
@@ -472,7 +477,6 @@ mod size_estimate {
         for i in 0..n {
             let estimate = encode_uint_length_estimate(i);
             let actual = encode_uint_allow_modifiers(i).len();
-            //assert!(estimate == actual || estimate + 1 == actual, "size {estimate} vs {actual} for {i}");
             assert!(estimate == actual, "size {estimate} vs {actual} for {i}");
         }
     }
@@ -567,5 +571,3 @@ macro_rules! common_tests {
 
 pub(self) use common_tests;
 
-use crate::compile::parse::Pos;
-use crate::UINT;

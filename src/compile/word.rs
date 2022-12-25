@@ -1,8 +1,8 @@
 use ::std::fmt;
 
 use crate::compile::Letter;
-use crate::TildeRes;
 use crate::NR;
+use crate::TildeRes;
 
 //TODO @mverleg: this is only suitable for general context for now
 

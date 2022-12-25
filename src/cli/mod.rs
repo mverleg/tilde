@@ -1,12 +1,13 @@
 use ::std::fs::read_to_string;
-use ::std::io::stdin;
 use ::std::io::BufRead;
+use ::std::io::stdin;
+use ::std::sync::Arc;
 use ::std::sync::atomic::AtomicBool;
 use ::std::sync::atomic::Ordering;
-use ::std::sync::Arc;
 use ::std::thread;
 use ::std::thread::sleep;
 use ::std::time::Duration;
+
 use ::tilde::tilde_analyze;
 use ::tilde::tilde_gen_md_docs;
 use ::tilde::tilde_log;

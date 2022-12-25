@@ -1,12 +1,12 @@
+use ::std::convert::TryInto;
 use ::std::fmt;
 use ::std::fmt::Formatter;
-use ::std::convert::TryInto;
 use ::std::iter::Iterator;
 
 use ::strum::IntoEnumIterator;
-use crate::common::lookup_buffer;
-use crate::common::INDX;
 
+use crate::common::INDX;
+use crate::common::lookup_buffer;
 use crate::compile::letter::Letter;
 use crate::compile::letter::Letter::*;
 use crate::compile::parse::Pos;
