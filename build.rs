@@ -1,7 +1,7 @@
 use ::std::env;
 use ::std::fs;
 use ::std::path::PathBuf;
-
+use ::std::fmt::Write;
 use crate::text_trans::TextTransformation;
 
 // use ::std::path::PathBuf;
@@ -23,7 +23,7 @@ fn main() {
     let mut code = generate_base_dict_code(&base_dict_entries);
     let derivation_options = generate_derivation_options();
     let derivations = collect_cheapest_derivations(&base_dict_entries, &derivation_options);
-    code.push_str(&generate_derived_dict_code());
+    code.push_str(&generate_derived_dict_code(&derivations, &derivation_options));
     write_dict_code(&code);
 }
 
@@ -50,9 +50,19 @@ fn generate_base_dict_code(base_dict_entries: &[&str]) -> String {
     buffer
 }
 
-fn generate_derived_dict_code() -> String {
+fn generate_derived_dict_code(derivations: &Vec<()>, derivation_options: &Vec<TextTransformation>) -> String {
+    let mut buffer = String::new();
+    for tt in derivation_options {
+        write!(buffer, "#[inline]\nfn {}() -> TextTransformation {{
+TextTransformation {{
+case_first: {}
+case_all: {}
+reverse: {}
+pop_start: {}
+pop_end: {} }}
+}}\n\n", tt.name(), tt.case_first, tt.case_all, tt.reverse, tt.pop_start, tt.pop_end).unwrap();
+    }
     todo!()
-    // let mut buffer = String::new();
     // buffer.push_str(&format!("pub const DERIVED_DICT: [DictEntry; {}] = [\n", base_dict_entries.len()));
     // for entry in base_dict_entries.iter() {
     //     let creator = match *entry {

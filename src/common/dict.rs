@@ -23,10 +23,12 @@ pub struct DerivedEntry {
     cost: usize,
 }
 
+#[inline]
 const fn s(snip: &'static str) -> DictEntry {
     DictEntry::Snippet{ snip, capitalize_next: false, }
 }
 //noinspection RsFunctionNaming
+#[inline]
 const fn S(snip: &'static str) -> DictEntry {
     DictEntry::Snippet{ snip, capitalize_next: true, }
 }

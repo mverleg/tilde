@@ -1,8 +1,8 @@
-
 /// Dictionary entry transformations.
 /// This file is also included from `build.rs`
 
 use ::std::borrow::Cow;
+use ::std::fmt::Write;
 
 use ::tinyvec::ArrayVec;
 
@@ -60,6 +60,23 @@ impl TextTransformation {
             end_index -= chr.len_utf8();
         }
         Cow::Borrowed(&input[0..end_index])
+    }
+
+    pub fn name(&self) -> String {
+        let mut repr = String::with_capacity(6);
+        write!(repr, "{}", match (self.case_all, self.case_first) {
+            (true, false) => 'a',
+            (false, true) => 'f',
+            (true, true) => 'w',
+            (false, false) => 'n',
+        }).unwrap();
+        write!(repr, "{}", if self.reverse { 'r' } else { 'i' }).unwrap();
+        if self.pop_start >= 10 || self.pop_end >= 10 {
+            write!(repr, "{}_{}", self.pop_start, self.pop_end).unwrap();
+        } else {
+            write!(repr, "{}{}", self.pop_start, self.pop_end).unwrap();
+        }
+        repr
     }
 }
 
