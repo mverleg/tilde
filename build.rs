@@ -76,10 +76,13 @@ fn generate_derived_dict_code() -> String {
 
 fn generate_derivation_options() -> Vec<TextTransformation> {
     let mut transformations = vec![];
-    for case_first in [true, false] {
-        for case_all in [true, false] {
-            for reverse in [true, false] {
-                for pop_start in [0, 1, 2] {
+    for case_first in [false, true] {
+        for case_all in [false] {
+            //TODO @mark: ^
+            for reverse in [false] {
+                //TODO @mark: ^
+                for pop_start in [0] {
+                    //TODO @mark: ^
                     for pop_end in [0, 1, 2, 3] {
                         transformations.push(TextTransformation {
                             case_first,
@@ -93,7 +96,7 @@ fn generate_derivation_options() -> Vec<TextTransformation> {
             }
         }
     }
-    assert!(transformations.len() < 10);
+    assert!(transformations.len() <= 100);
     transformations
 }
 
