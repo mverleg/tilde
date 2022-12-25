@@ -1,12 +1,10 @@
-// use ::std::collections::HashSet;
 use ::std::env;
-use ::std::path::PathBuf;
-
 use ::std::fs;
+use ::std::path::PathBuf;
 
 // use ::std::path::PathBuf;
 
-mod texttrans {
+mod text_trans {
     include!("src/common/text_trans.rs");
 }
 mod build_text {
@@ -22,8 +20,6 @@ fn main() {
         .collect::<Vec<_>>();
     let code = generate_base_dict_code(&base_dict_entries);
     write_dict_code(&code);
-
-//     derived_dict_entries();
 }
 
 fn generate_base_dict_code(base_dict_entries: &[&str]) -> String {
