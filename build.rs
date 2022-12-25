@@ -1,11 +1,12 @@
-use ::std::env;
-use ::std::fs;
-use ::std::path::PathBuf;
-use ::std::fmt::Write;
 use ::std::borrow::Cow;
 use ::std::collections::hash_map::Entry;
 use ::std::collections::HashMap;
-use ::std::collections::HashSet;
+use ::std::env;
+use ::std::fmt::Write;
+use ::std::fs;
+use ::std::path::PathBuf;
+
+use crate::text_trans::DerivationInfo;
 use crate::text_trans::TextTransformation;
 
 // use ::std::path::PathBuf;
@@ -59,17 +60,24 @@ fn generate_base_dict_code(base_dict_entries: &[&str]) -> String {
 fn generate_derived_dict_code(derivations: &[DerivationInfo]) -> String {
     let mut buffer = String::new();
     let mut derivation_options = derivations.iter()
-        .map(|deriv| deriv.transformation)
-        .collect::<HashSet<_>>()
+        .map(|deriv| (deriv.transformation.name(), &deriv.transformation))
+        .collect::<HashMap<_, _>>()
         .into_iter()
         .collect::<Vec<_>>();
-    derivation_options.sort();
-    for tt in derivation_options {
+    derivation_options.sort_by(|entry1, entry2| entry1.0.cmp(&entry2.0));
+    for (tt_name, tt) in derivation_options {
         write!(buffer, "#[inline]\nfn {}() -> TextTransformation {{ \
         TextTransformation {{ case_first: {}, case_all: {}, reverse: {}, pop_start: {}, pop_end: {} }} }}\n\n",
-               tt.name(), tt.case_first, tt.case_all, tt.reverse, tt.pop_start, tt.pop_end).unwrap();
+               tt_name, tt.case_first, tt.case_all, tt.reverse, tt.pop_start, tt.pop_end).unwrap();
     }
-    todo!()
+
+    write!(buffer, "pub const DICT: [DerivationInfo; {}] = [\n", derivations.len()).unwrap();
+    for deriv in derivations.iter() {
+        todo!();
+        //write!(buffer, "\t{creator},\n").unwrap();
+    }
+    write!(buffer, "];\n\n").unwrap();
+
     // buffer.push_str(&format!("pub const DERIVED_DICT: [DictEntry; {}] = [\n", base_dict_entries.len()));
     // for entry in base_dict_entries.iter() {
     //     let creator = match *entry {
@@ -88,7 +96,7 @@ fn generate_derived_dict_code(derivations: &[DerivationInfo]) -> String {
     //     buffer.push_str(&format!("\t{creator},\n"))
     // }
     // buffer.push_str("];\n\n");
-    // buffer
+    buffer
 }
 
 fn generate_derivation_options() -> Vec<TextTransformation> {
@@ -117,18 +125,10 @@ fn generate_derivation_options() -> Vec<TextTransformation> {
     transformations
 }
 
-#[derive(Debug)]
-struct DerivationInfo<'a> {
-    original_index: usize,
-    derived_text: String,
-    cost: Cost,
-    transformation: &'a TextTransformation,
-}
-
 fn collect_cheapest_derivations<'a>(
     base_dict_entries: &[&'a str],
     transformations: &'a [TextTransformation]
-) -> Vec<DerivationInfo<'a>> {
+) -> Vec<DerivationInfo> {
     let mut min_costs: HashMap<Cow<str>, (usize, Cost, &TextTransformation)> = HashMap::new();
     for (index, entry) in base_dict_entries.iter().enumerate() {
         if entry.starts_with("$magic-") {
@@ -154,7 +154,7 @@ fn collect_cheapest_derivations<'a>(
             original_index: value.0,
             derived_text: key.into_owned(),
             cost: value.1,
-            transformation: value.2,
+            transformation: value.2.clone(),
         })
         .collect::<Vec<_>>();
     result.sort_by(|deriv1, deriv2| deriv1.derived_text.cmp(&deriv2.derived_text));
