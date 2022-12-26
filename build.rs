@@ -1,4 +1,3 @@
-use ::std::borrow::Cow;
 use ::std::collections::hash_map::Entry;
 use ::std::collections::HashMap;
 use ::std::env;
@@ -43,8 +42,8 @@ fn generate_base_dict_code(base_dict_entries: &[&str]) -> String {
             "$magic-capitalize-first$" => "DictEntry::CapitalizeFirst".to_owned(),
             "$magic-capitalize all$" => "DictEntry::CapitalizeAll".to_owned(),
             "\"" => "s(\"\\\"\")".to_owned(),
-            _ => if entry.ends_with("$capitalize-next$") {
-                format!("S(\"{}\")", entry.strip_suffix("$capitalize-next$").unwrap())
+            _ => if entry.ends_with("$magic-capitalize-next$") {
+                format!("S(\"{}\")", entry.strip_suffix("$magic-capitalize-next$").unwrap())
             } else {
                 assert!(!entry.contains("$magic"));
                 format!("s(\"{}\")", entry)
@@ -89,25 +88,6 @@ fn generate_derived_dict_code(derivations: &[BuildDerivationInfo]) -> String {
         //write!(buffer, "\t{creator},\n").unwrap();
     }
     write!(buffer, "];\n\n").unwrap();
-
-    // buffer.push_str(&format!("pub const DERIVED_DICT: [DictEntry; {}] = [\n", base_dict_entries.len()));
-    // for entry in base_dict_entries.iter() {
-    //     let creator = match *entry {
-    //         "$magic-backspace$" => "DictEntry::Backspace".to_owned(),
-    //         "$magic-newline$" => "s(\"\\n\")".to_owned(),
-    //         "$magic-capitalize-first$" => "DictEntry::CapitalizeFirst".to_owned(),
-    //         "$magic-capitalize all$" => "DictEntry::CapitalizeAll".to_owned(),
-    //         "\"" => "s(\"\\\"\")".to_owned(),
-    //         _ => if entry.ends_with("$capitalize-next$") {
-    //             format!("S(\"{}\")", entry.strip_suffix("$capitalize-next$").unwrap())
-    //         } else {
-    //             assert!(!entry.contains("$magic"));
-    //             format!("s(\"{}\")", entry)
-    //         },
-    //     };
-    //     buffer.push_str(&format!("\t{creator},\n"))
-    // }
-    // buffer.push_str("];\n\n");
     buffer
 }
 
@@ -141,15 +121,15 @@ fn collect_cheapest_derivations<'a>(
     base_dict_entries: &[&'a str],
     transformations: &'a [TextTransformation]
 ) -> Vec<BuildDerivationInfo> {
-    let mut min_costs: HashMap<Cow<str>, (usize, Cost, &TextTransformation)> = HashMap::new();
+    let mut min_costs: HashMap<String, (usize, Cost, &TextTransformation)> = HashMap::new();
     for (index, entry) in base_dict_entries.iter().enumerate() {
-        if entry.starts_with("$magic-") {
+        if entry.contains("$magic-") {
             continue
         }
         for trans in transformations {
             let deriv = trans.apply(entry);
             let cost: Cost = 1;  //TODO @mark:
-            match min_costs.entry(deriv) {
+            match min_costs.entry(deriv.into_owned()) {
                 Entry::Occupied(mut prev) => {
                     if cost < prev.get().0 {
                         prev.insert((index, cost, trans));
@@ -164,7 +144,7 @@ fn collect_cheapest_derivations<'a>(
     let mut result = min_costs.into_iter()
         .map(|(key, value)| BuildDerivationInfo {
             original_index: value.0,
-            derived_text: key.into_owned(),
+            derived_text: key,
             cost: value.1,
             transformation: value.2.clone(),
         })
