@@ -1,4 +1,3 @@
-use ::std::collections::hash_map::Entry;
 use ::std::collections::HashMap;
 use ::std::env;
 use ::std::fmt::Write;
@@ -7,15 +6,8 @@ use ::std::path::PathBuf;
 
 use crate::text_trans::TextTransformation;
 
-// use ::std::path::PathBuf;
-
-type Cost = usize;
-
 mod text_trans {
     include!("src/common/text_trans.rs");
-}
-mod build_text {
-    include!("src/common/build_text.rs");
 }
 
 fn main() {
@@ -25,10 +17,7 @@ fn main() {
     let base_dict_str = fs::read_to_string("./dictionary.txt").unwrap();
     let base_dict_entries = base_dict_str.lines()
         .collect::<Vec<_>>();
-    let mut code = generate_base_dict_code(&base_dict_entries);
-    let derivation_options = generate_derivation_options();
-    let derivations = collect_cheapest_derivations(&base_dict_entries, &derivation_options);
-    code.push_str(&generate_derived_dict_code(&derivations));
+    let code = generate_base_dict_code(&base_dict_entries);
     write_dict_code(&code);
 }
 
@@ -63,95 +52,95 @@ pub struct BuildDerivationInfo {
     pub cost: usize,
 }
 
-fn generate_derived_dict_code(derivations: &[BuildDerivationInfo]) -> String {
-    let mut buffer = String::new();
-    let mut derivation_options = derivations.iter()
-        .map(|deriv| (deriv.transformation.name(), &deriv.transformation))
-        .collect::<HashMap<_, _>>()
-        .into_iter()
-        .collect::<Vec<_>>();
-    derivation_options.sort_by(|entry1, entry2| entry1.0.cmp(&entry2.0));
-    for (tt_name, tt) in derivation_options {
-        write!(buffer, "#[inline]\nconst fn {}(derived_text: &'static str, original_index: usize, cost: usize) -> DerivationInfo {{
-            let transformation = TextTransformation {{ case_first: {}, case_all: {}, reverse: {}, pop_start: {}, pop_end: {} }};
-            DerivationInfo {{ derived_text, original_index, transformation, cost }} }}\n\n",
-               tt_name, tt.case_first, tt.case_all, tt.reverse, tt.pop_start, tt.pop_end).unwrap();
-    }
+// fn generate_derived_dict_code(derivations: &[BuildDerivationInfo]) -> String {
+//     let mut buffer = String::new();
+//     let mut derivation_options = derivations.iter()
+//         .map(|deriv| (deriv.transformation.name(), &deriv.transformation))
+//         .collect::<HashMap<_, _>>()
+//         .into_iter()
+//         .collect::<Vec<_>>();
+//     derivation_options.sort_by(|entry1, entry2| entry1.0.cmp(&entry2.0));
+//     for (tt_name, tt) in derivation_options {
+//         write!(buffer, "#[inline]\nconst fn {}(derived_text: &'static str, original_index: usize, cost: usize) -> DerivationInfo {{
+//             let transformation = TextTransformation {{ case_first: {}, case_all: {}, reverse: {}, pop_start: {}, pop_end: {} }};
+//             DerivationInfo {{ derived_text, original_index, transformation, cost }} }}\n\n",
+//                tt_name, tt.case_first, tt.case_all, tt.reverse, tt.pop_start, tt.pop_end).unwrap();
+//     }
+//
+//     write!(buffer, "pub const DERIVED: [DerivationInfo; {}] = [\n", derivations.len()).unwrap();
+//     for deriv in derivations.iter() {
+//         write!(buffer, "\t{}(", deriv.transformation.name()).unwrap();
+//         write!(buffer, "\"{}\", ", deriv.derived_text.replace("\"", "\\\"")).unwrap();
+//         write!(buffer, "{}, ", deriv.original_index).unwrap();
+//         write!(buffer, "{}", deriv.cost).unwrap();
+//         write!(buffer, "),\n").unwrap();
+//         //write!(buffer, "\t{creator},\n").unwrap();
+//     }
+//     write!(buffer, "];\n\n").unwrap();
+//     buffer
+// }
 
-    write!(buffer, "pub const DERIVED: [DerivationInfo; {}] = [\n", derivations.len()).unwrap();
-    for deriv in derivations.iter() {
-        write!(buffer, "\t{}(", deriv.transformation.name()).unwrap();
-        write!(buffer, "\"{}\", ", deriv.derived_text.replace("\"", "\\\"")).unwrap();
-        write!(buffer, "{}, ", deriv.original_index).unwrap();
-        write!(buffer, "{}", deriv.cost).unwrap();
-        write!(buffer, "),\n").unwrap();
-        //write!(buffer, "\t{creator},\n").unwrap();
-    }
-    write!(buffer, "];\n\n").unwrap();
-    buffer
-}
+// fn generate_derivation_options() -> Vec<TextTransformation> {
+//     let mut transformations = vec![];
+//     for case_first in [false, true] {
+//         for case_all in [false] {
+//             //TODO @mark: ^
+//             for reverse in [false] {
+//                 //TODO @mark: ^
+//                 for pop_start in [0] {
+//                     //TODO @mark: ^
+//                     for pop_end in [0, 1, 2, 3] {
+//                         transformations.push(TextTransformation {
+//                             case_first,
+//                             case_all,
+//                             reverse,
+//                             pop_start,
+//                             pop_end,
+//                         })
+//                     }
+//                 }
+//             }
+//         }
+//     }
+//     assert!(transformations.len() <= 100);
+//     transformations
+// }
 
-fn generate_derivation_options() -> Vec<TextTransformation> {
-    let mut transformations = vec![];
-    for case_first in [false, true] {
-        for case_all in [false] {
-            //TODO @mark: ^
-            for reverse in [false] {
-                //TODO @mark: ^
-                for pop_start in [0] {
-                    //TODO @mark: ^
-                    for pop_end in [0, 1, 2, 3] {
-                        transformations.push(TextTransformation {
-                            case_first,
-                            case_all,
-                            reverse,
-                            pop_start,
-                            pop_end,
-                        })
-                    }
-                }
-            }
-        }
-    }
-    assert!(transformations.len() <= 100);
-    transformations
-}
-
-fn collect_cheapest_derivations<'a>(
-    base_dict_entries: &[&'a str],
-    transformations: &'a [TextTransformation]
-) -> Vec<BuildDerivationInfo> {
-    let mut min_costs: HashMap<String, (usize, Cost, &TextTransformation)> = HashMap::new();
-    for (index, entry) in base_dict_entries.iter().enumerate() {
-        if entry.contains("$magic-") {
-            continue
-        }
-        for trans in transformations {
-            let deriv = trans.apply(entry);
-            let cost: Cost = 1;  //TODO @mark:
-            match min_costs.entry(deriv.into_owned()) {
-                Entry::Occupied(mut prev) => {
-                    if cost < prev.get().0 {
-                        prev.insert((index, cost, trans));
-                    }
-                }
-                Entry::Vacant(prev) => {
-                    prev.insert((index, cost, trans));
-                },
-            }
-        }
-    }
-    let mut result = min_costs.into_iter()
-        .map(|(key, value)| BuildDerivationInfo {
-            original_index: value.0,
-            derived_text: key,
-            cost: value.1,
-            transformation: value.2.clone(),
-        })
-        .collect::<Vec<_>>();
-    result.sort_by(|deriv1, deriv2| deriv1.derived_text.cmp(&deriv2.derived_text));
-    result
-}
+// fn colect_cheapest_derivations<'a>(
+//     base_dict_entries: &[&'a str],
+//     transformations: &'a [TextTransformation]
+// ) -> Vec<BuildDerivationInfo> {
+//     let mut min_costs: HashMap<String, (usize, Cost, &TextTransformation)> = HashMap::new();
+//     for (index, entry) in base_dict_entries.iter().enumerate() {
+//         if entry.contains("$magic-") {
+//             continue
+//         }
+//         for trans in transformations {
+//             let deriv = trans.apply(entry);
+//             let cost: Cost = 1;  //TODO @mark:
+//             match min_costs.entry(deriv.into_owned()) {
+//                 Entry::Occupied(mut prev) => {
+//                     if cost < prev.get().0 {
+//                         prev.insert((index, cost, trans));
+//                     }
+//                 }
+//                 Entry::Vacant(prev) => {
+//                     prev.insert((index, cost, trans));
+//                 },
+//             }
+//         }
+//     }
+//     let mut result = min_costs.into_iter()
+//         .map(|(key, value)| BuildDerivationInfo {
+//             original_index: value.0,
+//             derived_text: key,
+//             cost: value.1,
+//             transformation: value.2.clone(),
+//         })
+//         .collect::<Vec<_>>();
+//     result.sort_by(|deriv1, deriv2| deriv1.derived_text.cmp(&deriv2.derived_text));
+//     result
+// }
 
 fn write_dict_code(code: &str) {
     let mut out_file = PathBuf::from(env::var("OUT_DIR").unwrap());

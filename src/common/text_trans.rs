@@ -115,6 +115,9 @@ mod capitalisation {
         let mut letter = 'a';
         switch_capitalization_char(&mut letter);
         assert_eq!(letter, 'A');
+        let mut letter = 'é';
+        switch_capitalization_char(&mut letter);
+        assert_eq!(letter, 'É');
     }
 
     #[test]
@@ -122,6 +125,9 @@ mod capitalisation {
         let mut letter = 'A';
         switch_capitalization_char(&mut letter);
         assert_eq!(letter, 'a');
+        let mut letter = 'É';
+        switch_capitalization_char(&mut letter);
+        assert_eq!(letter, 'é');
     }
 
     #[test]
@@ -129,5 +135,8 @@ mod capitalisation {
         let mut letter = '.';
         switch_capitalization_char(&mut letter);
         assert_eq!(letter, '.');
+        let mut letter = '🦀';
+        switch_capitalization_char(&mut letter);
+        assert_eq!(letter, '🦀');
     }
 }

@@ -1,4 +1,3 @@
-pub use self::build_text::encode_snippet_len_estimate;
 pub use self::dict::INDX;
 pub use self::dict_lookup::lookup_buffer;
 pub use self::log::log;
@@ -11,4 +10,3 @@ mod log;
 //TODO @mark: ^
 mod trie;
 mod text_trans;
-mod build_text;
