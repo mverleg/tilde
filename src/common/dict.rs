@@ -14,7 +14,7 @@ pub type INDX = u16;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EnumIter)]
 pub enum DictEntry {
-    Snippet { snip: &'static str, capitalize_next: bool, },
+    Snippet { snip: &'static str, capitalize_next: bool },
     Backspace,
     CapitalizeFirst,
     CapitalizeAll,
@@ -30,12 +30,13 @@ pub struct DerivationInfo {
 
 #[inline]
 const fn s(snip: &'static str) -> DictEntry {
-    DictEntry::Snippet{ snip, capitalize_next: false, }
+    DictEntry::Snippet { snip, capitalize_next: false }
 }
+
 //noinspection RsFunctionNaming
 #[inline]
 const fn S(snip: &'static str) -> DictEntry {
-    DictEntry::Snippet{ snip, capitalize_next: true, }
+    DictEntry::Snippet { snip, capitalize_next: true }
 }
 
 include!(concat!(env!("OUT_DIR"), "/dict_init.rs"));
@@ -51,7 +52,7 @@ pub fn iter_snippets(dict: &[DictEntry]) -> impl Iterator<Item=&str> {
 }
 
 #[cfg(test)]
-static TEST_POEM: &'static str = "
+pub(crate) static TEST_POEM: &'static str = "
 When you get what you want in your struggle for pelf,
 And the world makes you King for a day,
 Then go to the mirror and look at yourself,
@@ -84,7 +85,7 @@ mod lookup {
     use ::std::collections::HashSet;
 
     use super::*;
-use ::strum::IntoEnumIterator;
+    use ::strum::IntoEnumIterator;
 
     #[test]
     fn first_is_whitespace() {
@@ -123,7 +124,7 @@ use ::strum::IntoEnumIterator;
             .collect::<HashSet<_>>();
         for expect in DictEntry::iter() {
             if matches!(expect, DictEntry::Snippet { .. }) {
-                continue
+                continue;
             }
             assert!(seen.contains(&expect), "expected in dict: {expect:?}");
         }

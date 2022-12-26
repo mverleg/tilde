@@ -6,7 +6,6 @@ pub use self::text_trans::TextTransformation;
 mod dict;
 mod dict_lookup;
 mod log;
-//mod compress;
-//TODO @mark: ^
+mod compress;
 mod trie;
 mod text_trans;

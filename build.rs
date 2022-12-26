@@ -43,13 +43,13 @@ fn generate_base_dict_code(base_dict_entries: &[&str]) -> String {
     buffer
 }
 
-#[derive(Debug)]
-pub struct BuildDerivationInfo {
-    pub derived_text: String,
-    pub original_index: usize,
-    pub transformation: TextTransformation,
-    pub cost: usize,
-}
+// #[derive(Debug)]
+// pub struct BuildDerivationInfo {
+//     pub derived_text: String,
+//     pub original_index: usize,
+//     pub transformation: TextTransformation,
+//     pub cost: usize,
+// }
 
 // fn generate_derived_dict_code(derivations: &[BuildDerivationInfo]) -> String {
 //     let mut buffer = String::new();

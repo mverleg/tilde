@@ -1,6 +1,12 @@
 use crate::common::{INDX, TextTransformation};
 use crate::common::dict::{DICT, DictEntry};
 
+pub fn lookup_alloc(indices: &[INDX]) -> String {
+    let mut buffer = String::new();
+    lookup_buffer(indices, &mut buffer, &mut vec![]);
+    buffer
+}
+
 ///
 /// String buffer is NOT cleared (can expand), char buffer IS overwritten.
 pub fn lookup_buffer(indices: &[INDX], buffer: &mut String, char_buffer: &mut Vec<char>) {
