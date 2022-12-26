@@ -4,11 +4,15 @@
 //TODO @mark: add a pop-first operation
 //TODO @mark: maybe a reverse operation?
 
+use ::std::iter::FlatMap;
+use ::std::option::IntoIter;
+use ::std::slice::Iter;
+use ::strum_macros::EnumIter;
 use crate::common::TextTransformation;
 
 pub type INDX = u16;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EnumIter)]
 pub enum DictEntry {
     Snippet { snip: &'static str, capitalize_next: bool, },
     Backspace,
@@ -35,6 +39,16 @@ const fn S(snip: &'static str) -> DictEntry {
 }
 
 include!(concat!(env!("OUT_DIR"), "/dict_init.rs"));
+
+pub fn iter_snippets(dict: &[DictEntry]) -> impl Iterator<Item=&str> {
+    dict.iter()
+        .flat_map(|entry| match entry {
+            DictEntry::Snippet { snip, capitalize_next } => Some(*snip),
+            DictEntry::Backspace => None,
+            DictEntry::CapitalizeFirst => None,
+            DictEntry::CapitalizeAll => None,
+        }.into_iter())
+}
 
 #[cfg(test)]
 static TEST_POEM: &'static str = "
@@ -70,6 +84,7 @@ mod lookup {
     use ::std::collections::HashSet;
 
     use super::*;
+use ::strum::IntoEnumIterator;
 
     #[test]
     fn first_is_whitespace() {
@@ -78,7 +93,7 @@ mod lookup {
 
     #[test]
     fn trailing_whitespace() {
-        let trailing_whitespace_count = dict_iter_snippets()
+        let trailing_whitespace_count = iter_snippets(&DICT)
             .filter(|entry| entry.ends_with(" "))
             .count();
         assert!(trailing_whitespace_count > 10, "quite some entries should have trailing space (maybe stripped by editor?)");
@@ -87,14 +102,14 @@ mod lookup {
     #[test]
     fn no_duplicates() {
         let mut seen = HashSet::new();
-        for entry in dict_iter() {
+        for entry in iter_snippets(&DICT) {
             assert!(seen.insert(entry), "duplicate: {entry:?}");
         }
     }
 
     #[test]
     fn no_leftover_specials() {
-        for entry in dict_iter_snippets() {
+        for entry in iter_snippets(&DICT) {
             if entry.matches("$").count() >= 2 {
                 panic!("unparsed magic value: {entry:?}")
             }
@@ -103,7 +118,7 @@ mod lookup {
 
     #[test]
     fn all_specials_encountered() {
-        let seen = dict_iter()
+        let seen = DICT.iter()
             .filter(|entry| !matches!(entry, DictEntry::Snippet { .. }))
             .collect::<HashSet<_>>();
         for expect in DictEntry::iter() {
