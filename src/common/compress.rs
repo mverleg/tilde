@@ -11,8 +11,9 @@ use ::std::sync::LazyLock;
 use ::strum::IntoEnumIterator;
 use ::strum_macros::EnumIter;
 
-use crate::common::dict::{DICT, DictEntry, iter_snippets};
+use crate::common::dict::{DerivationInfo, DICT, DictEntry, iter_snippets};
 use crate::common::INDX;
+use crate::common::text_trans::DictStr;
 use crate::common::trie::Trie;
 use crate::tilde_log;
 
@@ -22,6 +23,8 @@ const DICT_META: LazyCell<DictMeta> = LazyCell::new(DictMeta::new);
 struct DictMeta {
     dict: &'static [DictEntry],
     trie: Trie,
+    entry_info: HashMap<DictStr, DerivationInfo>,
+    //TODO @mark: fewer allocations?
 }
 
 impl DictMeta {
@@ -40,24 +43,23 @@ impl DictMeta {
 
 pub fn compress_with_dict(text: &str) -> Vec<INDX> {
     let f = DICT_META.trie.lookup("hello");
-    // let mut rem = text;
-    // let mut numbers = vec![];
-    // let mut prefix = String::new();
-    // let mut buffer = String::new();
-    // while !rem.is_empty() {
-    //     DICT.ext_prefix_tree.longest_prefix_with(rem, &mut prefix, &mut buffer);
-    //     if prefix.is_empty() {
-    //         //TODO @mark: return Err instead of panic?
-    //         panic!("cannot encode string because dictionary does not contain '{}'", rem.chars().next().unwrap())
-    //     }
-    //     rem = &rem[prefix.len()..];
-    //     let nrs = DICT.ext_snippet_positions.get(prefix.as_str())
-    //         .unwrap_or_else(|| panic!("prefix not in dictionary: '{prefix}'"))
-    //         .into_iter().map(|nr| *nr).collect::<SnipCombi>();
-    //     numbers.extend(nrs)
-    // }
-    //numbers
-    todo!()  //TODO @mark: TEMPORARY! REMOVE THIS!
+    let mut rem = text;
+    let mut numbers = vec![];
+    let mut prefix = String::new();
+    let mut buffer = String::new();
+    while !rem.is_empty() {
+        DICT.ext_prefix_tree.longest_prefix_with(rem, &mut prefix, &mut buffer);
+        rem = &rem[prefix.len()..];
+        if prefix.is_empty() {
+            //TODO @mark: return Err instead of panic?
+            panic!("cannot encode string because dictionary does not contain '{}'", rem.chars().next().unwrap())
+        }
+        let nrs = DICT.ext_snippet_positions.get(prefix.as_str())
+            .unwrap_or_else(|| panic!("prefix not in dictionary: '{prefix}'"))
+            .into_iter().map(|nr| *nr).collect::<SnipCombi>();
+        numbers.extend(nrs)
+    }
+    numbers
 }
 
 #[cfg(test)]

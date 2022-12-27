@@ -1,7 +1,6 @@
 /// Dictionary entry transformations.
 /// This file is also included from `build.rs`
 
-use ::std::borrow::Cow;
 use ::std::fmt::Write;
 use ::tinyvec_string::ArrayString;
 use ::tinyvec::ArrayVec;
@@ -9,6 +8,11 @@ use ::tinyvec::ArrayVec;
 #[allow(dead_code)]
 pub const LONGEST_DICT_ENTRY_BYTES: usize = 22;  // located in this file because of build.rs
 pub type DictStr = ArrayString::<[u8; LONGEST_DICT_ENTRY_BYTES]>;
+#[derive(Debug)]
+pub enum CowDictStr {
+    Owned(DictStr),
+    Borrowed(&'static str),
+}
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TextTransformation {
@@ -30,12 +34,12 @@ impl TextTransformation {
         }
     }
 
-    pub fn apply<'a>(&self, input: &'a str) -> DictStr {
+    pub fn apply(&self, input: &'static str) -> CowDictStr {
         if self == &Self::new_noop() {
-            return Cow::Borrowed(input);
+            return CowDictStr::Borrowed(input);
         }
         if input.len() <= self.pop_start as usize + self.pop_end as usize {
-            return Cow::Borrowed(input);
+            return CowDictStr::Borrowed(input);
         }
         assert!(self.pop_start == 0, "pop_start not impl");
         assert!(!self.reverse, "reverse not impl");
@@ -49,21 +53,21 @@ impl TextTransformation {
             if self.case_first {
                 switch_capitalization_char(&mut chars[0])
             }
-            return chars.into_iter().collect::<DictStr>()
+            return CowDictStr::Owned(chars.into_iter().collect::<DictStr>())
         }
         // slice without alloc
         let mut end_index = input.len();
         for _ in 0..self.pop_end {
             let Some(chr) = chars.pop() else {
-                return Cow::Borrowed("");
+                return CowDictStr::Borrowed("");
             };
             end_index -= chr.len_utf8();
         }
-        Cow::Borrowed(&input[0..end_index])
+        CowDictStr::Borrowed(&input[0..end_index])
     }
 
     pub fn name(&self) -> ArrayString::<[u8; 6]> {
-        let mut repr = DictStr::new();
+        let mut repr = ArrayString::new();
         write!(repr, "{}", match (self.case_all, self.case_first) {
             (true, false) => 'a',
             (false, true) => 'f',
@@ -76,7 +80,7 @@ impl TextTransformation {
         } else {
             write!(repr, "{}{}", self.pop_start, self.pop_end).unwrap();
         }
-        repr
+        ArrayString::try_from(repr).expect("name is too long for array string")
     }
 }
 
