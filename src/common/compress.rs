@@ -7,12 +7,13 @@ use ::std::iter::FlatMap;
 use ::std::slice::Iter;
 use ::std::sync::{Arc, Mutex, RwLock};
 use ::std::sync::LazyLock;
+use ::std::process::Output;
 
 use ::strum::IntoEnumIterator;
 use ::strum_macros::EnumIter;
 
 use crate::common::dict::{DerivationInfo, DICT, DictEntry, iter_snippets};
-use crate::common::INDX;
+use crate::common::{INDX, TextTransformation};
 use crate::common::text_trans::DictStr;
 use crate::common::trie::Trie;
 use crate::tilde_log;
@@ -34,30 +35,43 @@ impl DictMeta {
         for snip in iter_snippets(&DICT) {
             trie.push(snip)
         }
+        let mut entry_info = HashMap::new();
+        for (index, entry) in DICT.iter().enumerate() {
+            let DictEntry::Snippet { snip, .. } = entry else { continue };
+            entry_info.insert(
+                DictStr::try_from(&**snip).expect("dict entry too long for array string"),
+                DerivationInfo {
+                    derived_text: DictStr::try_from(&**snip).expect("derivation too long for array string"),
+                    original_index: index,
+                    transformation: TextTransformation::new_noop(),
+                    cost: 1, //TODO @mark:
+                });
+        }
         DictMeta {
             dict: &DICT,
             trie,
+            entry_info,
         }
     }
 }
 
 pub fn compress_with_dict(text: &str) -> Vec<INDX> {
-    let f = DICT_META.trie.lookup("hello");
     let mut rem = text;
     let mut numbers = vec![];
     let mut prefix = String::new();
     let mut buffer = String::new();
     while !rem.is_empty() {
-        DICT.ext_prefix_tree.longest_prefix_with(rem, &mut prefix, &mut buffer);
+        DICT_META.trie.longest_prefix_with(rem, &mut prefix, &mut buffer);
         rem = &rem[prefix.len()..];
         if prefix.is_empty() {
             //TODO @mark: return Err instead of panic?
             panic!("cannot encode string because dictionary does not contain '{}'", rem.chars().next().unwrap())
         }
-        let nrs = DICT.ext_snippet_positions.get(prefix.as_str())
+        let nrs = DICT_META.entry_info.get(&prefix)
             .unwrap_or_else(|| panic!("prefix not in dictionary: '{prefix}'"))
-            .into_iter().map(|nr| *nr).collect::<SnipCombi>();
-        numbers.extend(nrs)
+            .original_index
+            .try_into().expect("index does not fit in type");
+        numbers.push(nrs)
     }
     numbers
 }

@@ -8,6 +8,7 @@ use ::std::iter::FlatMap;
 use ::std::option::IntoIter;
 use ::std::slice::Iter;
 use ::strum_macros::EnumIter;
+use crate::common::text_trans::DictStr;
 use crate::common::TextTransformation;
 
 pub type INDX = u16;
@@ -22,7 +23,7 @@ pub enum DictEntry {
 
 #[derive(Debug)]
 pub struct DerivationInfo {
-    pub derived_text: &'static str,
+    pub derived_text: DictStr,
     pub original_index: usize,
     pub transformation: TextTransformation,
     pub cost: usize,
