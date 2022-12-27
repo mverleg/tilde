@@ -67,7 +67,8 @@ pub fn compress_with_dict(text: &str) -> Vec<INDX> {
             //TODO @mark: return Err instead of panic?
             panic!("cannot encode string because dictionary does not contain '{}'", rem.chars().next().unwrap())
         }
-        let nrs = DICT_META.entry_info.get(&prefix)
+        let nrs = DICT_META.entry_info.get(&DictStr::try_from(prefix.as_str()).expect("prefix too long for array string"))
+            //TODO @mark: use str instead of DictStr above? ^
             .unwrap_or_else(|| panic!("prefix not in dictionary: '{prefix}'"))
             .original_index
             .try_into().expect("index does not fit in type");
