@@ -13,6 +13,14 @@ pub enum CowDictStr {
     Owned(DictStr),
     Borrowed(&'static str),
 }
+impl AsRef<str> for CowDictStr {
+    fn as_ref(&self) -> &str {
+        match self {
+            CowDictStr::Owned(text) => &*text,
+            CowDictStr::Borrowed(text) => *text,
+        }
+    }
+}
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TextTransformation {
