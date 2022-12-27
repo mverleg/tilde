@@ -3,11 +3,12 @@
 
 use ::std::borrow::Cow;
 use ::std::fmt::Write;
-
+use ::tinyvec_string::ArrayString;
 use ::tinyvec::ArrayVec;
 
 #[allow(dead_code)]
 pub const LONGEST_DICT_ENTRY_BYTES: usize = 22;  // located in this file because of build.rs
+pub type DictStr = ArrayString::<[u8; LONGEST_DICT_ENTRY_BYTES]>;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TextTransformation {
@@ -29,7 +30,7 @@ impl TextTransformation {
         }
     }
 
-    pub fn apply<'a>(&self, input: &'a str) -> Cow<'a, str> {
+    pub fn apply<'a>(&self, input: &'a str) -> DictStr {
         if self == &Self::new_noop() {
             return Cow::Borrowed(input);
         }
@@ -40,7 +41,7 @@ impl TextTransformation {
         assert!(!self.reverse, "reverse not impl");
         let mut chars = input.chars().collect::<ArrayVec<[char; LONGEST_DICT_ENTRY_BYTES]>>();
         if self.case_all || self.case_first {
-            // need to alloc string
+            // need to create string
             for _ in 0..self.pop_end {
                 chars.pop();
             }
@@ -48,7 +49,7 @@ impl TextTransformation {
             if self.case_first {
                 switch_capitalization_char(&mut chars[0])
             }
-            return Cow::Owned(chars.into_iter().collect::<String>())
+            return chars.into_iter().collect::<DictStr>()
         }
         // slice without alloc
         let mut end_index = input.len();
@@ -61,8 +62,8 @@ impl TextTransformation {
         Cow::Borrowed(&input[0..end_index])
     }
 
-    pub fn name(&self) -> String {
-        let mut repr = String::with_capacity(6);
+    pub fn name(&self) -> ArrayString::<[u8; 6]> {
+        let mut repr = DictStr::new();
         write!(repr, "{}", match (self.case_all, self.case_first) {
             (true, false) => 'a',
             (false, true) => 'f',

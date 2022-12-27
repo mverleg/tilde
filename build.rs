@@ -3,8 +3,6 @@ use ::std::fmt::Write;
 use ::std::fs;
 use ::std::path::PathBuf;
 
-use crate::text_trans::TextTransformation;
-
 mod text_trans {
     include!("src/common/text_trans.rs");
 }
