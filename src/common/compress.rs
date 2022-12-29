@@ -4,21 +4,22 @@ use ::std::cell::OnceCell;
 use ::std::collections::HashMap;
 use ::std::iter::Cloned;
 use ::std::iter::FlatMap;
-use ::std::slice::Iter;
-use ::std::sync::{Arc, Mutex, RwLock};
-use ::std::sync::LazyLock;
 use ::std::process::Output;
+use ::std::slice::Iter;
+use ::std::sync::LazyLock;
 
 use ::strum::IntoEnumIterator;
 use ::strum_macros::EnumIter;
 
-use crate::common::dict::{DerivationInfo, DICT, DictEntry, iter_snippets};
 use crate::common::{INDX, TextTransformation};
+use crate::common::dict::{DerivationInfo, DICT, DictEntry, iter_snippets};
 use crate::common::text_trans::DictStr;
 use crate::common::trie::Trie;
 use crate::tilde_log;
 
-const DICT_META: LazyCell<DictMeta> = LazyCell::new(DictMeta::new);
+thread_local! {
+    static DICT_META: LazyCell<DictMeta> = LazyCell::new(DictMeta::new);
+}
 
 #[derive(Debug)]
 struct DictMeta {
@@ -61,18 +62,20 @@ pub fn compress_with_dict(text: &str) -> Vec<INDX> {
     let mut prefix = String::new();
     let mut buffer = String::new();
     while !rem.is_empty() {
-        DICT_META.trie.longest_prefix_with(rem, &mut prefix, &mut buffer);
-        rem = &rem[prefix.len()..];
-        if prefix.is_empty() {
-            //TODO @mark: return Err instead of panic?
-            panic!("cannot encode string because dictionary does not contain '{}'", rem.chars().next().unwrap())
-        }
-        let nrs = DICT_META.entry_info.get(&DictStr::try_from(prefix.as_str()).expect("prefix too long for array string"))
-            //TODO @mark: use str instead of DictStr above? ^
-            .unwrap_or_else(|| panic!("prefix not in dictionary: '{prefix}'"))
-            .original_index
-            .try_into().expect("index does not fit in type");
-        numbers.push(nrs)
+        DICT_META.with(|meta| {
+            meta.trie.longest_prefix_with(rem, &mut prefix, &mut buffer);
+            rem = &rem[prefix.len()..];
+            if prefix.is_empty() {
+                //TODO @mark: return Err instead of panic?
+                panic!("cannot encode string because dictionary does not contain '{}'", rem.chars().next().unwrap())
+            }
+            let nrs = meta.entry_info.get(&DictStr::try_from(prefix.as_str()).expect("prefix too long for array string"))
+                //TODO @mark: use str instead of DictStr above? ^
+                .unwrap_or_else(|| panic!("prefix not in dictionary: '{prefix}'"))
+                .original_index
+                .try_into().expect("index does not fit in type");
+            numbers.push(nrs)
+        })
     }
     numbers
 }
