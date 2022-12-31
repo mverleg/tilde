@@ -13,6 +13,7 @@ use ::strum_macros::EnumIter;
 
 use crate::common::{INDX, TextTransformation};
 use crate::common::dict::{DerivationInfo, DICT, DictEntry, iter_snippets};
+use crate::common::dict_derive::DerivationInfo;
 use crate::common::text_trans::DictStr;
 use crate::common::trie::Trie;
 use crate::tilde_log;

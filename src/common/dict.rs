@@ -21,14 +21,6 @@ pub enum DictEntry {
     CapitalizeAll,
 }
 
-#[derive(Debug)]
-pub struct DerivationInfo {
-    pub derived_text: DictStr,
-    pub original_index: usize,
-    pub transformation: TextTransformation,
-    pub cost: usize,
-}
-
 #[inline]
 const fn s(snip: &'static str) -> DictEntry {
     DictEntry::Snippet { snip, capitalize_next: false }
