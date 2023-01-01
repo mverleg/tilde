@@ -12,7 +12,7 @@ use ::strum::IntoEnumIterator;
 use ::strum_macros::EnumIter;
 
 use crate::common::{INDX, TextTransformation};
-use crate::common::dict::{DerivationInfo, DICT, DictEntry, iter_snippets};
+use crate::common::dict::{DICT, DictEntry, iter_snippets};
 use crate::common::dict_derive::DerivationInfo;
 use crate::common::text_trans::DictStr;
 use crate::common::trie::Trie;
@@ -24,21 +24,28 @@ thread_local! {
 
 #[derive(Debug)]
 struct DictMeta {
-    dict: &'static [DictEntry],
+    base_dict: &'static [DictEntry],
+    extended_dict: Vec<DerivationInfo>,  //TODO @mark: needed? or push stuff directly into trie?
     trie: Trie,
-    entry_info: HashMap<DictStr, DerivationInfo>,
     //TODO @mark: fewer allocations?
+}
+
+fn with_derived_dict_entries(base_dict: &[DictEntry]) -> Vec<DerivationInfo> {
+    todo!();
 }
 
 impl DictMeta {
     fn new() -> Self {
         tilde_log!("initializing DictMeta (large) for string compression");
+        let extended_dict = with_derived_dict_entries(&DICT);
         let mut trie = Trie::new();
-        for snip in iter_snippets(&DICT) {
-            trie.push(snip)
+        for snip in extended_dict.iter() {
+            trie.push(&snip.derived_text)
         }
-        let mut entry_info = HashMap::new();
-        for (index, entry) in DICT.iter().enumerate() {
+        let mut entry_info = extended_dict.iter()
+            .enumerate()
+            .map(|(index, info)|  );
+        for (index, entry) in extended_dict.iter().enumerate() {
             let DictEntry::Snippet { snip, .. } = entry else { continue };
             entry_info.insert(
                 DictStr::try_from(&**snip).expect("dict entry too long for array string"),
@@ -50,9 +57,9 @@ impl DictMeta {
                 });
         }
         DictMeta {
-            dict: &DICT,
+            base_dict: &DICT,
+            extended_dict,
             trie,
-            entry_info,
         }
     }
 }
