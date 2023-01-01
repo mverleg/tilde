@@ -13,7 +13,7 @@ use ::strum_macros::EnumIter;
 
 use crate::common::{INDX, TextTransformation};
 use crate::common::dict::{DICT, DictEntry, iter_snippets};
-use crate::common::dict_derive::DerivationInfo;
+use crate::common::dict_derive::{DerivationInfo, with_derived_dict_entries};
 use crate::common::text_trans::DictStr;
 use crate::common::trie::Trie;
 use crate::tilde_log;
@@ -30,10 +30,6 @@ struct DictMeta {
     //TODO @mark: fewer allocations?
 }
 
-fn with_derived_dict_entries(base_dict: &[DictEntry]) -> Vec<DerivationInfo> {
-    todo!();
-}
-
 impl DictMeta {
     fn new() -> Self {
         tilde_log!("initializing DictMeta (large) for string compression");
@@ -41,20 +37,6 @@ impl DictMeta {
         let mut trie = Trie::new();
         for snip in extended_dict.iter() {
             trie.push(&snip.derived_text)
-        }
-        let mut entry_info = extended_dict.iter()
-            .enumerate()
-            .map(|(index, info)|  );
-        for (index, entry) in extended_dict.iter().enumerate() {
-            let DictEntry::Snippet { snip, .. } = entry else { continue };
-            entry_info.insert(
-                DictStr::try_from(&**snip).expect("dict entry too long for array string"),
-                DerivationInfo {
-                    derived_text: DictStr::try_from(&**snip).expect("derivation too long for array string"),
-                    original_index: index,
-                    transformation: TextTransformation::new_noop(),
-                    cost: 1, //TODO @mark:
-                });
         }
         DictMeta {
             base_dict: &DICT,
@@ -77,12 +59,13 @@ pub fn compress_with_dict(text: &str) -> Vec<INDX> {
                 //TODO @mark: return Err instead of panic?
                 panic!("cannot encode string because dictionary does not contain '{}'", rem.chars().next().unwrap())
             }
-            let nrs = meta.entry_info.get(&DictStr::try_from(prefix.as_str()).expect("prefix too long for array string"))
-                //TODO @mark: use str instead of DictStr above? ^
-                .unwrap_or_else(|| panic!("prefix not in dictionary: '{prefix}'"))
-                .original_index
-                .try_into().expect("index does not fit in type");
-            numbers.push(nrs)
+            todo!(); //TODO @mark:
+            // let nrs = meta.entry_info.get(&DictStr::try_from(prefix.as_str()).expect("prefix too long for array string"))
+                // TODO @mark: use str instead of DictStr above? ^
+                // .unwrap_or_else(|| panic!("prefix not in dictionary: '{prefix}'"))
+                // .original_index
+                // .try_into().expect("index does not fit in type");
+            //numbers.push(nrs)
         })
     }
     numbers

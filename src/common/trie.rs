@@ -216,12 +216,18 @@ impl Trie {
         result_buffer
     }
 
+    /// Given a text, find all the words that are prefixes of it. E.g. "dogma" is ["do", "dog", "dogma"].
+    pub fn all_prefixes_of(&self, value: &str) {
+        todo!()  //TODO @mark:
+    }
+
     pub fn longest_prefix_with(&self, value: &str, result_buffer: &mut String, postfix_buffer: &mut String) {
         result_buffer.clear();
         postfix_buffer.clear();
         self.root.longest_prefix(value, result_buffer, postfix_buffer);
     }
 
+    /// Given a text, find all the words that have that text as a prefix.
     pub fn iter_prefix(&self, prefix: &str) -> TrieIterator {
         self.root.iterator_at_prefix(prefix, prefix)
     }
