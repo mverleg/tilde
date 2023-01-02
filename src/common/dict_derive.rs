@@ -1,7 +1,7 @@
 use ::std::collections::hash_map::Entry;
 use ::std::collections::HashMap;
 use crate::common::dict::DictEntry;
-use crate::common::text_trans::DictStr;
+use crate::common::text_trans::{CowDictStr, DictStr};
 use crate::common::TextTransformation;
 
 #[derive(Debug)]
@@ -54,7 +54,7 @@ fn collect_cheapest_derivations(
     base_dict_entries: &[&str],
     transformations: &[TextTransformation]
 ) -> Vec<DerivationInfo> {
-    let mut min_costs: HashMap<&str, TransformationCost> = HashMap::new();
+    let mut min_costs: HashMap<CowDictStr, TransformationCost> = HashMap::new();
     for (index, entry) in base_dict_entries.iter().enumerate() {
         if entry.contains("$magic-") {
             continue
@@ -66,7 +66,7 @@ fn collect_cheapest_derivations(
                 transformation,
             };
             let deriv = transformation.apply(entry);
-            match min_costs.entry(deriv.as_ref()) {
+            match min_costs.entry(deriv) {
                 Entry::Occupied(mut prev) => {
                     if new.cost < prev.get().cost {
                         prev.insert(new);
@@ -80,7 +80,7 @@ fn collect_cheapest_derivations(
     }
     let mut result = min_costs.into_iter()
         .map(|(key, value)| DerivationInfo {
-            derived_text: DictStr::from(key),
+            derived_text: key.into_owned(),
             original_index: value.index,
             cost: value.cost,
             transformation: value.transformation.clone(),

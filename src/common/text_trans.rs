@@ -2,23 +2,53 @@
 /// This file is also included from `build.rs`
 
 use ::std::fmt::Write;
+use ::std::hash;
+use ::std::hash::Hasher;
 use ::tinyvec_string::ArrayString;
 use ::tinyvec::ArrayVec;
 
 #[allow(dead_code)]
 pub const LONGEST_DICT_ENTRY_BYTES: usize = 22;  // located in this file because of build.rs
 pub type DictStr = ArrayString::<[u8; LONGEST_DICT_ENTRY_BYTES]>;
-#[derive(Debug)]
+#[derive(Debug, Eq)]
 pub enum CowDictStr {
     Owned(DictStr),
     Borrowed(&'static str),
 }
+
+impl CowDictStr {
+    pub fn into_owned(self) -> DictStr {
+        match self {
+            CowDictStr::Owned(val) => val,
+            CowDictStr::Borrowed(val) => DictStr::from(val),
+        }
+    }
+}
+
 impl AsRef<str> for CowDictStr {
     fn as_ref(&self) -> &str {
         match self {
             CowDictStr::Owned(text) => &*text,
             CowDictStr::Borrowed(text) => *text,
         }
+    }
+}
+
+impl PartialEq for CowDictStr {
+    fn eq(&self, other: &Self) -> bool {
+use ::CowDictStr::*;
+        match (self, other) {
+            (Owned(left), Owned(right)) => left == right,
+            (Borrowed(left), Owned(right)) => left == right,
+            (Owned(left), Borrowed(right)) => left == right,
+            (Borrowed(left), Borrowed(right)) => left == right,
+        }
+    }
+}
+
+impl hash::Hash for CowDictStr {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        state.write(self.as_ref().as_bytes())
     }
 }
 
