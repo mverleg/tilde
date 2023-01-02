@@ -54,29 +54,33 @@ fn collect_cheapest_derivations(
     base_dict_entries: &[&str],
     transformations: &[TextTransformation]
 ) -> Vec<DerivationInfo> {
-    let mut min_costs: HashMap<String, TransformationCost> = HashMap::new();
+    let mut min_costs: HashMap<&str, TransformationCost> = HashMap::new();
     for (index, entry) in base_dict_entries.iter().enumerate() {
         if entry.contains("$magic-") {
             continue
         }
-        for trans in transformations {
-            let deriv = trans.apply(entry);
-            let cost: u32 = 1;  //TODO @mark:
-            match min_costs.entry(deriv.into_owned()) {
+        for transformation in transformations {
+            let new = TransformationCost {
+                index,
+                cost: 1,  //TODO @mark:
+                transformation,
+            };
+            let deriv = transformation.apply(entry);
+            match min_costs.entry(deriv.as_ref()) {
                 Entry::Occupied(mut prev) => {
-                    if cost < prev.get().0 {
-                        prev.insert((index, cost, trans));
+                    if new.cost < prev.get().cost {
+                        prev.insert(new);
                     }
                 }
                 Entry::Vacant(prev) => {
-                    prev.insert((index, cost, trans));
+                    prev.insert(new);
                 },
             }
         }
     }
     let mut result = min_costs.into_iter()
         .map(|(key, value)| DerivationInfo {
-            derived_text: key,
+            derived_text: DictStr::from(key),
             original_index: value.index,
             cost: value.cost,
             transformation: value.transformation.clone(),
