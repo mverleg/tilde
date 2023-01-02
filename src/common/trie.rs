@@ -25,7 +25,7 @@ pub enum TrieLookup {
     NotFound,
 }
 
-impl TrieNode {
+impl <E> TrieNode<E> {
     fn new_empty() -> Self {
         TrieNode {
             children: HashMap::with_capacity(0),
@@ -97,7 +97,7 @@ impl TrieNode {
         }
     }
 
-    fn iterator_at_prefix(&self, initial_prefix: &str, remaining_value: &str) -> TrieIterator {
+    fn iterator_at_prefix(&self, initial_prefix: &str, remaining_value: &str) -> TrieIterator<E> {
         let head = match remaining_value.chars().next() {
             Some(chr) => chr,
             None => return TrieIterator::new_at(initial_prefix.to_owned(), self),
@@ -134,30 +134,30 @@ impl TrieNode {
 }
 
 #[derive(Debug)]
-pub struct Trie {
+pub struct Trie<E> {
     root: TrieNode,
 }
 
 #[derive(Debug)]
 struct TrieNodePrefix<'a> {
-    prefix: String,
+    prefix: E,
     node: &'a TrieNode,
 }
 
-impl <'a> TrieNodePrefix<'a> {
-    pub fn new(prefix: String, node: &'a TrieNode) -> Self {
+impl <'a, E> TrieNodePrefix<'a, E> {
+    pub fn new(prefix: String, node: &'a TrieNode<E>) -> Self {
         TrieNodePrefix { prefix, node }
     }
 }
 
 // Breadth-first iterator, ordering of elements is undefined (depends on hashes).
 #[derive(Debug)]
-pub struct TrieIterator<'a> {
-    nodes: VecDeque<TrieNodePrefix<'a>>,
+pub struct TrieIterator<'a, E> {
+    nodes: VecDeque<TrieNodePrefix<'a, E>>,
 }
 
-impl <'a> TrieIterator<'a> {
-    fn new_at(prefix: String, elem: &'a TrieNode) -> Self {
+impl <'a, E> TrieIterator<'a, E> {
+    fn new_at(prefix: String, elem: &'a TrieNode<E>) -> Self {
         let mut nodes = VecDeque::new();
         eprintln!("pushing initial: {}", &prefix);  //TODO @mark: TEMPORARY! REMOVE THIS!
         nodes.push_back(TrieNodePrefix::new(prefix, elem));
@@ -171,7 +171,7 @@ impl <'a> TrieIterator<'a> {
     }
 }
 
-impl <'a> Iterator for TrieIterator<'a> {
+impl <'a, E> Iterator for TrieIterator<'a, E> {
     type Item = String;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -190,7 +190,7 @@ impl <'a> Iterator for TrieIterator<'a> {
     }
 }
 
-impl Trie {
+impl <E> Trie<E> {
     pub fn new() -> Self {
         Trie {
             root:TrieNode::new_empty(),
@@ -228,7 +228,7 @@ impl Trie {
     }
 
     /// Given a text, find all the words that have that text as a prefix.
-    pub fn iter_prefix(&self, prefix: &str) -> TrieIterator {
+    pub fn iter_prefix(&self, prefix: &str) -> TrieIterator<E> {
         self.root.iterator_at_prefix(prefix, prefix)
     }
 
@@ -266,7 +266,7 @@ mod tests {
         assert_eq!(trie.lookup("p"), TrieLookup::NotFound);
     }
 
-    fn build_test_trie() -> Trie {
+    fn build_test_trie() -> Trie<&'static str> {
         let mut trie = Trie::new();
         trie.push("hello");
         trie.push("he");
