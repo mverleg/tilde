@@ -4,6 +4,7 @@
 use ::std::fmt::Write;
 use ::std::hash;
 use ::std::hash::Hasher;
+use ::std::cmp::Ordering;
 use ::tinyvec_string::ArrayString;
 use ::tinyvec::ArrayVec;
 
@@ -37,10 +38,21 @@ impl AsRef<str> for CowDictStr {
 impl PartialEq for CowDictStr {
     fn eq(&self, other: &Self) -> bool {
         match (self, other) {
-            (CowDictStr::Owned(left), CowDictStr::Owned(right)) => left == right,
-            (CowDictStr::Borrowed(left), CowDictStr::Owned(right)) => left == right,
-            (CowDictStr::Owned(left), CowDictStr::Borrowed(right)) => left == right,
+            (CowDictStr::Owned(left), CowDictStr::Owned(right)) => left.as_str() == right.as_str(),
+            (CowDictStr::Borrowed(left), CowDictStr::Owned(right)) => *left == right.as_str(),
+            (CowDictStr::Owned(left), CowDictStr::Borrowed(right)) => left.as_str() == *right,
             (CowDictStr::Borrowed(left), CowDictStr::Borrowed(right)) => left == right,
+        }
+    }
+}
+
+impl PartialOrd for CowDictStr {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        match (self, other) {
+            (CowDictStr::Owned(left), CowDictStr::Owned(right)) => left.as_str().partial_cmp(right.as_str()),
+            (CowDictStr::Borrowed(left), CowDictStr::Owned(right)) => left.partial_cmp(&right.as_str()),
+            (CowDictStr::Owned(left), CowDictStr::Borrowed(right)) => left.as_str().partial_cmp(right),
+            (CowDictStr::Borrowed(left), CowDictStr::Borrowed(right)) => left.partial_cmp(right),
         }
     }
 }
