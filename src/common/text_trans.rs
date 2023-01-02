@@ -10,7 +10,7 @@ use ::tinyvec::ArrayVec;
 #[allow(dead_code)]
 pub const LONGEST_DICT_ENTRY_BYTES: usize = 22;  // located in this file because of build.rs
 pub type DictStr = ArrayString::<[u8; LONGEST_DICT_ENTRY_BYTES]>;
-#[derive(Debug, Eq)]
+#[derive(Debug, Eq, Ord)]
 pub enum CowDictStr {
     Owned(DictStr),
     Borrowed(&'static str),
