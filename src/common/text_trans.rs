@@ -36,12 +36,11 @@ impl AsRef<str> for CowDictStr {
 
 impl PartialEq for CowDictStr {
     fn eq(&self, other: &Self) -> bool {
-use ::CowDictStr::*;
         match (self, other) {
-            (Owned(left), Owned(right)) => left == right,
-            (Borrowed(left), Owned(right)) => left == right,
-            (Owned(left), Borrowed(right)) => left == right,
-            (Borrowed(left), Borrowed(right)) => left == right,
+            (CowDictStr::Owned(left), CowDictStr::Owned(right)) => left == right,
+            (CowDictStr::Borrowed(left), CowDictStr::Owned(right)) => left == right,
+            (CowDictStr::Owned(left), CowDictStr::Borrowed(right)) => left == right,
+            (CowDictStr::Borrowed(left), CowDictStr::Borrowed(right)) => left == right,
         }
     }
 }

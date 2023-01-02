@@ -51,12 +51,12 @@ struct TransformationCost<'a> {
 }
 
 fn collect_cheapest_derivations(
-    base_dict_entries: &[&str],
+    base_dict_entries: &[&'static str],
     transformations: &[TextTransformation]
 ) -> Vec<DerivationInfo> {
     let mut min_costs: HashMap<CowDictStr, TransformationCost> = HashMap::new();
-    for (index, entry) in base_dict_entries.iter().enumerate() {
-        if entry.contains("$magic-") {
+    for (index, base_dict_entry) in base_dict_entries.iter().enumerate() {
+        if base_dict_entry.contains("$magic-") {
             continue
         }
         for transformation in transformations {
@@ -65,7 +65,7 @@ fn collect_cheapest_derivations(
                 cost: 1,  //TODO @mark:
                 transformation,
             };
-            let deriv = transformation.apply(entry);
+            let deriv = transformation.apply(base_dict_entry);
             match min_costs.entry(deriv) {
                 Entry::Occupied(mut prev) => {
                     if new.cost < prev.get().cost {
