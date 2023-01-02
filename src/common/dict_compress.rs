@@ -26,7 +26,7 @@ thread_local! {
 struct DictMeta {
     base_dict: &'static [DictEntry],
     extended_dict: Vec<DerivationInfo>,  //TODO @mark: needed? or push stuff directly into trie?
-    trie: Trie<DictEntry>,
+    trie: Trie,
     //TODO @mark: fewer allocations?
 }
 

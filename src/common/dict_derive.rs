@@ -17,7 +17,7 @@ pub fn with_derived_dict_entries(base_dict: &[DictEntry]) -> Vec<DerivationInfo>
     iter_snippets(base_dict)
         .enumerate()
         .flat_map(|(original_index, snippet)| transformations.iter()
-            .map(|transformation| DerivationInfo {
+            .map(move |transformation| DerivationInfo {
                 derived_text: transformation.apply(snippet),
                 original_index,
                 transformation: transformation.clone(),
