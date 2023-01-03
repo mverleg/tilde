@@ -34,10 +34,10 @@ const fn S(snip: &'static str) -> DictEntry {
 
 include!(concat!(env!("OUT_DIR"), "/dict_init.rs"));
 
-pub fn iter_snippets(dict: &[DictEntry]) -> impl Iterator<Item=&'static str> {
+pub fn iter_snippets(dict: &'static [DictEntry]) -> impl Iterator<Item=&'static str> {
     dict.iter()
-        .flat_map(|entry| match entry {
-            DictEntry::Snippet { snip, capitalize_next } => Some(*snip),
+        .flat_map(|entry| match *entry {
+            DictEntry::Snippet { snip, capitalize_next } => Some(snip),
             DictEntry::Backspace => None,
             DictEntry::CapitalizeFirst => None,
             DictEntry::CapitalizeAll => None,
