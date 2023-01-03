@@ -2,15 +2,10 @@
 // This files uses len_utf8 for char length, based on the promise that str is utf8
 // https://doc.rust-lang.org/std/primitive.char.html#method.len_utf8
 
-//TODO @mark: iteration allocates a lot of strings, since each node only stores char
-//TODO @mark: it would be possible to make iteration cheaper, if we'd store the whole text for each node
-
 use ::std::collections::hash_map::Entry;
 use ::std::collections::HashMap;
 use ::std::collections::VecDeque;
 use ::std::vec::IntoIter;
-
-//TODO: maybe make this a separate crate (but there are already 2 - one has too many dependencies for my taste, and the other seems dead)
 
 #[derive(Debug)]
 struct TrieNode {
