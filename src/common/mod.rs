@@ -8,5 +8,6 @@ mod dict;
 mod dict_lookup;
 mod dict_compress;
 mod dict_derive;
-mod trie;
+mod trie_data;
+mod trie_original;
 mod text_trans;

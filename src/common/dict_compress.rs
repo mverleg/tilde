@@ -15,18 +15,20 @@ use crate::common::{INDX, TextTransformation};
 use crate::common::dict::{DICT, DictEntry, iter_snippets};
 use crate::common::dict_derive::{DerivationInfo, with_derived_dict_entries};
 use crate::common::text_trans::DictStr;
-use crate::common::trie::Trie;
+use crate::common::trie_data::Trie;
 use crate::tilde_log;
 
 thread_local! {
     static DICT_META: LazyCell<DictMeta> = LazyCell::new(DictMeta::new);
 }
 
+type ExtIndx = u32;
+
 #[derive(Debug)]
 struct DictMeta {
     base_dict: &'static [DictEntry],
-    extended_dict: Vec<DerivationInfo>,  //TODO @mark: needed? or push stuff directly into trie?
-    trie: Trie,
+    extended_dict: Vec<DerivationInfo>,
+    trie: Trie<ExtIndx>,
     //TODO @mark: fewer allocations?
 }
 
@@ -59,7 +61,6 @@ pub fn compress_with_dict(text: &str) -> Vec<INDX> {
                 //TODO @mark: return Err instead of panic?
                 panic!("cannot encode string because dictionary does not contain '{}'", rem.chars().next().unwrap())
             }
-            todo!(); //TODO @mark:
             // let nrs = meta.entry_info.get(&DictStr::try_from(prefix.as_str()).expect("prefix too long for array string"))
                 // TODO @mark: use str instead of DictStr above? ^
                 // .unwrap_or_else(|| panic!("prefix not in dictionary: '{prefix}'"))
