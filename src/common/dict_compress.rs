@@ -55,12 +55,12 @@ pub fn compress_with_dict(text: &str) -> Vec<INDX> {
     let mut buffer = String::new();
     while !rem.is_empty() {
         DICT_META.with(|meta| {
-            meta.trie.longest_prefix_with(rem, &mut prefix, &mut buffer);
-            rem = &rem[prefix.len()..];
-            if prefix.is_empty() {
-                //TODO @mark: return Err instead of panic?
-                panic!("cannot encode string because dictionary does not contain '{}'", rem.chars().next().unwrap())
-            }
+            // meta.trie.all_prefixes_of(rem, &mut prefix, &mut buffer);
+            // rem = &rem[prefix.len()..];
+            // if prefix.is_empty() {
+            //     //TODO @mark: return Err instead of panic?
+            //     panic!("cannot encode string because dictionary does not contain '{}'", rem.chars().next().unwrap())
+            // }
             // let nrs = meta.entry_info.get(&DictStr::try_from(prefix.as_str()).expect("prefix too long for array string"))
                 // TODO @mark: use str instead of DictStr above? ^
                 // .unwrap_or_else(|| panic!("prefix not in dictionary: '{prefix}'"))

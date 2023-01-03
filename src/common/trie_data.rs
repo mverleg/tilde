@@ -5,6 +5,9 @@
 //TODO @mark: iteration allocates a lot of strings, since each node only stores char
 //TODO @mark: it would be possible to make iteration cheaper, if we'd store the whole text for each node
 
+//TODO @mark: remove comments
+//TODO @mark: enable tests
+
 use ::std::collections::hash_map::Entry;
 use ::std::collections::HashMap;
 use ::std::collections::VecDeque;
@@ -73,53 +76,53 @@ impl <Word> TrieNode<Word> {
         }
     }
 
-    fn contains_exactly(&self, value: &str) -> bool {
-        self.lookup(value) == TrieLookup::IsWord
-    }
-
-    fn longest_prefix(&self, value_remaining: &str, longest_word: &mut String, post_word: &mut String) {
-        if self.word {
-            longest_word.push_str(&post_word);
-            post_word.clear();
-        }
-        let head = match value_remaining.chars().next() {
-            Some(chr) => chr,
-            None => {
-                return
-            },
-        };
-        let tail = &value_remaining[head.len_utf8()..];
-        return match self.children.get(&head) {
-            Some(child) => {
-                post_word.push(head);
-                child.longest_prefix(tail, longest_word, post_word)
-            },
-            None => return,
-        }
-    }
-
-    fn level_iterator_at_prefix(&self, initial_prefix: &str, remaining_value: &str) -> impl Iterator<Item = String> {
-        let head = match remaining_value.chars().next() {
-            Some(chr) => chr,
-            None => {
-                let mut child_texts = vec![];
-                for child in &self.children {
-                    let Some(word) = &child.1.word else {
-                        continue
-                    };
-                    let mut text = initial_prefix.to_owned();
-                    text.push(*child.0);
-                    child_texts.push(text)
-                }
-                return child_texts.into_iter()
-            },
-        };
-        let tail = &remaining_value[head.len_utf8()..];
-        return match self.children.get(&head) {
-            Some(child) => child.level_iterator_at_prefix(initial_prefix, tail),
-            None => vec![].into_iter(),
-        }
-    }
+    // fn contains_exactly(&self, value: &str) -> bool {
+    //     self.lookup(value) == TrieLookup::IsWord
+    // }
+    //
+    // fn longest_prefix(&self, value_remaining: &str, longest_word: &mut String, post_word: &mut String) {
+    //     if self.word {
+    //         longest_word.push_str(&post_word);
+    //         post_word.clear();
+    //     }
+    //     let head = match value_remaining.chars().next() {
+    //         Some(chr) => chr,
+    //         None => {
+    //             return
+    //         },
+    //     };
+    //     let tail = &value_remaining[head.len_utf8()..];
+    //     return match self.children.get(&head) {
+    //         Some(child) => {
+    //             post_word.push(head);
+    //             child.longest_prefix(tail, longest_word, post_word)
+    //         },
+    //         None => return,
+    //     }
+    // }
+    //
+    // fn level_iterator_at_prefix(&self, initial_prefix: &str, remaining_value: &str) -> impl Iterator<Item = String> {
+    //     let head = match remaining_value.chars().next() {
+    //         Some(chr) => chr,
+    //         None => {
+    //             let mut child_texts = vec![];
+    //             for child in &self.children {
+    //                 let Some(word) = &child.1.word else {
+    //                     continue
+    //                 };
+    //                 let mut text = initial_prefix.to_owned();
+    //                 text.push(*child.0);
+    //                 child_texts.push(text)
+    //             }
+    //             return child_texts.into_iter()
+    //         },
+    //     };
+    //     let tail = &remaining_value[head.len_utf8()..];
+    //     return match self.children.get(&head) {
+    //         Some(child) => child.level_iterator_at_prefix(initial_prefix, tail),
+    //         None => vec![].into_iter(),
+    //     }
+    // }
 }
 
 #[derive(Debug)]
@@ -146,26 +149,9 @@ impl <Word> Trie<Word> {
         self.root.lookup(value) == TrieLookup::IsWord
     }
 
-    pub fn longest_prefix(&self, value: &str) -> String {
-        let mut result_buffer = String::new();
-        let mut postfix_buffer = String::new();
-        self.longest_prefix_with(value, &mut result_buffer, &mut postfix_buffer);
-        result_buffer
-    }
-
     /// Given a text, find all the words that are prefixes of it. E.g. "dogma" is ["do", "dog", "dogma"].
     pub fn all_prefixes_of(&self, value: &str) {
         todo!()  //TODO @mark:
-    }
-
-    pub fn longest_prefix_with(&self, value: &str, result_buffer: &mut String, postfix_buffer: &mut String) {
-        result_buffer.clear();
-        postfix_buffer.clear();
-        self.root.longest_prefix(value, result_buffer, postfix_buffer);
-    }
-
-    pub fn iter_one_extra_letter(&self, prefix: &str) -> impl Iterator<Item = String> {
-        self.root.level_iterator_at_prefix(prefix, prefix)
     }
 }
 
