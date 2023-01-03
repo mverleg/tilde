@@ -76,6 +76,10 @@ impl <Word> TrieNode<Word> {
         }
     }
 
+    fn all_prefixes_of(&self, text: &str, buffer: &mut Vec<Word>) {
+        todo!()  //TODO @mark: TEMPORARY! REMOVE THIS!
+    }
+
     // fn contains_exactly(&self, value: &str) -> bool {
     //     self.lookup(value) == TrieLookup::IsWord
     // }
@@ -150,8 +154,16 @@ impl <Word> Trie<Word> {
     }
 
     /// Given a text, find all the words that are prefixes of it. E.g. "dogma" is ["do", "dog", "dogma"].
-    pub fn all_prefixes_of(&self, value: &str) {
-        todo!()  //TODO @mark:
+    pub fn all_prefixes_of(&self, text: &str) -> Vec<Word> {
+        let mut matches = Vec::new();
+        self.all_prefixes_buffered_of(text, &mut matches);
+        matches
+    }
+
+    /// Like `all_prefixes_of` but use existing buffer instead of allocating.
+    pub fn all_prefixes_buffered_of(&self, text: &str, buffer: &mut Vec<Word>) {
+        buffer.clear();
+        self.root.all_prefixes_of(text, buffer)
     }
 }
 
