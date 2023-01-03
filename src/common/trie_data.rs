@@ -22,8 +22,8 @@ struct TrieNode<Word> {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum TrieLookup {
-    IsWord,
+pub enum TrieLookup<'a, Word> {
+    IsWord(&'a Word),
     IsPrefix,
     NotFound,
 }
@@ -36,40 +36,40 @@ impl <Word> TrieNode<Word> {
         }
     }
 
-    fn push(&mut self, value: impl AsRef<str>) {
-        let text = value.as_ref();
+    fn push(&mut self, text: &str, value: Word) {
         let head = match text.chars().next() {
             Some(chr) => chr,
             None => {
-                self.word = true;
+                self.word = Some(value);
                 return
             },
         };
         let tail = &text[head.len_utf8()..];
         match self.children.entry(head) {
-            Entry::Occupied(mut child) => child.get_mut().push(tail),
+            Entry::Occupied(mut child) => {
+                child.get_mut().push(tail, value)
+            },
             Entry::Vacant(mut entry) => {
                 let mut child = TrieNode::new_empty();
                 if tail.is_empty() {
-                    child.word = true;
+                    child.word = Some(value);
                 } else {
-                    child.push(tail);
+                    child.push(tail, value);
                 }
                 entry.insert(child);
             }
         }
     }
 
-    fn lookup(&self, value: &str) -> TrieLookup {
-        let head = match value.chars().next() {
+    fn lookup(&self, text: &str) -> TrieLookup<Word> {
+        let head = match text.chars().next() {
             Some(chr) => chr,
-            None => return if self.word {
-                TrieLookup::IsWord
-            } else {
-                TrieLookup::IsPrefix
+            None => return match &self.word {
+                Some(value) => TrieLookup::IsWord(value),
+                None => TrieLookup::IsPrefix,
             },
         };
-        let tail = &value[head.len_utf8()..];
+        let tail = &text[head.len_utf8()..];
         return match self.children.get(&head) {
             Some(child) => child.lookup(tail),
             None => TrieLookup::NotFound,
@@ -137,16 +137,16 @@ impl <Word> Trie<Word> {
         }
     }
 
-    pub fn push(&mut self, value: impl AsRef<str>) {
-        self.root.push(value)
+    pub fn push(&mut self, text: &str, value: Word) {
+        self.root.push(text, value)
     }
 
-    pub fn lookup(&self, value: &str) -> TrieLookup {
+    pub fn lookup(&self, value: &str) -> TrieLookup<Word> {
         self.root.lookup(value)
     }
 
     pub fn contains_exactly(&self, value: &str) -> bool {
-        self.root.lookup(value) == TrieLookup::IsWord
+        matches!(self.root.lookup(value), TrieLookup::IsWord(_))
     }
 
     /// Given a text, find all the words that are prefixes of it. E.g. "dogma" is ["do", "dog", "dogma"].

@@ -37,8 +37,8 @@ impl DictMeta {
         tilde_log!("initializing DictMeta (large) for string compression");
         let extended_dict = with_derived_dict_entries(&DICT);
         let mut trie = Trie::new();
-        for snip in extended_dict.iter() {
-            trie.push(&snip.derived_text)
+        for (index, snip) in extended_dict.iter().enumerate() {
+            trie.push(snip.derived_text.as_ref(), index.try_into().expect("extended dict too large to find index"))
         }
         DictMeta {
             base_dict: &DICT,
