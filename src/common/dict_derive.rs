@@ -15,7 +15,6 @@ pub struct DerivationInfo {
 pub fn with_derived_dict_entries(base_dict: &'static [DictEntry]) -> Vec<DerivationInfo> {
     let transformations = generate_transformations();
     iter_snippets(base_dict)
-        .enumerate()
         .flat_map(|(original_index, snippet)| transformations.iter()
             .map(move |transformation| DerivationInfo {
                 derived_text: transformation.apply(snippet),

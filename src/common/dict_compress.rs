@@ -50,13 +50,15 @@ impl DictMeta {
 
 pub fn compress_with_dict(text: &str) -> Vec<INDX> {
     let mut rem = text;
-    let mut numbers = vec![];
-    let mut prefix = String::new();
-    let mut buffer = String::new();
+    let mut numbers = Vec::new();
+    let mut buffer = Vec::new();
     while !rem.is_empty() {
         DICT_META.with(|meta| {
-            // meta.trie.all_prefixes_of(rem, &mut prefix, &mut buffer);
-            // rem = &rem[prefix.len()..];
+            meta.trie.all_prefixes_buffered_of(rem, &mut buffer);
+            let prefix_index = *buffer.last()
+                .unwrap_or_else(|| panic!("did not find snippet for {}", rem.chars().next().unwrap()));
+            let DictEntry::Snippet { snip: prefix, capitalize_next } = meta.base_dict[prefix_index as usize] else { todo!() };
+            rem = &rem[prefix.len()..];
             // if prefix.is_empty() {
             //     //TODO @mark: return Err instead of panic?
             //     panic!("cannot encode string because dictionary does not contain '{}'", rem.chars().next().unwrap())

@@ -70,7 +70,7 @@ impl <Word> TrieNode<Word> {
             },
         };
         let tail = &text[head.len_utf8()..];
-        return match self.children.get(&head) {
+        match self.children.get(&head) {
             Some(child) => child.lookup(tail),
             None => TrieLookup::NotFound,
         }

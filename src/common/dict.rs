@@ -34,14 +34,15 @@ const fn S(snip: &'static str) -> DictEntry {
 
 include!(concat!(env!("OUT_DIR"), "/dict_init.rs"));
 
-pub fn iter_snippets(dict: &'static [DictEntry]) -> impl Iterator<Item=&'static str> {
+pub fn iter_snippets(dict: &'static [DictEntry]) -> impl Iterator<Item=(usize, &'static str)> {
     dict.iter()
-        .flat_map(|entry| match *entry {
+        .enumerate()
+        .flat_map(|(index, entry)| match *entry {
             DictEntry::Snippet { snip, capitalize_next } => Some(snip),
             DictEntry::Backspace => None,
             DictEntry::CapitalizeFirst => None,
             DictEntry::CapitalizeAll => None,
-        }.into_iter())
+        }.map(|e| (index, e)).into_iter())
 }
 
 #[cfg(test)]
@@ -88,7 +89,7 @@ mod lookup {
     #[test]
     fn trailing_whitespace() {
         let trailing_whitespace_count = iter_snippets(&DICT)
-            .filter(|entry| entry.ends_with(" "))
+            .filter(|entry| entry.1.ends_with(" "))
             .count();
         assert!(trailing_whitespace_count > 10, "quite some entries should have trailing space (maybe stripped by editor?)");
     }
@@ -104,7 +105,7 @@ mod lookup {
     #[test]
     fn no_leftover_specials() {
         for entry in iter_snippets(&DICT) {
-            if entry.matches("$").count() >= 2 {
+            if entry.1.matches("$").count() >= 2 {
                 panic!("unparsed magic value: {entry:?}")
             }
         }
