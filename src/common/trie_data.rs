@@ -75,11 +75,21 @@ impl <Word> TrieNode<Word> {
             None => TrieLookup::NotFound,
         }
     }
+}
 
-    fn all_prefixes_of(&self, text: &str, buffer: &mut Vec<Word>) {
-        todo!()  //TODO @mark: TEMPORARY! REMOVE THIS!
+impl <Word: Clone> TrieNode<Word> {
+    fn all_prefixes_of(&self, text: &str, handler: &mut impl FnMut(Word)) {
+        if let Some(value) = &self.word {
+            handler((*value).clone())
+        }
+        let Some(head) = text.chars().next() else {
+            return;
+        };
+        let tail = &text[head.len_utf8()..];
+        self.all_prefixes_of(tail, handler)
     }
 
+    //TODO @mark:
     // fn contains_exactly(&self, value: &str) -> bool {
     //     self.lookup(value) == TrieLookup::IsWord
     // }
@@ -137,7 +147,7 @@ pub struct Trie<Word> {
 impl <Word> Trie<Word> {
     pub fn new() -> Self {
         Trie {
-            root:TrieNode::new_empty(),
+            root: TrieNode::new_empty(),
         }
     }
 
@@ -152,6 +162,9 @@ impl <Word> Trie<Word> {
     pub fn contains_exactly(&self, value: &str) -> bool {
         matches!(self.root.lookup(value), TrieLookup::IsWord(_))
     }
+}
+
+impl <Word: Clone> Trie<Word> {
 
     /// Given a text, find all the words that are prefixes of it. E.g. "dogma" is ["do", "dog", "dogma"].
     pub fn all_prefixes_of(&self, text: &str) -> Vec<Word> {
@@ -163,7 +176,7 @@ impl <Word> Trie<Word> {
     /// Like `all_prefixes_of` but use existing buffer instead of allocating.
     pub fn all_prefixes_buffered_of(&self, text: &str, buffer: &mut Vec<Word>) {
         buffer.clear();
-        self.root.all_prefixes_of(text, buffer)
+        self.root.all_prefixes_of(text, &mut |word| buffer.push(word))
     }
 }
 
