@@ -166,6 +166,12 @@ impl <Word> Trie<Word> {
 
 impl <Word: Clone> Trie<Word> {
 
+    pub fn longest_prefix(&self, text: &str) -> Option<Word> {
+        let mut res = None;
+        self.root.all_prefixes_of(text, &mut |word| res = Some(word));
+        res
+    }
+
     /// Given a text, find all the words that are prefixes of it. E.g. "dogma" is ["do", "dog", "dogma"].
     pub fn all_prefixes_of(&self, text: &str) -> Vec<Word> {
         let mut matches = Vec::new();
@@ -224,61 +230,33 @@ mod tests {
     }
 
     #[test]
-    fn prefix_iter_deep() {
-        let trie = build_test_trie();
-        let mut matches = trie.iter_prefix("hel")
-            .collect::<Vec<_>>();
-        matches.sort();
-        assert_eq!(matches, vec!["hell", "hello", "help", "helvetica"]);
-    }
-
-    #[test]
-    fn prefix_iter_shallow() {
-        let mut trie = build_test_trie();
-        let mut matches = trie.iter_one_extra_letter("hel")
-            .collect::<Vec<_>>();
-        matches.sort();
-        assert_eq!(matches, vec!["hell", "help"]);
-    }
-
-    #[test]
     fn longest_prefix_out_of_input_while_at_word() {
         let mut trie = build_test_trie();
-        assert_eq!(trie.longest_prefix("hell"), "hell");
+        assert_eq!(TrieLookup::IsWord(&trie.longest_prefix("hell").unwrap()), trie.lookup("hell"));
     }
 
     #[test]
     fn longest_prefix_out_of_input_while_not_at_word() {
         let mut trie = build_test_trie();
-        assert_eq!(trie.longest_prefix("her"), "he");
+        assert_eq!(TrieLookup::IsWord(&trie.longest_prefix("her").unwrap()), trie.lookup("he"));
     }
 
     #[test]
     fn longest_prefix_out_of_matches_while_deepest_is_word() {
         let mut trie = build_test_trie();
-        assert_eq!(trie.longest_prefix("helpless"), "help");
+        assert_eq!(TrieLookup::IsWord(&trie.longest_prefix("helpless").unwrap()), trie.lookup("help"));
     }
 
     #[test]
     fn longest_prefix_out_of_matches_while_deepest_is_not_word() {
         let mut trie = build_test_trie();
-        assert_eq!(trie.longest_prefix("helve"), "he");
+        assert_eq!(TrieLookup::IsWord(&trie.longest_prefix("helve").unwrap()), trie.lookup("he"));
     }
 
     #[test]
     fn longest_prefix_unknown_prefix() {
         let mut trie = build_test_trie();
-        assert_eq!(trie.longest_prefix("abacus"), "");
-    }
-
-    #[test]
-    fn longest_prefix_with_buffer() {
-        let mut result_buffer = "clear this".to_owned();
-        let mut postfix_buffer = "clear this".to_owned();
-        let mut trie = build_test_trie();
-        trie.longest_prefix_with("her", &mut result_buffer, &mut postfix_buffer);
-        assert_eq!(result_buffer, "he");
-        assert_eq!(postfix_buffer, "r");
+        assert_eq!(TrieLookup::IsWord(&trie.longest_prefix("abacus").unwrap()), trie.lookup(""));
     }
 
     #[test]
