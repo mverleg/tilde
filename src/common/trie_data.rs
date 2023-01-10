@@ -180,103 +180,109 @@ impl <Word: Clone> Trie<Word> {
     }
 }
 
-// #[cfg(test)]
-// mod tests {
-//     use super::*;
-//
-//     #[test]
-//     fn empty() {
-//         let trie = Trie::new();
-//         assert!(!trie.contains_exactly("hello"));
-//     }
-//
-//     #[test]
-//     fn build() {
-//         let mut trie = Trie::new();
-//         trie.push("hello");
-//         assert_eq!(trie.lookup("hello"), TrieLookup::IsWord);
-//         assert_eq!(trie.lookup("he"), TrieLookup::IsPrefix);
-//         assert_eq!(trie.lookup("eh"), TrieLookup::NotFound);
-//         trie.push("he");
-//         assert_eq!(trie.lookup("he"), TrieLookup::IsWord);
-//         assert_eq!(trie.lookup("hel"), TrieLookup::IsPrefix);
-//         trie.push("hell");
-//         assert_eq!(trie.lookup("hell"), TrieLookup::IsWord);
-//         assert_eq!(trie.lookup("hel"), TrieLookup::IsPrefix);
-//         trie.push("hey");
-//         assert_eq!(trie.lookup("hey"), TrieLookup::IsWord);
-//         assert_eq!(trie.lookup("h"), TrieLookup::IsPrefix);
-//         assert_eq!(trie.lookup("p"), TrieLookup::NotFound);
-//     }
-//
-//     fn build_test_trie() -> Trie {
-//         let mut trie = Trie::new();
-//         trie.push("hello");
-//         trie.push("he");
-//         trie.push("hell");
-//         trie.push("help");
-//         trie.push("hey");
-//         trie.push("hero");
-//         trie.push("helvetica");
-//         trie.push("potato");
-//         trie
-//     }
-//
-//     #[test]
-//     fn prefix_iter_deep() {
-//         let trie = build_test_trie();
-//         let mut matches = trie.iter_prefix("hel")
-//             .collect::<Vec<_>>();
-//         matches.sort();
-//         assert_eq!(matches, vec!["hell", "hello", "help", "helvetica"]);
-//     }
-//
-//     #[test]
-//     fn prefix_iter_shallow() {
-//         let mut trie = build_test_trie();
-//         let mut matches = trie.iter_one_extra_letter("hel")
-//             .collect::<Vec<_>>();
-//         matches.sort();
-//         assert_eq!(matches, vec!["hell", "help"]);
-//     }
-//
-//     #[test]
-//     fn longest_prefix_out_of_input_while_at_word() {
-//         let mut trie = build_test_trie();
-//         assert_eq!(trie.longest_prefix("hell"), "hell");
-//     }
-//
-//     #[test]
-//     fn longest_prefix_out_of_input_while_not_at_word() {
-//         let mut trie = build_test_trie();
-//         assert_eq!(trie.longest_prefix("her"), "he");
-//     }
-//
-//     #[test]
-//     fn longest_prefix_out_of_matches_while_deepest_is_word() {
-//         let mut trie = build_test_trie();
-//         assert_eq!(trie.longest_prefix("helpless"), "help");
-//     }
-//
-//     #[test]
-//     fn longest_prefix_out_of_matches_while_deepest_is_not_word() {
-//         let mut trie = build_test_trie();
-//         assert_eq!(trie.longest_prefix("helve"), "he");
-//     }
-//
-//     #[test]
-//     fn longest_prefix_unknown_prefix() {
-//         let mut trie = build_test_trie();
-//         assert_eq!(trie.longest_prefix("abacus"), "");
-//     }
-//
-//     #[test]
-//     fn longest_prefix_with_buffer() {
-//         let mut result_buffer = "clear this".to_owned();
-//         let mut postfix_buffer = "clear this".to_owned();
-//         let mut trie = build_test_trie();
-//         trie.longest_prefix_with("her", &mut result_buffer, &mut postfix_buffer);
-//         assert_eq!(result_buffer, "he");
-//         assert_eq!(postfix_buffer, "r");
-//     }
-// }
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn empty() {
+        let trie = Trie::<()>::new();
+        assert!(!trie.contains_exactly("hello"));
+    }
+
+    #[test]
+    fn build() {
+        let mut trie = Trie::new();
+        trie.push("hello", 1);
+        assert_eq!(trie.lookup("hello"), TrieLookup::IsWord(&1));
+        assert_eq!(trie.lookup("he"), TrieLookup::IsPrefix);
+        assert_eq!(trie.lookup("eh"), TrieLookup::NotFound);
+        trie.push("he", 2);
+        assert_eq!(trie.lookup("he"), TrieLookup::IsWord(&2));
+        assert_eq!(trie.lookup("hel"), TrieLookup::IsPrefix);
+        trie.push("hell", 3);
+        assert_eq!(trie.lookup("hell"), TrieLookup::IsWord(&3));
+        assert_eq!(trie.lookup("hel"), TrieLookup::IsPrefix);
+        trie.push("hey", 4);
+        assert_eq!(trie.lookup("hey"), TrieLookup::IsWord(&4));
+        assert_eq!(trie.lookup("h"), TrieLookup::IsPrefix);
+        assert_eq!(trie.lookup("p"), TrieLookup::NotFound);
+        assert_eq!(trie.lookup("hello"), TrieLookup::IsWord(&1));
+    }
+
+    fn build_test_trie() -> Trie<i8> {
+        let mut trie = Trie::new();
+        trie.push("hello", 1);
+        trie.push("he", 2);
+        trie.push("hell", 3);
+        trie.push("help", 4);
+        trie.push("hey", 5);
+        trie.push("hero", 6);
+        trie.push("helvetica", 7);
+        trie.push("potato", 8);
+        trie
+    }
+
+    #[test]
+    fn prefix_iter_deep() {
+        let trie = build_test_trie();
+        let mut matches = trie.iter_prefix("hel")
+            .collect::<Vec<_>>();
+        matches.sort();
+        assert_eq!(matches, vec!["hell", "hello", "help", "helvetica"]);
+    }
+
+    #[test]
+    fn prefix_iter_shallow() {
+        let mut trie = build_test_trie();
+        let mut matches = trie.iter_one_extra_letter("hel")
+            .collect::<Vec<_>>();
+        matches.sort();
+        assert_eq!(matches, vec!["hell", "help"]);
+    }
+
+    #[test]
+    fn longest_prefix_out_of_input_while_at_word() {
+        let mut trie = build_test_trie();
+        assert_eq!(trie.longest_prefix("hell"), "hell");
+    }
+
+    #[test]
+    fn longest_prefix_out_of_input_while_not_at_word() {
+        let mut trie = build_test_trie();
+        assert_eq!(trie.longest_prefix("her"), "he");
+    }
+
+    #[test]
+    fn longest_prefix_out_of_matches_while_deepest_is_word() {
+        let mut trie = build_test_trie();
+        assert_eq!(trie.longest_prefix("helpless"), "help");
+    }
+
+    #[test]
+    fn longest_prefix_out_of_matches_while_deepest_is_not_word() {
+        let mut trie = build_test_trie();
+        assert_eq!(trie.longest_prefix("helve"), "he");
+    }
+
+    #[test]
+    fn longest_prefix_unknown_prefix() {
+        let mut trie = build_test_trie();
+        assert_eq!(trie.longest_prefix("abacus"), "");
+    }
+
+    #[test]
+    fn longest_prefix_with_buffer() {
+        let mut result_buffer = "clear this".to_owned();
+        let mut postfix_buffer = "clear this".to_owned();
+        let mut trie = build_test_trie();
+        trie.longest_prefix_with("her", &mut result_buffer, &mut postfix_buffer);
+        assert_eq!(result_buffer, "he");
+        assert_eq!(postfix_buffer, "r");
+    }
+
+    #[test]
+    fn test_all_prefixes_of() {
+        todo!("all_prefixes_of");
+    }
+}
