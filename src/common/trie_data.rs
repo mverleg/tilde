@@ -75,12 +75,10 @@ impl <Word> TrieNode<Word> {
             None => TrieLookup::NotFound,
         }
     }
-}
 
-impl <Word: Clone> TrieNode<Word> {
-    fn all_prefixes_of(&self, text: &str, handler: &mut impl FnMut(Word)) {
+    fn all_prefixes_of<'a>(&'a self, text: &str, handler: &mut impl FnMut(&'a Word)) {
         if let Some(value) = &self.word {
-            handler((*value).clone())
+            handler(value)
         }
         let Some(head) = text.chars().next() else {
             return;
@@ -162,6 +160,19 @@ impl <Word> Trie<Word> {
     pub fn contains_exactly(&self, value: &str) -> bool {
         matches!(self.root.lookup(value), TrieLookup::IsWord(_))
     }
+
+    /// Given a text, find all the words that are prefixes of it. E.g. "dogma" is ["do", "dog", "dogma"].
+    pub fn all_prefixes_of(&self, text: &str) -> Vec<&Word> {
+        let mut matches = Vec::new();
+        self.all_prefixes_buffered_of(text, &mut matches);
+        matches
+    }
+
+    /// Like `all_prefixes_of` but use existing buffer instead of allocating.
+    pub fn all_prefixes_buffered_of<'a>(&'a self, text: &str, buffer: &mut Vec<&'a Word>) {
+        buffer.clear();
+        self.root.all_prefixes_of(text, &mut |word| buffer.push(word))
+    }
 }
 
 impl <Word: Clone> Trie<Word> {
@@ -169,20 +180,12 @@ impl <Word: Clone> Trie<Word> {
     pub fn longest_prefix(&self, text: &str) -> Option<Word> {
         let mut res = None;
         self.root.all_prefixes_of(text, &mut |word| res = Some(word));
-        res
+        res.cloned()
     }
 
-    /// Given a text, find all the words that are prefixes of it. E.g. "dogma" is ["do", "dog", "dogma"].
-    pub fn all_prefixes_of(&self, text: &str) -> Vec<Word> {
-        let mut matches = Vec::new();
-        self.all_prefixes_buffered_of(text, &mut matches);
-        matches
-    }
-
-    /// Like `all_prefixes_of` but use existing buffer instead of allocating.
-    pub fn all_prefixes_buffered_of(&self, text: &str, buffer: &mut Vec<Word>) {
+    pub fn all_prefixes_cloned_of(&self, text: &str, buffer: &mut Vec<Word>) {
         buffer.clear();
-        self.root.all_prefixes_of(text, &mut |word| buffer.push(word))
+        self.root.all_prefixes_of(text, &mut |word| buffer.push((*word).clone()))
     }
 }
 
