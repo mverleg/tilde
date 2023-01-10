@@ -232,38 +232,58 @@ mod tests {
         trie
     }
 
+    fn value_for<T: Clone>(trie: &Trie<T>, text: &str) -> T {
+        let TrieLookup::IsWord(word) = trie.lookup(text) else {
+            panic!("did not find {}", text)
+        };
+        (*word).clone()
+    }
+
     #[test]
     fn longest_prefix_out_of_input_while_at_word() {
         let mut trie = build_test_trie();
-        assert_eq!(TrieLookup::IsWord(&trie.longest_prefix("hell").unwrap()), trie.lookup("hell"));
+        assert_eq!(trie.longest_prefix("hell").unwrap(), value_for(&trie, "hell"));
     }
 
     #[test]
     fn longest_prefix_out_of_input_while_not_at_word() {
         let mut trie = build_test_trie();
-        assert_eq!(TrieLookup::IsWord(&trie.longest_prefix("her").unwrap()), trie.lookup("he"));
+        assert_eq!(trie.longest_prefix("her").unwrap(), value_for(&trie, "he"));
     }
 
     #[test]
     fn longest_prefix_out_of_matches_while_deepest_is_word() {
         let mut trie = build_test_trie();
-        assert_eq!(TrieLookup::IsWord(&trie.longest_prefix("helpless").unwrap()), trie.lookup("help"));
+        assert_eq!(trie.longest_prefix("helpless").unwrap(), value_for(&trie, "help"));
     }
 
     #[test]
     fn longest_prefix_out_of_matches_while_deepest_is_not_word() {
         let mut trie = build_test_trie();
-        assert_eq!(TrieLookup::IsWord(&trie.longest_prefix("helve").unwrap()), trie.lookup("he"));
+        assert_eq!(trie.longest_prefix("helve").unwrap(), value_for(&trie, "he"));
     }
 
     #[test]
     fn longest_prefix_unknown_prefix() {
         let mut trie = build_test_trie();
-        assert_eq!(TrieLookup::IsWord(&trie.longest_prefix("abacus").unwrap()), trie.lookup(""));
+        assert_eq!(trie.longest_prefix("abacus").unwrap(), value_for(&trie, ""));
     }
 
     #[test]
-    fn test_all_prefixes_of() {
-        todo!("all_prefixes_of");
+    fn test_all_prefixes_of_no_match() {
+        let mut trie = build_test_trie();
+        assert!(trie.all_prefixes_of("abacus").is_empty());
+    }
+
+    #[test]
+    fn test_all_prefixes_of_exact_match() {
+        let mut trie = build_test_trie();
+        assert_eq!(trie.all_prefixes_of("hell"), vec![&value_for(&trie, "he"), &value_for(&trie, "hell")]);
+    }
+
+    #[test]
+    fn test_all_prefixes_of_sub_matches() {
+        let mut trie = build_test_trie();
+        assert_eq!(trie.all_prefixes_of("helpless"), vec![&value_for(&trie, "he"), &value_for(&trie, "help")]);
     }
 }
