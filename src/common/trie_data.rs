@@ -12,6 +12,7 @@ use ::std::collections::hash_map::Entry;
 use ::std::collections::HashMap;
 use ::std::collections::VecDeque;
 use ::std::vec::IntoIter;
+use ::std::fmt::Debug;
 use crate::common::trie_original::TrieIterator;
 
 #[derive(Debug)]
@@ -28,7 +29,7 @@ pub enum TrieLookup<'a, Word> {
     NotFound,
 }
 
-impl <Word> TrieNode<Word> {
+impl <Word: Debug> TrieNode<Word> {
     fn new_empty() -> Self {
         TrieNode {
             children: HashMap::with_capacity(0),
@@ -78,11 +79,15 @@ impl <Word> TrieNode<Word> {
 
     fn all_prefixes_of<'a>(&'a self, text: &str, handler: &mut impl FnMut(&'a Word)) {
         if let Some(value) = &self.word {
+            eprintln!(">> {} {:?} {:?}", text.chars().next().unwrap_or('?'), self.word, value);  //TODO @mark: TEMPORARY! REMOVE THIS!
             handler(value)
+        } else {
+            eprintln!(">>> {} {:?} ...", text.chars().next().unwrap_or('?'), self.word);  //TODO @mark: TEMPORARY! REMOVE THIS!
         }
         let Some(head) = text.chars().next() else {
             return;
         };
+        eprintln!("> {}", head);  //TODO @mark: TEMPORARY! REMOVE THIS!
         let tail = &text[head.len_utf8()..];
         self.all_prefixes_of(tail, handler)
     }
@@ -142,7 +147,7 @@ pub struct Trie<Word> {
     root: TrieNode<Word>,
 }
 
-impl <Word> Trie<Word> {
+impl <Word: Debug> Trie<Word> {
     pub fn new() -> Self {
         Trie {
             root: TrieNode::new_empty(),
@@ -175,7 +180,7 @@ impl <Word> Trie<Word> {
     }
 }
 
-impl <Word: Clone> Trie<Word> {
+impl <Word: Clone + Debug> Trie<Word> {
 
     pub fn longest_prefix(&self, text: &str) -> Option<Word> {
         let mut res = None;
@@ -232,7 +237,7 @@ mod tests {
         trie
     }
 
-    fn value_for<T: Clone>(trie: &Trie<T>, text: &str) -> T {
+    fn value_for<T: Clone + Debug>(trie: &Trie<T>, text: &str) -> T {
         let TrieLookup::IsWord(word) = trie.lookup(text) else {
             panic!("did not find {}", text)
         };
