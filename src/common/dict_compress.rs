@@ -56,10 +56,14 @@ pub fn compress_with_dict(text: &str) -> Vec<INDX> {
         DICT_META.with(|meta| {
             meta.trie.all_prefixes_cloned_of(rem, &mut buffer);
             eprintln!("> {} | for: {}", buffer.iter().map(|c| format!("{:?}", meta.base_dict[*c as usize])).collect::<Vec<_>>().join(" / "), rem);  //TODO @mark: TEMPORARY! REMOVE THIS!
-            let prefix_index = *buffer.last()
+            let deriv_index = *buffer.last()
                 .unwrap_or_else(|| panic!("did not find snippet for {}", rem.chars().next().unwrap()));
-            let DictEntry::Snippet { snip: prefix, capitalize_next } = meta.base_dict[prefix_index as usize] else { todo!() };
-            rem = &rem[prefix.len()..];
+            let deriv = &meta.extended_dict[deriv_index as usize];
+            numbers.push(deriv.original_index.try_into().expect("could not convert usize into index"));
+            numbers.extend(deriv.transformation.operation_indices());
+            //let DictEntry::Snippet { snip: prefix, capitalize_next } = meta.base_dict[prefix_index as usize] else { todo!() };
+            //eprintln!("prefix: {prefix}");  //TODO @mark: TEMPORARY! REMOVE THIS!
+            rem = &rem[deriv.derived_text.as_ref().len()..];
             // if prefix.is_empty() {
             //     //TODO @mark: return Err instead of panic?
             //     panic!("cannot encode string because dictionary does not contain '{}'", rem.chars().next().unwrap())
