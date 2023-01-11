@@ -79,17 +79,16 @@ impl <Word: Debug> TrieNode<Word> {
 
     fn all_prefixes_of<'a>(&'a self, text: &str, handler: &mut impl FnMut(&'a Word)) {
         if let Some(value) = &self.word {
-            eprintln!(">> {} {:?} {:?}", text.chars().next().unwrap_or('?'), self.word, value);  //TODO @mark: TEMPORARY! REMOVE THIS!
             handler(value)
-        } else {
-            eprintln!(">>> {} {:?} ...", text.chars().next().unwrap_or('?'), self.word);  //TODO @mark: TEMPORARY! REMOVE THIS!
         }
         let Some(head) = text.chars().next() else {
             return;
         };
-        eprintln!("> {}", head);  //TODO @mark: TEMPORARY! REMOVE THIS!
+        let Some(next) = self.children.get(&head) else {
+            return;
+        };
         let tail = &text[head.len_utf8()..];
-        self.all_prefixes_of(tail, handler)
+        next.all_prefixes_of(tail, handler)
     }
 
     //TODO @mark:
@@ -271,7 +270,7 @@ mod tests {
     #[test]
     fn longest_prefix_unknown_prefix() {
         let mut trie = build_test_trie();
-        assert_eq!(trie.longest_prefix("abacus").unwrap(), value_for(&trie, ""));
+        assert!(trie.longest_prefix("abacus").is_none());
     }
 
     #[test]
