@@ -58,25 +58,12 @@ pub fn compress_with_dict(text: &str) -> Vec<INDX> {
     DICT_META.with(|meta| {
         while !rem.is_empty() {
             meta.trie.all_prefixes_cloned_of(rem, &mut buffer);
-            //eprintln!("> {} | for: {}", buffer.iter().map(|c| format!("{:?}", meta.extended_dict[*c as usize])).collect::<Vec<_>>().join(" / "), rem);  //TODO @mark: TEMPORARY! REMOVE THIS!
             let deriv_index = *buffer.last()
                 .unwrap_or_else(|| panic!("did not find snippet for {}", rem.chars().next().unwrap()));
             let deriv = &meta.extended_dict[deriv_index as usize];
             numbers.push(deriv.original_index.try_into().expect("could not convert usize into index"));
             numbers.extend(deriv.transformation.operation_indices());
-            //let DictEntry::Snippet { snip: prefix, capitalize_next } = meta.base_dict[prefix_index as usize] else { todo!() };
-            //eprintln!("prefix: {prefix}");  //TODO @mark: TEMPORARY! REMOVE THIS!
             rem = &rem[deriv.derived_text.as_ref().len()..];
-            // if prefix.is_empty() {
-            //     //TODO @mark: return Err instead of panic?
-            //     panic!("cannot encode string because dictionary does not contain '{}'", rem.chars().next().unwrap())
-            // }
-            // let nrs = meta.entry_info.get(&DictStr::try_from(prefix.as_str()).expect("prefix too long for array string"))
-            // TODO @mark: use str instead of DictStr above? ^
-            // .unwrap_or_else(|| panic!("prefix not in dictionary: '{prefix}'"))
-            // .original_index
-            // .try_into().expect("index does not fit in type");
-            //numbers.push(nrs)
         }
     });
     numbers

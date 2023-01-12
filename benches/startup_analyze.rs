@@ -8,9 +8,9 @@ use ::tilde::TildeArgs;
 
 pub fn criterion_benchmark(c: &mut Criterion) {
     let source = ",hello world";
-    let args = TildeArgs { operation: CliOperation::Analyze(source.to_string()) };
-    c.bench_function("analyze_tilde_code", |b| b.iter(|| thread::scope(|_|
-        run_tilde(black_box(&args)))));
+    c.bench_function("analyze_tilde_code", |b| b.iter(|| thread::spawn(||
+        run_tilde(black_box(&TildeArgs { operation: CliOperation::Analyze(source.to_string()) }))
+    ).join()));
 }
 
 criterion_group!(benches, criterion_benchmark);

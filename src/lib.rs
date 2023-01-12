@@ -133,7 +133,7 @@ pub fn tilde_analyze(code: &str) -> TildeRes<String> {
     analysis.push_str("\"length_valid\": 0,\n");
     analysis.push_str("\"length_preview_features\": 0\n");
     analysis.push_str("}\n");
-    println!("compress len: {}", compress_with_dict(code).len());  //TODO @mverleg: just for bench
+    if 1 == 1 { return Ok(compress_with_dict(code).len().to_string()); }
     Ok(analysis)
     //TODO @mverleg: implement
 }
