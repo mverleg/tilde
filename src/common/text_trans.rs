@@ -1,16 +1,15 @@
-/// Dictionary entry transformations.
-/// This file is also included from `build.rs`
-
+use ::std::cmp::Ordering;
 use ::std::fmt::Write;
 use ::std::hash;
 use ::std::hash::Hasher;
-use ::std::cmp::Ordering;
-use ::tinyvec_string::ArrayString;
 use ::tinyvec::ArrayVec;
+use ::tinyvec_string::ArrayString;
+
+use crate::common::INDX;
 
 #[allow(dead_code)]
-pub const LONGEST_DICT_ENTRY_BYTES: usize = 22;  // located in this file because of build.rs
-pub type DictStr = ArrayString::<[u8; LONGEST_DICT_ENTRY_BYTES]>;
+pub const LONGEST_DICT_ENTRY_BYTES: usize = 22; // located in this file because of build.rs
+pub type DictStr = ArrayString<[u8; LONGEST_DICT_ENTRY_BYTES]>;
 #[derive(Debug, Eq, Ord)]
 pub enum CowDictStr {
     Owned(DictStr),
@@ -115,7 +114,11 @@ impl TextTransformation {
         CowDictStr::Borrowed(&input[0..end_index])
     }
 
-    pub fn name(&self) -> ArrayString::<[u8; 6]> {
+    pub fn operation_indices(&self) -> ArrayVec<[INDX; 4]> {
+        todo!();
+    }
+
+    pub fn name(&self) -> ArrayString<[u8; 6]> {
         let mut repr = ArrayString::new();
         write!(repr, "{}", match (self.case_all, self.case_first) {
             (true, false) => 'a',

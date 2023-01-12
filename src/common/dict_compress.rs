@@ -11,11 +11,15 @@ use ::std::sync::LazyLock;
 use ::strum::IntoEnumIterator;
 use ::strum_macros::EnumIter;
 
-use crate::common::{INDX, TextTransformation};
-use crate::common::dict::{DICT, DictEntry, iter_snippets};
-use crate::common::dict_derive::{DerivationInfo, with_derived_dict_entries};
+use crate::common::dict::iter_snippets;
+use crate::common::dict::DictEntry;
+use crate::common::dict::DICT;
+use crate::common::dict_derive::with_derived_dict_entries;
+use crate::common::dict_derive::DerivationInfo;
 use crate::common::text_trans::DictStr;
 use crate::common::trie_data::Trie;
+use crate::common::TextTransformation;
+use crate::common::INDX;
 use crate::tilde_log;
 
 thread_local! {

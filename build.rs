@@ -3,9 +3,9 @@ use ::std::fmt::Write;
 use ::std::fs;
 use ::std::path::PathBuf;
 
-mod text_trans {
-    include!("src/common/text_trans.rs");
-}
+// mod text_trans {
+//     include!("src/common/text_trans.rs");
+// }
 
 fn main() {
     println!("cargo:rerun-if-changed=Cargo.toml");
