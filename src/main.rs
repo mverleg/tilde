@@ -43,32 +43,32 @@ fn parse_operation(mut args: Vec<String>) -> ArgParseRes {
     let cli_op = match arg1.as_deref() {
         Some("-h") | Some("--help") => GenHelp,
         Some("-f") | Some("--file") => {
-            let pth = args
-                .pop()
-                .ok_or_else(|| "argument -f/--file expects a path to a source file".to_string())?;
+            let Some(pth) = args.pop() else {
+                return Err("argument -f/--file expects a path to a source file".to_string())
+            };
             tilde_log!("reading source from file {}", pth);
-            Ok(MainOperation::Run(read_to_string(pth).map_err(|err| format!("failed to read source file, err {err}"))?))
+            Lib(CliOperation::Run(read_to_string(pth).map_err(|err| format!("failed to read source file, err {err}"))?))
         },
         Some("-s") | Some("--source") => {
-            let src = args
-                .pop()
-                .ok_or_else(|| "argument -s/--source expects a single argument containing source code".to_string())?;
+            let Some(src) = args.pop() else {
+                return Err("argument -s/--source expects a single argument containing source code".to_string())
+            };
             tilde_log!("getting source from command line (length in utf8 bytes: {})", src.len());
-            Ok(MainOperation::Run(src))
+            Lib(CliOperation::Run(src))
         },
         Some("-F") | Some("--analyze-file") => {
-            let pth = args
-                .pop()
-                .ok_or_else(|| "argument -F/--analyze-file expects a path to a source file".to_string())?;
+            let Some(pth) = args.pop() else {
+                return Err("argument -F/--analyze-file expects a path to a source file".to_string())
+            };
             tilde_log!("reading source from file {} for analysis", pth);
-            Ok(MainOperation::Analyze(read_to_string(pth).map_err(|err| format!("failed to read source file, err {err}"))?))
+            Lib(CliOperation::Analyze(read_to_string(pth).map_err(|err| format!("failed to read source file, err {err}"))?))
         },
         Some("-S") | Some("--analyze-source") => {
-            let src = args
-                .pop()
-                .ok_or_else(|| "argument -S/--analyze-source expects a single argument containing source code".to_string())?;
+            let Some(src) = args.pop() else {
+                return Err("argument -S/--analyze-source expects a single argument containing source code".to_string())
+            };
             tilde_log!("getting source from command line (length in utf8 bytes: {}) for analysis", src.len());
-            Ok(MainOperation::Analyze(src))
+            Lib(CliOperation::Analyze(src))
         },
         Some("doc-gen") => Lib(CliOperation::DocGen),
         Some(arg) => {
