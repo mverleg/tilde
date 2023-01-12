@@ -10,13 +10,17 @@ use ::std::io::BufWriter;
 use ::std::io::Read;
 use ::std::path::Path;
 use ::std::process::ExitCode;
+use std::cmp::Ordering;
+use std::io::{BufRead, stdin};
+use std::sync::Arc;
+use std::sync::atomic::AtomicBool;
+use std::thread;
+use std::thread::sleep;
+use std::time::Duration;
 
 pub use crate::common::log as tilde_log;
 use crate::compile::parse;
 pub use crate::exec::Value;
-
-#[cfg(feature = "gen")]
-pub use self::gen::mddoc::tilde_gen_md_docs;
 
 mod common;
 mod compile;
@@ -25,14 +29,24 @@ mod exec;
 mod gen;
 mod op;
 
-#[cfg(not(feature = "gen"))]
-pub fn tilde_gen_md_docs() -> TildeRes<()> {
-    Err("doc-gen can only be used if compiled with feature `gen`".to_owned())
+//TODO @mverleg: move this code?
+fn gather_input() -> Vec<String> {
+    let is_ready = Arc::new(AtomicBool::new(false));
+    let is_ready_clone = is_ready.clone();
+    thread::spawn(move || {
+        sleep(Duration::from_secs(5));
+        if !is_ready_clone.load(Ordering::Acquire) {
+            eprintln!("waiting for input on stdin; stdin needs to be closed before tilde can start")
+        }
+    });
+    let inp = stdin()
+        .lock()
+        .lines()
+        .map(|l| l.expect("cannot read line from stdin, not utf8?"))
+        .collect();
+    is_ready.store(true, Ordering::Release);
+    inp
 }
-
-pub type TildeRes<T> = Result<T, String>;
-pub type NR = f64;
-pub type UINT = u64;
 
 /// Run tilde with input lines produces by a reader, and results handled by a writer.
 pub fn tilde_from<R: io::Read, W: io::Write>(

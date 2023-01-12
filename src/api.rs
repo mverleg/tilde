@@ -14,14 +14,26 @@ use ::tilde::Value;
 
 use crate::gen_help;
 
+#[cfg(not(feature = "gen"))]
+pub fn tilde_gen_md_docs() -> TildeRes<()> {
+    Err("doc-gen can only be used if compiled with feature `gen`".to_owned())
+}
+
+pub type TildeRes<T> = Result<T, String>;
+pub type NR = f64;
+pub type UINT = u64;
+
+#[cfg(feature = "gen")]
+pub use self::gen::mddoc::tilde_gen_md_docs;
+
 pub fn run_tilde(args: &TildeArgs) -> TildeRes<Value> {
     match &args.operation {
         CliOperation::Run(_source) => {
             todo!() //TODO @mark: TEMPORARY! REMOVE THIS!
-                    //tilde_from();
-                    // let inp = gather_input();
-                    // let prog = parse(&source)?;
-                    // execute(prog, inp)
+            //tilde_from();
+            // let inp = gather_input();
+            // let prog = parse(&source)?;
+            // execute(prog, inp)
         },
         CliOperation::Analyze(source) => Ok(tilde_analyze(&source)?.into()),
         CliOperation::ShowHelp => Ok(gen_help().into()),
@@ -43,23 +55,4 @@ pub enum CliOperation {
     Analyze(String),
     ShowHelp,
     DocGen,
-}
-
-#[allow(unused)] //TODO @mark: TEMPORARY! REMOVE THIS!
-fn gather_input() -> Vec<String> {
-    let is_ready = Arc::new(AtomicBool::new(false));
-    let is_ready_clone = is_ready.clone();
-    thread::spawn(move || {
-        sleep(Duration::from_secs(5));
-        if !is_ready_clone.load(Ordering::Acquire) {
-            eprintln!("waiting for input on stdin; stdin needs to be closed before tilde can start")
-        }
-    });
-    let inp = stdin()
-        .lock()
-        .lines()
-        .map(|l| l.expect("cannot read line from stdin, not utf8?"))
-        .collect();
-    is_ready.store(true, Ordering::Release);
-    inp
 }
