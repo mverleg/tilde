@@ -36,27 +36,21 @@ impl <K: Default + Eq + Hash, V: Default> TinyMap<K, V> {
     }
 
     pub fn insert(&mut self, key: K, value: V) {
-        let should_upgrade = match self {
+        match self {
             TinyMap::Small(vec) => {
-                if let Some(_) = vec.try_push((key, value)) {
+                if let Some((key, value)) = vec.try_push((key, value)) {
                     // need to switch from Small to Big
-                    true
-                } else {
-                    false
+                    let mut map = HashMap::new();
+                    for (k, v) in vec.drain(..) {
+                        map.insert(k, v);
+                    }
+                    map.insert(key, value);
+                    *self = TinyMap::Big(map)
                 }
             }
             TinyMap::Big(map) => {
                 map.insert(key, value);
-                false
             },
         };
-        if should_upgrade {
-            let mut map = HashMap::new();
-            for (k, v) in vec {
-                map.insert(k, v);
-            }
-            map.insert(key, value);
-            *self = TinyMap::Big(map)
-        }
     }
 }
