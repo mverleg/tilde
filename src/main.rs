@@ -47,7 +47,11 @@ fn parse_operation(mut args: Vec<String>) -> ArgParseRes {
                 return Err("argument -f/--file expects a path to a source file".to_string())
             };
             tilde_log!("reading source from file {}", pth);
-            Lib(CliOperation::Run(read_to_string(pth).map_err(|err| format!("failed to read source file, err {err}"))?))
+            let src = match read_to_string(pth) {
+                Ok(src) => src,
+                ArgParseRes::Err(err) => return Err(format!("failed to read source file, err {err}"))
+            };
+            Lib(CliOperation::Run(src))
         },
         Some("-s") | Some("--source") => {
             let Some(src) = args.pop() else {
@@ -61,7 +65,11 @@ fn parse_operation(mut args: Vec<String>) -> ArgParseRes {
                 return Err("argument -F/--analyze-file expects a path to a source file".to_string())
             };
             tilde_log!("reading source from file {} for analysis", pth);
-            Lib(CliOperation::Analyze(read_to_string(pth).map_err(|err| format!("failed to read source file, err {err}"))?))
+            let src = match read_to_string(pth) {
+                Ok(src) => src,
+                ArgParseRes::Err(err) => return Err(format!("failed to read source file, err {err}"))
+            };
+            Lib(CliOperation::Analyze(src))
         },
         Some("-S") | Some("--analyze-source") => {
             let Some(src) = args.pop() else {
@@ -76,7 +84,7 @@ fn parse_operation(mut args: Vec<String>) -> ArgParseRes {
             Err(format!("unknown argument '{arg}'\n{hint}try --help for options"))
         },
         None => Err("expected at least one argument; try --help for options".to_string()),
-    }?;
+    };
     if !args.is_empty() {
         return Err(format!("cannot handle these arguments: {}\ntry --help for options", args.join(" ")));
     }
