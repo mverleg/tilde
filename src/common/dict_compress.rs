@@ -55,10 +55,10 @@ pub fn compress_with_dict(text: &str) -> Vec<INDX> {
     let mut rem = text;
     let mut numbers = Vec::new();
     let mut buffer = Vec::new();
-    while !rem.is_empty() {
-        DICT_META.with(|meta| {
+    DICT_META.with(|meta| {
+        while !rem.is_empty() {
             meta.trie.all_prefixes_cloned_of(rem, &mut buffer);
-            eprintln!("> {} | for: {}", buffer.iter().map(|c| format!("{:?}", meta.extended_dict[*c as usize])).collect::<Vec<_>>().join(" / "), rem);  //TODO @mark: TEMPORARY! REMOVE THIS!
+            //eprintln!("> {} | for: {}", buffer.iter().map(|c| format!("{:?}", meta.extended_dict[*c as usize])).collect::<Vec<_>>().join(" / "), rem);  //TODO @mark: TEMPORARY! REMOVE THIS!
             let deriv_index = *buffer.last()
                 .unwrap_or_else(|| panic!("did not find snippet for {}", rem.chars().next().unwrap()));
             let deriv = &meta.extended_dict[deriv_index as usize];
@@ -77,8 +77,8 @@ pub fn compress_with_dict(text: &str) -> Vec<INDX> {
             // .original_index
             // .try_into().expect("index does not fit in type");
             //numbers.push(nrs)
-        })
-    }
+        }
+    });
     numbers
 }
 

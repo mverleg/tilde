@@ -10,6 +10,10 @@ build = "build.rs"
 [features]
 gen = []
 
+[[bench]]
+name = "startup_analyze"
+harness = false
+
 [dependencies]
 strum = { version = "0.24", default-features = false }
 strum_macros = { version = "0.24", default-features = false }

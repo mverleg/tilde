@@ -123,6 +123,7 @@ pub fn tilde_eval(
 
 /// Analyze the Tilde source code and report stats as json.
 pub fn tilde_analyze(code: &str) -> TildeRes<String> {
+    use crate::common::compress_with_dict;
     let mut analysis = String::with_capacity(512);
     analysis.push_str("{\n");
     analysis.push_str("\"uses_preview_features\": false,\n");
@@ -132,5 +133,7 @@ pub fn tilde_analyze(code: &str) -> TildeRes<String> {
     analysis.push_str("\"length_valid\": 0,\n");
     analysis.push_str("\"length_preview_features\": 0\n");
     analysis.push_str("}\n");
+    println!("compress len: {}", compress_with_dict(code).len());  //TODO @mverleg: just for bench
     Ok(analysis)
+    //TODO @mverleg: implement
 }
