@@ -64,17 +64,28 @@ impl <K: Default + Eq + Hash, V: Default> TinyMap<K, V> {
 }
 
 #[cfg(test)]
-mod tests {
+mod tiny_map {
     use super::*;
 
     #[test]
-    fn add_unique() {
+    fn unique() {
         let mut map = TinyMap::new();
         for i in 0..=20 {
             map.insert(i, i * 10);
             assert_eq!(map.get(i), Some(&(10 * i)));
             assert_eq!(map.get(i + 1), None);
             assert_eq!(map.len(), i + 1);
+        }
+    }
+
+    #[test]
+    fn duplicate() {
+        let mut map = TinyMap::new();
+        assert_eq!(map.len(), 0);
+        for i in 0..=20 {
+            map.insert("hello world", i);
+            assert_eq!(map.get("hello world"), Some(&i));
+            assert_eq!(map.len(), 1);
         }
     }
 }
