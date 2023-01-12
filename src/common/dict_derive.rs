@@ -100,7 +100,7 @@ struct TransformationCost<'a> {
 
 #[cfg(test)]
 mod tests {
-    use ::std::cmp::min;
+    use ::std::cmp::max;
 
     use super::*;
 
@@ -111,7 +111,7 @@ mod tests {
         for transformation in generate_transformations() {
             let indices = transformation.operation_indices();
             capacity = indices.capacity();
-            longest = min(longest, indices.len());
+            longest = max(longest, indices.len());
         }
         assert_eq!(capacity, longest, "capacity of operation_indices() result is larger than needed");
     }

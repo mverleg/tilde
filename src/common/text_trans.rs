@@ -63,7 +63,7 @@ impl hash::Hash for CowDictStr {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Default, Clone, PartialEq, Eq)]
 pub struct TextTransformation {
     pub case_first: bool,
     pub case_all: bool,
@@ -118,19 +118,24 @@ impl TextTransformation {
     pub fn operation_indices(&self) -> OpIndices {
         let mut indices = OpIndices::new();
         if self.case_first {
-            indices.push(x);
+            indices.push(0);
+            //TODO @mverleg:
         }
         if self.case_all {
-            indices.push(x);
+            indices.push(0);
+            //TODO @mverleg:
         }
         if self.reverse {
-            indices.push(x);
+            indices.push(0);
+            //TODO @mverleg:
         }
         for _ in 0..self.pop_start {
-            indices.push(x);
+            indices.push(0);
+            //TODO @mverleg:
         }
         for _ in 0..self.pop_end {
-            indices.push(x);
+            indices.push(0);
+            //TODO @mverleg:
         }
         indices
     }
@@ -212,5 +217,39 @@ mod capitalisation {
         let mut letter = '🦀';
         switch_capitalization_char(&mut letter);
         assert_eq!(letter, '🦀');
+    }
+}
+
+#[cfg(test)]
+mod indices_in_sync_with_dict {
+    use ::std::cell::LazyCell;
+    use ::std::collections::HashMap;
+
+    use super::*;
+    use crate::common::dict::iter_snippets;
+    use crate::common::dict::DictEntry;
+    use crate::common::dict::DICT;
+
+    thread_local! {
+        static DICT_POSITIONS: LazyCell<HashMap<DictEntry, usize>> = LazyCell::new(||
+            DICT.iter().enumerate()
+                .map(|(index, entry)| (*entry, index))
+                .collect());
+    }
+
+    #[test]
+    fn case_first() {
+        let trans = TextTransformation { case_first: true, ..Default::default() };
+        let indices = trans.operation_indices();
+        assert!(indices.len() == 1);
+        let index: usize = indices[0]
+            .try_into()
+            .expect("could not convert index to usize");
+        let expected = DICT_POSITIONS.with(|dict_pos| {
+            *dict_pos
+                .get(&DictEntry::CapitalizeFirst)
+                .unwrap()
+        });
+        assert_eq!(index, expected);
     }
 }
