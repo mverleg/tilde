@@ -118,12 +118,10 @@ impl TextTransformation {
     pub fn operation_indices(&self) -> OpIndices {
         let mut indices = OpIndices::new();
         if self.case_first {
-            indices.push(0);
-            //TODO @mverleg:
+            indices.push(70);
         }
         if self.case_all {
-            indices.push(0);
-            //TODO @mverleg:
+            indices.push(71);
         }
         if self.reverse {
             indices.push(0);
@@ -135,7 +133,6 @@ impl TextTransformation {
         }
         for _ in 0..self.pop_end {
             indices.push(0);
-            //TODO @mverleg:
         }
         indices
     }
@@ -237,9 +234,7 @@ mod indices_in_sync_with_dict {
                 .collect());
     }
 
-    #[test]
-    fn case_first() {
-        let trans = TextTransformation { case_first: true, ..Default::default() };
+    fn assert_transformation_index(trans: TextTransformation, entry: DictEntry) {
         let indices = trans.operation_indices();
         assert!(indices.len() == 1);
         let index: usize = indices[0]
@@ -247,9 +242,30 @@ mod indices_in_sync_with_dict {
             .expect("could not convert index to usize");
         let expected = DICT_POSITIONS.with(|dict_pos| {
             *dict_pos
-                .get(&DictEntry::CapitalizeFirst)
+                .get(&entry)
                 .unwrap()
         });
-        assert_eq!(index, expected);
+        assert_eq!(index, expected, "index should be {expected} but is {index}");
+    }
+
+    #[test]
+    fn case_first() {
+        assert_transformation_index(
+            TextTransformation { case_first: true, ..Default::default() },
+            DictEntry::CapitalizeFirst)
+    }
+
+    #[test]
+    fn case_all() {
+        assert_transformation_index(
+            TextTransformation { case_all: true, ..Default::default() },
+            DictEntry::CapitalizeAll)
+    }
+
+    #[test]
+    fn pop_end() {
+        assert_transformation_index(
+            TextTransformation { pop_end: 1, ..Default::default() },
+            DictEntry::Backspace)
     }
 }
