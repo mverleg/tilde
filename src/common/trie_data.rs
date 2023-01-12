@@ -11,6 +11,8 @@ use ::std::collections::VecDeque;
 use ::std::fmt::Debug;
 use ::std::vec::IntoIter;
 
+use crate::common::INDX;
+
 type NodeIndex = u32;
 
 #[derive(Debug)]
@@ -34,7 +36,7 @@ impl <Word: Debug> TrieNode<Word> {
         }
     }
 
-    fn push(&mut self, text: &str, value: Word) {
+    fn push(&mut self, text: &str, value: Word, nodes: &mut Vec<TrieNode<Word>>) {
         let head = match text.chars().next() {
             Some(chr) => chr,
             None => {
@@ -44,22 +46,25 @@ impl <Word: Debug> TrieNode<Word> {
         };
         let tail = &text[head.len_utf8()..];
         match self.children.entry(head) {
-            Entry::Occupied(mut child) => {
-                child.get_mut().push(tail, value)
+            Entry::Occupied(child_entry) => {
+                let mut child = nodes.get_mut(*child_entry.get() as usize).expect("trie node missing");
+                child.push(tail, value, nodes)
             },
             Entry::Vacant(mut entry) => {
+                let child_index = nodes.len();
                 let mut child = TrieNode::new_empty();
                 if tail.is_empty() {
                     child.word = Some(value);
                 } else {
-                    child.push(tail, value);
+                    child.push(tail, value, nodes);
                 }
-                entry.insert(child);
+                nodes.push(child);
+                entry.insert(child_index.try_into().expect("INDX overflow, too many trie nodes"));
             }
         }
     }
 
-    fn lookup(&self, text: &str) -> TrieLookup<Word> {
+    fn lookup(&self, text: &str, nodes: &Vec<TrieNode<Word>>) -> TrieLookup<Word> {
         let head = match text.chars().next() {
             Some(chr) => chr,
             None => return match &self.word {
@@ -69,23 +74,27 @@ impl <Word: Debug> TrieNode<Word> {
         };
         let tail = &text[head.len_utf8()..];
         match self.children.get(&head) {
-            Some(child) => child.lookup(tail),
+            Some(child_index) => {
+                let child = &nodes[*child_index as usize];
+                child.lookup(tail, nodes)
+            },
             None => TrieLookup::NotFound,
         }
     }
 
-    fn all_prefixes_of<'a>(&'a self, text: &str, handler: &mut impl FnMut(&'a Word)) {
+    fn all_prefixes_of<'a>(&'a self, text: &str, handler: &mut impl FnMut(&'a Word), nodes: &Vec<TrieNode<Word>>) {
         if let Some(value) = &self.word {
             handler(value)
         }
         let Some(head) = text.chars().next() else {
             return;
         };
-        let Some(next) = self.children.get(&head) else {
+        let Some(next_index) = self.children.get(&head) else {
             return;
         };
+        let next = &nodes[*next_index as usize];
         let tail = &text[head.len_utf8()..];
-        next.all_prefixes_of(tail, handler)
+        next.all_prefixes_of(tail, handler, nodes)
     }
 
     //TODO @mark:
@@ -151,20 +160,24 @@ impl <Word: Debug> Trie<Word> {
         }
     }
 
-    pub fn root(&self) -> &mut TrieNode<Word> {
+    pub fn root(&self) -> &TrieNode<Word> {
+        &self.arena[0]
+    }
+
+    pub fn root_mut(&mut self) -> &mut TrieNode<Word> {
         &mut self.arena[0]
     }
 
     pub fn push(&mut self, text: &str, value: Word) {
-        self.root.push(text, value)
+        self.root().push(text, value, &mut self.arena)
     }
 
     pub fn lookup(&self, value: &str) -> TrieLookup<Word> {
-        self.root.lookup(value)
+        self.root().lookup(value, &self.arena)
     }
 
     pub fn contains_exactly(&self, value: &str) -> bool {
-        matches!(self.root.lookup(value), TrieLookup::IsWord(_))
+        matches!(self.root().lookup(value, &self.arena), TrieLookup::IsWord(_))
     }
 
     /// Given a text, find all the words that are prefixes of it. E.g. "dogma" is ["do", "dog", "dogma"].
@@ -177,7 +190,7 @@ impl <Word: Debug> Trie<Word> {
     /// Like `all_prefixes_of` but use existing buffer instead of allocating.
     pub fn all_prefixes_buffered_of<'a>(&'a self, text: &str, buffer: &mut Vec<&'a Word>) {
         buffer.clear();
-        self.root.all_prefixes_of(text, &mut |word| buffer.push(word))
+        self.root().all_prefixes_of(text, &mut |word| buffer.push(word), &self.arena)
     }
 }
 
@@ -185,19 +198,27 @@ impl <Word: Clone + Debug> Trie<Word> {
 
     pub fn longest_prefix(&self, text: &str) -> Option<Word> {
         let mut res = None;
-        self.root.all_prefixes_of(text, &mut |word| res = Some(word));
+        self.root().all_prefixes_of(text, &mut |word| res = Some(word), &self.arena);
         res.cloned()
     }
 
     pub fn all_prefixes_cloned_of(&self, text: &str, buffer: &mut Vec<Word>) {
         buffer.clear();
-        self.root.all_prefixes_of(text, &mut |word| buffer.push((*word).clone()))
+        self.root().all_prefixes_of(text, &mut |word| buffer.push((*word).clone()), &self.arena)
     }
 }
 
 #[cfg(test)]
 mod tests {
+    use ::std::mem::size_of;
+
     use super::*;
+
+    #[test]
+    fn index_size() {
+        assert!(size_of::<INDX>() <= size_of::<usize>(),
+                "usize is smaller than index on this platform, this is not supported");
+    }
 
     #[test]
     fn empty() {
