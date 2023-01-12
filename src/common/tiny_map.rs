@@ -1,4 +1,5 @@
 use ::std::collections::HashMap;
+use std::borrow::BorrowMut;
 use std::hash::Hash;
 
 use ::tinyvec::ArrayVec;
@@ -22,19 +23,12 @@ impl <K: Default, V: Default> TinyMap<K, V> {
 
 impl <K: Default + Eq + Hash, V: Default> TinyMap<K, V> {
 
-    pub fn len(&self) -> usize {
-        match self {
-            TinyMap::Small(vec) => vec.len(),
-            TinyMap::Big(map) => map.len(),
-        }
-    }
-
     pub fn get(&self, key: K) -> Option<&V> {
         match self {
             TinyMap::Small(vec) => {
-                for elem in vec {
-                    if key == elem.0 {
-                        return Some(&elem.1)
+                for (k, v) in vec {
+                    if key == *k {
+                        return Some(v)
                     }
                 }
                 None
@@ -45,9 +39,16 @@ impl <K: Default + Eq + Hash, V: Default> TinyMap<K, V> {
 
     pub fn insert(&mut self, key: K, value: V) {
         match self {
-            TinyMap::Small(vec) => {
+            TinyMap::Small(ref mut vec) => {
+                // overwrite existing value?
+                for elem in &mut *vec {
+                    if key == elem.0 {
+                        *elem = (key, value);
+                        return;
+                    }
+                }
+                // need to switch from Small to Big?
                 if let Some((key, value)) = vec.try_push((key, value)) {
-                    // need to switch from Small to Big
                     let mut map = HashMap::new();
                     for (k, v) in vec.drain(..) {
                         map.insert(k, v);
@@ -60,6 +61,13 @@ impl <K: Default + Eq + Hash, V: Default> TinyMap<K, V> {
                 map.insert(key, value);
             },
         };
+    }
+
+    pub fn len(&self) -> usize {
+        match self {
+            TinyMap::Small(vec) => vec.len(),
+            TinyMap::Big(map) => map.len(),
+        }
     }
 }
 
