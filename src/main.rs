@@ -46,9 +46,7 @@ fn parse_operation(mut args: Vec<String>) -> ArgParseRes {
             let Some(pth) = args.pop() else {
                 return Err("argument -f/--file expects a path to a source file".to_string())
             };
-            {
-                let q: () = tilde_log!("reading source from file {}", pth);
-            };
+            tilde_log!("reading source from file {pth}");
             let src = match read_to_string(pth) {
                 Ok(src) => src,
                 Result::Err(err) => return Err(format!("failed to read source file, err {err}"))
@@ -59,18 +57,14 @@ fn parse_operation(mut args: Vec<String>) -> ArgParseRes {
             let Some(src) = args.pop() else {
                 return Err("argument -s/--source expects a single argument containing source code".to_string())
             };
-                {
-                    let q: () = tilde_log!("getting source from command line (length in utf8 bytes: {})", src.len());
-                };
+            tilde_log!("getting source from command line (length in utf8 bytes: {})", src.len());
             Lib(CliOperation::Run(src))
         },
         Some("-F") | Some("--analyze-file") => {
             let Some(pth) = args.pop() else {
                 return Err("argument -F/--analyze-file expects a path to a source file".to_string())
             };
-                    {
-                        let q: () = tilde_log!("reading source from file {} for analysis", pth);
-                    };
+            tilde_log!("reading source from file {pth} for analysis");
             let src = match read_to_string(pth) {
                 Ok(src) => src,
                 Result::Err(err) => return Err(format!("failed to read source file, err {err}"))
@@ -81,9 +75,7 @@ fn parse_operation(mut args: Vec<String>) -> ArgParseRes {
             let Some(src) = args.pop() else {
                 return Err("argument -S/--analyze-source expects a single argument containing source code".to_string())
             };
-                        {
-                            let q: () = tilde_log!("getting source from command line (length in utf8 bytes: {}) for analysis", src.len());
-                        };
+            tilde_log!("getting source from command line (length in utf8 bytes: {}) for analysis", src.len());
             Lib(CliOperation::Analyze(src))
         },
         Some("doc-gen") => Lib(CliOperation::DocGen),

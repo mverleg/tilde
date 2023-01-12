@@ -12,7 +12,7 @@ macro_rules! log {
             let mut is_on = LOG_ON.load(Ordering::Acquire);
             if is_on == UNKNOWN {
                 let on_env = env::var("TILDE_LOG");
-                let is_off = matches!(on_env, Err(_)) || matches!(on_env.as_deref(), Ok("")) || matches!(on_env.as_deref(), Ok("0"));
+                let is_off = matches!(on_env, Result::Err(_)) || matches!(on_env.as_deref(), Result::Ok("")) || matches!(on_env.as_deref(), Result::Ok("0"));
                 is_on = if is_off { OFF } else { ON };
                 LOG_ON.store(is_on, Ordering::Release);
             }
