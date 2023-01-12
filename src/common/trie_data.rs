@@ -14,6 +14,7 @@ use ::std::vec::IntoIter;
 use crate::common::INDX;
 
 type NodeIndex = u32;
+const ROOT_INDEX: usize = 0;
 
 #[derive(Debug)]
 struct TrieNode<Word> {
@@ -36,30 +37,39 @@ impl <Word: Debug> TrieNode<Word> {
         }
     }
 
-    fn push(&mut self, text: &str, value: Word, nodes: &mut Vec<TrieNode<Word>>) {
+    /// This takes `self_index`, which indexes into `nodes` to find current node. It does this
+    /// 'hack' because the caller cannot borrow both this node, and the list of all nodes, mutably.
+    /// But inside this method we can borrow all the nodes mutably one by one.
+    ///
+    /// (An alternative would be to only pass all subsequent nodes, not excluding the current one,
+    /// which works because the child is always after the parent. But this would involve offset
+    /// arithmetic, which adds complication and overhead).
+    fn push(self_index: usize, text: &str, value: Word, nodes: &mut Vec<TrieNode<Word>>) {
+        let new_child_index = nodes.len();
+        let current = nodes.get_mut(self_index).expect("trie node missing");
         let head = match text.chars().next() {
             Some(chr) => chr,
             None => {
-                self.word = Some(value);
+                current.word = Some(value);
                 return
             },
         };
         let tail = &text[head.len_utf8()..];
-        match self.children.entry(head) {
+        match current.children.entry(head) {
             Entry::Occupied(child_entry) => {
-                let mut child = nodes.get_mut(*child_entry.get() as usize).expect("trie node missing");
-                child.push(tail, value, nodes)
+                let child_index = *child_entry.get() as usize;
+                Self::push(child_index, tail, value, nodes)
             },
             Entry::Vacant(mut entry) => {
-                let child_index = nodes.len();
                 let mut child = TrieNode::new_empty();
                 if tail.is_empty() {
                     child.word = Some(value);
+                    nodes.push(child);
                 } else {
-                    child.push(tail, value, nodes);
+                    nodes.push(child);
+                    Self::push(new_child_index, tail, value, nodes);
                 }
-                nodes.push(child);
-                entry.insert(child_index.try_into().expect("INDX overflow, too many trie nodes"));
+                entry.insert(new_child_index.try_into().expect("INDX overflow, too many trie nodes"));
             }
         }
     }
@@ -165,11 +175,11 @@ impl <Word: Debug> Trie<Word> {
     }
 
     pub fn root_mut(&mut self) -> &mut TrieNode<Word> {
-        &mut self.arena[0]
+        &mut self.arena[ROOT_INDEX]
     }
 
     pub fn push(&mut self, text: &str, value: Word) {
-        self.root_mut().push(text, value, &mut self.arena)
+        TrieNode::push(ROOT_INDEX, text, value, &mut self.arena)
     }
 
     pub fn lookup(&self, value: &str) -> TrieLookup<Word> {
