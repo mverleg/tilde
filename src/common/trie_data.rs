@@ -64,7 +64,7 @@ impl <Word: Debug> TrieNode<Word> {
         }
     }
 
-    fn lookup(&self, text: &str, nodes: &Vec<TrieNode<Word>>) -> TrieLookup<Word> {
+    fn lookup<'a>(&'a self, text: &str, nodes: &'a [TrieNode<Word>]) -> TrieLookup<Word> {
         let head = match text.chars().next() {
             Some(chr) => chr,
             None => return match &self.word {
@@ -82,7 +82,7 @@ impl <Word: Debug> TrieNode<Word> {
         }
     }
 
-    fn all_prefixes_of<'a>(&'a self, text: &str, handler: &mut impl FnMut(&'a Word), nodes: &Vec<TrieNode<Word>>) {
+    fn all_prefixes_of<'a>(&'a self, text: &str, handler: &mut impl FnMut(&'a Word), nodes: &'a [TrieNode<Word>]) {
         if let Some(value) = &self.word {
             handler(value)
         }
@@ -169,7 +169,7 @@ impl <Word: Debug> Trie<Word> {
     }
 
     pub fn push(&mut self, text: &str, value: Word) {
-        self.root().push(text, value, &mut self.arena)
+        self.root_mut().push(text, value, &mut self.arena)
     }
 
     pub fn lookup(&self, value: &str) -> TrieLookup<Word> {
