@@ -17,7 +17,7 @@ type NodeIndex = u32;
 const ROOT_INDEX: usize = 0;
 
 #[derive(Debug)]
-struct TrieNode<Word> {
+pub struct TrieNode<Word> {
     children: HashMap<char, NodeIndex>,
     word: Option<Word>,
 }
@@ -67,7 +67,8 @@ impl <Word: Debug> TrieNode<Word> {
                 Self::push(new_child_index, tail, value, nodes);
             }
             let child_index = new_child_index.try_into().expect("INDX overflow, too many trie nodes");
-            current.children.insert(head, child_index);
+            // re-borrow the current note here, to prevent lifetime conflicts
+            nodes[self_index].children.insert(head, child_index);
         }
     }
 
