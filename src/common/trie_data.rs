@@ -2,23 +2,20 @@
 // This files uses len_utf8 for char length, based on the promise that str is utf8
 // https://doc.rust-lang.org/std/primitive.char.html#method.len_utf8
 
-//TODO @mark: iteration allocates a lot of strings, since each node only stores char
-//TODO @mark: it would be possible to make iteration cheaper, if we'd store the whole text for each node
-
 //TODO @mark: remove comments
 //TODO @mark: enable tests
 
 use ::std::collections::hash_map::Entry;
 use ::std::collections::HashMap;
 use ::std::collections::VecDeque;
-use ::std::vec::IntoIter;
 use ::std::fmt::Debug;
-use crate::common::trie_original::TrieIterator;
+use ::std::vec::IntoIter;
+
+type NodeIndex = u32;
 
 #[derive(Debug)]
 struct TrieNode<Word> {
-    children: HashMap<char, TrieNode<Word>>,
-    //TODO @mark: no alloc hashmap?
+    children: HashMap<char, NodeIndex>,
     word: Option<Word>,
 }
 
@@ -32,7 +29,7 @@ pub enum TrieLookup<'a, Word> {
 impl <Word: Debug> TrieNode<Word> {
     fn new_empty() -> Self {
         TrieNode {
-            children: HashMap::with_capacity(0),
+            children: HashMap::new(),
             word: None
         }
     }
@@ -143,14 +140,19 @@ impl <Word: Debug> TrieNode<Word> {
 
 #[derive(Debug)]
 pub struct Trie<Word> {
-    root: TrieNode<Word>,
+    arena: Vec<TrieNode<Word>>,
 }
 
 impl <Word: Debug> Trie<Word> {
     pub fn new() -> Self {
+        let root = TrieNode::new_empty();
         Trie {
-            root: TrieNode::new_empty(),
+            arena: vec![root],
         }
+    }
+
+    pub fn root(&self) -> &mut TrieNode<Word> {
+        &mut self.arena[0]
     }
 
     pub fn push(&mut self, text: &str, value: Word) {

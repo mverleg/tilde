@@ -17,3 +17,5 @@ impl <K: Default, V: Default> TinyMap<K, V> {
         TinyMap::Small(ArrayVec::new())
     }
 }
+
+//TODO @mverleg: use
