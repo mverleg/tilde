@@ -6,14 +6,19 @@ use ::std::process::ExitCode;
 
 use ::tilde::tilde_log;
 use ::tilde::TildeRes;
-
-use crate::cli::{CliOperation, run_tilde, TildeArgs};
-
-mod cli;
+use tilde::{CliOperation, run_tilde, TildeArgs};
 
 fn main() -> ExitCode {
-    let operation = match parse_operation(env::args().collect()) {
-        Ok(op) => op,
+    let operation: CliOperation = match parse_operation(env::args().collect()) {
+        Ok(op) => match op {
+            MainOperation::GenHelp => {
+                println!("{}", gen_help());
+                ExitCode::from(0)
+            }
+            MainOperation::Run(value) => CliOperation::Run(value),
+            MainOperation::Analyze(value) => CliOperation::Analyze(value),
+            MainOperation::DocGen => CliOperation::DocGen,
+        },
         Err(err) => {
             eprintln!("{}", err);
             return ExitCode::from(2)
@@ -33,7 +38,7 @@ fn main() -> ExitCode {
     }
 }
 
-fn parse_operation(mut args: Vec<String>) -> TildeRes<CliOperation> {
+fn parse_operation(mut args: Vec<String>) -> TildeRes<MainOperation> {
     args.reverse();
     args.pop();
     let arg1 = args.pop();
@@ -105,4 +110,12 @@ fn gen_help() -> String {
         help.push("    doc-gen              Generate documentation (if built with `gen` feature)".to_owned());
     }
     help.join("\n")
+}
+
+#[derive(Debug)]
+enum MainOperation {
+    Run(String),
+    Analyze(String),
+    GenHelp,
+    DocGen,
 }
