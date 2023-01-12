@@ -3,25 +3,27 @@
 #![feature(once_cell)]
 #![allow(unused)] //TODO @mark: TEMPORARY! REMOVE THIS!
 
+use ::std::cmp::Ordering;
 use ::std::env;
 use ::std::io;
+use ::std::io::{BufRead, stdin};
 use ::std::io::BufReader;
 use ::std::io::BufWriter;
 use ::std::io::Read;
 use ::std::path::Path;
 use ::std::process::ExitCode;
-use std::cmp::Ordering;
-use std::io::{BufRead, stdin};
-use std::sync::Arc;
-use std::sync::atomic::AtomicBool;
-use std::thread;
-use std::thread::sleep;
-use std::time::Duration;
+use ::std::sync::Arc;
+use ::std::sync::atomic::AtomicBool;
+use ::std::thread;
+use ::std::thread::sleep;
+use ::std::time::Duration;
 
-pub use crate::common::log as tilde_log;
-use crate::compile::parse;
-pub use crate::exec::Value;
+use crate::compile::{parse, Value};
 
+/// This should be the only public thing.
+pub use self::api::*;
+
+mod api;
 mod common;
 mod compile;
 mod exec;

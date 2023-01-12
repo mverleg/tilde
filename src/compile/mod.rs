@@ -2,10 +2,11 @@ use ::std::env::current_exe;
 
 use crate::op::Op;
 use crate::op::Prog;
-use crate::tilde_log;
 use crate::TildeRes;
 
 pub use self::parse::parse;
+
+pub use crate::exec::Value;
 
 //TODO @mark: remove unused modules
 // mod alphabet;

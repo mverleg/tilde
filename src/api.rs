@@ -7,12 +7,12 @@ use ::std::thread;
 use ::std::thread::sleep;
 use ::std::time::Duration;
 
-use ::tilde::tilde_analyze;
-use ::tilde::tilde_gen_md_docs;
-use ::tilde::TildeRes;
-use ::tilde::Value;
+pub use crate::common::log as tilde_log;
+use crate::compile::Value;
+use crate::tilde_analyze;
 
-use crate::gen_help;
+#[cfg(feature = "gen")]
+pub use self::gen::mddoc::tilde_gen_md_docs;
 
 #[cfg(not(feature = "gen"))]
 pub fn tilde_gen_md_docs() -> TildeRes<()> {
@@ -22,9 +22,6 @@ pub fn tilde_gen_md_docs() -> TildeRes<()> {
 pub type TildeRes<T> = Result<T, String>;
 pub type NR = f64;
 pub type UINT = u64;
-
-#[cfg(feature = "gen")]
-pub use self::gen::mddoc::tilde_gen_md_docs;
 
 pub fn run_tilde(args: &TildeArgs) -> TildeRes<Value> {
     match &args.operation {
