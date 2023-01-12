@@ -11,3 +11,4 @@ mod dict_derive;
 mod trie_data;
 mod trie_original;
 mod text_trans;
+mod tiny_map;
