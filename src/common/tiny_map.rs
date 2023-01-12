@@ -5,7 +5,7 @@ use ::tinyvec::ArrayVec;
 
 const TINY_MAP_TRANSITION: usize = 2;
 
-/// Map that allocates on the stack when it is small.
+/// Grow-only map that allocates on the stack when it is small.
 /// Only uses hashcode for 'big' maps, so behaviour might be different if Hash and Eq are inconsistent.
 /// For now, the `get` method takes an owned key instead of ref, because in current use it is small.
 #[derive(Debug)]
@@ -36,6 +36,27 @@ impl <K: Default + Eq + Hash, V: Default> TinyMap<K, V> {
     }
 
     pub fn insert(&mut self, key: K, value: V) {
-        todo!()
+        let should_upgrade = match self {
+            TinyMap::Small(vec) => {
+                if let Some(_) = vec.try_push((key, value)) {
+                    // need to switch from Small to Big
+                    true
+                } else {
+                    false
+                }
+            }
+            TinyMap::Big(map) => {
+                map.insert(key, value);
+                false
+            },
+        };
+        if should_upgrade {
+            let mut map = HashMap::new();
+            for (k, v) in vec {
+                map.insert(k, v);
+            }
+            map.insert(key, value);
+            *self = TinyMap::Big(map)
+        }
     }
 }
