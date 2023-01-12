@@ -55,22 +55,19 @@ impl <Word: Debug> TrieNode<Word> {
             },
         };
         let tail = &text[head.len_utf8()..];
-        match current.children.entry(head) {
-            Entry::Occupied(child_entry) => {
-                let child_index = *child_entry.get() as usize;
-                Self::push(child_index, tail, value, nodes)
-            },
-            Entry::Vacant(mut entry) => {
-                let mut child = TrieNode::new_empty();
-                if tail.is_empty() {
-                    child.word = Some(value);
-                    nodes.push(child);
-                } else {
-                    nodes.push(child);
-                    Self::push(new_child_index, tail, value, nodes);
-                }
-                entry.insert(new_child_index.try_into().expect("INDX overflow, too many trie nodes"));
+        if let Some(child_index) = current.children.get(&head) {
+            Self::push(*child_index as usize, tail, value, nodes)
+        } else {
+            let mut child = TrieNode::new_empty();
+            if tail.is_empty() {
+                child.word = Some(value);
+                nodes.push(child);
+            } else {
+                nodes.push(child);
+                Self::push(new_child_index, tail, value, nodes);
             }
+            let child_index = new_child_index.try_into().expect("INDX overflow, too many trie nodes");
+            current.children.insert(head, child_index);
         }
     }
 
