@@ -10,6 +10,7 @@ use crate::common::INDX;
 #[allow(dead_code)]
 pub const LONGEST_DICT_ENTRY_BYTES: usize = 22; // located in this file because of build.rs
 pub type DictStr = ArrayString<[u8; LONGEST_DICT_ENTRY_BYTES]>;
+pub type OpIndices = ArrayVec<[INDX; 4]>;
 #[derive(Debug, Eq, Ord)]
 pub enum CowDictStr {
     Owned(DictStr),
@@ -114,17 +115,33 @@ impl TextTransformation {
         CowDictStr::Borrowed(&input[0..end_index])
     }
 
-    pub fn operation_indices(&self) -> ArrayVec<[INDX; 4]> {
-        todo!();
+    pub fn operation_indices(&self) -> OpIndices {
+        let mut indices = OpIndices::new();
+        if self.case_first {
+            indices.push(x);
+        }
+        if self.case_all {
+            indices.push(x);
+        }
+        if self.reverse {
+            indices.push(x);
+        }
+        for _ in 0..self.pop_start {
+            indices.push(x);
+        }
+        for _ in 0..self.pop_end {
+            indices.push(x);
+        }
+        indices
     }
 
     pub fn name(&self) -> ArrayString<[u8; 6]> {
         let mut repr = ArrayString::new();
         write!(repr, "{}", match (self.case_all, self.case_first) {
-            (true, false) => 'a',
-            (false, true) => 'f',
-            (true, true) => 'w',
-            (false, false) => 'n',
+                (true, false) => 'a',
+                (false, true) => 'f',
+                (true, true) => 'w',
+                (false, false) => 'n',
         }).unwrap();
         write!(repr, "{}", if self.reverse { 'r' } else { 'i' }).unwrap();
         if self.pop_start >= 10 || self.pop_end >= 10 {
@@ -143,7 +160,7 @@ fn switch_capitalization_char(orig_first: &mut char) {
     match upper.nth(0) {
         Some(switch_first) => {
             if switch_first != *orig_first {
-                assert!(upper.nth(1).is_none(), "multi-char uppercase representations not yet supported");  //TODO @mark
+                assert!(upper.nth(1).is_none(), "multi-char uppercase representations not yet supported"); //TODO @mark
                 *orig_first = switch_first;
                 return;
             }
@@ -154,7 +171,7 @@ fn switch_capitalization_char(orig_first: &mut char) {
     match lower.nth(0) {
         Some(switch_first) => {
             if switch_first != *orig_first {
-                assert!(lower.nth(1).is_none(), "multi-char lowercase representations not yet supported");  //TODO @mark
+                assert!(lower.nth(1).is_none(), "multi-char lowercase representations not yet supported"); //TODO @mark
                 *orig_first = switch_first;
                 return;
             }

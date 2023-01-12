@@ -7,7 +7,6 @@ use ::std::iter::FlatMap;
 use ::std::process::Output;
 use ::std::slice::Iter;
 use ::std::sync::LazyLock;
-
 use ::strum::IntoEnumIterator;
 use ::strum_macros::EnumIter;
 
@@ -73,10 +72,10 @@ pub fn compress_with_dict(text: &str) -> Vec<INDX> {
             //     panic!("cannot encode string because dictionary does not contain '{}'", rem.chars().next().unwrap())
             // }
             // let nrs = meta.entry_info.get(&DictStr::try_from(prefix.as_str()).expect("prefix too long for array string"))
-                // TODO @mark: use str instead of DictStr above? ^
-                // .unwrap_or_else(|| panic!("prefix not in dictionary: '{prefix}'"))
-                // .original_index
-                // .try_into().expect("index does not fit in type");
+            // TODO @mark: use str instead of DictStr above? ^
+            // .unwrap_or_else(|| panic!("prefix not in dictionary: '{prefix}'"))
+            // .original_index
+            // .try_into().expect("index does not fit in type");
             //numbers.push(nrs)
         })
     }
@@ -85,14 +84,13 @@ pub fn compress_with_dict(text: &str) -> Vec<INDX> {
 
 #[cfg(test)]
 mod compress_decode {
+    use super::*;
     use crate::common::dict::TEST_POEM;
     use crate::common::dict_lookup::lookup_alloc;
 
-    use super::*;
-
     #[test]
     fn decode_random_nrs() {
-        let mut nrs = (0 .. 1000).collect::<Vec<_>>();
+        let mut nrs = (0..1000).collect::<Vec<_>>();
         let text = lookup_alloc(&nrs);
         let compress = compress_with_dict(&text);
         assert!(compress.len() < nrs.len())

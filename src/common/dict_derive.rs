@@ -97,3 +97,22 @@ struct TransformationCost<'a> {
 //     result.sort_by(|deriv1, deriv2| deriv1.derived_text.cmp(&deriv2.derived_text));
 //     result
 // }
+
+#[cfg(test)]
+mod tests {
+    use ::std::cmp::min;
+
+    use super::*;
+
+    #[test]
+    fn generate_transformations_operation_indices_length() {
+        let mut capacity = 0;
+        let mut longest = 0;
+        for transformation in generate_transformations() {
+            let indices = transformation.operation_indices();
+            capacity = indices.capacity();
+            longest = min(longest, indices.len());
+        }
+        assert_eq!(capacity, longest, "capacity of operation_indices() result is larger than needed");
+    }
+}
