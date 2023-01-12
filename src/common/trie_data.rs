@@ -6,19 +6,19 @@
 //TODO @mark: enable tests
 
 use ::std::collections::hash_map::Entry;
-use ::std::collections::HashMap;
 use ::std::collections::VecDeque;
 use ::std::fmt::Debug;
 use ::std::vec::IntoIter;
 
 use crate::common::INDX;
+use crate::common::tiny_map::TinyMap;
 
 type NodeIndex = u32;
 const ROOT_INDEX: usize = 0;
 
 #[derive(Debug)]
 pub struct TrieNode<Word> {
-    children: HashMap<char, NodeIndex>,
+    children: TinyMap<char, NodeIndex>,
     word: Option<Word>,
 }
 
@@ -32,7 +32,7 @@ pub enum TrieLookup<'a, Word> {
 impl <Word: Debug> TrieNode<Word> {
     fn new_empty() -> Self {
         TrieNode {
-            children: HashMap::new(),
+            children: TinyMap::new(),
             word: None
         }
     }
@@ -55,7 +55,7 @@ impl <Word: Debug> TrieNode<Word> {
             },
         };
         let tail = &text[head.len_utf8()..];
-        if let Some(child_index) = current.children.get(&head) {
+        if let Some(child_index) = current.children.get(head) {
             Self::push(*child_index as usize, tail, value, nodes)
         } else {
             let mut child = TrieNode::new_empty();
@@ -81,7 +81,7 @@ impl <Word: Debug> TrieNode<Word> {
             },
         };
         let tail = &text[head.len_utf8()..];
-        match self.children.get(&head) {
+        match self.children.get(head) {
             Some(child_index) => {
                 let child = &nodes[*child_index as usize];
                 child.lookup(tail, nodes)
@@ -97,7 +97,7 @@ impl <Word: Debug> TrieNode<Word> {
         let Some(head) = text.chars().next() else {
             return;
         };
-        let Some(next_index) = self.children.get(&head) else {
+        let Some(next_index) = self.children.get(head) else {
             return;
         };
         let next = &nodes[*next_index as usize];
