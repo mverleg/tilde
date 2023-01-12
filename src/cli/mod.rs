@@ -1,4 +1,3 @@
-use ::std::fs::read_to_string;
 use ::std::io::BufRead;
 use ::std::io::stdin;
 use ::std::sync::Arc;
@@ -10,7 +9,6 @@ use ::std::time::Duration;
 
 use ::tilde::tilde_analyze;
 use ::tilde::tilde_gen_md_docs;
-use ::tilde::tilde_log;
 use ::tilde::TildeRes;
 use ::tilde::Value;
 
