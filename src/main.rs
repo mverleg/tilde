@@ -4,22 +4,19 @@ use ::std::env;
 use ::std::fs::read_to_string;
 use ::std::process::ExitCode;
 
+use ::tilde::CliOperation;
+use ::tilde::run_tilde;
 use ::tilde::tilde_log;
-use ::tilde::TildeRes;
-use tilde::{CliOperation, run_tilde, TildeArgs};
+use ::tilde::TildeArgs;
 
 fn main() -> ExitCode {
     let operation: CliOperation = match parse_operation(env::args().collect()) {
-        Ok(op) => match op {
-            MainOperation::GenHelp => {
-                println!("{}", gen_help());
-                ExitCode::from(0)
-            }
-            MainOperation::Run(value) => CliOperation::Run(value),
-            MainOperation::Analyze(value) => CliOperation::Analyze(value),
-            MainOperation::DocGen => CliOperation::DocGen,
+        ArgParseRes::Lib(op) => op,
+        ArgParseRes::GenHelp => {
+            println!("{}", gen_help());
+            return ExitCode::from(0)
         },
-        Err(err) => {
+        ArgParseRes::Err(err) => {
             eprintln!("{}", err);
             return ExitCode::from(2)
         }
@@ -38,41 +35,42 @@ fn main() -> ExitCode {
     }
 }
 
-fn parse_operation(mut args: Vec<String>) -> TildeRes<MainOperation> {
+fn parse_operation(mut args: Vec<String>) -> ArgParseRes {
+    use ArgParseRes::*;
     args.reverse();
     args.pop();
     let arg1 = args.pop();
-    let cli_op: CliOperation = match arg1.as_deref() {
-        Some("-h") | Some("--help") => Ok(CliOperation::ShowHelp),
+    let cli_op = match arg1.as_deref() {
+        Some("-h") | Some("--help") => GenHelp,
         Some("-f") | Some("--file") => {
             let pth = args
                 .pop()
                 .ok_or_else(|| "argument -f/--file expects a path to a source file".to_string())?;
             tilde_log!("reading source from file {}", pth);
-            Ok(CliOperation::Run(read_to_string(pth).map_err(|err| format!("failed to read source file, err {err}"))?))
+            Ok(MainOperation::Run(read_to_string(pth).map_err(|err| format!("failed to read source file, err {err}"))?))
         },
         Some("-s") | Some("--source") => {
             let src = args
                 .pop()
                 .ok_or_else(|| "argument -s/--source expects a single argument containing source code".to_string())?;
             tilde_log!("getting source from command line (length in utf8 bytes: {})", src.len());
-            Ok(CliOperation::Run(src))
+            Ok(MainOperation::Run(src))
         },
         Some("-F") | Some("--analyze-file") => {
             let pth = args
                 .pop()
                 .ok_or_else(|| "argument -F/--analyze-file expects a path to a source file".to_string())?;
             tilde_log!("reading source from file {} for analysis", pth);
-            Ok(CliOperation::Analyze(read_to_string(pth).map_err(|err| format!("failed to read source file, err {err}"))?))
+            Ok(MainOperation::Analyze(read_to_string(pth).map_err(|err| format!("failed to read source file, err {err}"))?))
         },
         Some("-S") | Some("--analyze-source") => {
             let src = args
                 .pop()
                 .ok_or_else(|| "argument -S/--analyze-source expects a single argument containing source code".to_string())?;
             tilde_log!("getting source from command line (length in utf8 bytes: {}) for analysis", src.len());
-            Ok(CliOperation::Analyze(src))
+            Ok(MainOperation::Analyze(src))
         },
-        Some("doc-gen") => Ok(CliOperation::DocGen),
+        Some("doc-gen") => Lib(CliOperation::DocGen),
         Some(arg) => {
             let hint = if arg.contains('=') { "hint: --arg=value syntax is not supported, use '--arg value'\n" } else { "" };
             Err(format!("unknown argument '{arg}'\n{hint}try --help for options"))
@@ -82,7 +80,7 @@ fn parse_operation(mut args: Vec<String>) -> TildeRes<MainOperation> {
     if !args.is_empty() {
         return Err(format!("cannot handle these arguments: {}\ntry --help for options", args.join(" ")));
     }
-    Ok(cli_op)
+    cli_op
 }
 
 fn gen_help() -> String {
@@ -113,9 +111,8 @@ fn gen_help() -> String {
 }
 
 #[derive(Debug)]
-enum MainOperation {
-    Run(String),
-    Analyze(String),
+enum ArgParseRes {
+    Lib(CliOperation),
+    Err(String),
     GenHelp,
-    DocGen,
 }
