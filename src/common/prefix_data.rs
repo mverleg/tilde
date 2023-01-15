@@ -2,13 +2,14 @@
 // This files uses len_utf8 for char length, based on the promise that str is utf8
 // https://doc.rust-lang.org/std/primitive.char.html#method.len_utf8
 
-//TODO @mverleg: is there a data structure with more efficient hashcode?
+//TODO @mverleg: is there a data structure with more efficient hashcode? arrayvec-specific map?
 
 use ::std::collections::hash_map::Entry;
 use ::std::collections::HashMap;
 use ::std::collections::VecDeque;
 use ::std::fmt::Debug;
 use ::std::vec::IntoIter;
+use fnv::{FnvBuildHasher, FnvHashMap};
 
 use crate::common::INDX;
 use crate::common::text_trans::{CowDictStr, DictStr, LONGEST_DICT_ENTRY_BYTES};
@@ -22,7 +23,7 @@ pub enum TrieLookup<'a, Word> {
 
 #[derive(Debug)]
 pub struct PrefixMap<Word> {
-    words: HashMap<DictStr, Word>,
+    words: FnvHashMap<DictStr, Word>,
 }
 
 impl <Word: Debug> PrefixMap<Word> {
@@ -32,7 +33,7 @@ impl <Word: Debug> PrefixMap<Word> {
 
     pub fn with_capacity(cap: usize) -> Self {
         PrefixMap {
-            words: HashMap::with_capacity(cap),
+            words: FnvHashMap::with_capacity_and_hasher(cap, FnvBuildHasher::default()),
         }
     }
 
