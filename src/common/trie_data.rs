@@ -2,11 +2,9 @@
 // This files uses len_utf8 for char length, based on the promise that str is utf8
 // https://doc.rust-lang.org/std/primitive.char.html#method.len_utf8
 
-//TODO @mark: remove comments
-//TODO @mark: enable tests
-
-//TODO @mverleg: would it be faster to just store all strings in a hashmap and search all substrings one by one?
+//  would it be faster to just store all strings in a hashmap and search all substrings one by one?
 //  trie is more useful to e.g. find all things with a prefix, not all prefixes of a thing (although it works for that, just not faster)
+//TODO @mverleg: remove this file once replaced
 
 use ::std::collections::hash_map::Entry;
 use ::std::collections::VecDeque;
@@ -20,7 +18,7 @@ type NodeIndex = u32;
 const ROOT_INDEX: usize = 0;
 
 #[derive(Debug)]
-pub struct TrieNode<Word> {
+struct TrieNode<Word> {
     children: TinyMap<char, NodeIndex>,
     word: Option<Word>,
 }
@@ -171,11 +169,11 @@ impl <Word: Debug> Trie<Word> {
         }
     }
 
-    pub fn root(&self) -> &TrieNode<Word> {
+    fn root(&self) -> &TrieNode<Word> {
         &self.arena[0]
     }
 
-    pub fn root_mut(&mut self) -> &mut TrieNode<Word> {
+    fn root_mut(&mut self) -> &mut TrieNode<Word> {
         &mut self.arena[ROOT_INDEX]
     }
 

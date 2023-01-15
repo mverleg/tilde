@@ -11,6 +11,7 @@ mod dict_lookup;
 mod dict_compress;
 mod dict_derive;
 mod trie_data;
+mod prefix_data;
 mod trie_original;
 mod text_trans;
 mod tiny_map;

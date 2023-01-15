@@ -18,9 +18,9 @@ use crate::common::dict::iter_snippets;
 use crate::common::dict_derive::DerivationInfo;
 use crate::common::dict_derive::with_derived_dict_entries;
 use crate::common::INDX;
+use crate::common::prefix_data::PrefixMap;
 use crate::common::text_trans::DictStr;
 use crate::common::TextTransformation;
-use crate::common::trie_data::Trie;
 use crate::tilde_log;
 
 thread_local! {
@@ -33,7 +33,7 @@ type ExtIndx = u32;
 struct DictMeta {
     base_dict: &'static [DictEntry],
     extended_dict: Vec<DerivationInfo>,
-    trie: Trie<ExtIndx>,
+    trie: PrefixMap<ExtIndx>,
     //TODO @mark: fewer allocations?
 }
 
@@ -42,7 +42,7 @@ impl DictMeta {
         tilde_log!("initializing DictMeta (large) for string compression");
         let start = Instant::now();
         let extended_dict = with_derived_dict_entries(&DICT);
-        let mut trie = Trie::new();
+        let mut trie = PrefixMap::new();
         for (index, snip) in extended_dict.iter().enumerate() {
             trie.push(snip.derived_text.as_ref(), index.try_into().expect("extended dict too large to find index"))
         }
