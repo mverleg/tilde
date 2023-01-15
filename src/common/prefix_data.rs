@@ -2,10 +2,7 @@
 // This files uses len_utf8 for char length, based on the promise that str is utf8
 // https://doc.rust-lang.org/std/primitive.char.html#method.len_utf8
 
-//TODO @mark: remove comments
-
-//TODO @mverleg: would it be faster to just store all strings in a hashmap and search all substrings one by one?
-//  trie is more useful to e.g. find all things with a prefix, not all prefixes of a thing (although it works for that, just not faster)
+//TODO @mverleg: is there a data structure with more efficient hashcode?
 
 use ::std::collections::hash_map::Entry;
 use ::std::collections::HashMap;
@@ -30,8 +27,12 @@ pub struct PrefixMap<Word> {
 
 impl <Word: Debug> PrefixMap<Word> {
     pub fn new() -> Self {
+        Self::with_capacity(0)
+    }
+
+    pub fn with_capacity(cap: usize) -> Self {
         PrefixMap {
-            words: HashMap::new(),
+            words: HashMap::with_capacity(cap),
         }
     }
 

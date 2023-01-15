@@ -42,7 +42,7 @@ impl DictMeta {
         tilde_log!("initializing DictMeta (large) for string compression");
         let start = Instant::now();
         let extended_dict = with_derived_dict_entries(&DICT);
-        let mut trie = PrefixMap::new();
+        let mut trie = PrefixMap::with_capacity(extended_dict.len());
         for (index, snip) in extended_dict.iter().enumerate() {
             trie.push(
                 snip.derived_text.clone().into_owned(),
