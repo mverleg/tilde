@@ -10,7 +10,7 @@ pub fn criterion_benchmark(c: &mut Criterion) {
     let source = ",hello world";
     c.bench_function("analyze_tilde_code", |b| b.iter(|| thread::spawn(||
         run_tilde(black_box(&TildeArgs { operation: CliOperation::Analyze(source.to_string()) }))
-    ).join()));
+    ).join().unwrap()));
 }
 
 criterion_group!(benches, criterion_benchmark);

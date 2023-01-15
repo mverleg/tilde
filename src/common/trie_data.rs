@@ -5,6 +5,9 @@
 //TODO @mark: remove comments
 //TODO @mark: enable tests
 
+//TODO @mverleg: would it be faster to just store all strings in a hashmap and search all substrings one by one?
+//  trie is more useful to e.g. find all things with a prefix, not all prefixes of a thing (although it works for that, just not faster)
+
 use ::std::collections::hash_map::Entry;
 use ::std::collections::VecDeque;
 use ::std::fmt::Debug;

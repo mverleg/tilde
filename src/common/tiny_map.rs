@@ -4,7 +4,7 @@ use std::hash::Hash;
 
 use ::tinyvec::ArrayVec;
 
-const TINY_MAP_TRANSITION: usize = 2;
+const TINY_MAP_TRANSITION: usize = 3;
 
 /// Grow-only map that allocates on the stack when it is small.
 /// Only uses hashcode for 'big' maps, so behaviour might be different if Hash and Eq are inconsistent.

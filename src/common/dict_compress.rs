@@ -7,18 +7,20 @@ use ::std::iter::FlatMap;
 use ::std::process::Output;
 use ::std::slice::Iter;
 use ::std::sync::LazyLock;
+use std::time::Instant;
+
 use ::strum::IntoEnumIterator;
 use ::strum_macros::EnumIter;
 
-use crate::common::dict::iter_snippets;
-use crate::common::dict::DictEntry;
 use crate::common::dict::DICT;
-use crate::common::dict_derive::with_derived_dict_entries;
+use crate::common::dict::DictEntry;
+use crate::common::dict::iter_snippets;
 use crate::common::dict_derive::DerivationInfo;
-use crate::common::text_trans::DictStr;
-use crate::common::trie_data::Trie;
-use crate::common::TextTransformation;
+use crate::common::dict_derive::with_derived_dict_entries;
 use crate::common::INDX;
+use crate::common::text_trans::DictStr;
+use crate::common::TextTransformation;
+use crate::common::trie_data::Trie;
 use crate::tilde_log;
 
 thread_local! {
@@ -38,11 +40,14 @@ struct DictMeta {
 impl DictMeta {
     fn new() -> Self {
         tilde_log!("initializing DictMeta (large) for string compression");
+        let start = Instant::now();
         let extended_dict = with_derived_dict_entries(&DICT);
         let mut trie = Trie::new();
         for (index, snip) in extended_dict.iter().enumerate() {
             trie.push(snip.derived_text.as_ref(), index.try_into().expect("extended dict too large to find index"))
         }
+        let duration = start.elapsed();
+        tilde_log!("DictMeta has {} entries based on {} base entries, init took {} ms`", extended_dict.len(), DICT.len(), duration.as_millis());
         DictMeta {
             base_dict: &DICT,
             extended_dict,
@@ -71,9 +76,10 @@ pub fn compress_with_dict(text: &str) -> Vec<INDX> {
 
 #[cfg(test)]
 mod compress_decode {
-    use super::*;
     use crate::common::dict::TEST_POEM;
     use crate::common::dict_lookup::lookup_alloc;
+
+    use super::*;
 
     #[test]
     fn decode_random_nrs() {
@@ -94,12 +100,24 @@ mod compress_decode {
 
 #[cfg(test)]
 mod compression {
+    use ::std::thread;
+
+    use crate::run_tilde;
+
     use super::*;
 
     #[test]
     fn simple_text_compression() {
         let nrs = compress_with_dict("hello world, this is a test");
         assert_eq!(nrs.len(), 16);
+    }
+
+    #[test]
+    fn bench() {
+        //TODO @mverleg: TEMPORARY! REMOVE THIS!
+        for _ in 0..20 {
+            thread::spawn(|| compress_with_dict("hello world, this is a test")).join().unwrap();
+        }
     }
 
     //TODO @mark: test more, e.g. symbols, caps
