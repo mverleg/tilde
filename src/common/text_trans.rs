@@ -11,7 +11,7 @@ use crate::common::INDX;
 pub const LONGEST_DICT_ENTRY_BYTES: usize = 22; // located in this file because of build.rs
 pub type DictStr = ArrayString<[u8; LONGEST_DICT_ENTRY_BYTES]>;
 pub type OpIndices = ArrayVec<[INDX; 4]>;
-#[derive(Debug, Eq, Ord)]
+#[derive(Debug, Eq, Ord, Clone)]
 pub enum CowDictStr {
     Owned(DictStr),
     Borrowed(&'static str),

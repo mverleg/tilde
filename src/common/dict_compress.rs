@@ -44,7 +44,7 @@ impl DictMeta {
         let extended_dict = with_derived_dict_entries(&DICT);
         let mut trie = PrefixMap::new();
         for (index, snip) in extended_dict.iter().enumerate() {
-            trie.push(snip.derived_text.as_ref(), index.try_into().expect("extended dict too large to find index"))
+            trie.push(&snip.derived_text, index.try_into().expect("extended dict too large to find index"))
         }
         let duration = start.elapsed();
         tilde_log!("DictMeta has {} entries based on {} base entries, init took {} ms`", extended_dict.len(), DICT.len(), duration.as_millis());
