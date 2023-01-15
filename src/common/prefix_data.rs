@@ -9,7 +9,10 @@ use ::std::collections::HashMap;
 use ::std::collections::VecDeque;
 use ::std::fmt::Debug;
 use ::std::vec::IntoIter;
-use fnv::{FnvBuildHasher, FnvHashMap};
+use std::hash::BuildHasher;
+
+use ::nohash_hasher::{BuildNoHashHasher, NoHashHasher};
+use ::tinyvec_string::ArrayString;
 
 use crate::common::INDX;
 use crate::common::text_trans::{CowDictStr, DictStr, LONGEST_DICT_ENTRY_BYTES};
@@ -23,7 +26,7 @@ pub enum TrieLookup<'a, Word> {
 
 #[derive(Debug)]
 pub struct PrefixMap<Word> {
-    words: FnvHashMap<DictStr, Word>,
+    words: HashMap<DictStr, Word, NoHashHasher<DictStr>>,
 }
 
 impl <Word: Debug> PrefixMap<Word> {
@@ -33,7 +36,7 @@ impl <Word: Debug> PrefixMap<Word> {
 
     pub fn with_capacity(cap: usize) -> Self {
         PrefixMap {
-            words: FnvHashMap::with_capacity_and_hasher(cap, FnvBuildHasher::default()),
+            words: HashMap::with_capacity_and_hasher(cap, NoHashHasher::<DictStr>::default()),
         }
     }
 
