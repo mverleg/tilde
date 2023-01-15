@@ -26,7 +26,7 @@ pub enum TrieLookup<'a, Word> {
 
 #[derive(Debug)]
 pub struct PrefixMap<Word> {
-    words: HashMap<CowDictStr, Word>,
+    words: HashMap<DictStr, Word>,
 }
 
 impl <Word: Debug> PrefixMap<Word> {
@@ -36,19 +36,20 @@ impl <Word: Debug> PrefixMap<Word> {
         }
     }
 
-    pub fn push(&mut self, text: &CowDictStr, value: Word) {
-        if self.words.contains_key(text) {
-            return
-        }
-        self.words.insert((*text).clone(), value);
+    pub fn push(&mut self, text: DictStr, value: Word) {
+        debug_assert!(!self.words.contains_key(&text));
+        self.words.insert(text, value);
     }
 
-    pub fn contains_exactly(&self, value: &CowDictStr) -> bool {
+    pub fn contains_exactly(&self, value: &DictStr) -> bool {
         self.words.get(value).is_some()
     }
+}
+
+impl <Word: Clone + Debug> PrefixMap<Word> {
 
     /// Given a text, find all the words that are prefixes of it. E.g. "dogma" is ["do", "dog", "dogma"].
-    pub fn all_prefixes_of(&self, text: &str) -> Vec<&Word> {
+    pub fn all_prefixes_cloned_of(&self, text: &str, buffer: &mut Vec<Word>) {
         text
             .chars()
             .map(|c| c.len_utf8())
@@ -58,29 +59,12 @@ impl <Word: Debug> PrefixMap<Word> {
             })
             .take_while(|length| *length <= LONGEST_DICT_ENTRY_BYTES)
             .flat_map(|upto| {
-                self.words.get(&CowDictStr::Borrowed(&text[0..upto])).into_iter()
+                let key = DictStr::from(&text[0..upto]);
+                //TODO @mverleg: lot of copying here, even though it's just on stack
+                let value = self.words.get(&key);
+                value.map(|word| (*word).clone()).into_iter()
             })
-            .collect()
-    }
-
-    /// Like `all_prefixes_of` but use existing buffer instead of allocating.
-    pub fn all_prefixes_buffered_of<'a>(&'a self, text: &str, buffer: &mut Vec<&'a Word>) {
-    }
-}
-
-impl <Word: Clone + Debug> PrefixMap<Word> {
-
-    pub fn longest_prefix(&self, text: &str) -> Option<Word> {
-        // let mut res = None;
-        // self.root().all_prefixes_of(text, &mut |word| res = Some(word), &self.words);
-        // res.cloned()
-        todo!()
-    }
-
-    pub fn all_prefixes_cloned_of(&self, text: &str, buffer: &mut Vec<Word>) {
-        // buffer.clear();
-        // self.root().all_prefixes_of(text, &mut |word| buffer.push((*word).clone()), &self.words)
-        todo!()
+            .for_each(|word| buffer.push(word))
     }
 }
 
