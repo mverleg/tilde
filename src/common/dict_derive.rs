@@ -1,6 +1,5 @@
 use ::std::collections::hash_map::Entry;
 use ::std::collections::HashMap;
-use ::std::collections::HashSet;
 use crate::common::dict::{DictEntry, iter_snippets};
 use crate::common::text_trans::{CowDictStr, DictStr};
 use crate::common::TextTransformation;
@@ -15,21 +14,13 @@ pub struct DerivationInfo {
 
 pub fn with_derived_dict_entries(base_dict: &'static [DictEntry]) -> Vec<DerivationInfo> {
     let transformations = generate_transformations();
-    let mut seen = HashSet::with_capacity(base_dict.len());  // low but better than default
     iter_snippets(base_dict)
         .flat_map(|(original_index, snippet)| transformations.iter()
-            .flat_map(|transformation| {
-                let derived_text = transformation.apply(snippet);
-                if seen.insert(derived_text.as_ref()) {
-                    Some(DerivationInfo {
-                        derived_text: derived_text,
-                        original_index,
-                        transformation: transformation.clone(),
-                        cost: 0,  //TODO @mark:
-                    })
-                } else {
-                    None
-                }.into_iter()
+            .map(move |transformation| DerivationInfo {
+                derived_text: transformation.apply(snippet),
+                original_index,
+                transformation: transformation.clone(),
+                cost: 0,  //TODO @mark:
             }))
         .collect()
 }

@@ -77,7 +77,8 @@ impl <Word: Debug> PrefixMap<Word> {
 
     pub fn push(&mut self, text: DictStr, value: Word) {
         eprintln!("insert '{}'", text.as_str());  //TODO @mark:
-        debug_assert!(!self.words.contains_key(&Key(text)));
+        //debug_assert!(!self.words.contains_key(&Key(text)));
+        //TODO @mark: maybe re-enable this assert if derivations get de-duplicated?
         self.words.insert(Key(text), value);
     }
 
