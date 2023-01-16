@@ -7,7 +7,7 @@ use ::std::iter::FlatMap;
 use ::std::process::Output;
 use ::std::slice::Iter;
 use ::std::sync::LazyLock;
-use std::time::Instant;
+use ::std::time::Instant;
 
 use ::strum::IntoEnumIterator;
 use ::strum_macros::EnumIter;

@@ -1,6 +1,7 @@
 #![feature(fmt_internals)]
 #![feature(const_for)]
 #![feature(once_cell)]
+#![feature(hasher_prefixfree_extras)]
 #![allow(unused)] //TODO @mark: TEMPORARY! REMOVE THIS!
 
 use ::std::env;

@@ -1,6 +1,6 @@
 use ::std::collections::HashMap;
-use std::borrow::BorrowMut;
-use std::hash::Hash;
+use ::std::borrow::BorrowMut;
+use ::std::hash::Hash;
 
 use ::tinyvec::ArrayVec;
 

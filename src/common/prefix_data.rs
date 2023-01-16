@@ -9,7 +9,8 @@ use ::std::collections::HashMap;
 use ::std::collections::VecDeque;
 use ::std::fmt::Debug;
 use ::std::vec::IntoIter;
-use std::hash::BuildHasher;
+use ::std::hash;
+use ::std::hash::{BuildHasher, BuildHasherDefault, Hash, Hasher};
 
 use ::nohash_hasher::{BuildNoHashHasher, NoHashHasher};
 use ::tinyvec_string::ArrayString;
@@ -24,9 +25,20 @@ pub enum TrieLookup<'a, Word> {
     NotFound,
 }
 
+#[derive(Debug, PartialEq, Eq)]
+struct Key(DictStr);
+
+impl hash::Hash for Key {
+    fn hash<H: hash::Hasher>(&self, state: &mut H) {
+        state.write_str(self.0.as_str())
+    }
+}
+
+impl nohash_hasher::IsEnabled for Key {}
+
 #[derive(Debug)]
 pub struct PrefixMap<Word> {
-    words: HashMap<DictStr, Word, NoHashHasher<DictStr>>,
+    words: HashMap<Key, Word, BuildHasherDefault<NoHashHasher<DictStr>>>,
 }
 
 impl <Word: Debug> PrefixMap<Word> {
@@ -36,24 +48,24 @@ impl <Word: Debug> PrefixMap<Word> {
 
     pub fn with_capacity(cap: usize) -> Self {
         PrefixMap {
-            words: HashMap::with_capacity_and_hasher(cap, NoHashHasher::<DictStr>::default()),
+            words: HashMap::with_capacity_and_hasher(cap, BuildHasherDefault::default()),
         }
     }
 
     pub fn push(&mut self, text: DictStr, value: Word) {
-        debug_assert!(!self.words.contains_key(&text));
-        self.words.insert(text, value);
+        debug_assert!(!self.words.contains_key(&Key(text)));
+        self.words.insert(Key(text), value);
     }
 
     pub fn lookup<'a>(&'a self, value: &DictStr) -> TrieLookup<'a, Word> {
-        match self.words.get(value) {
+        match self.words.get(&Key(*value)) {
             Some(word) => TrieLookup::IsWord(word),
             None => TrieLookup::NotFound,
         }
     }
 
     pub fn contains_exactly(&self, value: &DictStr) -> bool {
-        self.words.get(value).is_some()
+        self.words.get(&Key(*value)).is_some()
     }
 }
 
@@ -86,7 +98,7 @@ impl <Word: Clone + Debug> PrefixMap<Word> {
             .flat_map(|upto| {
                 let key = DictStr::from(&text[0..upto]);
                 //TODO @mverleg: lot of copying here, even though it's just on stack
-                let value = self.words.get(&key);
+                let value = self.words.get(&Key(key));
                 value.map(|word| (*word).clone()).into_iter()
             })
             .for_each(|word| buffer.push(word))
