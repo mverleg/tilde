@@ -30,6 +30,7 @@ struct Key(DictStr);
 
 impl hash::Hash for Key {
     fn hash<H: hash::Hasher>(&self, state: &mut H) {
+        // Not resistant to pathological input, but the actual input is trusted and static.
         let bytes = self.0.as_bytes();
         let mut hash: u32 = 0;
         let mut i = 0;
@@ -51,6 +52,7 @@ impl hash::Hash for Key {
         if i < n {
             hash += bytes[i] as u32;
         }
+        eprintln!("hash '{}' as {}", self.0.as_str(), hash);  //TODO @mark: TEMPORARY! REMOVE THIS!
         state.write_u32(hash)
     }
 }
@@ -74,6 +76,7 @@ impl <Word: Debug> PrefixMap<Word> {
     }
 
     pub fn push(&mut self, text: DictStr, value: Word) {
+        eprintln!("insert '{}'", text.as_str());  //TODO @mark:
         debug_assert!(!self.words.contains_key(&Key(text)));
         self.words.insert(Key(text), value);
     }
