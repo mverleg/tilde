@@ -30,7 +30,28 @@ struct Key(DictStr);
 
 impl hash::Hash for Key {
     fn hash<H: hash::Hasher>(&self, state: &mut H) {
-        state.write_str(self.0.as_str())
+        let bytes = self.0.as_bytes();
+        let mut hash: u32 = 0;
+        let mut i = 0;
+        let u8size = u8::MAX as u32;
+        let n = bytes.len();
+        while i * 4 + 4 < n {
+            hash += u8size * u8size * u8size * (bytes[i + 3] as u32);
+            hash += u8size * u8size * (bytes[i + 2] as u32);
+            hash += u8size * (bytes[i + 1] as u32);
+            hash += bytes[i] as u32;
+            i += 4;
+        }
+        if i + 2 < n {
+            hash += u8size * u8size * (bytes[i + 2] as u32);
+        }
+        if i + 1 < n {
+            hash += u8size * (bytes[i + 1] as u32);
+        }
+        if i < n {
+            hash += bytes[i] as u32;
+        }
+        state.write_u32(hash)
     }
 }
 
@@ -38,7 +59,7 @@ impl nohash_hasher::IsEnabled for Key {}
 
 #[derive(Debug)]
 pub struct PrefixMap<Word> {
-    words: HashMap<Key, Word, BuildHasherDefault<NoHashHasher<DictStr>>>,
+    words: HashMap<Key, Word, BuildHasherDefault<NoHashHasher<Key>>>,
 }
 
 impl <Word: Debug> PrefixMap<Word> {
