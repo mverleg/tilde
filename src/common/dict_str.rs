@@ -4,6 +4,7 @@ use ::std::hash;
 use ::std::hash::Hasher;
 use ::tinyvec::ArrayVec;
 use ::tinyvec_string::ArrayString;
+use fnv::FnvHasher;
 
 use crate::common::INDX;
 
@@ -19,10 +20,14 @@ pub struct DictStr {
 
 impl DictStr {
     pub fn new(text: DictStrContent) -> Self {
-        todo!("hash");
+        let hash = {
+            let mut hasher = FnvHasher::default();
+            hasher.write(text.as_bytes());
+            hasher.finish()
+        };
         DictStr {
             text,
-            cached_hash: 0,
+            cached_hash: hash,
         }
     }
 
