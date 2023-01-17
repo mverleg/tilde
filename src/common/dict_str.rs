@@ -9,17 +9,30 @@ use crate::common::INDX;
 
 #[allow(dead_code)]
 pub const LONGEST_DICT_ENTRY_BYTES: usize = 22; // located in this file because of build.rs
-
-#[derive(Debug, Eq, Ord)]
-pub enum CowDictStr {
-    Owned(DictStr),
-    Borrowed(&'static str),
-}
+pub type DictStrContent = ArrayString<[u8; LONGEST_DICT_ENTRY_BYTES]>;
 
 #[derive(Debug)]
 pub struct DictStr {
-    text: ArrayString<[u8; LONGEST_DICT_ENTRY_BYTES]>,
+    text: DictStrContent,
     cached_hash: u64,
+}
+
+impl DictStr {
+    pub fn new(text: DictStrContent) -> Self {
+        todo!("hash");
+        DictStr {
+            text,
+            cached_hash: 0,
+        }
+    }
+
+    pub fn from(text: impl AsRef<str>) -> Self {
+        DictStr::new(DictStrContent::from(text.as_ref()))
+    }
+
+    pub fn as_str(&self) -> &str {
+        self.text.as_str()
+    }
 }
 
 impl PartialEq for DictStr {
@@ -48,10 +61,33 @@ impl Ord for DictStr {
     }
 }
 
+impl From<DictStrContent> for DictStr {
+    fn from(value: DictStrContent) -> Self {
+        DictStr::new(value)
+    }
+}
+
+impl ToOwned for DictStr {
+    type Owned = DictStr;
+
+    fn to_owned(&self) -> Self::Owned {
+        DictStr {
+            text: self.text.clone(),
+            cached_hash: self.cached_hash,
+        }
+    }
+}
+
+#[derive(Debug, Eq, Ord)]
+pub enum CowDictStr {
+    Owned(DictStr),
+    Borrowed(&'static str),
+}
+
 impl CowDictStr {
-    pub fn into_owned(self) -> DictStr {
+    pub fn to_owned(&self) -> DictStr {
         match self {
-            CowDictStr::Owned(val) => val,
+            CowDictStr::Owned(val) => val.to_owned(),
             CowDictStr::Borrowed(val) => DictStr::from(val),
         }
     }
@@ -60,7 +96,7 @@ impl CowDictStr {
 impl AsRef<str> for CowDictStr {
     fn as_ref(&self) -> &str {
         match self {
-            CowDictStr::Owned(text) => &*text,
+            CowDictStr::Owned(text) => text.text.as_str(),
             CowDictStr::Borrowed(text) => *text,
         }
     }

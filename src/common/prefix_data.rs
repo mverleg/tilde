@@ -193,7 +193,7 @@ mod tests {
     fn test_all_prefixes_of_exact_match() {
         let mut pm = build_test_prefix_map();
         assert_eq!(pm.all_prefixes_of("hell"),
-                   vec![value_for(&pm, "he"), value_for(&pm, &DictStr::from("hell"))]);
+                   vec![value_for(&pm, "he"), value_for(&pm, "hell")]);
     }
 
     #[test]
@@ -201,6 +201,6 @@ mod tests {
         let mut pm = build_test_prefix_map();
         let mut pm = build_test_prefix_map();
         assert_eq!(pm.all_prefixes_of("helpless"),
-                   vec![value_for(&pm, "he"), value_for(&pm, &DictStr::from("help"))]);
+                   vec![value_for(&pm, "he"), value_for(&pm, "help")]);
     }
 }

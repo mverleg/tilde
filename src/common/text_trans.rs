@@ -6,7 +6,7 @@ use ::std::hash::Hasher;
 use ::tinyvec::ArrayVec;
 use ::tinyvec_string::ArrayString;
 
-use crate::common::dict_str::CowDictStr;
+use crate::common::dict_str::{CowDictStr, DictStrContent};
 use crate::common::dict_str::DictStr;
 use crate::common::dict_str::LONGEST_DICT_ENTRY_BYTES;
 use crate::common::INDX;
@@ -52,7 +52,9 @@ impl TextTransformation {
             if self.case_first {
                 switch_capitalization_char(&mut chars[0])
             }
-            return CowDictStr::Owned(chars.into_iter().collect::<DictStr>())
+            return CowDictStr::Owned(chars.into_iter()
+                .collect::<DictStrContent>()
+                .into())
         }
         // slice without alloc
         let mut end_index = input.len();

@@ -44,7 +44,8 @@ impl DictMeta {
         let mut trie = PrefixMap::with_capacity(extended_dict.len());
         for (index, snip) in extended_dict.iter().enumerate() {
             trie.push(
-                snip.derived_text.clone().into_owned(),
+                snip.derived_text.to_owned(),
+                //TODO @mverleg: get rid of clone? impossible without lifetimes perhaps, but duplicate data with extended_dict, so it is wasteful
                 index.try_into().expect("extended dict too large to find index"))
         }
         let duration = start.elapsed();
