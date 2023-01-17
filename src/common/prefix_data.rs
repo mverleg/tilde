@@ -20,7 +20,7 @@ use crate::common::text_trans::{CowDictStr, DictStr, LONGEST_DICT_ENTRY_BYTES};
 use crate::common::tiny_map::TinyMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum TrieLookup<'a, Word> {
+pub enum PrefixMapLookup<'a, Word> {
     IsWord(&'a Word),
     NotFound,
 }
@@ -52,7 +52,7 @@ impl hash::Hash for Key {
         if i < n {
             hash += bytes[i] as u32;
         }
-        eprintln!("hash '{}' as {}", self.0.as_str(), hash);  //TODO @mark: TEMPORARY! REMOVE THIS!
+        //eprintln!("hash '{}' as {}", self.0.as_str(), hash);  //TODO @mark: TEMPORARY! REMOVE THIS!
         state.write_u32(hash)
     }
 }
@@ -76,16 +76,16 @@ impl <Word: Debug> PrefixMap<Word> {
     }
 
     pub fn push(&mut self, text: DictStr, value: Word) {
-        eprintln!("insert '{}'", text.as_str());  //TODO @mark:
+        //eprintln!("insert '{}'", text.as_str());  //TODO @mark:
         //debug_assert!(!self.words.contains_key(&Key(text)));
         //TODO @mark: maybe re-enable this assert if derivations get de-duplicated?
         self.words.insert(Key(text), value);
     }
 
-    pub fn lookup<'a>(&'a self, value: &DictStr) -> TrieLookup<'a, Word> {
+    pub fn lookup<'a>(&'a self, value: &DictStr) -> PrefixMapLookup<'a, Word> {
         match self.words.get(&Key(*value)) {
-            Some(word) => TrieLookup::IsWord(word),
-            None => TrieLookup::NotFound,
+            Some(word) => PrefixMapLookup::IsWord(word),
+            None => PrefixMapLookup::NotFound,
         }
     }
 
@@ -144,45 +144,45 @@ mod tests {
 
     #[test]
     fn empty() {
-        let trie = PrefixMap::<()>::new();
-        assert!(!trie.contains_exactly(&DictStr::from("hello")));
+        let pm = PrefixMap::<()>::new();
+        assert!(!pm.contains_exactly(&DictStr::from("hello")));
     }
 
     #[test]
     fn build() {
-        let mut trie = PrefixMap::new();
-        trie.push(DictStr::from("hello"), 1);
-        assert_eq!(trie.lookup(&DictStr::from("hello")), TrieLookup::IsWord(&1));
-        assert_eq!(trie.lookup(&DictStr::from("he")), TrieLookup::NotFound);
-        assert_eq!(trie.lookup(&DictStr::from("eh")), TrieLookup::NotFound);
-        trie.push(DictStr::from("he"), 2);
-        assert_eq!(trie.lookup(&DictStr::from("he")), TrieLookup::IsWord(&2));
-        assert_eq!(trie.lookup(&DictStr::from("hel")), TrieLookup::NotFound);
-        trie.push(DictStr::from("hell"), 3);
-        assert_eq!(trie.lookup(&DictStr::from("hell")), TrieLookup::IsWord(&3));
-        assert_eq!(trie.lookup(&DictStr::from("hel")), TrieLookup::NotFound);
-        trie.push(DictStr::from("hey"), 4);
-        assert_eq!(trie.lookup(&DictStr::from("hey")), TrieLookup::IsWord(&4));
-        assert_eq!(trie.lookup(&DictStr::from("h")), TrieLookup::NotFound);
-        assert_eq!(trie.lookup(&DictStr::from("p")), TrieLookup::NotFound);
-        assert_eq!(trie.lookup(&DictStr::from("hello")), TrieLookup::IsWord(&1));
+        let mut pm = PrefixMap::new();
+        pm.push(DictStr::from("hello"), 1);
+        assert_eq!(pm.lookup(&DictStr::from("hello")), PrefixMapLookup::IsWord(&1));
+        assert_eq!(pm.lookup(&DictStr::from("he")), PrefixMapLookup::NotFound);
+        assert_eq!(pm.lookup(&DictStr::from("eh")), PrefixMapLookup::NotFound);
+        pm.push(DictStr::from("he"), 2);
+        assert_eq!(pm.lookup(&DictStr::from("he")), PrefixMapLookup::IsWord(&2));
+        assert_eq!(pm.lookup(&DictStr::from("hel")), PrefixMapLookup::NotFound);
+        pm.push(DictStr::from("hell"), 3);
+        assert_eq!(pm.lookup(&DictStr::from("hell")), PrefixMapLookup::IsWord(&3));
+        assert_eq!(pm.lookup(&DictStr::from("hel")), PrefixMapLookup::NotFound);
+        pm.push(DictStr::from("hey"), 4);
+        assert_eq!(pm.lookup(&DictStr::from("hey")), PrefixMapLookup::IsWord(&4));
+        assert_eq!(pm.lookup(&DictStr::from("h")), PrefixMapLookup::NotFound);
+        assert_eq!(pm.lookup(&DictStr::from("p")), PrefixMapLookup::NotFound);
+        assert_eq!(pm.lookup(&DictStr::from("hello")), PrefixMapLookup::IsWord(&1));
     }
 
-    fn build_test_trie() -> PrefixMap<i8> {
-        let mut trie = PrefixMap::new();
-        trie.push(DictStr::from("hello"), 1);
-        trie.push(DictStr::from("he"), 2);
-        trie.push(DictStr::from("hell"), 3);
-        trie.push(DictStr::from("help"), 4);
-        trie.push(DictStr::from("hey"), 5);
-        trie.push(DictStr::from("hero"), 6);
-        trie.push(DictStr::from("helvetica"), 7);
-        trie.push(DictStr::from("potato"), 8);
-        trie
+    fn build_test_prefix_map() -> PrefixMap<i8> {
+        let mut pm = PrefixMap::new();
+        pm.push(DictStr::from("hello"), 1);
+        pm.push(DictStr::from("he"), 2);
+        pm.push(DictStr::from("hell"), 3);
+        pm.push(DictStr::from("help"), 4);
+        pm.push(DictStr::from("hey"), 5);
+        pm.push(DictStr::from("hero"), 6);
+        pm.push(DictStr::from("helvetica"), 7);
+        pm.push(DictStr::from("potato"), 8);
+        pm
     }
 
-    fn value_for<T: Clone + Debug>(trie: &PrefixMap<T>, text: &str) -> T {
-        let TrieLookup::IsWord(word) = trie.lookup(&DictStr::from(text)) else {
+    fn value_for<T: Clone + Debug>(pm: &PrefixMap<T>, text: &str) -> T {
+        let PrefixMapLookup::IsWord(word) = pm.lookup(&DictStr::from(text)) else {
             panic!("did not find {}", text)
         };
         (*word).clone()
@@ -190,51 +190,52 @@ mod tests {
 
     #[test]
     fn longest_prefix_out_of_input_while_at_word() {
-        let mut trie = build_test_trie();
-        assert_eq!(trie.longest_prefix("hell").unwrap(), value_for(&trie, "hell"));
+        let mut pm = build_test_prefix_map();
+        assert_eq!(pm.longest_prefix("hell").unwrap(), value_for(&pm, "hell"));
     }
 
     #[test]
     fn longest_prefix_out_of_input_while_not_at_word() {
-        let mut trie = build_test_trie();
-        assert_eq!(trie.longest_prefix("her").unwrap(), value_for(&trie, "he"));
+        let mut pm = build_test_prefix_map();
+        assert_eq!(pm.longest_prefix("her").unwrap(), value_for(&pm, "he"));
     }
 
     #[test]
     fn longest_prefix_out_of_matches_while_deepest_is_word() {
-        let mut trie = build_test_trie();
-        assert_eq!(trie.longest_prefix("helpless").unwrap(), value_for(&trie, "help"));
+        let mut pm = build_test_prefix_map();
+        assert_eq!(pm.longest_prefix("helpless").unwrap(), value_for(&pm, "help"));
     }
 
     #[test]
     fn longest_prefix_out_of_matches_while_deepest_is_not_word() {
-        let mut trie = build_test_trie();
-        assert_eq!(trie.longest_prefix("helve").unwrap(), value_for(&trie, "he"));
+        let mut pm = build_test_prefix_map();
+        assert_eq!(pm.longest_prefix("helve").unwrap(), value_for(&pm, "he"));
     }
 
     #[test]
     fn longest_prefix_unknown_prefix() {
-        let mut trie = build_test_trie();
-        assert!(trie.longest_prefix("abacus").is_none());
+        let mut pm = build_test_prefix_map();
+        assert!(pm.longest_prefix("abacus").is_none());
     }
 
     #[test]
     fn test_all_prefixes_of_no_match() {
-        let mut trie = build_test_trie();
-        assert!(trie.all_prefixes_of("abacus").is_empty());
+        let mut pm = build_test_prefix_map();
+        assert!(pm.all_prefixes_of("abacus").is_empty());
     }
 
     #[test]
     fn test_all_prefixes_of_exact_match() {
-        let mut trie = build_test_trie();
-        assert_eq!(trie.all_prefixes_of("hell"),
-            vec![value_for(&trie, "he"), value_for(&trie, &DictStr::from("hell"))]);
+        let mut pm = build_test_prefix_map();
+        assert_eq!(pm.all_prefixes_of("hell"),
+                   vec![value_for(&pm, "he"), value_for(&pm, &DictStr::from("hell"))]);
     }
 
     #[test]
     fn test_all_prefixes_of_sub_matches() {
-        let mut trie = build_test_trie();
-        assert_eq!(trie.all_prefixes_of("helpless"),
-            vec![value_for(&trie, "he"), value_for(&trie, &DictStr::from("help"))]);
+        let mut pm = build_test_prefix_map();
+        let mut pm = build_test_prefix_map();
+        assert_eq!(pm.all_prefixes_of("helpless"),
+                   vec![value_for(&pm, "he"), value_for(&pm, &DictStr::from("help"))]);
     }
 }
