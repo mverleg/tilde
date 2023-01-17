@@ -1,5 +1,8 @@
 use ::std::collections::hash_map::Entry;
 use ::std::collections::HashMap;
+use ::std::collections::HashSet;
+use ::std::hash;
+use ::std::hash::Hasher;
 
 use crate::common::dict::{DictEntry, iter_snippets};
 use crate::common::dict_str::CowDictStr;
@@ -13,18 +16,35 @@ pub struct DerivationInfo {
     pub cost: u32,
 }
 
-pub fn with_derived_dict_entries(base_dict: &'static [DictEntry]) -> Vec<DerivationInfo> {
+impl hash::Hash for DerivationInfo {
+    fn hash<H: hash::Hasher>(&self, state: &mut H) {
+        state.write(self.derived_text.as_ref().as_bytes())
+    }
+}
+
+impl PartialEq for DerivationInfo {
+    fn eq(&self, other: &Self) -> bool {
+        self.derived_text == other.derived_text
+    }
+}
+
+impl Eq for DerivationInfo {}
+
+pub fn with_derived_dict_entries(base_dict: &'static [DictEntry]) -> HashSet<DerivationInfo> {
     let transformations = generate_transformations();
     debug_assert!(!transformations.is_empty());
-    let mut derivations = Vec::with_capacity(base_dict.len() * transformations.len());
+    let cap = base_dict.len() * transformations.len();
+    let mut derivations = HashSet::with_capacity(cap);
     for (original_index, snippet) in iter_snippets(base_dict) {
         for transformation in &transformations {
-            derivations.push(DerivationInfo {
+            let derivation = DerivationInfo {
                 derived_text: transformation.apply(snippet),
                 original_index,
                 transformation: transformation.clone(),
                 cost: 0,  //TODO @mark:
-            })
+            };
+            let mut entry = derivations.get();
+            entry.insert(derivation);
         }
     }
     derivations

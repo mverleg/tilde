@@ -32,7 +32,7 @@ type ExtIndx = u32;
 struct DictMeta {
     base_dict: &'static [DictEntry],
     extended_dict: Vec<DerivationInfo>,
-    trie: PrefixMap<ExtIndx>,
+    prefix_map: PrefixMap<ExtIndx>,
     //TODO @mark: fewer allocations?
 }
 
@@ -41,9 +41,9 @@ impl DictMeta {
         tilde_log!("initializing DictMeta (large) for string compression");
         let start = Instant::now();
         let extended_dict = with_derived_dict_entries(&DICT);
-        let mut pm = PrefixMap::with_capacity(extended_dict.len());
+        let mut prefix_map = PrefixMap::with_capacity(extended_dict.len());
         for (index, snip) in extended_dict.iter().enumerate() {
-            pm.push(
+            prefix_map.push(
                 snip.derived_text.to_owned(),
                 //TODO @mverleg: get rid of clone? impossible without lifetimes perhaps, but duplicate data with extended_dict, so it is wasteful
                 index.try_into().expect("extended dict too large to find index"))
@@ -52,8 +52,8 @@ impl DictMeta {
         tilde_log!("DictMeta has {} entries based on {} base entries, init took {} ms`", extended_dict.len(), DICT.len(), duration.as_millis());
         DictMeta {
             base_dict: &DICT,
-            extended_dict,
-            trie: pm,
+            extended_dict: extended_dict.into_iter().collect::<Vec<_>>(),
+            prefix_map,
         }
     }
 }
@@ -64,7 +64,7 @@ pub fn compress_with_dict(text: &str) -> Vec<INDX> {
     let mut buffer = Vec::new();
     DICT_META.with(|meta| {
         while !rem.is_empty() {
-            meta.trie.all_prefixes_cloned_of(rem, &mut buffer);
+            meta.prefix_map.all_prefixes_cloned_of(rem, &mut buffer);
             let deriv_index = *buffer.last()
                 .unwrap_or_else(|| panic!("did not find snippet for {}", rem.chars().next().unwrap()));
             let deriv = &meta.extended_dict[deriv_index as usize];
