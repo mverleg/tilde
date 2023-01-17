@@ -26,44 +26,29 @@ pub enum PrefixMapLookup<'a, Word> {
 }
 
 #[derive(Debug, PartialEq, Eq)]
-struct Key2(DictStr);
+struct Key(DictStr);
 
-impl hash::Hash for Key2 {
+impl hash::Hash for Key {
     fn hash<H: hash::Hasher>(&self, state: &mut H) {
         // Not resistant to pathological input, but the actual input is trusted and static.
         let bytes = self.0.as_bytes();
-        let mut hash: u32 = 0;
+        let mut hash: u32 = bytes.len() as u32;
         let mut i = 0;
-        let u8size = u8::MAX as u32;
-        let n = bytes.len();
-        while i * 4 + 4 < n {
-            hash += u8size * u8size * u8size * (bytes[i + 3] as u32);
-            hash += u8size * u8size * (bytes[i + 2] as u32);
-            hash += u8size * (bytes[i + 1] as u32);
-            hash += bytes[i] as u32;
-            i += 4;
+        let mul_each = 126-32;
+        let mut scale = LONGEST_DICT_ENTRY_BYTES as u32;
+        for i in 0..bytes.len() {
+            hash = hash.overflowing_add((bytes[i] as u32).saturating_sub(32).overflowing_mul(scale).0).0;
+            scale = scale.overflowing_mul(mul_each).0;
         }
-        if i + 2 < n {
-            hash += u8size * u8size * (bytes[i + 2] as u32);
-        }
-        if i + 1 < n {
-            hash += u8size * (bytes[i + 1] as u32);
-        }
-        if i < n {
-            hash += bytes[i] as u32;
-        }
-        //eprintln!("hash '{}' as {}", self.0.as_str(), hash);  //TODO @mark: TEMPORARY! REMOVE THIS!
         state.write_u32(hash)
     }
 }
 
-impl nohash_hasher::IsEnabled for Key2 {}
-
-fn Key(it: DictStr) -> DictStr { it }
+impl nohash_hasher::IsEnabled for Key {}
 
 #[derive(Debug)]
 pub struct PrefixMap<Word> {
-    words: HashMap<DictStr, Word>,
+    words: HashMap<Key, Word, BuildHasherDefault<NoHashHasher<Key>>>,
 }
 
 impl <Word: Debug> PrefixMap<Word> {
@@ -73,7 +58,7 @@ impl <Word: Debug> PrefixMap<Word> {
 
     pub fn with_capacity(cap: usize) -> Self {
         PrefixMap {
-            words: HashMap::with_capacity(cap),
+            words: HashMap::with_capacity_and_hasher(cap, BuildHasherDefault::default()),
         }
     }
 
