@@ -16,19 +16,12 @@ pub type DictStrContent = ArrayString<[u8; LONGEST_DICT_ENTRY_BYTES]>;
 #[derive(Debug)]
 pub struct DictStr {
     text: DictStrContent,
-    cached_hash: u32,
 }
 
 impl DictStr {
     pub fn new(text: DictStrContent) -> Self {
-        let hash = {
-            let mut hasher = FnvHasher::default();
-            hasher.write(text.as_bytes());
-            hasher.finish() as u32
-        };
         DictStr {
             text,
-            cached_hash: hash,
         }
     }
 
@@ -51,7 +44,11 @@ impl Eq for DictStr {}
 
 impl hash::Hash for DictStr {
     fn hash<H: hash::Hasher>(&self, state: &mut H) {
-        state.write_u32(self.cached_hash)
+        state.write_u32({
+            let mut hasher = FnvHasher::default();
+            hasher.write(self.text.as_bytes());
+            hasher.finish() as u32
+        })
     }
 }
 
@@ -79,7 +76,6 @@ impl ToOwned for DictStr {
     fn to_owned(&self) -> Self::Owned {
         DictStr {
             text: self.text.clone(),
-            cached_hash: self.cached_hash,
         }
     }
 }
