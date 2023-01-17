@@ -41,19 +41,23 @@ impl DictMeta {
         tilde_log!("initializing DictMeta (large) for string compression");
         let start = Instant::now();
         let extended_dict = with_derived_dict_entries(&DICT);
-        let mut trie = PrefixMap::with_capacity(extended_dict.len());
+        eprintln!("DictMeta extended {} ms`", start.elapsed().as_millis());  //TODO @mverleg: TEMPORARY! REMOVE THIS!
+        let start = Instant::now();  //TODO @mverleg: TEMPORARY! REMOVE THIS!
+        let mut pm = PrefixMap::with_capacity(extended_dict.len());
         for (index, snip) in extended_dict.iter().enumerate() {
-            trie.push(
+            pm.push(
                 snip.derived_text.to_owned(),
                 //TODO @mverleg: get rid of clone? impossible without lifetimes perhaps, but duplicate data with extended_dict, so it is wasteful
                 index.try_into().expect("extended dict too large to find index"))
         }
+        eprintln!("DictMeta build map {} ms`", start.elapsed().as_millis());  //TODO @mverleg: TEMPORARY! REMOVE THIS!
+        let start = Instant::now();  //TODO @mverleg: TEMPORARY! REMOVE THIS!
         let duration = start.elapsed();
         tilde_log!("DictMeta has {} entries based on {} base entries, init took {} ms`", extended_dict.len(), DICT.len(), duration.as_millis());
         DictMeta {
             base_dict: &DICT,
             extended_dict,
-            trie,
+            trie: pm,
         }
     }
 }
@@ -117,9 +121,14 @@ mod compression {
     #[test]
     fn bench() {
         //TODO @mverleg: TEMPORARY! REMOVE THIS!
-        for _ in 0..20 {
+        compress_with_dict("hello world, this is a test");
+        let n = 100;
+        let start = Instant::now();
+        for _ in 0..n {
             thread::spawn(|| compress_with_dict("hello world, this is a test")).join().unwrap();
         }
+        let duration = start.elapsed();
+        println!("{} iterations in {} ms so {} ms/iter", n, duration.as_millis(), duration.as_millis() / n)
     }
 
     //TODO @mark: test more, e.g. symbols, caps

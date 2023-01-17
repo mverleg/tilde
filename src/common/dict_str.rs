@@ -2,9 +2,10 @@ use ::std::cmp::Ordering;
 use ::std::fmt::Write;
 use ::std::hash;
 use ::std::hash::Hasher;
+
+use ::fnv::FnvHasher;
 use ::tinyvec::ArrayVec;
 use ::tinyvec_string::ArrayString;
-use fnv::FnvHasher;
 
 use crate::common::INDX;
 
