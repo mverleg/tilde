@@ -16,38 +16,46 @@ pub struct DerivationInfo {
     pub cost: u32,
 }
 
-impl hash::Hash for DerivationInfo {
-    fn hash<H: hash::Hasher>(&self, state: &mut H) {
-        state.write(self.derived_text.as_ref().as_bytes())
-    }
+#[derive(Debug)]
+pub struct PartialDerivationInfo {
+    pub original_index: usize,
+    pub transformation: TextTransformation,
+    pub cost: u32,
 }
 
-impl PartialEq for DerivationInfo {
-    fn eq(&self, other: &Self) -> bool {
-        self.derived_text == other.derived_text
-    }
-}
-
-impl Eq for DerivationInfo {}
-
-pub fn with_derived_dict_entries(base_dict: &'static [DictEntry]) -> HashSet<DerivationInfo> {
+pub fn with_derived_dict_entries(base_dict: &'static [DictEntry]) -> Vec<DerivationInfo> {
     let transformations = generate_transformations();
     debug_assert!(!transformations.is_empty());
     let cap = base_dict.len() * transformations.len();
-    let mut derivations = HashSet::with_capacity(cap);
+    let mut derivations: HashMap<CowDictStr, PartialDerivationInfo> = HashMap::with_capacity(cap);
     for (original_index, snippet) in iter_snippets(base_dict) {
         for transformation in &transformations {
-            let derivation = DerivationInfo {
-                derived_text: transformation.apply(snippet),
+            let derived_text = transformation.apply(snippet);
+            let derivation = PartialDerivationInfo {
                 original_index,
                 transformation: transformation.clone(),
                 cost: 0,  //TODO @mark:
             };
-            let mut entry = derivations.get();
-            entry.insert(derivation);
+            match derivations.entry(derived_text) {
+                Entry::Occupied(mut existing) => {
+                    if derivation.cost < existing.get().cost {
+                        existing.insert(derivation);
+                    }
+                }
+                Entry::Vacant(vacancy) => {
+                    vacancy.insert(derivation);
+                }
+            }
         }
     }
-    derivations
+    derivations.into_iter()
+        .map(|(dt, pdi)| DerivationInfo {
+            derived_text: dt,
+            original_index: pdi.original_index,
+            transformation: pdi.transformation,
+            cost: pdi.cost,
+        })
+        .collect()
 }
 
 fn generate_transformations() -> Vec<TextTransformation> {
