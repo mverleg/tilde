@@ -14,8 +14,6 @@ use ::std::vec::IntoIter;
 
 use ::fnv::FnvBuildHasher;
 use ::fnv::FnvHashMap;
-use ::nohash_hasher;
-use ::nohash_hasher::NoHashHasher;
 use ::tinyvec_string::ArrayString;
 
 use crate::common::dict_str::{DictStr, LONGEST_DICT_ENTRY_BYTES};
@@ -61,8 +59,6 @@ impl <Word: Debug> PrefixMap<Word> {
         self.words.get(&*value).is_some()
     }
 }
-
-impl nohash_hasher::IsEnabled for DictStr {}
 
 impl <Word: Clone + Debug> PrefixMap<Word> {
 

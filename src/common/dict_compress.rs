@@ -41,8 +41,6 @@ impl DictMeta {
         tilde_log!("initializing DictMeta (large) for string compression");
         let start = Instant::now();
         let extended_dict = with_derived_dict_entries(&DICT);
-        eprintln!("DictMeta extended {} ms`", start.elapsed().as_millis());  //TODO @mverleg: TEMPORARY! REMOVE THIS!
-        let start = Instant::now();  //TODO @mverleg: TEMPORARY! REMOVE THIS!
         let mut pm = PrefixMap::with_capacity(extended_dict.len());
         for (index, snip) in extended_dict.iter().enumerate() {
             pm.push(
@@ -50,8 +48,6 @@ impl DictMeta {
                 //TODO @mverleg: get rid of clone? impossible without lifetimes perhaps, but duplicate data with extended_dict, so it is wasteful
                 index.try_into().expect("extended dict too large to find index"))
         }
-        eprintln!("DictMeta build map {} ms`", start.elapsed().as_millis());  //TODO @mverleg: TEMPORARY! REMOVE THIS!
-        let start = Instant::now();  //TODO @mverleg: TEMPORARY! REMOVE THIS!
         let duration = start.elapsed();
         tilde_log!("DictMeta has {} entries based on {} base entries, init took {} ms`", extended_dict.len(), DICT.len(), duration.as_millis());
         DictMeta {
