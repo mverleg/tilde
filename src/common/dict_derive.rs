@@ -1,7 +1,8 @@
 use ::std::collections::hash_map::Entry;
 use ::std::collections::HashMap;
+
 use crate::common::dict::{DictEntry, iter_snippets};
-use crate::common::text_trans::{CowDictStr, DictStr};
+use crate::common::dict_str::CowDictStr;
 use crate::common::TextTransformation;
 
 #[derive(Debug)]

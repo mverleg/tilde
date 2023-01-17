@@ -19,7 +19,6 @@ use crate::common::dict_derive::DerivationInfo;
 use crate::common::dict_derive::with_derived_dict_entries;
 use crate::common::INDX;
 use crate::common::prefix_data::PrefixMap;
-use crate::common::text_trans::DictStr;
 use crate::common::TextTransformation;
 use crate::tilde_log;
 

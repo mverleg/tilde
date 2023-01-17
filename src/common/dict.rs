@@ -8,7 +8,7 @@ use ::std::iter::FlatMap;
 use ::std::option::IntoIter;
 use ::std::slice::Iter;
 use ::strum_macros::EnumIter;
-use crate::common::text_trans::DictStr;
+use crate::common::dict_str::DictStr;
 use crate::common::TextTransformation;
 
 pub type INDX = u16;

@@ -44,7 +44,7 @@ pub fn lookup_buffer(indices: &[INDX], buffer: &mut String, char_buffer: &mut Ve
 
 #[cfg(test)]
 mod tests {
-    use crate::common::text_trans::LONGEST_DICT_ENTRY_BYTES;
+    use crate::common::dict_str::LONGEST_DICT_ENTRY_BYTES;
 
     use super::*;
 

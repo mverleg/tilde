@@ -2,66 +2,16 @@ use ::std::cmp::Ordering;
 use ::std::fmt::Write;
 use ::std::hash;
 use ::std::hash::Hasher;
+
 use ::tinyvec::ArrayVec;
 use ::tinyvec_string::ArrayString;
 
+use crate::common::dict_str::CowDictStr;
+use crate::common::dict_str::DictStr;
+use crate::common::dict_str::LONGEST_DICT_ENTRY_BYTES;
 use crate::common::INDX;
 
-#[allow(dead_code)]
-pub const LONGEST_DICT_ENTRY_BYTES: usize = 22; // located in this file because of build.rs
-pub type DictStr = ArrayString<[u8; LONGEST_DICT_ENTRY_BYTES]>;
 pub type OpIndices = ArrayVec<[INDX; 4]>;
-#[derive(Debug, Eq, Ord, Clone)]
-pub enum CowDictStr {
-    Owned(DictStr),
-    Borrowed(&'static str),
-}
-
-impl CowDictStr {
-    pub fn into_owned(self) -> DictStr {
-        match self {
-            CowDictStr::Owned(val) => val,
-            CowDictStr::Borrowed(val) => DictStr::from(val),
-        }
-    }
-}
-
-impl AsRef<str> for CowDictStr {
-    fn as_ref(&self) -> &str {
-        match self {
-            CowDictStr::Owned(text) => &*text,
-            CowDictStr::Borrowed(text) => *text,
-        }
-    }
-}
-
-impl PartialEq for CowDictStr {
-    fn eq(&self, other: &Self) -> bool {
-        match (self, other) {
-            (CowDictStr::Owned(left), CowDictStr::Owned(right)) => left.as_str() == right.as_str(),
-            (CowDictStr::Borrowed(left), CowDictStr::Owned(right)) => *left == right.as_str(),
-            (CowDictStr::Owned(left), CowDictStr::Borrowed(right)) => left.as_str() == *right,
-            (CowDictStr::Borrowed(left), CowDictStr::Borrowed(right)) => left == right,
-        }
-    }
-}
-
-impl PartialOrd for CowDictStr {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        match (self, other) {
-            (CowDictStr::Owned(left), CowDictStr::Owned(right)) => left.as_str().partial_cmp(right.as_str()),
-            (CowDictStr::Borrowed(left), CowDictStr::Owned(right)) => left.partial_cmp(&right.as_str()),
-            (CowDictStr::Owned(left), CowDictStr::Borrowed(right)) => left.as_str().partial_cmp(right),
-            (CowDictStr::Borrowed(left), CowDictStr::Borrowed(right)) => left.partial_cmp(right),
-        }
-    }
-}
-
-impl hash::Hash for CowDictStr {
-    fn hash<H: Hasher>(&self, state: &mut H) {
-        state.write(self.as_ref().as_bytes())
-    }
-}
 
 #[derive(Debug, Default, Clone, PartialEq, Eq)]
 pub struct TextTransformation {
@@ -222,10 +172,11 @@ mod indices_in_sync_with_dict {
     use ::std::cell::LazyCell;
     use ::std::collections::HashMap;
 
-    use super::*;
-    use crate::common::dict::iter_snippets;
-    use crate::common::dict::DictEntry;
     use crate::common::dict::DICT;
+    use crate::common::dict::DictEntry;
+    use crate::common::dict::iter_snippets;
+
+    use super::*;
 
     thread_local! {
         static DICT_POSITIONS: LazyCell<HashMap<DictEntry, usize>> = LazyCell::new(||

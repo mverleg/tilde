@@ -6,6 +6,7 @@ pub use self::log::log;
 pub use self::text_trans::TextTransformation;
 
 mod log;
+mod dict_str;
 mod dict;
 mod dict_lookup;
 mod dict_compress;

@@ -13,11 +13,10 @@ use ::std::hash::{BuildHasher, BuildHasherDefault, Hash, Hasher};
 use ::std::vec::IntoIter;
 
 use ::fnv::{FnvBuildHasher, FnvHashMap};
-use ::nohash_hasher::{BuildNoHashHasher, NoHashHasher};
 use ::tinyvec_string::ArrayString;
 
+use crate::common::dict_str::{DictStr, LONGEST_DICT_ENTRY_BYTES};
 use crate::common::INDX;
-use crate::common::text_trans::{CowDictStr, DictStr, LONGEST_DICT_ENTRY_BYTES};
 use crate::common::tiny_map::TinyMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
