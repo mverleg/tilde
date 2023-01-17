@@ -33,12 +33,12 @@ impl TextTransformation {
         }
     }
 
-    pub fn apply(&self, input: &'static str) -> DictStr {
+    pub fn apply(&self, input: &'static str) -> CowDictStr {
         if self == &Self::new_noop() {
-            return DictStr::from(input);
+            return CowDictStr::Borrowed(input);
         }
         if input.len() <= self.pop_start as usize + self.pop_end as usize {
-            return DictStr::from(input);
+            return CowDictStr::Borrowed(input);
         }
         assert!(self.pop_start == 0, "pop_start not impl");
         assert!(!self.reverse, "reverse not impl");
@@ -52,19 +52,19 @@ impl TextTransformation {
             if self.case_first {
                 switch_capitalization_char(&mut chars[0])
             }
-            return chars.into_iter()
+            return CowDictStr::Owned(chars.into_iter()
                 .collect::<DictStrContent>()
-                .into()
+                .into())
         }
         // slice without alloc
         let mut end_index = input.len();
         for _ in 0..self.pop_end {
             let Some(chr) = chars.pop() else {
-                return DictStr::from("");
+                return CowDictStr::Borrowed("");
             };
             end_index -= chr.len_utf8();
         }
-        DictStr::from(&input[0..end_index])
+        CowDictStr::Borrowed(&input[0..end_index])
     }
 
     pub fn operation_indices(&self) -> OpIndices {
