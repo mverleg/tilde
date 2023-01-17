@@ -26,9 +26,9 @@ pub enum PrefixMapLookup<'a, Word> {
 }
 
 #[derive(Debug, PartialEq, Eq)]
-struct Key(DictStr);
+struct Key2(DictStr);
 
-impl hash::Hash for Key {
+impl hash::Hash for Key2 {
     fn hash<H: hash::Hasher>(&self, state: &mut H) {
         // Not resistant to pathological input, but the actual input is trusted and static.
         let bytes = self.0.as_bytes();
@@ -57,11 +57,13 @@ impl hash::Hash for Key {
     }
 }
 
-impl nohash_hasher::IsEnabled for Key {}
+impl nohash_hasher::IsEnabled for Key2 {}
+
+fn Key(it: DictStr) -> DictStr { it }
 
 #[derive(Debug)]
 pub struct PrefixMap<Word> {
-    words: HashMap<Key, Word, BuildHasherDefault<NoHashHasher<Key>>>,
+    words: HashMap<DictStr, Word>,
 }
 
 impl <Word: Debug> PrefixMap<Word> {
@@ -71,7 +73,7 @@ impl <Word: Debug> PrefixMap<Word> {
 
     pub fn with_capacity(cap: usize) -> Self {
         PrefixMap {
-            words: HashMap::with_capacity_and_hasher(cap, BuildHasherDefault::default()),
+            words: HashMap::with_capacity(cap),
         }
     }
 
