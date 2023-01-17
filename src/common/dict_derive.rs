@@ -15,15 +15,19 @@ pub struct DerivationInfo {
 
 pub fn with_derived_dict_entries(base_dict: &'static [DictEntry]) -> Vec<DerivationInfo> {
     let transformations = generate_transformations();
-    iter_snippets(base_dict)
-        .flat_map(|(original_index, snippet)| transformations.iter()
-            .map(move |transformation| DerivationInfo {
+    debug_assert!(!transformations.is_empty());
+    let mut derivations = Vec::with_capacity(base_dict.len() * transformations.len());
+    for (original_index, snippet) in iter_snippets(base_dict) {
+        for transformation in &transformations {
+            derivations.push(DerivationInfo {
                 derived_text: transformation.apply(snippet),
                 original_index,
                 transformation: transformation.clone(),
                 cost: 0,  //TODO @mark:
-            }))
-        .collect()
+            })
+        }
+    }
+    derivations
 }
 
 fn generate_transformations() -> Vec<TextTransformation> {
