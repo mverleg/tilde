@@ -8,10 +8,11 @@ use ::std::collections::hash_map::Entry;
 use ::std::collections::HashMap;
 use ::std::collections::VecDeque;
 use ::std::fmt::Debug;
-use ::std::vec::IntoIter;
 use ::std::hash;
 use ::std::hash::{BuildHasher, BuildHasherDefault, Hash, Hasher};
+use ::std::vec::IntoIter;
 
+use ::fnv::{FnvBuildHasher, FnvHashMap};
 use ::nohash_hasher::{BuildNoHashHasher, NoHashHasher};
 use ::tinyvec_string::ArrayString;
 
@@ -25,30 +26,9 @@ pub enum PrefixMapLookup<'a, Word> {
     NotFound,
 }
 
-#[derive(Debug, PartialEq, Eq)]
-struct Key(DictStr);
-
-impl hash::Hash for Key {
-    fn hash<H: hash::Hasher>(&self, state: &mut H) {
-        // Not resistant to pathological input, but the actual input is trusted and static.
-        let bytes = self.0.as_bytes();
-        let mut hash: u32 = bytes.len() as u32;
-        let mut i = 0;
-        let mul_each = 126-32;
-        let mut scale = LONGEST_DICT_ENTRY_BYTES as u32;
-        for i in 0..bytes.len() {
-            hash = hash.overflowing_add((bytes[i] as u32).saturating_sub(32).overflowing_mul(scale).0).0;
-            scale = scale.overflowing_mul(mul_each).0;
-        }
-        state.write_u32(hash)
-    }
-}
-
-impl nohash_hasher::IsEnabled for Key {}
-
 #[derive(Debug)]
 pub struct PrefixMap<Word> {
-    words: HashMap<Key, Word, BuildHasherDefault<NoHashHasher<Key>>>,
+    words: HashMap<DictStr, Word>,
 }
 
 impl <Word: Debug> PrefixMap<Word> {
@@ -58,26 +38,25 @@ impl <Word: Debug> PrefixMap<Word> {
 
     pub fn with_capacity(cap: usize) -> Self {
         PrefixMap {
-            words: HashMap::with_capacity_and_hasher(cap, BuildHasherDefault::default()),
+            words: HashMap::with_capacity(cap),
         }
     }
 
     pub fn push(&mut self, text: DictStr, value: Word) {
-        //eprintln!("insert '{}'", text.as_str());  //TODO @mark:
         //debug_assert!(!self.words.contains_key(&Key(text)));
         //TODO @mark: maybe re-enable this assert if derivations get de-duplicated?
-        self.words.insert(Key(text), value);
+        self.words.insert(text, value);
     }
 
     pub fn lookup<'a>(&'a self, value: &DictStr) -> PrefixMapLookup<'a, Word> {
-        match self.words.get(&Key(*value)) {
+        match self.words.get(&*value) {
             Some(word) => PrefixMapLookup::IsWord(word),
             None => PrefixMapLookup::NotFound,
         }
     }
 
     pub fn contains_exactly(&self, value: &DictStr) -> bool {
-        self.words.get(&Key(*value)).is_some()
+        self.words.get(&*value).is_some()
     }
 }
 
@@ -110,7 +89,7 @@ impl <Word: Clone + Debug> PrefixMap<Word> {
             .flat_map(|upto| {
                 let key = DictStr::from(&text[0..upto]);
                 //TODO @mverleg: lot of copying here, even though it's just on stack
-                let value = self.words.get(&Key(key));
+                let value = self.words.get(&key);
                 value.map(|word| (*word).clone()).into_iter()
             })
             .for_each(|word| buffer.push(word))
