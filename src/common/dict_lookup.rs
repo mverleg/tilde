@@ -21,7 +21,7 @@ pub fn lookup_buffer(indices: &[INDX], buffer: &mut String, char_buffer: &mut Ve
         // }
         match DICT[*indx as usize] {
             DictEntry::Snippet { snip, capitalize_next } => {
-                buffer.push_str(transform.apply(current_snip).as_ref());
+                buffer.push_str(transform.apply(current_snip).as_str());
                 current_snip = snip;
                 transform = TextTransformation::new_noop();
                 transform.case_first = current_capitalize_next;
@@ -39,7 +39,7 @@ pub fn lookup_buffer(indices: &[INDX], buffer: &mut String, char_buffer: &mut Ve
             }
         }
     }
-    buffer.push_str(transform.apply(current_snip).as_ref());
+    buffer.push_str(transform.apply(current_snip).as_str());
 }
 
 #[cfg(test)]

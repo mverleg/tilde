@@ -70,7 +70,7 @@ pub fn compress_with_dict(text: &str) -> Vec<INDX> {
             let deriv = &meta.extended_dict[deriv_index as usize];
             numbers.push(deriv.original_index.try_into().expect("could not convert usize into index"));
             numbers.extend(deriv.transformation.operation_indices());
-            rem = &rem[deriv.derived_text.as_ref().len()..];
+            rem = &rem[deriv.derived_text.as_str().len()..];
         }
     });
     numbers
@@ -118,7 +118,7 @@ mod compression {
     fn bench() {
         //TODO @mverleg: TEMPORARY! REMOVE THIS!
         compress_with_dict("hello world, this is a test");
-        let n = 100;
+        let n = 200;
         let start = Instant::now();
         for _ in 0..n {
             thread::spawn(|| compress_with_dict("hello world, this is a test")).join().unwrap();

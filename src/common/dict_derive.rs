@@ -2,12 +2,12 @@ use ::std::collections::hash_map::Entry;
 use ::std::collections::HashMap;
 
 use crate::common::dict::{DictEntry, iter_snippets};
-use crate::common::dict_str::CowDictStr;
+use crate::common::dict_str::{CowDictStr, DictStr};
 use crate::common::TextTransformation;
 
 #[derive(Debug)]
 pub struct DerivationInfo {
-    pub derived_text: CowDictStr,
+    pub derived_text: DictStr,
     pub original_index: usize,
     pub transformation: TextTransformation,
     pub cost: u32,
