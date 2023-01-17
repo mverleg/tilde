@@ -12,7 +12,10 @@ use ::std::hash;
 use ::std::hash::{BuildHasher, BuildHasherDefault, Hash, Hasher};
 use ::std::vec::IntoIter;
 
-use ::fnv::{FnvBuildHasher, FnvHashMap};
+use ::fnv::FnvBuildHasher;
+use ::fnv::FnvHashMap;
+use ::nohash_hasher;
+use ::nohash_hasher::NoHashHasher;
 use ::tinyvec_string::ArrayString;
 
 use crate::common::dict_str::{DictStr, LONGEST_DICT_ENTRY_BYTES};
@@ -27,7 +30,7 @@ pub enum PrefixMapLookup<'a, Word> {
 
 #[derive(Debug)]
 pub struct PrefixMap<Word> {
-    words: HashMap<DictStr, Word>,
+    words: HashMap<DictStr, Word, BuildHasherDefault<NoHashHasher<DictStr>>>,
 }
 
 impl <Word: Debug> PrefixMap<Word> {
@@ -37,7 +40,7 @@ impl <Word: Debug> PrefixMap<Word> {
 
     pub fn with_capacity(cap: usize) -> Self {
         PrefixMap {
-            words: HashMap::with_capacity(cap),
+            words: HashMap::with_capacity_and_hasher(cap, BuildHasherDefault::default()),
         }
     }
 
@@ -58,6 +61,8 @@ impl <Word: Debug> PrefixMap<Word> {
         self.words.get(&*value).is_some()
     }
 }
+
+impl nohash_hasher::IsEnabled for DictStr {}
 
 impl <Word: Clone + Debug> PrefixMap<Word> {
 
