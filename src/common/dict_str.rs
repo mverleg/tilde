@@ -13,7 +13,7 @@ use crate::common::INDX;
 pub const LONGEST_DICT_ENTRY_BYTES: usize = 22; // located in this file because of build.rs
 pub type DictStrContent = ArrayString<[u8; LONGEST_DICT_ENTRY_BYTES]>;
 
-#[derive(Debug)]
+#[derive(Debug, Hash)]
 pub struct DictStr {
     text: DictStrContent,
 }
@@ -41,16 +41,6 @@ impl PartialEq for DictStr {
 }
 
 impl Eq for DictStr {}
-
-impl hash::Hash for DictStr {
-    fn hash<H: hash::Hasher>(&self, state: &mut H) {
-        state.write_u32({
-            let mut hasher = FnvHasher::default();
-            hasher.write(self.text.as_bytes());
-            hasher.finish() as u32
-        })
-    }
-}
 
 impl PartialOrd for DictStr {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {

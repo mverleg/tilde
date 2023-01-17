@@ -30,7 +30,7 @@ pub enum PrefixMapLookup<'a, Word> {
 
 #[derive(Debug)]
 pub struct PrefixMap<Word> {
-    words: HashMap<DictStr, Word, BuildHasherDefault<NoHashHasher<DictStr>>>,
+    words: FnvHashMap<DictStr, Word>,
 }
 
 impl <Word: Debug> PrefixMap<Word> {
@@ -40,7 +40,7 @@ impl <Word: Debug> PrefixMap<Word> {
 
     pub fn with_capacity(cap: usize) -> Self {
         PrefixMap {
-            words: HashMap::with_capacity_and_hasher(cap, BuildHasherDefault::default()),
+            words: HashMap::with_capacity_and_hasher(cap, FnvBuildHasher::default()),
         }
     }
 
