@@ -37,6 +37,7 @@ struct DictMeta {
 }
 
 impl DictMeta {
+    //TODO @mverleg: if this is still too slow, it could probably happen at compile time (but it's probably fine if under 200ms)
     fn new() -> Self {
         tilde_log!("initializing DictMeta (large) for string compression");
         let start = Instant::now();

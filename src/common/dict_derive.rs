@@ -27,44 +27,40 @@ pub struct PartialDerivationInfo {
 pub fn with_derived_dict_entries(base_dict: &'static [DictEntry]) -> Vec<DerivationInfo> {
     let transformations = generate_transformations();
     debug_assert!(!transformations.is_empty());
-    let cap = base_dict.len() * transformations.len();
-    let mut derivations: Vec<(CowDictStr, PartialDerivationInfo)> = Vec::with_capacity(cap);
+    let capacity = base_dict.len() * transformations.len();
+    let mut derivations: FnvHashMap<CowDictStr, PartialDerivationInfo> =
+        FnvHashMap::with_capacity_and_hasher(capacity, FnvBuildHasher::default());
     for (original_index, snippet) in iter_snippets(base_dict) {
         for transformation in &transformations {
             let derived_text = transformation.apply(snippet);
-            let new_cost = 0;  //TODO @mverleg: TEMPORARY! REMOVE THIS!
-            derivations.push((derived_text, PartialDerivationInfo {
+            insert_if_cheapest(&mut derivations, derived_text, |cost| PartialDerivationInfo {
                 original_index,
                 transformation: transformation.clone(),
-                cost: new_cost,
-            }));
-            // match derivations.entry(derived_text) {
-            //     Entry::Occupied(mut existing) => {
-            //         if new_cost < existing.get().cost {
-            //             existing.insert(PartialDerivationInfo {
-            //                 original_index,
-            //                 transformation: transformation.clone(),
-            //                 cost: new_cost,
-            //             });
-            //         }
-            //     }
-            //     Entry::Vacant(vacancy) => {
-            //         vacancy.insert(PartialDerivationInfo {
-            //             original_index,
-            //             transformation: transformation.clone(),
-            //             cost: new_cost,
-            //         });
-            //     }
-            // }
+                cost,
+            })
         }
     }
-    derivations.sort_by(|(left_str, _), (right_str, _)| left_str.cmp(right_str));
-    tmp_convert(derivations)
+    collect_transformations(derivations)
 }
 
-#[inline(never)]
-fn tmp_convert(derivations: Vec<(CowDictStr, PartialDerivationInfo)>) -> Vec<DerivationInfo> {
-    //TODO @mverleg: inline
+fn insert_if_cheapest(
+        derivations: &mut FnvHashMap<CowDictStr, PartialDerivationInfo>,
+        derived_text: CowDictStr,
+        creator: impl Fn(u32) -> PartialDerivationInfo) {
+    let new_cost = 0;  //TODO @mverleg: TEMPORARY! REMOVE THIS!
+    match derivations.entry(derived_text) {
+        Entry::Occupied(mut existing) => {
+            if new_cost < existing.get().cost {
+                existing.insert(creator(new_cost));
+            }
+        }
+        Entry::Vacant(vacancy) => {
+            vacancy.insert(creator(new_cost));
+        }
+    }
+}
+
+fn collect_transformations(derivations: FnvHashMap<CowDictStr, PartialDerivationInfo>) -> Vec<DerivationInfo> {
     derivations.into_iter()
         .map(|(dt, pdi)| DerivationInfo {
             derived_text: dt,
