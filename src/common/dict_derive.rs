@@ -58,6 +58,7 @@ pub fn with_derived_dict_entries(base_dict: &'static [DictEntry]) -> Vec<Derivat
             // }
         }
     }
+    derivations.sort_by(|(left_str, _), (right_str, _)| left_str.cmp(right_str));
     tmp_convert(derivations)
 }
 
