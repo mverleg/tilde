@@ -6,6 +6,8 @@ use ::tilde::CliOperation;
 use ::tilde::run_tilde;
 use ::tilde::TildeArgs;
 
+//TODO @mverleg: remove? or start using
+
 pub fn criterion_benchmark(c: &mut Criterion) {
     let source = ",hello world";
     c.bench_function("analyze_tilde_code", |b| b.iter(|| thread::spawn(||

@@ -33,24 +33,29 @@ pub fn with_derived_dict_entries(base_dict: &'static [DictEntry]) -> Vec<Derivat
         for transformation in &transformations {
             let derived_text = transformation.apply(snippet);
             let new_cost = 0;  //TODO @mverleg: TEMPORARY! REMOVE THIS!
-            match derivations.entry(derived_text) {
-                Entry::Occupied(mut existing) => {
-                    if new_cost < existing.get().cost {
-                        existing.insert(PartialDerivationInfo {
-                            original_index,
-                            transformation: transformation.clone(),
-                            cost: new_cost,
-                        });
-                    }
-                }
-                Entry::Vacant(vacancy) => {
-                    vacancy.insert(PartialDerivationInfo {
-                        original_index,
-                        transformation: transformation.clone(),
-                        cost: new_cost,
-                    });
-                }
-            }
+            derivations.insert(derived_text, PartialDerivationInfo {
+                original_index,
+                transformation: transformation.clone(),
+                cost: new_cost,
+            });
+            // match derivations.entry(derived_text) {
+            //     Entry::Occupied(mut existing) => {
+            //         if new_cost < existing.get().cost {
+            //             existing.insert(PartialDerivationInfo {
+            //                 original_index,
+            //                 transformation: transformation.clone(),
+            //                 cost: new_cost,
+            //             });
+            //         }
+            //     }
+            //     Entry::Vacant(vacancy) => {
+            //         vacancy.insert(PartialDerivationInfo {
+            //             original_index,
+            //             transformation: transformation.clone(),
+            //             cost: new_cost,
+            //         });
+            //     }
+            // }
         }
     }
     tmp_convert(derivations)
