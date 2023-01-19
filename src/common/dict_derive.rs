@@ -3,6 +3,7 @@ use ::std::collections::HashMap;
 use ::std::collections::HashSet;
 use ::std::hash;
 use ::std::hash::Hasher;
+use fnv::{FnvBuildHasher, FnvHasher, FnvHashMap};
 
 use crate::common::dict::{DictEntry, iter_snippets};
 use crate::common::dict_str::CowDictStr;
@@ -27,27 +28,37 @@ pub fn with_derived_dict_entries(base_dict: &'static [DictEntry]) -> Vec<Derivat
     let transformations = generate_transformations();
     debug_assert!(!transformations.is_empty());
     let cap = base_dict.len() * transformations.len();
-    let mut derivations: HashMap<CowDictStr, PartialDerivationInfo> = HashMap::with_capacity(cap);
+    let mut derivations: FnvHashMap<CowDictStr, PartialDerivationInfo> = FnvHashMap::with_capacity_and_hasher(cap, FnvBuildHasher::default());
     for (original_index, snippet) in iter_snippets(base_dict) {
         for transformation in &transformations {
             let derived_text = transformation.apply(snippet);
-            let derivation = PartialDerivationInfo {
-                original_index,
-                transformation: transformation.clone(),
-                cost: 0,  //TODO @mark:
-            };
+            let new_cost = 0;  //TODO @mverleg: TEMPORARY! REMOVE THIS!
             match derivations.entry(derived_text) {
                 Entry::Occupied(mut existing) => {
-                    if derivation.cost < existing.get().cost {
-                        existing.insert(derivation);
+                    if new_cost < existing.get().cost {
+                        existing.insert(PartialDerivationInfo {
+                            original_index,
+                            transformation: transformation.clone(),
+                            cost: new_cost,
+                        });
                     }
                 }
                 Entry::Vacant(vacancy) => {
-                    vacancy.insert(derivation);
+                    vacancy.insert(PartialDerivationInfo {
+                        original_index,
+                        transformation: transformation.clone(),
+                        cost: new_cost,
+                    });
                 }
             }
         }
     }
+    tmp_convert(derivations)
+}
+
+#[inline(never)]
+fn tmp_convert(derivations: FnvHashMap<CowDictStr, PartialDerivationInfo>) -> Vec<DerivationInfo> {
+    //TODO @mverleg: inline
     derivations.into_iter()
         .map(|(dt, pdi)| DerivationInfo {
             derived_text: dt,
