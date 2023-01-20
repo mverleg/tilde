@@ -116,8 +116,8 @@ mod compression {
     }
 
     #[test]
-    fn bench0() {
-        //TODO @mverleg: TEMPORARY! REMOVE THIS!
+    #[ignore]  //TODO @mark: remove this test?
+    fn bench() {
         compress_with_dict("hello world, this is a test");
         let n = 100;
         let start = Instant::now();
@@ -126,20 +126,6 @@ mod compression {
         }
         let duration = start.elapsed();
         println!("{} iterations in {} ms so {} ms/iter", n, duration.as_millis(), duration.as_millis() / n)
-    }
-
-    #[test]
-    fn bench() {
-        //TODO @mverleg: TEMPORARY! REMOVE THIS!
-        with_derived_dict_entries(&DICT);
-        let mut sum = 0;
-        let n = 100;
-        let start = Instant::now();
-        for _ in 0..n {
-            sum += with_derived_dict_entries(&DICT).len();
-        }
-        let duration = start.elapsed();
-        println!("{} iterations in {} ms so {} ms/iter ({})", n, duration.as_millis(), duration.as_millis() / n, sum)
     }
 
     //TODO @mark: test more, e.g. symbols, caps

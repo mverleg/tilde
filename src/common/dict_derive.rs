@@ -3,7 +3,7 @@ use ::std::collections::HashMap;
 use ::std::collections::HashSet;
 use ::std::hash;
 use ::std::hash::Hasher;
-use fnv::{FnvBuildHasher, FnvHasher, FnvHashMap};
+use ::fnv::{FnvBuildHasher, FnvHasher, FnvHashMap};
 
 use crate::common::dict::{DictEntry, iter_snippets};
 use crate::common::dict_str::CowDictStr;
@@ -103,46 +103,6 @@ struct TransformationCost<'a> {
     cost: u32,
     transformation: &'a TextTransformation,
 }
-
-// fn collect_cheapest_derivations(
-//     base_dict_entries: &[&'static str],
-//     transformations: &[TextTransformation],
-// ) -> Vec<DerivationInfo> {
-//     let mut min_costs: HashMap<CowDictStr, TransformationCost> = HashMap::new();
-//     for (index, base_dict_entry) in base_dict_entries.iter().enumerate() {
-//         if base_dict_entry.contains("$magic-") {
-//             continue;
-//         }
-//         for transformation in transformations {
-//             let new = TransformationCost {
-//                 index,
-//                 cost: 1,  //TODO @mark:
-//                 transformation,
-//             };
-//             let deriv = transformation.apply(base_dict_entry);
-//             match min_costs.entry(deriv) {
-//                 Entry::Occupied(mut prev) => {
-//                     if new.cost < prev.get().cost {
-//                         prev.insert(new);
-//                     }
-//                 }
-//                 Entry::Vacant(prev) => {
-//                     prev.insert(new);
-//                 }
-//             }
-//         }
-//     }
-//     let mut result = min_costs.into_iter()
-//         .map(|(key, value)| DerivationInfo {
-//             derived_text: key,
-//             original_index: value.index,
-//             cost: value.cost,
-//             transformation: value.transformation.clone(),
-//         })
-//         .collect::<Vec<_>>();
-//     result.sort_by(|deriv1, deriv2| deriv1.derived_text.cmp(&deriv2.derived_text));
-//     result
-// }
 
 #[cfg(test)]
 mod tests {

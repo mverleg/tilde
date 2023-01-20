@@ -36,7 +36,7 @@ fn main() -> ExitCode {
 }
 
 fn parse_operation(mut args: Vec<String>) -> ArgParseRes {
-use ::ArgParseRes::*;
+    use ArgParseRes::*;
     args.reverse();
     args.pop();
     let arg1 = args.pop();
