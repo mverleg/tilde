@@ -69,6 +69,8 @@ pub fn compress_with_dict(text: &str) -> Vec<INDX> {
             let deriv_index = *buffer.last()
                 .unwrap_or_else(|| panic!("did not find snippet for {}", rem.chars().next().unwrap()));
             let deriv = &meta.extended_dict[deriv_index as usize];
+            eprintln!("for rem len = {} at '{}' found {} matches {}", rem.len(), rem.chars().next().unwrap(), //TODO @mark: TEMPORARY! REMOVE THIS!
+                      buffer.len(), buffer.iter().map(|nr| format!("{nr}='{}'", &meta.extended_dict[*nr as usize].derived_text.as_ref())).collect::<Vec<_>>().join(", "));  //TODO @mark: TEMPORARY! REMOVE THIS!
             numbers.push(deriv.original_index.try_into().expect("could not convert usize into index"));
             numbers.extend(deriv.transformation.operation_indices());
             rem = &rem[deriv.derived_text.as_ref().len()..];
@@ -90,6 +92,14 @@ mod compress_decode {
         let text = lookup_alloc(&nrs);
         let compress = compress_with_dict(&text);
         assert!(compress.len() < nrs.len())
+    }
+
+    #[test]
+    fn compress_special() {
+        let nrs = compress_with_dict("hi ©©");
+        assert!(nrs.len() < 1);
+        let text = lookup_alloc(&nrs);
+        assert_eq!(text, TEST_POEM);
     }
 
     #[test]

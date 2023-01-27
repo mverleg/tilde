@@ -78,6 +78,7 @@ impl <Word: Clone + Debug> PrefixMap<Word> {
 
     /// Given a text, find all the words that are prefixes of it. E.g. "dogma" is ["do", "dog", "dogma"].
     pub fn all_prefixes_cloned_of(&self, text: &str, buffer: &mut Vec<Word>) {
+        buffer.clear();
         text
             .chars()
             .map(|c| c.len_utf8())
