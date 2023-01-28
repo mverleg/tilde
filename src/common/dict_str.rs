@@ -29,6 +29,10 @@ impl DictStr {
         DictStr::new(DictStrContent::from(text.as_ref()))
     }
 
+    pub fn from_char(letter: char) -> Self {
+        DictStr::new(DictStrContent::from(letter))
+    }
+
     pub fn as_str(&self) -> &str {
         self.text.as_str()
     }
@@ -73,6 +77,7 @@ impl ToOwned for DictStr {
 #[derive(Debug, Eq, Ord)]
 pub enum CowDictStr {
     Owned(DictStr),
+    Char(char),
     Borrowed(&'static str),
 }
 
@@ -80,6 +85,7 @@ impl CowDictStr {
     pub fn to_owned(&self) -> DictStr {
         match self {
             CowDictStr::Owned(val) => val.to_owned(),
+            CowDictStr::Char(val) => DictStr::from_char(*val),
             CowDictStr::Borrowed(val) => DictStr::from(val),
         }
     }

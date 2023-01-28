@@ -33,6 +33,13 @@ impl TextTransformation {
         }
     }
 
+    pub fn apply_cow(&self, input: CowDictStr) -> CowDictStr {
+        match input {
+            CowDictStr::Borrowed(txt) => self.apply(txt),
+            CowDictStr::Owned(txt) => self.apply(txt.as_str()),
+        }
+    }
+
     pub fn apply(&self, input: &'static str) -> CowDictStr {
         if self == &Self::new_noop() {
             return CowDictStr::Borrowed(input);
