@@ -1,4 +1,5 @@
 
+#[cfg(debug_assertions)]
 #[macro_export]
 macro_rules! log {
     ($templ:literal $(, $args:expr)*) => {
@@ -23,6 +24,14 @@ macro_rules! log {
                 eprintln!($templ, $($args, )*);
             }
         }
+    }
+}
+
+#[cfg(not(debug_assertions))]
+#[macro_export]
+macro_rules! log {
+    ($templ:literal $(, $args:expr)*) => {
+        {}
     }
 }
 

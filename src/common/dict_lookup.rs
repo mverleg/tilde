@@ -111,9 +111,9 @@ mod tests {
 
     #[test]
     fn lookup_with_magic() {
-        // as-CAP/tea-BS/risk-BS/!/capital
+        // as-CAP/tea-BS-BS/risk-BS/!/capital-CAP-BS
         let mut out = String::new();
-        lookup_buffer(&[90, 71, 2545, 0, 839, 0, 62, 757, 0], &mut out, &mut vec![]);
+        lookup_buffer(&[90, 71, 2545, 0, 0, 839, 0, 62, 757, 0], &mut out, &mut vec![]);
         assert_eq!(&out, "Asterisk! Capital")
     }
 }
