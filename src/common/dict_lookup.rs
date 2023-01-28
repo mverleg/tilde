@@ -1,3 +1,4 @@
+use ::std::process::Output;
 use crate::common::{INDX, TextTransformation};
 use crate::common::dict::{DICT, DictEntry};
 
@@ -15,7 +16,10 @@ struct LatestSnippet {
 impl LatestSnippet {
     fn into_str(self, is_unicode: bool) -> &'static str {
         if is_unicode {
-            todo!()
+            self.indx.try_into::<Output=char>()
+                .unwrap_or_else(|_| "tried to create unicode entry #{self.indx} but failed")
+            //TODO @mark: problems with lifetimes when char->str
+            //TODO @mark: should this error case be handled?
         } else {
             self.snip
         }
