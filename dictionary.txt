@@ -300,6 +300,8 @@ view
 level 
 control 
 government 
+$magic-backspace-front$
+$magic-reverse$
 ask 
 among 
 course 

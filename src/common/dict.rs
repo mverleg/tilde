@@ -19,8 +19,10 @@ pub type INDX = u16;
 pub enum DictEntry {
     Snippet { snip: &'static str, capitalize_next: bool },
     Backspace,
+    BackspaceFront,
     CapitalizeFirst,
     CapitalizeAll,
+    Reverse,
     UnicodeLookup,
 }
 

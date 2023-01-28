@@ -20,15 +20,17 @@ fn generate_base_dict_code(base_dict_entries: &[&str]) -> String {
     for entry in base_dict_entries.iter() {
         let creator = match *entry {
             "$magic-backspace$" => "DictEntry::Backspace".to_owned(),
+            "$magic-backspace-front$" => "DictEntry::BackspaceFront".to_owned(),
             "$magic-newline$" => "s(\"\\n\")".to_owned(),
             "$magic-capitalize-first$" => "DictEntry::CapitalizeFirst".to_owned(),
             "$magic-capitalize-all$" => "DictEntry::CapitalizeAll".to_owned(),
+            "$magic-reverse$" => "DictEntry::Reverse".to_owned(),
             "$magic-unicode$" => "DictEntry::UnicodeLookup".to_owned(),
             "\"" => "s(\"\\\"\")".to_owned(),
             _ => if entry.ends_with("$magic-capitalize-next$") {
                 format!("S(\"{}\")", entry.strip_suffix("$magic-capitalize-next$").unwrap())
             } else {
-                assert!(!entry.contains("$magic"));
+                assert!(!entry.contains("$magic"), "unknown: '{entry}'");
                 format!("s(\"{}\")", entry)
             },
         };
