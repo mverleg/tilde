@@ -19,6 +19,7 @@ use crate::common::dict_derive::DerivationInfo;
 use crate::common::dict_derive::with_derived_dict_entries;
 use crate::common::INDX;
 use crate::common::prefix_data::PrefixMap;
+use crate::common::text_trans::UNICODE_MAGIC_INDX;
 use crate::common::TextTransformation;
 use crate::tilde_log;
 
@@ -77,9 +78,10 @@ pub fn compress_with_dict(text: &str) -> Vec<INDX> {
             } else {
                 // Did not find a single entry that matches, the only choice is to use unicode lookup.
                 // (Unicode lookup is only generated if normal dict fails, but that is fine because dict is almost always cheaper.)
-                //numbers.push();
-                //numbers.push();
-                //TODO @mark:
+                let letter = rem.chars().next().expect("first char must exist here");
+                numbers.push((letter  as u32).try_into().expect("unicode lookup value too large for index data type"));
+                numbers.push(UNICODE_MAGIC_INDX);
+                rem = &rem[letter.len_utf8()..];
             }
         }
     });
@@ -98,21 +100,24 @@ mod compress_decode {
         let mut nrs = (0..1000).collect::<Vec<_>>();
         let text = lookup_alloc(&nrs);
         let compress = compress_with_dict(&text);
+        eprintln!("{}", nrs.iter().map(|nr| nr.to_string()).collect::<Vec<_>>().join(" "));  //TODO @mark: TEMPORARY! REMOVE THIS!
+        eprintln!("{}", compress.iter().map(|nr| nr.to_string()).collect::<Vec<_>>().join(" "));  //TODO @mark: TEMPORARY! REMOVE THIS!
         assert!(compress.len() < nrs.len())
     }
 
     #[test]
     fn compress_special() {
-        let nrs = compress_with_dict("hi ©©");
-        assert!(nrs.len() < 1);
+        let sample = "hi ©©";
+        let nrs = compress_with_dict(sample);
+        assert!(nrs.len() > 1);
         let text = lookup_alloc(&nrs);
-        assert_eq!(text, TEST_POEM);
+        assert_eq!(text, sample);
     }
 
     #[test]
     fn compress_poem() {
         let nrs = compress_with_dict(TEST_POEM);
-        assert!(nrs.len() < 1);
+        assert!(nrs.len() > 1);
         let text = lookup_alloc(&nrs);
         assert_eq!(text, TEST_POEM);
     }
