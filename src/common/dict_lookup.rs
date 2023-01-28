@@ -16,10 +16,11 @@ struct LatestSnippet {
 impl LatestSnippet {
     fn into_str(self, is_unicode: bool) -> &'static str {
         if is_unicode {
-            self.indx.try_into::<Output=char>()
-                .unwrap_or_else(|_| "tried to create unicode entry #{self.indx} but failed")
-            //TODO @mark: problems with lifetimes when char->str
-            //TODO @mark: should this error case be handled?
+            TryInto::<char>::try_into(self.indx)
+                .unwrap_or_else(|_| panic!("tried to create unicode entry #{} but failed", self.indx))
+                .as_str()
+            //TODO @mark: u16 does not cover most of unicode, switch to u32 (which does)?
+            //TODO @mark: should this error case be handled? it can happen for quite some numbers
         } else {
             self.snip
         }
