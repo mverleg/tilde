@@ -28,14 +28,24 @@ pub fn lookup_buffer(indices: &[INDX], buffer: &mut String, char_buffer: &mut Ve
                 current_capitalize_next = capitalize_next;
                 //TODO @mark: do not count the capitalize next if it doesn't do anything? like on whitespace
             }
+            DictEntry::UnicodeLookup => {
+                todo!("unicode lookup not yet implemented")
+                //TODO @mark: ^
+            }
             DictEntry::Backspace => {
                 transform.pop_end += 1;
+            }
+            DictEntry::BackspaceFront => {
+                transform.pop_start += 1;
             }
             DictEntry::CapitalizeFirst => {
                 transform.case_first = !transform.case_first;
             }
             DictEntry::CapitalizeAll => {
                 transform.case_all = !transform.case_all;
+            }
+            DictEntry::Reverse => {
+                transform.reverse = !transform.reverse;
             }
         }
     }
@@ -69,6 +79,13 @@ mod tests {
         let mut out = String::new();
         lookup_buffer(&[9, 2, 12, 12, 5, 1, 224], &mut out, &mut vec![]);
         assert_eq!(&out, "hello world ")
+    }
+
+    #[test]
+    fn lookup_unicode() {
+        let mut out = String::new();
+        lookup_buffer(&[20320, 71, 22909, 71], &mut out, &mut vec![]);
+        assert_eq!(&out, "你好")
     }
 
     #[test]

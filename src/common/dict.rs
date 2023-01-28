@@ -45,8 +45,11 @@ pub fn iter_snippets(dict: &'static [DictEntry]) -> impl Iterator<Item=(usize, &
         .flat_map(|(index, entry)| match *entry {
             DictEntry::Snippet { snip, capitalize_next } => Some(snip),
             DictEntry::Backspace => None,
+            DictEntry::BackspaceFront => None,
             DictEntry::CapitalizeFirst => None,
             DictEntry::CapitalizeAll => None,
+            DictEntry::Reverse => None,
+            DictEntry::UnicodeLookup => None,
         }.map(|e| (index, e)).into_iter())
 }
 
