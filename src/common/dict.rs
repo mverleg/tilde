@@ -21,6 +21,7 @@ pub enum DictEntry {
     Backspace,
     CapitalizeFirst,
     CapitalizeAll,
+    UnicodeLookup,
 }
 
 #[inline]

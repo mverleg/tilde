@@ -22,7 +22,8 @@ fn generate_base_dict_code(base_dict_entries: &[&str]) -> String {
             "$magic-backspace$" => "DictEntry::Backspace".to_owned(),
             "$magic-newline$" => "s(\"\\n\")".to_owned(),
             "$magic-capitalize-first$" => "DictEntry::CapitalizeFirst".to_owned(),
-            "$magic-capitalize all$" => "DictEntry::CapitalizeAll".to_owned(),
+            "$magic-capitalize-all$" => "DictEntry::CapitalizeAll".to_owned(),
+            "$magic-unicode$" => "DictEntry::UnicodeLookup".to_owned(),
             "\"" => "s(\"\\\"\")".to_owned(),
             _ => if entry.ends_with("$magic-capitalize-next$") {
                 format!("S(\"{}\")", entry.strip_suffix("$magic-capitalize-next$").unwrap())

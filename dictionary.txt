@@ -68,6 +68,7 @@ _
 $
 ^
 ~
+$magic-unicode$
 $magic-capitalize-first$
 $magic-capitalize-all$
 //
