@@ -106,12 +106,10 @@ impl TextTransformation {
             indices.push(72);
         }
         if self.reverse {
-            indices.push(0);
-            //TODO @mverleg:
+            indices.push(304);
         }
         for _ in 0..self.pop_start {
-            indices.push(0);
-            //TODO @mverleg:
+            indices.push(303);
         }
         for _ in 0..self.pop_end {
             indices.push(0);

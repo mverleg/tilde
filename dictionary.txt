@@ -35,7 +35,7 @@ k
 I
 $magic-newline$
 ,
-.$magic-capitalize-next$
+. $magic-capitalize-next$
 j
 x
 q
@@ -300,6 +300,7 @@ view
 level 
 control 
 government 
+.
 $magic-backspace-front$
 $magic-reverse$
 ask 
