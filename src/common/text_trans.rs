@@ -42,12 +42,20 @@ impl TextTransformation {
     pub fn apply(&self, input: SnipOrChar) -> CowDictStr {
         match input {
             SnipOrChar::Snip(text) => self.apply_str(text),
-            SnipOrChar::Char(letter) => CowDictStr::Owned(DictStr::from_char(self.apply_char(letter))),
+            SnipOrChar::Char(letter) => CowDictStr::Owned(self.apply_char(letter)
+                .map_or_else(|| DictStr::empty(), |c| DictStr::from_char(c))),
         }
     }
 
-    fn apply_char(&self, input: char) -> char {
-        todo!()  //TODO @mark: TEMPORARY! REMOVE THIS!
+    fn apply_char(&self, input: char) -> Option<char> {
+        if self.pop_start > 0 || self.pop_end > 0 {
+            return None;
+        }
+        let mut letter = input;
+        if self.case_all || self.case_first {
+            switch_capitalization_char(&mut letter);
+        }
+        return Some(letter)
     }
 
     pub fn apply_str(&self, input: &'static str) -> CowDictStr {

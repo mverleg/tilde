@@ -25,6 +25,10 @@ impl DictStr {
         }
     }
 
+    pub fn empty() -> Self {
+        Self::new(DictStrContent::new())
+    }
+
     pub fn from(text: impl AsRef<str>) -> Self {
         DictStr::new(DictStrContent::from(text.as_ref()))
     }
