@@ -7,6 +7,7 @@ fn main() {
     println!("cargo:rerun-if-changed=Cargo.toml");
     println!("cargo:rerun-if-changed=build.rs");
     println!("cargo:rerun-if-changed=dictionary.txt");
+    eprintln!("refreshing build.rs");  //TODO @mark: TEMPORARY! REMOVE THIS!
     let base_dict_str = fs::read_to_string("./dictionary.txt").unwrap();
     let base_dict_entries = base_dict_str.lines()
         .collect::<Vec<_>>();

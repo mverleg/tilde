@@ -100,10 +100,10 @@ impl TextTransformation {
     pub fn operation_indices(&self) -> OpIndices {
         let mut indices = OpIndices::new();
         if self.case_first {
-            indices.push(70);
+            indices.push(71);
         }
         if self.case_all {
-            indices.push(71);
+            indices.push(72);
         }
         if self.reverse {
             indices.push(0);
@@ -204,6 +204,8 @@ mod indices_in_sync_with_dict {
     use ::std::cell::LazyCell;
     use ::std::collections::HashMap;
 
+    use ::strum::IntoEnumIterator;
+
     use crate::common::dict::DICT;
     use crate::common::dict::DictEntry;
     use crate::common::dict::iter_snippets;
@@ -250,5 +252,19 @@ mod indices_in_sync_with_dict {
         assert_transformation_index(
             TextTransformation { pop_end: 1, ..Default::default() },
             DictEntry::Backspace)
+    }
+
+    #[test]
+    fn pop_start() {
+        assert_transformation_index(
+            TextTransformation { pop_start: 1, ..Default::default() },
+            DictEntry::BackspaceFront)
+    }
+
+    #[test]
+    fn reverse() {
+        assert_transformation_index(
+            TextTransformation { reverse: true, ..Default::default() },
+            DictEntry::Reverse)
     }
 }
