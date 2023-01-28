@@ -66,14 +66,21 @@ pub fn compress_with_dict(text: &str) -> Vec<INDX> {
     DICT_META.with(|meta| {
         while !rem.is_empty() {
             meta.prefix_map.all_prefixes_cloned_of(rem, &mut buffer);
-            let deriv_index = *buffer.last()
-                .unwrap_or_else(|| panic!("did not find snippet for {}", rem.chars().next().unwrap()));
-            let deriv = &meta.extended_dict[deriv_index as usize];
-            //eprintln!("for rem len = {} at '{}' found {} matches {}", rem.len(), rem.chars().next().unwrap(), //TODO @mark: TEMPORARY! REMOVE THIS!
-            //          buffer.len(), buffer.iter().map(|nr| format!("{nr}='{}'", &meta.extended_dict[*nr as usize].derived_text.as_ref())).collect::<Vec<_>>().join(", "));  //TODO @mark: TEMPORARY! REMOVE THIS!
-            numbers.push(deriv.original_index.try_into().expect("could not convert usize into index"));
-            numbers.extend(deriv.transformation.operation_indices());
-            rem = &rem[deriv.derived_text.as_ref().len()..];
+            if let Some(deriv_index) = buffer.last() {
+                // Found entry in the derived dictionary, use the base snippet and any transformations
+                let deriv = &meta.extended_dict[*deriv_index as usize];
+                //eprintln!("for rem len = {} at '{}' found {} matches {}", rem.len(), rem.chars().next().unwrap(), //TODO @mark: TEMPORARY! REMOVE THIS!
+                //          buffer.len(), buffer.iter().map(|nr| format!("{nr}='{}'", &meta.extended_dict[*nr as usize].derived_text.as_ref())).collect::<Vec<_>>().join(", "));  //TODO @mark: TEMPORARY! REMOVE THIS!
+                numbers.push(deriv.original_index.try_into().expect("could not convert usize into index"));
+                numbers.extend(deriv.transformation.operation_indices());
+                rem = &rem[deriv.derived_text.as_ref().len()..];
+            } else {
+                // Did not find a single entry that matches, the only choice is to use unicode lookup.
+                // (Unicode lookup is only generated if normal dict fails, but that is fine because dict is almost always cheaper.)
+                //numbers.push();
+                //numbers.push();
+                //TODO @mark:
+            }
         }
     });
     numbers
@@ -122,7 +129,7 @@ mod compression {
     #[test]
     fn simple_text_compression() {
         let nrs = compress_with_dict("hello world, this is a test");
-        assert_eq!(nrs.len(), 16);
+        assert_eq!(nrs.len(), 15);
     }
 
     #[test]

@@ -14,6 +14,8 @@ use crate::tilde_log;
 
 pub type OpIndices = ArrayVec<[INDX; 4]>;
 
+pub const UNICODE_MAGIC_INDX: INDX = 70;
+
 #[derive(Debug, Default, Clone, PartialEq, Eq)]
 pub struct TextTransformation {
     pub case_first: bool,
@@ -264,5 +266,19 @@ mod indices_in_sync_with_dict {
         assert_transformation_index(
             TextTransformation { reverse: true, ..Default::default() },
             DictEntry::Reverse)
+    }
+
+    #[test]
+    fn unicode_lookup() {
+        let entry = DictEntry::UnicodeLookup;
+        let index: usize = UNICODE_MAGIC_INDX
+            .try_into()
+            .expect("could not convert index to usize");
+        let expected = DICT_POSITIONS.with(|dict_pos| {
+            *dict_pos
+                .get(&entry)
+                .unwrap()
+        });
+        assert_eq!(index, expected, "index should be {expected} but is {index}");
     }
 }
