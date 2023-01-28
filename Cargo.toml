@@ -29,7 +29,7 @@ tinyvec = { version = "1.6.0", default-features = false, features = ["rustc_1_57
 tinyvec_string = { version = "0.3.2", features = ["rustc_1_57"] }
 
 [profile.release]
-opt-level = 'z'     # Optimize for size.
+opt-level = 1       # Optimize for speed ('z' for size).
 lto = true          # Enable Link Time Optimization
 codegen-units = 1   # Reduce number of codegen units to increase optimizations.
 panic = 'abort'     # Abort on panic

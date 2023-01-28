@@ -7,30 +7,47 @@ pub fn lookup_alloc(indices: &[INDX]) -> String {
     buffer
 }
 
+struct LatestSnippet {
+    indx: INDX,
+    snip: &'static str,
+}
+
+impl LatestSnippet {
+    fn into_str(self, is_unicode: bool) -> &'static str {
+        if is_unicode {
+            todo!()
+        } else {
+            self.snip
+        }
+    }
+}
+
 ///
 /// String buffer is NOT cleared (can expand), char buffer IS overwritten.
 pub fn lookup_buffer(indices: &[INDX], buffer: &mut String, char_buffer: &mut Vec<char>) {
     //TODO @mark: remove `char_buffer` arg and rustdoc
-    let mut current_snip = "";
+    let mut current = LatestSnippet { indx: 0, snip: "" };
     let mut current_capitalize_next = false;
     let mut transform = TextTransformation::new_noop();
+    let mut is_unicode = false;
     for indx in indices {
+
         // if current_capitalize_next {
         //     transform.case_first = true;
         //     current_capitalize_next = false;
         // }
         match DICT[*indx as usize] {
             DictEntry::Snippet { snip, capitalize_next } => {
-                buffer.push_str(transform.apply(current_snip).as_ref());
-                current_snip = snip;
+                buffer.push_str(transform.apply(current.into_str(is_unicode)).as_ref());
+                current = LatestSnippet { indx: *indx, snip };
                 transform = TextTransformation::new_noop();
+                is_unicode = false;
                 transform.case_first = current_capitalize_next;
                 current_capitalize_next = capitalize_next;
                 //TODO @mark: do not count the capitalize next if it doesn't do anything? like on whitespace
             }
             DictEntry::UnicodeLookup => {
-                todo!("unicode lookup not yet implemented")
-                //TODO @mark: ^
+                is_unicode = true
             }
             DictEntry::Backspace => {
                 transform.pop_end += 1;
@@ -49,7 +66,7 @@ pub fn lookup_buffer(indices: &[INDX], buffer: &mut String, char_buffer: &mut Ve
             }
         }
     }
-    buffer.push_str(transform.apply(current_snip).as_ref());
+    buffer.push_str(transform.apply(current.into_str(is_unicode)).as_ref());
 }
 
 #[cfg(test)]
@@ -84,7 +101,7 @@ mod tests {
     #[test]
     fn lookup_unicode() {
         let mut out = String::new();
-        lookup_buffer(&[20320, 71, 22909, 71], &mut out, &mut vec![]);
+        lookup_buffer(&[20320, 70, 22909, 70], &mut out, &mut vec![]);
         assert_eq!(&out, "你好")
     }
 
