@@ -22,6 +22,12 @@ pub struct TextTransformation {
     pub pop_end: u8,
 }
 
+#[derive(Debug)]
+pub enum SnipOrChar {
+    Snip(&'static str),
+    Char(char),
+}
+
 impl TextTransformation {
     pub fn new_noop() -> TextTransformation {
         TextTransformation {
@@ -33,14 +39,18 @@ impl TextTransformation {
         }
     }
 
-    pub fn apply_cow(&self, input: CowDictStr) -> CowDictStr {
+    pub fn apply(&self, input: SnipOrChar) -> CowDictStr {
         match input {
-            CowDictStr::Borrowed(txt) => self.apply(txt),
-            CowDictStr::Owned(txt) => self.apply(txt.as_str()),
+            SnipOrChar::Snip(text) => self.apply_str(text),
+            SnipOrChar::Char(letter) => CowDictStr::Owned(DictStr::from_char(self.apply_char(letter))),
         }
     }
 
-    pub fn apply(&self, input: &'static str) -> CowDictStr {
+    fn apply_char(&self, input: char) -> char {
+        todo!()  //TODO @mark: TEMPORARY! REMOVE THIS!
+    }
+
+    pub fn apply_str(&self, input: &'static str) -> CowDictStr {
         if self == &Self::new_noop() {
             return CowDictStr::Borrowed(input);
         }

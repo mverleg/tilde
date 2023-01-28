@@ -33,7 +33,7 @@ pub fn with_derived_dict_entries(base_dict: &'static [DictEntry]) -> Vec<Derivat
         FnvHashMap::with_capacity_and_hasher(capacity, FnvBuildHasher::default());
     for (original_index, snippet) in iter_snippets(base_dict) {
         for transformation in &transformations {
-            let derived_text = transformation.apply(snippet);
+            let derived_text = transformation.apply_str(snippet);
             insert_if_cheapest(&mut derivations, derived_text, |cost| PartialDerivationInfo {
                 original_index,
                 transformation: transformation.clone(),

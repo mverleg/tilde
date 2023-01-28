@@ -2,6 +2,7 @@ use ::std::process::Output;
 use crate::common::{INDX, TextTransformation};
 use crate::common::dict::{DICT, DictEntry};
 use crate::common::dict_str::{CowDictStr, DictStr};
+use crate::common::text_trans::SnipOrChar;
 
 pub fn lookup_alloc(indices: &[INDX]) -> String {
     let mut buffer = String::new();
@@ -15,15 +16,14 @@ struct LatestSnippet {
 }
 
 impl LatestSnippet {
-    fn into_str(self, is_unicode: bool) -> CowDictStr {
+    fn into_str(self, is_unicode: bool) -> SnipOrChar {
         if is_unicode {
-            CowDictStr::Owned(DictStr::from(char::from_u32(self.indx as u32)
-                .unwrap_or_else(|| panic!("tried to create unicode entry #{} but failed", self.indx))
-                .to_string()))
+            SnipOrChar::Char(char::from_u32(self.indx as u32)
+                .unwrap_or_else(|| panic!("tried to create unicode entry #{} but failed", self.indx)))
             //TODO @mark: u16 does not cover most of unicode, switch to u32 (which does)?
             //TODO @mark: should this error case be handled? it can happen for quite some numbers
         } else {
-            CowDictStr::Borrowed(self.snip)
+            SnipOrChar::Snip(self.snip)
         }
     }
 }
@@ -44,7 +44,7 @@ pub fn lookup_buffer(indices: &[INDX], buffer: &mut String, char_buffer: &mut Ve
         // }
         match DICT[*indx as usize] {
             DictEntry::Snippet { snip, capitalize_next } => {
-                buffer.push_str(transform.apply_cow(current.into_str(is_unicode)).as_ref());
+                buffer.push_str(transform.apply(current.into_str(is_unicode)).as_ref());
                 current = LatestSnippet { indx: *indx, snip };
                 transform = TextTransformation::new_noop();
                 is_unicode = false;
@@ -72,7 +72,7 @@ pub fn lookup_buffer(indices: &[INDX], buffer: &mut String, char_buffer: &mut Ve
             }
         }
     }
-    buffer.push_str(transform.apply_cow(current.into_str(is_unicode)).as_ref());
+    buffer.push_str(transform.apply(current.into_str(is_unicode)).as_ref());
 }
 
 #[cfg(test)]

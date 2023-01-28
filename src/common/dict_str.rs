@@ -77,7 +77,6 @@ impl ToOwned for DictStr {
 #[derive(Debug, Eq, Ord)]
 pub enum CowDictStr {
     Owned(DictStr),
-    Char(char),
     Borrowed(&'static str),
 }
 
@@ -85,7 +84,6 @@ impl CowDictStr {
     pub fn to_owned(&self) -> DictStr {
         match self {
             CowDictStr::Owned(val) => val.to_owned(),
-            CowDictStr::Char(val) => DictStr::from_char(*val),
             CowDictStr::Borrowed(val) => DictStr::from(val),
         }
     }
