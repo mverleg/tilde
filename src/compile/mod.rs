@@ -1,12 +1,11 @@
 use ::std::env::current_exe;
 
+pub use crate::exec::Value;
 use crate::op::Op;
 use crate::op::Prog;
 use crate::TildeRes;
 
 pub use self::parse::parse;
-
-pub use crate::exec::Value;
 
 //TODO @mark: remove unused modules
 // mod alphabet;

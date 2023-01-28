@@ -1,7 +1,6 @@
 use ::std::thread;
 
 use ::criterion::{black_box, Criterion, criterion_group, criterion_main};
-
 use ::tilde::CliOperation;
 use ::tilde::run_tilde;
 use ::tilde::TildeArgs;

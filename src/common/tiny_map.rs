@@ -1,5 +1,5 @@
-use ::std::collections::HashMap;
 use ::std::borrow::BorrowMut;
+use ::std::collections::HashMap;
 use ::std::hash::Hash;
 
 use ::tinyvec::ArrayVec;

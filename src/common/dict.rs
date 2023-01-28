@@ -7,7 +7,9 @@
 use ::std::iter::FlatMap;
 use ::std::option::IntoIter;
 use ::std::slice::Iter;
+
 use ::strum_macros::EnumIter;
+
 use crate::common::dict_str::DictStr;
 use crate::common::TextTransformation;
 
@@ -78,8 +80,9 @@ If you've cheated the guy in the glass.
 mod lookup {
     use ::std::collections::HashSet;
 
-    use super::*;
     use ::strum::IntoEnumIterator;
+
+    use super::*;
 
     #[test]
     fn first_is_whitespace() {

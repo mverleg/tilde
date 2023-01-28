@@ -1,7 +1,7 @@
-pub use self::dict::INDX;
 pub use self::dict::DICT;
-pub use self::dict_lookup::lookup_buffer;
+pub use self::dict::INDX;
 pub use self::dict_compress::compress_with_dict;
+pub use self::dict_lookup::lookup_buffer;
 pub use self::log::log;
 pub use self::text_trans::TextTransformation;
 

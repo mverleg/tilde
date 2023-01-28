@@ -3,6 +3,7 @@ use ::std::collections::HashMap;
 use ::std::collections::HashSet;
 use ::std::hash;
 use ::std::hash::Hasher;
+
 use ::fnv::{FnvBuildHasher, FnvHasher, FnvHashMap};
 
 use crate::common::dict::{DictEntry, iter_snippets};
