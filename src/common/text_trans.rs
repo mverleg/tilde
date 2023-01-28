@@ -10,6 +10,7 @@ use crate::common::dict_str::{CowDictStr, DictStrContent};
 use crate::common::dict_str::DictStr;
 use crate::common::dict_str::LONGEST_DICT_ENTRY_BYTES;
 use crate::common::INDX;
+use crate::tilde_log;
 
 pub type OpIndices = ArrayVec<[INDX; 4]>;
 
@@ -40,6 +41,8 @@ impl TextTransformation {
     }
 
     pub fn apply(&self, input: SnipOrChar) -> CowDictStr {
+        tilde_log!("transform: case_first={} case_all={} reverse={} pop_start={} pop_end={}",
+            self.case_first, self.case_all, self.reverse, self.pop_start, self.pop_end);
         match input {
             SnipOrChar::Snip(text) => self.apply_str(text),
             SnipOrChar::Char(letter) => CowDictStr::Owned(self.apply_char(letter)

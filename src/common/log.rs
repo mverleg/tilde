@@ -1,6 +1,6 @@
 #[macro_export]
-macro_rules! log {
-    ($templ:literal $(, $args:expr)*) => {
+macro_rules! if_log {
+    ($cmd:expr) => {
         {
             use ::std::sync::atomic::AtomicU8;
             use ::std::sync::atomic::Ordering;
@@ -17,15 +17,29 @@ macro_rules! log {
                 LOG_ON.store(is_on, Ordering::Release);
             }
             if is_on == ON {
-                // add time without external dependencies?
-                eprint!("# ");
-                eprintln!($templ, $($args, )*);
+                $cmd
             }
         }
     }
 }
 
+#[macro_export]
+macro_rules! log {
+    ($templ:literal $(, $args:expr)*) => {
+        {
+            if_log! (
+                ({
+                    eprint!("# ");
+                    eprintln!($templ, $($args, )*);
+                    ()
+                })
+            )
+        }
+    }
+}
+
 pub use log;
+pub use if_log;
 
 #[cfg(test)]
 mod tests {

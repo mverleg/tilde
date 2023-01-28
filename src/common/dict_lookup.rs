@@ -1,8 +1,10 @@
 use ::std::process::Output;
+
 use crate::common::{INDX, TextTransformation};
 use crate::common::dict::{DICT, DictEntry};
 use crate::common::dict_str::{CowDictStr, DictStr};
 use crate::common::text_trans::SnipOrChar;
+use crate::tilde_log;
 
 pub fn lookup_alloc(indices: &[INDX]) -> String {
     let mut buffer = String::new();
@@ -37,11 +39,6 @@ pub fn lookup_buffer(indices: &[INDX], buffer: &mut String, char_buffer: &mut Ve
     let mut transform = TextTransformation::new_noop();
     let mut is_unicode = false;
     for indx in indices {
-
-        // if current_capitalize_next {
-        //     transform.case_first = true;
-        //     current_capitalize_next = false;
-        // }
         match DICT[*indx as usize] {
             DictEntry::Snippet { snip, capitalize_next } => {
                 buffer.push_str(transform.apply(current.into_str(is_unicode)).as_ref());
@@ -50,6 +47,7 @@ pub fn lookup_buffer(indices: &[INDX], buffer: &mut String, char_buffer: &mut Ve
                 is_unicode = false;
                 transform.case_first = current_capitalize_next;
                 current_capitalize_next = capitalize_next;
+                tilde_log!("snip = {} ({})", &current.snip, current.indx);
                 //TODO @mark: do not count the capitalize next if it doesn't do anything? like on whitespace
             }
             DictEntry::UnicodeLookup => {
@@ -100,7 +98,7 @@ mod tests {
     #[test]
     fn lookup_simple() {
         let mut out = String::new();
-        lookup_buffer(&[9, 2, 12, 12, 5, 1, 224], &mut out, &mut vec![]);
+        lookup_buffer(&[9, 2, 12, 12, 5, 1, 225], &mut out, &mut vec![]);
         assert_eq!(&out, "hello world ")
     }
 
@@ -113,8 +111,9 @@ mod tests {
 
     #[test]
     fn lookup_with_magic() {
+        // as-CAP/tea-BS/risk-BS/!/capital
         let mut out = String::new();
-        lookup_buffer(&[89, 70, 2542, 0, 836, 0, 62, 754, 0], &mut out, &mut vec![]);
+        lookup_buffer(&[90, 71, 2545, 0, 839, 0, 62, 757, 0], &mut out, &mut vec![]);
         assert_eq!(&out, "Asterisk! Capital")
     }
 }
