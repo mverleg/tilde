@@ -145,9 +145,12 @@ pub fn tilde_analyze(source: &str) -> TildeRes<String> {
     analysis.push_str("\"long_command_code\": \"");
     analysis.push_str(&safe_long_code);
     analysis.push_str("\",\n");
-    analysis.push_str("\"length_valid\": 0,\n");
-    analysis.push_str("\"length_preview_features\": 0\n");
+    analysis.push_str("\"length_valid_in_bytes\": ");
+    analysis.push_str(&format!("{}", -1));
+    analysis.push_str(",\n");
+    analysis.push_str("\"length_preview_features_in_bytes\": 0\n");
     analysis.push_str("}\n");
+    //TODO @mverleg: explanation
     //if 1 == 1 { return Ok(compress_with_dict(code).len().to_string()); }
     Ok(analysis)
     //TODO @mverleg: implement

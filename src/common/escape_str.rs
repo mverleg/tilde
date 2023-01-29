@@ -1,12 +1,13 @@
 
-/// Escape double quotes and backslashes.
+/// Escape double quotes, newlines and backslashes.
 pub fn escape_for_string(input: impl Into<String>) -> String {
     let input = input.into();
     let mut result = String::with_capacity(input.len() + 4);
     for ch in input.chars() {
         match ch {
-            '\\' => result.push_str("\\\\"),
             '"' => result.push_str("\\\""),
+            '\n' => result.push_str("\\n"),
+            '\\' => result.push_str("\\\\"),
             safe => result.push(safe),
         }
     }
@@ -18,8 +19,10 @@ pub fn is_safe_for_string(input: &str) -> bool {
     if input.contains('"') {
         return false
     }
-    if input.ends_with('\\') {
-        //TODO @mverleg: should maybe allow even numbers of backslashes
+    if input.contains('\\') {
+        return false
+    }
+    if input.contains('\n') {
         return false
     }
     true
@@ -78,6 +81,14 @@ mod tests {
     }
 
     #[test]
+    fn leading_backslash() {
+        let text = "\\hi";
+        assert!(!is_safe_for_string(text));
+        let escaped = escape_for_string(text);
+        assert_eq!("\\\\hi", escaped);
+    }
+
+    #[test]
     fn trailing_backslash() {
         let text = "hi\\";
         assert!(!is_safe_for_string(text));
@@ -94,11 +105,27 @@ mod tests {
     }
 
     #[test]
-    fn nightmare() {
-        // \\"hi\\"+\"\"
-        let text = "\\\\\"hi\\\\\"+\\\"\\\"";
+    fn just_newline() {
+        let text = "\n";
         assert!(!is_safe_for_string(text));
         let escaped = escape_for_string(text);
-        assert_eq!("\\\\\\\\\\\"hi\\\\\\\\\\\"+\\\\\\\"\\\\\\\"", escaped);
+        assert_eq!("\\n", escaped);
+    }
+
+    #[test]
+    fn quoted_newline() {
+        let text = "\"\n\"";
+        assert!(!is_safe_for_string(text));
+        let escaped = escape_for_string(text);
+        assert_eq!("\\\"\\n\\\"", escaped);
+    }
+
+    #[test]
+    fn nightmare() {
+        // \\"hi\\"+\"\"
+        let text = "\\\\\"hi\\\\\"\n+\n\\\"\\\"";
+        assert!(!is_safe_for_string(text));
+        let escaped = escape_for_string(text);
+        assert_eq!("\\\\\\\\\\\"hi\\\\\\\\\\\"\\n+\\n\\\\\\\"\\\\\\\"", escaped);
     }
 }
