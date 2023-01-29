@@ -1,5 +1,6 @@
 pub use ::std::slice;
 use ::std::vec;
+use std::ops::Index;
 
 use crate::op::Op;
 use crate::op::typ::Typ;
@@ -14,11 +15,28 @@ impl Prog {
         Prog { ops }
     }
 
-    pub fn iter(&self) -> slice::Iter<Op> {
-        self.ops.iter()
+    pub fn get(&self, index: usize) -> Option<&Op> {
+        self.ops.get(index)
     }
 
-    pub fn into_iter(self) -> vec::IntoIter<Op> {
-        self.ops.into_iter()
+    pub fn len(&self) -> usize {
+        self.ops.len()
+    }
+
+    // pub fn iter(&self) -> slice::Iter<Op> {
+    //     self.ops.iter()
+    // }
+    //
+    // pub fn into_iter(self) -> vec::IntoIter<Op> {
+    //     self.ops.into_iter()
+    // }
+    //TODO @mverleg:
+}
+
+impl Index<usize> for Prog {
+    type Output = Op;
+
+    fn index(&self, index: usize) -> &Self::Output {
+        &self.ops[index]
     }
 }

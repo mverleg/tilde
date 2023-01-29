@@ -22,6 +22,7 @@ use ::std::time::Duration;
 
 pub use crate::common::log as tilde_log;
 use crate::compile::{parse, Value};
+use crate::exec::execute;
 
 #[cfg(feature = "gen")]
 pub use self::gen::mddoc::tilde_gen_md_docs;
@@ -44,12 +45,12 @@ pub type UINT = u64;
 
 pub fn run_tilde(args: &TildeArgs) -> TildeRes<Value> {
     match &args.operation {
-        CliOperation::Run(_source) => {
-            todo!() //TODO @mark: TEMPORARY! REMOVE THIS!
+        CliOperation::Run(source) => {
             //tilde_from();
-            // let inp = gather_input();
-            // let prog = parse(&source)?;
-            // execute(prog, inp)
+            let inp = gather_input();
+            let prog = parse(&source)?;
+            execute(prog, inp);
+            Err("not impl".to_owned())  //TODO @mverleg:
         },
         CliOperation::Analyze(source) => Ok(tilde_analyze(&source)?.into()),
         CliOperation::DocGen => {

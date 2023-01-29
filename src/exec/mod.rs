@@ -18,8 +18,16 @@ pub fn execute(
     prog: Prog,
     mut inp: Vec<String>,
 ) -> TildeRes<Vec<Value>> {
-    todo!();
+    let mut i = 0;
+    let mut stack = Vec::new();
+    while let Some(op) = prog.get(i) {
+
+        i += 1;
+    }
+    Ok(vec![stack.pop().unwrap_or_else(|| Value::None)])
+
     //TODO @mark: TEMPORARY! REMOVE THIS!
+
     // inp.reverse();
     // let mut stack = Array::single(Array::of(inp));
     // for op in prog.iter() {
