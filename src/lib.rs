@@ -2,6 +2,7 @@
 #![feature(const_for)]
 #![feature(once_cell)]
 #![feature(hasher_prefixfree_extras)]
+#![feature(iter_intersperse)]
 #![allow(unused)] //TODO @mark: TEMPORARY! REMOVE THIS!
 
 use ::std::env;

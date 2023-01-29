@@ -8,7 +8,7 @@ use ::fnv::{FnvBuildHasher, FnvHasher, FnvHashMap};
 
 use crate::common::TextTransformation;
 use crate::dict::{CowDictStr, DictEntry};
-use crate::dict::entry::iter_snippets;
+use crate::dict::entries::iter_snippets;
 
 #[derive(Debug)]
 pub struct DerivationInfo {

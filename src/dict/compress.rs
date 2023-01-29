@@ -85,14 +85,15 @@ pub fn compress_with_dict(text: &str) -> Vec<INDX> {
 
 #[cfg(test)]
 mod compress_decode {
-    use crate::dict::entry::TEST_POEM;
+    use crate::dict::entries::TEST_POEM;
     use crate::dict::lookup::lookup_alloc;
 
     use super::*;
 
     #[test]
     fn decode_random_nrs() {
-        let mut nrs = (0..1000).collect::<Vec<_>>();
+        let n = 1000;
+        let mut nrs = (500..(500 + n)).intersperse(0).collect::<Vec<_>>();
         let text = lookup_alloc(&nrs);
         let compress = compress_with_dict(&text);
         eprintln!("{}", nrs.iter().map(|nr| nr.to_string()).collect::<Vec<_>>().join(" "));  //TODO @mark: TEMPORARY! REMOVE THIS!

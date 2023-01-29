@@ -2,7 +2,7 @@ use ::std::process::Output;
 
 use crate::common::{SnipOrChar, TextTransformation};
 use crate::dict::{DICT, INDX};
-use crate::dict::entry::DictEntry;
+use crate::dict::entries::DictEntry;
 use crate::tilde_log;
 
 pub fn lookup_alloc(indices: &[INDX]) -> String {
@@ -76,7 +76,7 @@ pub fn lookup_buffer(indices: &[INDX], buffer: &mut String, char_buffer: &mut Ve
 mod tests {
     use crate::dict::{DICT, INDX};
     use crate::dict::dict_str::LONGEST_DICT_ENTRY_BYTES;
-    use crate::dict::entry::DictEntry;
+    use crate::dict::entries::DictEntry;
 
     use super::*;
 
