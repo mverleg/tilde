@@ -49,8 +49,7 @@ pub fn run_tilde(args: &TildeArgs) -> TildeRes<Value> {
             //tilde_from();
             let inp = gather_input();
             let prog = parse(&source)?;
-            execute(prog, inp);
-            Err("not impl".to_owned())  //TODO @mverleg:
+            execute(prog, inp)
         },
         CliOperation::Analyze(source) => Ok(tilde_analyze(&source)?.into()),
         CliOperation::DocGen => {

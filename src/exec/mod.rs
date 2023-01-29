@@ -17,14 +17,38 @@ mod data;
 pub fn execute(
     prog: Prog,
     mut inp: Vec<String>,
-) -> TildeRes<Vec<Value>> {
+) -> TildeRes<Value> {
     let mut i = 0;
     let mut stack = Vec::new();
     while let Some(op) = prog.get(i) {
-
+        match op {
+            Op::Text(text) => stack.push(Value::Txt(Text::of(text))),
+            Op::Number(nr) => stack.push(Value::Num(Number::of(*nr))),
+            Op::Neg => todo!(),
+            Op::Abs => todo!(),
+            Op::Incr => todo!(),
+            Op::Decr => todo!(),
+            Op::Plus => todo!(),
+            Op::Minus => todo!(),
+            Op::Mul => todo!(),
+            Op::Div => todo!(),
+            Op::IntDiv => todo!(),
+            Op::Mod => todo!(),
+            Op::Eq => todo!(),
+            Op::Neq => todo!(),
+            Op::Gt => todo!(),
+            Op::Gte => todo!(),
+            Op::Lt => todo!(),
+            Op::Lte => todo!(),
+            Op::And => todo!(),
+            Op::Or => todo!(),
+            Op::Nand => todo!(),
+            Op::Xor => todo!(),
+            Op::Impl => todo!(),
+        }
         i += 1;
     }
-    Ok(vec![stack.pop().unwrap_or_else(|| Value::None)])
+    Ok(stack.pop().unwrap_or_else(|| Value::None))
 
     //TODO @mark: TEMPORARY! REMOVE THIS!
 
