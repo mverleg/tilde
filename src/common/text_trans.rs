@@ -6,15 +6,13 @@ use ::std::hash::Hasher;
 use ::tinyvec::ArrayVec;
 use ::tinyvec_string::ArrayString;
 
-use crate::common::dict_str::{CowDictStr, DictStrContent};
-use crate::common::dict_str::DictStr;
-use crate::common::dict_str::LONGEST_DICT_ENTRY_BYTES;
-use crate::common::INDX;
+use crate::dict::{CowDictStr, DictStr, DictStrContent, INDX, LONGEST_DICT_ENTRY_BYTES};
 use crate::tilde_log;
 
 pub type OpIndices = ArrayVec<[INDX; 4]>;
 
 pub const UNICODE_MAGIC_INDX: INDX = 70;
+//TODO @mark: move all derived data to one module, or generate from build.rs
 
 #[derive(Debug, Default, Clone, PartialEq, Eq)]
 pub struct TextTransformation {
@@ -206,9 +204,8 @@ mod indices_in_sync_with_dict {
 
     use ::strum::IntoEnumIterator;
 
-    use crate::common::dict::DICT;
-    use crate::common::dict::DictEntry;
-    use crate::common::dict::iter_snippets;
+    use crate::dict::DICT;
+    use crate::dict::DictEntry;
 
     use super::*;
 

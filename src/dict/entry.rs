@@ -10,7 +10,6 @@ use ::std::slice::Iter;
 
 use ::strum_macros::EnumIter;
 
-use crate::common::dict_str::DictStr;
 use crate::common::TextTransformation;
 
 pub type INDX = u16;

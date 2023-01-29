@@ -5,8 +5,6 @@ use ::std::iter::Iterator;
 
 use ::strum::IntoEnumIterator;
 
-use crate::common::INDX;
-use crate::common::lookup_buffer;
 use crate::compile::letter::Letter;
 use crate::compile::letter::Letter::*;
 use crate::compile::parse::Pos;
@@ -16,6 +14,7 @@ use crate::compile::var_uint::DecodeError;
 use crate::compile::var_uint::DecodeError::TooLarge;
 use crate::compile::var_uint::encode_uint_allow_modifiers;
 use crate::compile::var_uint::encode_uint_no_modifier_at_start;
+use crate::dict::{INDX, lookup_buffer};
 use crate::NR;
 use crate::op::Op;
 use crate::tilde_log;

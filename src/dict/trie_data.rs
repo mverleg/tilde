@@ -11,8 +11,7 @@ use ::std::collections::VecDeque;
 use ::std::fmt::Debug;
 use ::std::vec::IntoIter;
 
-use crate::common::INDX;
-use crate::common::tiny_map::TinyMap;
+use crate::common::TinyMap;
 
 type NodeIndex = u32;
 const ROOT_INDEX: usize = 0;
@@ -220,6 +219,8 @@ impl <Word: Clone + Debug> Trie<Word> {
 #[cfg(test)]
 mod tests {
     use ::std::mem::size_of;
+
+    use crate::dict::INDX;
 
     use super::*;
 

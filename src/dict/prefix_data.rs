@@ -16,9 +16,7 @@ use ::fnv::FnvBuildHasher;
 use ::fnv::FnvHashMap;
 use ::tinyvec_string::ArrayString;
 
-use crate::common::dict_str::{DictStr, LONGEST_DICT_ENTRY_BYTES};
-use crate::common::INDX;
-use crate::common::tiny_map::TinyMap;
+use crate::dict::{DictStr, LONGEST_DICT_ENTRY_BYTES};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum PrefixMapLookup<'a, Word> {
@@ -100,6 +98,8 @@ impl <Word: Clone + Debug> PrefixMap<Word> {
 #[cfg(test)]
 mod tests {
     use ::std::mem::size_of;
+
+    use crate::dict::INDX;
 
     use super::*;
 

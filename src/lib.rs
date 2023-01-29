@@ -19,8 +19,8 @@ use ::std::sync::atomic::Ordering;
 use ::std::thread;
 use ::std::thread::sleep;
 use ::std::time::Duration;
-use crate::common::{escape_for_string, is_safe_for_string};
 
+use crate::common::{escape_for_string, is_safe_for_string};
 pub use crate::common::log as tilde_log;
 use crate::compile::{parse, Value};
 use crate::exec::execute;
@@ -34,6 +34,7 @@ mod exec;
 #[cfg(feature = "gen")]
 mod gen;
 mod op;
+mod dict;
 
 #[cfg(not(feature = "gen"))]
 pub fn tilde_gen_md_docs() -> TildeRes<()> {
@@ -125,8 +126,8 @@ pub fn tilde_eval(
 
 /// Analyze the Tilde source code and report stats as json.
 pub fn tilde_analyze(source: &str) -> TildeRes<String> {
-    //use crate::common::compress_with_dict;
-    let prog = parse(&source)?;
+    //use crate::dict::compress_with_dict;
+let prog = parse(&source)?;
     let unsafe_long_code = prog.long_code();
     let golf_code = prog.golf_code();
     let base64_code = prog.golf_code();

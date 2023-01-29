@@ -7,8 +7,6 @@ use ::fnv::FnvHasher;
 use ::tinyvec::ArrayVec;
 use ::tinyvec_string::ArrayString;
 
-use crate::common::INDX;
-
 #[allow(dead_code)]
 pub const LONGEST_DICT_ENTRY_BYTES: usize = 22; // located in this file because of build.rs
 pub type DictStrContent = ArrayString<[u8; LONGEST_DICT_ENTRY_BYTES]>;

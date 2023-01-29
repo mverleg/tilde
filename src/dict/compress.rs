@@ -12,15 +12,10 @@ use ::std::time::Instant;
 use ::strum::IntoEnumIterator;
 use ::strum_macros::EnumIter;
 
-use crate::common::dict::DICT;
-use crate::common::dict::DictEntry;
-use crate::common::dict::iter_snippets;
-use crate::common::dict_derive::DerivationInfo;
-use crate::common::dict_derive::with_derived_dict_entries;
-use crate::common::INDX;
-use crate::common::prefix_data::PrefixMap;
-use crate::common::text_trans::UNICODE_MAGIC_INDX;
-use crate::common::TextTransformation;
+use crate::common::UNICODE_MAGIC_INDX;
+use crate::dict::{DICT, DictEntry, INDX};
+use crate::dict::derive::{DerivationInfo, with_derived_dict_entries};
+use crate::dict::prefix_data::PrefixMap;
 use crate::tilde_log;
 
 thread_local! {
@@ -90,8 +85,8 @@ pub fn compress_with_dict(text: &str) -> Vec<INDX> {
 
 #[cfg(test)]
 mod compress_decode {
-    use crate::common::dict::TEST_POEM;
-    use crate::common::dict_lookup::lookup_alloc;
+    use crate::dict::entry::TEST_POEM;
+    use crate::dict::lookup::lookup_alloc;
 
     use super::*;
 

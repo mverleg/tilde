@@ -1,7 +1,8 @@
 use std::borrow::Cow;
-use ::strum_macros::EnumIter;
-use crate::common::escape_for_string;
 
+use ::strum_macros::EnumIter;
+
+use crate::common::escape_for_string;
 use crate::op::typ::Typ;
 
 #[derive(Debug, Clone, PartialEq, EnumIter)]

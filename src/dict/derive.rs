@@ -6,9 +6,9 @@ use ::std::hash::Hasher;
 
 use ::fnv::{FnvBuildHasher, FnvHasher, FnvHashMap};
 
-use crate::common::dict::{DictEntry, iter_snippets};
-use crate::common::dict_str::CowDictStr;
 use crate::common::TextTransformation;
+use crate::dict::{CowDictStr, DictEntry};
+use crate::dict::entry::iter_snippets;
 
 #[derive(Debug)]
 pub struct DerivationInfo {
