@@ -12,7 +12,7 @@ use ::std::time::Instant;
 use ::strum::IntoEnumIterator;
 use ::strum_macros::EnumIter;
 
-use crate::common::UNICODE_MAGIC_INDX;
+use crate::common::{OpIndices, UNICODE_MAGIC_INDX};
 use crate::dict::{DICT, DictEntry, INDX};
 use crate::dict::derive::{DerivationInfo, with_derived_dict_entries};
 use crate::dict::prefix_data::PrefixMap;
@@ -55,30 +55,55 @@ impl DictMeta {
     }
 }
 
+struct BestSoFar {
+    //text_from_index: usize,
+    score_from: usize,
+    compressed_nr: OpIndices,
+    //TODO @mark:
+}
+
 pub fn compress_with_dict(text: &str) -> Vec<INDX> {
-    let mut rem = text;
-    let mut numbers = Vec::new();
+    let rev_chars = text.chars().rev().collect::<Vec<char>>();
+    let mut minimums = Vec::with_capacity(text.len());
     let mut buffer = Vec::new();
     DICT_META.with(|meta| {
-        while !rem.is_empty() {
+        for (i, letter) in rev_chars.into_iter().enumerate() {
+            // Find the cheapest from here until end
             meta.prefix_map.all_prefixes_cloned_of(rem, &mut buffer);
-            if let Some(deriv_index) = buffer.last() {
-                // Found entry in the derived dictionary, use the base snippet and any transformations
-                let deriv = &meta.extended_dict[*deriv_index as usize];
-                //eprintln!("for rem len = {} at '{}' found {} matches {}", rem.len(), rem.chars().next().unwrap(), //TODO @mark: TEMPORARY! REMOVE THIS!
-                //          buffer.len(), buffer.iter().map(|nr| format!("{nr}='{}'", &meta.extended_dict[*nr as usize].derived_text.as_ref())).collect::<Vec<_>>().join(", "));  //TODO @mark: TEMPORARY! REMOVE THIS!
-                numbers.push(deriv.original_index.try_into().expect("could not convert usize into index"));
-                numbers.extend(deriv.transformation.operation_indices());
-                rem = &rem[deriv.derived_text.as_ref().len()..];
+            if buffer.is_empty() {
+                // Did not find a single entry that matches, in this case we fall back to unicode lookup.
+                let mut ops = OpIndices::new();
+                ops.push((letter  as u32).try_into().expect("unicode lookup value too large for index data type"));
+                ops.push(UNICODE_MAGIC_INDX);
+                let score = 1;  //TODO @mark:
+                minimums[i] = BestSoFar { score_from: score, compressed_nr: ops };
             } else {
-                // Did not find a single entry that matches, the only choice is to use unicode lookup.
-                // (Unicode lookup is only generated if normal dict fails, but that is fine because dict is almost always cheaper.)
-                let letter = rem.chars().next().expect("first char must exist here");
-                numbers.push((letter  as u32).try_into().expect("unicode lookup value too large for index data type"));
-                numbers.push(UNICODE_MAGIC_INDX);
-                rem = &rem[letter.len_utf8()..];
+                todo!()
             }
+
+
         }
+        // while !rem.is_empty() {
+        //     meta.prefix_map.all_prefixes_cloned_of(rem, &mut buffer);
+        //     if ! buffer.is_empty() {
+        //         while let Some(deriv_index) = buffer.last() {
+        //             // Found entry in the derived dictionary, use the base snippet and any transformations
+        //             let deriv = &meta.extended_dict[*deriv_index as usize];
+        //             //eprintln!("for rem len = {} at '{}' found {} matches {}", rem.len(), rem.chars().next().unwrap(), //TODO @mark: TEMPORARY! REMOVE THIS!
+        //             //          buffer.len(), buffer.iter().map(|nr| format!("{nr}='{}'", &meta.extended_dict[*nr as usize].derived_text.as_ref())).collect::<Vec<_>>().join(", "));  //TODO @mark: TEMPORARY! REMOVE THIS!
+        //             numbers.push(deriv.original_index.try_into().expect("could not convert usize into index"));
+        //             numbers.extend(deriv.transformation.operation_indices());
+        //             rem = &rem[deriv.derived_text.as_ref().len()..];
+        //         }
+        //     } else {
+        //         // Did not find a single entry that matches, the only choice is to use unicode lookup.
+        //         // (Unicode lookup is only generated if normal dict fails, but that is fine because dict is almost always cheaper.)
+        //         let letter = rem.chars().next().expect("first char must exist here");
+        //         numbers.push((letter  as u32).try_into().expect("unicode lookup value too large for index data type"));
+        //         numbers.push(UNICODE_MAGIC_INDX);
+        //         rem = &rem[letter.len_utf8()..];
+        //     }
+        // }
     });
     numbers
 }

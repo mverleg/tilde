@@ -5,6 +5,7 @@ pub use self::dict_lookup::lookup_buffer;
 pub use self::escape_str::escape_for_string;
 pub use self::escape_str::is_safe_for_string;
 pub use self::log::log;
+pub use self::text_trans::OpIndices;
 pub use self::text_trans::SnipOrChar;
 pub use self::text_trans::TextTransformation;
 pub use self::text_trans::UNICODE_MAGIC_INDX;
