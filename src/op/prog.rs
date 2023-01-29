@@ -40,3 +40,13 @@ impl Index<usize> for Prog {
         &self.ops[index]
     }
 }
+
+impl Prog {
+    pub fn long_code(&self) -> String {
+        todo!()
+    }
+
+    pub fn golf_code(&self) -> String {
+        todo!()
+    }
+}

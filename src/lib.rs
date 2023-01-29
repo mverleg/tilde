@@ -19,6 +19,7 @@ use ::std::sync::atomic::Ordering;
 use ::std::thread;
 use ::std::thread::sleep;
 use ::std::time::Duration;
+use crate::common::{escape_for_json_string, is_safe_for_json_string};
 
 pub use crate::common::log as tilde_log;
 use crate::compile::{parse, Value};
@@ -123,14 +124,27 @@ pub fn tilde_eval(
 }
 
 /// Analyze the Tilde source code and report stats as json.
-pub fn tilde_analyze(code: &str) -> TildeRes<String> {
+pub fn tilde_analyze(source: &str) -> TildeRes<String> {
     //use crate::common::compress_with_dict;
+    let prog = parse(&source)?;
+    let unsafe_long_code = prog.long_code();
+    let golf_code = prog.golf_code();
+    let base64_code = prog.golf_code();
+    debug_assert!(is_safe_for_json_string(&golf_code), "golf code should never contain double quotes or trailing backslashes");
+    debug_assert!(is_safe_for_json_string(&base64_code), "base64 code should never contain double quotes or trailing backslashes");
+    let safe_long_code = escape_for_json_string(unsafe_long_code);
     let mut analysis = String::with_capacity(512);
     analysis.push_str("{\n");
     analysis.push_str("\"uses_preview_features\": false,\n");
-    analysis.push_str("\"golf_code\": \"\",\n");
-    analysis.push_str("\"base64_golf_code\": \"\",\n");
-    analysis.push_str("\"long_command_code\": \"\",\n");
+    analysis.push_str("\"golf_code\": \"");
+    analysis.push_str(&golf_code);
+    analysis.push_str("\",\n");
+    analysis.push_str("\"base64_golf_code\": \"");
+    analysis.push_str(&base64_code);
+    analysis.push_str("\",\n");
+    analysis.push_str("\"long_command_code\": \"");
+    analysis.push_str(&safe_long_code);
+    analysis.push_str("\",\n");
     analysis.push_str("\"length_valid\": 0,\n");
     analysis.push_str("\"length_preview_features\": 0\n");
     analysis.push_str("}\n");
