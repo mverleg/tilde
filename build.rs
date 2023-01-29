@@ -7,7 +7,6 @@ fn main() {
     println!("cargo:rerun-if-changed=Cargo.toml");
     println!("cargo:rerun-if-changed=build.rs");
     println!("cargo:rerun-if-changed=dictionary.txt");
-    eprintln!("refreshing build.rs");  //TODO @mark: TEMPORARY! REMOVE THIS!
     let base_dict_str = fs::read_to_string("./dictionary.txt").unwrap();
     let base_dict_entries = base_dict_str.lines()
         .collect::<Vec<_>>();
@@ -44,6 +43,5 @@ fn generate_base_dict_code(base_dict_entries: &[&str]) -> String {
 fn write_dict_code(code: &str) {
     let mut out_file = PathBuf::from(env::var("OUT_DIR").unwrap());
     out_file.push("dict_init.rs");
-    println!("cargo:rerun-if-changed={}", out_file.to_str().unwrap());
     fs::write(out_file, code).expect("failed to write");
 }
