@@ -2,10 +2,16 @@
 /// Escape double quotes and backslashes.
 pub fn escape_for_string(input: impl Into<String>) -> String {
     let input = input.into();
-    if ! is_safe_for_string(&input) {
-        todo!("json escaping ({})", &input);  //TODO @mverleg:
+    let mut result = String::with_capacity(input.len() + 4);
+    for ch in input.chars() {
+        match ch {
+            '\\' => result.push_str("\\\\"),
+            '"' => result.push_str("\\\""),
+            safe => result.push(safe),
+        }
     }
-    input
+    result
+    //TODO @mverleg: prevent reallocating if nothing to escape?
 }
 
 pub fn is_safe_for_string(input: &str) -> bool {
@@ -68,7 +74,7 @@ mod tests {
         let text = "hello\\\"there";
         assert!(!is_safe_for_string(text));
         let escaped = escape_for_string(text);
-        assert_eq!("hello\\\\\"there", escaped);
+        assert_eq!("hello\\\\\\\"there", escaped);
     }
 
     #[test]
@@ -87,5 +93,12 @@ mod tests {
         assert_eq!("\\\\\\\\hi\\\\", escaped);
     }
 
-    //TODO @mverleg: more fancy escape combinations
+    #[test]
+    fn nightmare() {
+        // \\"hi\\"+\"\"
+        let text = "\\\\\"hi\\\\\"+\\\"\\\"";
+        assert!(!is_safe_for_string(text));
+        let escaped = escape_for_string(text);
+        assert_eq!("\\\\\\\\\\\"hi\\\\\\\\\\\"+\\\\\\\"\\\\\\\"", escaped);
+    }
 }
