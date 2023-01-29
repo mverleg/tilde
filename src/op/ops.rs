@@ -1,4 +1,6 @@
+use std::borrow::Cow;
 use ::strum_macros::EnumIter;
+use crate::common::escape_for_string;
 
 use crate::op::typ::Typ;
 
@@ -69,6 +71,22 @@ impl Op {
             Self::Nand => "nand",
             Self::Xor => "xor",
             Self::Impl => "impl",
+        }
+    }
+
+    pub fn long_code(&self) -> Cow<str> {
+        match self {
+            Op::Text(text) => Cow::Owned(format!("\"{}\"", escape_for_string(text))),
+            Op::Number(number) => Cow::Owned(format!("{}", number)),
+            _ => todo!("impl long code"),
+        }
+    }
+
+    pub fn gold_code(&self) -> Cow<str> {
+        match self {
+            Op::Text(text) => Cow::Owned(format!("todo-golf-text:{}", text)),
+            Op::Number(number) => Cow::Owned(format!("todo-golf-number:{}", number)),
+            _ => todo!("impl long code"),
         }
     }
 }

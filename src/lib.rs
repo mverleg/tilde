@@ -19,7 +19,7 @@ use ::std::sync::atomic::Ordering;
 use ::std::thread;
 use ::std::thread::sleep;
 use ::std::time::Duration;
-use crate::common::{escape_for_json_string, is_safe_for_json_string};
+use crate::common::{escape_for_string, is_safe_for_string};
 
 pub use crate::common::log as tilde_log;
 use crate::compile::{parse, Value};
@@ -130,9 +130,9 @@ pub fn tilde_analyze(source: &str) -> TildeRes<String> {
     let unsafe_long_code = prog.long_code();
     let golf_code = prog.golf_code();
     let base64_code = prog.golf_code();
-    debug_assert!(is_safe_for_json_string(&golf_code), "golf code should never contain double quotes or trailing backslashes");
-    debug_assert!(is_safe_for_json_string(&base64_code), "base64 code should never contain double quotes or trailing backslashes");
-    let safe_long_code = escape_for_json_string(unsafe_long_code);
+    debug_assert!(is_safe_for_string(&golf_code), "golf code should never contain double quotes or trailing backslashes");
+    debug_assert!(is_safe_for_string(&base64_code), "base64 code should never contain double quotes or trailing backslashes");
+    let safe_long_code = escape_for_string(unsafe_long_code);
     let mut analysis = String::with_capacity(512);
     analysis.push_str("{\n");
     analysis.push_str("\"uses_preview_features\": false,\n");

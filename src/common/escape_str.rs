@@ -1,14 +1,14 @@
 
 /// Escape double quotes and trailing backslashes.
-pub fn escape_for_json_string(input: impl Into<String>) -> String {
+pub fn escape_for_string(input: impl Into<String>) -> String {
     let input = input.into();
-    if ! is_safe_for_json_string(&input) {
+    if ! is_safe_for_string(&input) {
         todo!("json escaping");  //TODO @mverleg:
     }
     input
 }
 
-pub fn is_safe_for_json_string(input: &str) -> bool {
+pub fn is_safe_for_string(input: &str) -> bool {
     if input.contains('"') {
         return false
     }

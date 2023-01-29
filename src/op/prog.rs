@@ -1,3 +1,4 @@
+use ::std::fmt::Write;
 pub use ::std::slice;
 use ::std::vec;
 use std::ops::Index;
@@ -43,10 +44,19 @@ impl Index<usize> for Prog {
 
 impl Prog {
     pub fn long_code(&self) -> String {
-        todo!()
+        let mut code = String::with_capacity(self.ops.len() * 16);
+        for op in &self.ops {
+            write!(code, "{} ", op.long_code().as_ref()).unwrap()  //TODO @mverleg:
+        }
+        code.pop();
+        code
     }
 
     pub fn golf_code(&self) -> String {
-        todo!()
+        let mut code = String::with_capacity(self.ops.len() * 4);
+        for op in &self.ops {
+            write!(code, "{}", op.gold_code().as_ref()).unwrap()  //TODO @mverleg:
+        }
+        code
     }
 }
