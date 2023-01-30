@@ -57,17 +57,16 @@ impl DictMeta {
 
 #[derive(Debug, Clone, Copy)]
 struct BestSoFar {
-    score_from: usize,
+    cost_from: u32,
     compressed_nr: OpIndices,
-    snippet_len: usize,
+    snippet_len: u8,
     //TODO @mark: smaller size?
 }
 
 pub fn compress_with_dict(text: &str) -> Vec<INDX> {
     let rev_chars = text.chars().rev().collect::<Vec<char>>();
     let mut transformed_snippet = String::with_capacity(LONGEST_DICT_ENTRY_BYTES);
-    let mut char_buffer = Vec::with_capacity(LONGEST_DICT_ENTRY_BYTES);
-    let mut minimums = vec![BestSoFar { score_from: usize::MAX, compressed_nr: OpIndices::new(), snippet_len: 1, }; text.len()];
+    let mut minimums = vec![BestSoFar { cost_from: u32::MAX, compressed_nr: OpIndices::new(), snippet_len: 1, }; text.len()];
     let mut snippet_options_buffer = Vec::new();
     let mut tail_len = 0;
     DICT_META.with(|meta| {
@@ -81,9 +80,13 @@ pub fn compress_with_dict(text: &str) -> Vec<INDX> {
                 ops.push((letter  as u32).try_into().expect("unicode lookup value too large for index data type"));
                 ops.push(UNICODE_MAGIC_INDX);
                 let snippet_len = 1;
-                let continuation_score = minimums.get(i + snippet_len).map(|min| min.score_from);
-                let score_from = continuation_score.unwrap_or(0) + 2;  //TODO @mark: not +2 but real cost
-                minimums[i] = BestSoFar { score_from, compressed_nr: ops, snippet_len };
+                let continuation_cost = if i > snippet_len {
+                    minimums[i - snippet_len].cost_from
+                } else {
+                    0
+                };
+                let cost_from = continuation_cost + 2;  //TODO @mark: not +2 but real cost
+                minimums[i] = BestSoFar { cost_from, compressed_nr: ops, snippet_len: snippet_len as u8 };
                 tilde_log!("compress index {}-{i} using unicode {letter} (only one option)", text.len())
             } else {
                 for snip_op in &snippet_options_buffer {
@@ -96,11 +99,15 @@ pub fn compress_with_dict(text: &str) -> Vec<INDX> {
                     let snippet_len = derivation_info.derived_text.as_ref().len();
                     //TODO @mverleg: this could also lookup the string, if it makes it faster to initialize the meta dict
                     debug_assert!(snippet_len >= 1, "no snippet for ops: {ops}");
-                    let continuation_score = minimums.get(i + snippet_len).map(|min| min.score_from);
-                    let score_from = continuation_score + derivation_info.cost;
-                    if score_from < minimums[i].score_from {
+                    let continuation_cost = if i > snippet_len {
+                        minimums[i - snippet_len].cost_from
+                    } else {
+                        0
+                    };
+                    let cost_from = continuation_cost + derivation_info.cost;
+                    if cost_from < minimums[i].cost_from {
                         tilde_log!("compress index {}-{i}, found a cheaper option #{snip_op} (out of {})", text.len(), snippet_options_buffer.len());
-                        minimums[i] = BestSoFar { score_from, compressed_nr: ops, snippet_len };
+                        minimums[i] = BestSoFar { cost_from, compressed_nr: ops, snippet_len: snippet_len as u8 };
                     } else {
                         tilde_log!("compress index {}-{i}, discarded more expensive option #{snip_op} (out of {})", text.len(), snippet_options_buffer.len());
                     }
@@ -136,7 +143,7 @@ pub fn compress_with_dict(text: &str) -> Vec<INDX> {
     let mut numbers = Vec::new();
     while i < text.len() {
         numbers.extend(&minimums[i].compressed_nr);
-        i += minimums[i].snippet_len;
+        i += minimums[i].snippet_len as usize;
     }
     numbers
 }
