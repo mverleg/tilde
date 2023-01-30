@@ -1,7 +1,7 @@
 use ::std::fmt::Write;
 pub use ::std::slice;
 use ::std::vec;
-use std::ops::Index;
+use ::std::ops::Index;
 
 use crate::op::Op;
 use crate::op::typ::Typ;

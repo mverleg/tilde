@@ -13,10 +13,10 @@ use ::strum::IntoEnumIterator;
 use ::strum_macros::EnumIter;
 
 use crate::common::{OpIndices, UNICODE_MAGIC_INDX};
-use crate::dict::{DICT, DictEntry, INDX};
+use crate::dict::{DICT, DictEntry, INDX, LONGEST_DICT_ENTRY_BYTES, lookup_buffer};
 use crate::dict::derive::{DerivationInfo, with_derived_dict_entries};
 use crate::dict::prefix_data::PrefixMap;
-use crate::tilde_log;
+use crate::{tilde_gen_md_docs, tilde_log};
 
 thread_local! {
     static DICT_META: LazyCell<DictMeta> = LazyCell::new(DictMeta::new);
@@ -55,28 +55,39 @@ impl DictMeta {
     }
 }
 
+#[derive(Debug, Clone, Copy)]
 struct BestSoFar {
-    //text_from_index: usize,
     score_from: usize,
     compressed_nr: OpIndices,
-    //TODO @mark:
+    snippet_len: usize,
+    //TODO @mark: smaller size?
 }
 
 pub fn compress_with_dict(text: &str) -> Vec<INDX> {
     let rev_chars = text.chars().rev().collect::<Vec<char>>();
-    let mut minimums = Vec::with_capacity(text.len());
+    let mut transformed_snippet = String::with_capacity(LONGEST_DICT_ENTRY_BYTES);
+    let mut char_buffer = Vec::with_capacity(LONGEST_DICT_ENTRY_BYTES);
+    let mut minimums = vec![BestSoFar { score_from: usize::MAX, compressed_nr: OpIndices::new(), snippet_len: 1, }; text.len()];
     let mut buffer = Vec::new();
+    let mut tail_len = 0;
     DICT_META.with(|meta| {
         for (i, letter) in rev_chars.into_iter().enumerate() {
             // Find the cheapest from here until end
-            meta.prefix_map.all_prefixes_cloned_of(rem, &mut buffer);
-            if buffer.is_empty() {
+            tail_len += letter.len_utf8();
+            meta.prefix_map.all_prefixes_cloned_of(&text[tail_len..], &mut buffer);
+            if true || buffer.is_empty() {
+                //TODO @mark: ^
                 // Did not find a single entry that matches, in this case we fall back to unicode lookup.
                 let mut ops = OpIndices::new();
                 ops.push((letter  as u32).try_into().expect("unicode lookup value too large for index data type"));
                 ops.push(UNICODE_MAGIC_INDX);
                 let score = 1;  //TODO @mark:
-                minimums[i] = BestSoFar { score_from: score, compressed_nr: ops };
+                transformed_snippet.clear();
+                lookup_buffer(&ops, &mut transformed_snippet, &mut char_buffer);
+                let snippet_len = transformed_snippet.len();
+                //TODO @mark: can this just be 1? ^
+                minimums[i] = BestSoFar { score_from: score, compressed_nr: ops, snippet_len };
+                tilde_log!("compress index {}-{i} using unicode {letter} (only one option)", text.len())
             } else {
                 todo!()
             }
@@ -105,6 +116,13 @@ pub fn compress_with_dict(text: &str) -> Vec<INDX> {
         //     }
         // }
     });
+    dbg!(&minimums);
+    let mut i = 0;
+    let mut numbers = Vec::new();
+    while i < text.len() {
+        numbers.extend(&minimums[i].compressed_nr);
+        i += minimums[i].snippet_len;
+    }
     numbers
 }
 
