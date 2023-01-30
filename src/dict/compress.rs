@@ -70,7 +70,7 @@ pub fn compress_with_dict(text: &str) -> Vec<INDX> {
     let mut snippet_options_buffer = Vec::new();
     let mut tail_len = 0;
     DICT_META.with(|meta| {
-        for (i, letter) in rev_chars.into_iter().enumerate() {
+        for letter in rev_chars.into_iter() {
             // Find the cheapest from here until end
             meta.prefix_map.all_prefixes_cloned_of(&text[tail_len..], &mut snippet_options_buffer);
             if snippet_options_buffer.is_empty() {
@@ -79,14 +79,14 @@ pub fn compress_with_dict(text: &str) -> Vec<INDX> {
                 ops.push((letter  as u32).try_into().expect("unicode lookup value too large for index data type"));
                 ops.push(UNICODE_MAGIC_INDX);
                 let snippet_len = 1;
-                let continuation_cost = if i > snippet_len {
-                    minimums[i - snippet_len].cost_from
+                let continuation_cost = if tail_len > snippet_len {
+                    minimums[tail_len - snippet_len].cost_from
                 } else {
                     0
                 };
                 let cost_from = continuation_cost + 2;  //TODO @mark: not +2 but real cost
-                minimums[i] = BestSoFar { cost_from, compressed_nr: ops, snippet_len: snippet_len as u8 };
-                tilde_log!("compress index {}-{i} using unicode {letter} (only one option)", text.len())
+                minimums[tail_len] = BestSoFar { cost_from, compressed_nr: ops, snippet_len: snippet_len as u8 };
+                tilde_log!("compress index {} using unicode {letter} (only one option)", text.len() - tail_len)
             } else {
                 for snip_op in &snippet_options_buffer {
                     let mut ops = OpIndices::new();
@@ -98,23 +98,25 @@ pub fn compress_with_dict(text: &str) -> Vec<INDX> {
                     let snippet_len = derivation_info.derived_text.as_ref().len();
                     //TODO @mverleg: this could also lookup the string, if it makes it faster to initialize the meta dict
                     debug_assert!(snippet_len >= 1, "no snippet for ops: {ops}");
-                    let continuation_cost = if i > snippet_len {
-                        minimums[i - snippet_len].cost_from
+                    let continuation_cost = if tail_len > snippet_len {
+                        debug_assert!(minimums[tail_len - snippet_len].cost_from < u32::MAX,
+                            "previous entry ({}) not initialized", tail_len - snippet_len);
+                        minimums[tail_len - snippet_len].cost_from
                     } else {
                         0
                     };
                     let cost_from = continuation_cost + derivation_info.cost;
-                    if cost_from < minimums[i].cost_from {
-                        tilde_log!("compress index {}-{i}, found a cheaper option #{snip_op} (out of {}): {} < {}",
-                            text.len(), snippet_options_buffer.len(), cost_from, minimums[i].cost_from);
-                        minimums[i] = BestSoFar { cost_from, compressed_nr: ops, snippet_len: snippet_len as u8 };
+                    if cost_from < minimums[tail_len].cost_from {
+                        tilde_log!("compress index {}, found a cheaper option #{snip_op} (out of {}): {} < {}",
+                            text.len() - tail_len, snippet_options_buffer.len(), cost_from, minimums[tail_len].cost_from);
+                        minimums[tail_len] = BestSoFar { cost_from, compressed_nr: ops, snippet_len: snippet_len as u8 };
                     } else {
-                        tilde_log!("compress index {}-{i}, discarded more expensive option #{snip_op} (out of {}): {} >= {}",
-                            text.len(), snippet_options_buffer.len(), cost_from, minimums[i].cost_from);
+                        tilde_log!("compress index {}, discarded more expensive option #{snip_op} (out of {}): {} >= {}",
+                            text.len() - tail_len, snippet_options_buffer.len(), cost_from, minimums[tail_len].cost_from);
                     }
                 }
-                tail_len += minimums[i].snippet_len as usize;
             }
+            tail_len += minimums[tail_len].snippet_len as usize;
         }
     });
     for (q, min) in minimums.iter().enumerate() {  //TODO @mverleg: TEMPORARY! REMOVE THIS!
