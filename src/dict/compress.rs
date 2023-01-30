@@ -72,7 +72,6 @@ pub fn compress_with_dict(text: &str) -> Vec<INDX> {
     DICT_META.with(|meta| {
         for (i, letter) in rev_chars.into_iter().enumerate() {
             // Find the cheapest from here until end
-            tail_len += letter.len_utf8();
             meta.prefix_map.all_prefixes_cloned_of(&text[tail_len..], &mut snippet_options_buffer);
             if snippet_options_buffer.is_empty() {
                 // Did not find a single entry that matches, in this case we fall back to unicode lookup.
@@ -106,42 +105,25 @@ pub fn compress_with_dict(text: &str) -> Vec<INDX> {
                     };
                     let cost_from = continuation_cost + derivation_info.cost;
                     if cost_from < minimums[i].cost_from {
-                        tilde_log!("compress index {}-{i}, found a cheaper option #{snip_op} (out of {})", text.len(), snippet_options_buffer.len());
+                        tilde_log!("compress index {}-{i}, found a cheaper option #{snip_op} (out of {}): {} < {}",
+                            text.len(), snippet_options_buffer.len(), cost_from, minimums[i].cost_from);
                         minimums[i] = BestSoFar { cost_from, compressed_nr: ops, snippet_len: snippet_len as u8 };
                     } else {
-                        tilde_log!("compress index {}-{i}, discarded more expensive option #{snip_op} (out of {})", text.len(), snippet_options_buffer.len());
+                        tilde_log!("compress index {}-{i}, discarded more expensive option #{snip_op} (out of {}): {} >= {}",
+                            text.len(), snippet_options_buffer.len(), cost_from, minimums[i].cost_from);
                     }
                 }
+                tail_len += minimums[i].snippet_len as usize;
             }
-
-
         }
-        // while !rem.is_empty() {
-        //     meta.prefix_map.all_prefixes_cloned_of(rem, &mut buffer);
-        //     if ! buffer.is_empty() {
-        //         while let Some(deriv_index) = buffer.last() {
-        //             // Found entry in the derived dictionary, use the base snippet and any transformations
-        //             let deriv = &meta.extended_dict[*deriv_index as usize];
-        //             //eprintln!("for rem len = {} at '{}' found {} matches {}", rem.len(), rem.chars().next().unwrap(), //TODO @mark: TEMPORARY! REMOVE THIS!
-        //             //          buffer.len(), buffer.iter().map(|nr| format!("{nr}='{}'", &meta.extended_dict[*nr as usize].derived_text.as_ref())).collect::<Vec<_>>().join(", "));  //TODO @mark: TEMPORARY! REMOVE THIS!
-        //             numbers.push(deriv.original_index.try_into().expect("could not convert usize into index"));
-        //             numbers.extend(deriv.transformation.operation_indices());
-        //             rem = &rem[deriv.derived_text.as_ref().len()..];
-        //         }
-        //     } else {
-        //         // Did not find a single entry that matches, the only choice is to use unicode lookup.
-        //         // (Unicode lookup is only generated if normal dict fails, but that is fine because dict is almost always cheaper.)
-        //         let letter = rem.chars().next().expect("first char must exist here");
-        //         numbers.push((letter  as u32).try_into().expect("unicode lookup value too large for index data type"));
-        //         numbers.push(UNICODE_MAGIC_INDX);
-        //         rem = &rem[letter.len_utf8()..];
-        //     }
-        // }
     });
-    dbg!(&minimums);
+    for (q, min) in minimums.iter().enumerate() {  //TODO @mverleg: TEMPORARY! REMOVE THIS!
+        println!("{q}\t{}\t{}\t{}", min.cost_from, min.compressed_nr, min.snippet_len)  //TODO @mverleg: TEMPORARY! REMOVE THIS!
+    }
     let mut i = 0;
     let mut numbers = Vec::new();
     while i < text.len() {
+        debug_assert!(minimums[i].cost_from > u32::MAX, "index {i} or later one not updated");
         numbers.extend(&minimums[i].compressed_nr);
         i += minimums[i].snippet_len as usize;
     }
