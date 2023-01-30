@@ -68,28 +68,35 @@ pub fn compress_with_dict(text: &str) -> Vec<INDX> {
     let mut transformed_snippet = String::with_capacity(LONGEST_DICT_ENTRY_BYTES);
     let mut char_buffer = Vec::with_capacity(LONGEST_DICT_ENTRY_BYTES);
     let mut minimums = vec![BestSoFar { score_from: usize::MAX, compressed_nr: OpIndices::new(), snippet_len: 1, }; text.len()];
-    let mut buffer = Vec::new();
+    let mut snippet_options_buffer = Vec::new();
     let mut tail_len = 0;
     DICT_META.with(|meta| {
         for (i, letter) in rev_chars.into_iter().enumerate() {
             // Find the cheapest from here until end
             tail_len += letter.len_utf8();
-            meta.prefix_map.all_prefixes_cloned_of(&text[tail_len..], &mut buffer);
-            if true || buffer.is_empty() {
-                //TODO @mark: ^
+            meta.prefix_map.all_prefixes_cloned_of(&text[tail_len..], &mut snippet_options_buffer);
+            if snippet_options_buffer.is_empty() {
                 // Did not find a single entry that matches, in this case we fall back to unicode lookup.
                 let mut ops = OpIndices::new();
                 ops.push((letter  as u32).try_into().expect("unicode lookup value too large for index data type"));
                 ops.push(UNICODE_MAGIC_INDX);
-                let score = 1;  //TODO @mark:
-                transformed_snippet.clear();
-                lookup_buffer(&ops, &mut transformed_snippet, &mut char_buffer);
-                let snippet_len = transformed_snippet.len();
-                //TODO @mark: can this just be 1? ^
-                minimums[i] = BestSoFar { score_from: score, compressed_nr: ops, snippet_len };
+                let snippet_len = 1;
+                let score_from = minimums.get(i + snippet_len).map(|min| min.score_from).unwrap_or(0) + 2;  //TODO @mark: not +2 but real cost
+                minimums[i] = BestSoFar { score_from, compressed_nr: ops, snippet_len };
                 tilde_log!("compress index {}-{i} using unicode {letter} (only one option)", text.len())
             } else {
-                todo!()
+                for snip_op in snippet_options_buffer {
+                    let mut ops = OpIndices::new();
+                    ops.push((letter as u32).try_into().expect("unicode lookup value too large for index data type"));
+                    ops.push(UNICODE_MAGIC_INDX);
+                    let score = 1;  //TODO @mark:
+                    transformed_snippet.clear();
+                    lookup_buffer(&ops, &mut transformed_snippet, &mut char_buffer);
+                    let snippet_len = transformed_snippet.len();
+                    let score_from = minimums.get(i + snippet_len).map(|min| min.score_from).unwrap_or(0) + 2;  //TODO @mark: not +2 but real cost
+                    minimums[i] = BestSoFar { score_from, compressed_nr: ops, snippet_len };
+                    tilde_log!("compress index {}-{i} using unicode {letter} (only one option)", text.len())
+                }
             }
 
 
