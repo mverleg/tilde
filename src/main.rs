@@ -2,6 +2,7 @@
 
 use ::std::env;
 use ::std::fs::read_to_string;
+use ::std::intrinsics::size_of;
 use ::std::process::ExitCode;
 
 use ::tilde::CliOperation;
@@ -10,6 +11,7 @@ use ::tilde::tilde_log;
 use ::tilde::TildeArgs;
 
 fn main() -> ExitCode {
+    assert!(size_of::<usize>() >= size_of::<u32>(), "due to indexing tricks, platforms with narrow pointers are not supported at this time");
     let operation: CliOperation = match parse_operation(env::args().collect()) {
         ArgParseRes::Lib(op) => op,
         ArgParseRes::GenHelp => {

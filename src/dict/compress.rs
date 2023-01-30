@@ -81,21 +81,29 @@ pub fn compress_with_dict(text: &str) -> Vec<INDX> {
                 ops.push((letter  as u32).try_into().expect("unicode lookup value too large for index data type"));
                 ops.push(UNICODE_MAGIC_INDX);
                 let snippet_len = 1;
-                let score_from = minimums.get(i + snippet_len).map(|min| min.score_from).unwrap_or(0) + 2;  //TODO @mark: not +2 but real cost
+                let continuation_score = minimums.get(i + snippet_len).map(|min| min.score_from);
+                let score_from = continuation_score.unwrap_or(0) + 2;  //TODO @mark: not +2 but real cost
                 minimums[i] = BestSoFar { score_from, compressed_nr: ops, snippet_len };
                 tilde_log!("compress index {}-{i} using unicode {letter} (only one option)", text.len())
             } else {
-                for snip_op in snippet_options_buffer {
+                for snip_op in &snippet_options_buffer {
                     let mut ops = OpIndices::new();
-                    ops.push((letter as u32).try_into().expect("unicode lookup value too large for index data type"));
-                    ops.push(UNICODE_MAGIC_INDX);
-                    let score = 1;  //TODO @mark:
+                    let derivation_info = &meta.extended_dict[*snip_op as usize];
+                    ops.push(derivation_info.original_index.try_into().expect("could not convert to index from usize"));
+                    ops.extend(derivation_info.transformation.operation_indices());
                     transformed_snippet.clear();
-                    lookup_buffer(&ops, &mut transformed_snippet, &mut char_buffer);
-                    let snippet_len = transformed_snippet.len();
-                    let score_from = minimums.get(i + snippet_len).map(|min| min.score_from).unwrap_or(0) + 2;  //TODO @mark: not +2 but real cost
-                    minimums[i] = BestSoFar { score_from, compressed_nr: ops, snippet_len };
-                    tilde_log!("compress index {}-{i} using unicode {letter} (only one option)", text.len())
+                    //lookup_buffer(&snip_op, &mut transformed_snippet, &mut char_buffer);
+                    let snippet_len = derivation_info.derived_text.as_ref().len();
+                    //TODO @mverleg: this could also lookup the string, if it makes it faster to initialize the meta dict
+                    debug_assert!(snippet_len >= 1, "no snippet for ops: {ops}");
+                    let continuation_score = minimums.get(i + snippet_len).map(|min| min.score_from);
+                    let score_from = continuation_score + derivation_info.cost;
+                    if score_from < minimums[i].score_from {
+                        tilde_log!("compress index {}-{i}, found a cheaper option #{snip_op} (out of {})", text.len(), snippet_options_buffer.len());
+                        minimums[i] = BestSoFar { score_from, compressed_nr: ops, snippet_len };
+                    } else {
+                        tilde_log!("compress index {}-{i}, discarded more expensive option #{snip_op} (out of {})", text.len(), snippet_options_buffer.len());
+                    }
                 }
             }
 
@@ -153,7 +161,7 @@ mod compress_decode {
 
     #[test]
     fn compress_special() {
-        let sample = "hi ©©";
+        let sample = "hi there ♡©";
         let nrs = compress_with_dict(sample);
         assert!(nrs.len() > 1);
         let text = lookup_alloc(&nrs);
