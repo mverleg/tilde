@@ -80,9 +80,18 @@ impl TextTransformation {
             for _ in 0..self.pop_end {
                 chars.pop();
             }
-            assert!(!self.case_all, "case_all not impl");
-            if self.case_first {
-                switch_capitalization_char(&mut chars[0])
+            if self.case_all {
+                if self.case_first {
+                    for i in self.pop_start + 1 .. self.pop_end {
+                        switch_capitalization_char(&mut chars[i as usize])
+                    }
+                } else {
+                    for i in self.pop_start .. self.pop_end {
+                        switch_capitalization_char(&mut chars[i as usize])
+                    }
+                }
+            } else if self.case_first {
+                switch_capitalization_char(&mut chars[self.pop_start as usize])
             }
             return CowDictStr::Owned(chars.into_iter()
                 .collect::<DictStrContent>()
