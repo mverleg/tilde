@@ -6,10 +6,10 @@ use ::std::hash::Hasher;
 use ::tinyvec::ArrayVec;
 use ::tinyvec_string::ArrayString;
 
-use crate::dict::{CowDictStr, DictStr, DictStrContent, INDX, LONGEST_DICT_ENTRY_BYTES};
+use crate::dict::{CowDictStr, DictStr, DictStrContent, INDX, LONGEST_DICT_ENTRY_BYTES, MAX_TEXT_TRANSFORMS};
 use crate::tilde_log;
 
-pub type OpIndices = ArrayVec<[INDX; 4]>;
+pub type OpIndices = ArrayVec<[INDX; MAX_TEXT_TRANSFORMS]>;
 
 pub const UNICODE_MAGIC_INDX: INDX = 70;
 //TODO @mark: move all derived data to one module, or generate from build.rs

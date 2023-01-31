@@ -11,6 +11,8 @@ use crate::dict::{CowDictStr, DictEntry, INDX};
 use crate::dict::compress::COST;
 use crate::dict::entries::iter_snippets;
 
+pub const MAX_TEXT_TRANSFORMS: usize = 4;
+
 #[derive(Debug)]
 pub struct DerivationInfo {
     pub derived_text: CowDictStr,
@@ -76,13 +78,17 @@ fn collect_transformations(derivations: FnvHashMap<CowDictStr, PartialDerivation
 fn generate_transformations() -> Vec<TextTransformation> {
     let mut transformations = vec![];
     for case_first in [false, true] {
-        for case_all in [false] {
+        for case_all in [false, true] {
             //TODO @mark: ^
-            for reverse in [false] {
+            for reverse in [false, true] {
                 //TODO @mark: ^
-                for pop_start in [0] {
+                for pop_start in [0, 1, 2] {
                     //TODO @mark: ^
                     for pop_end in [0, 1, 2, 3] {
+                        let tt_count = case_first as u8 + case_all as u8 + reverse as u8 + pop_start + pop_end;
+                        if tt_count as usize > MAX_TEXT_TRANSFORMS {
+                            continue;
+                        }
                         transformations.push(TextTransformation {
                             case_first,
                             case_all,
@@ -111,6 +117,14 @@ mod tests {
     use ::std::cmp::max;
 
     use super::*;
+
+    #[test]
+    fn check_maximum_length() {
+        let max = generate_transformations().iter()
+            .map(|tt| tt.operation_indices().len())
+            .max().unwrap();
+        assert_eq!(max, MAX_TEXT_TRANSFORMS);
+    }
 
     #[test]
     fn generate_transformations_operation_indices_length() {
