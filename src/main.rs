@@ -2,7 +2,7 @@
 
 use ::std::env;
 use ::std::fs::read_to_string;
-use ::std::intrinsics::size_of;
+use ::std::mem::size_of;
 use ::std::process::ExitCode;
 
 use ::tilde::CliOperation;

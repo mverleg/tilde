@@ -79,11 +79,8 @@ fn generate_transformations() -> Vec<TextTransformation> {
     let mut transformations = vec![];
     for case_first in [false, true] {
         for case_all in [false, true] {
-            //TODO @mark: ^
             for reverse in [false, true] {
-                //TODO @mark: ^
                 for pop_start in [0, 1, 2] {
-                    //TODO @mark: ^
                     for pop_end in [0, 1, 2, 3] {
                         let tt_count = case_first as u8 + case_all as u8 + reverse as u8 + pop_start + pop_end;
                         if tt_count as usize > MAX_TEXT_TRANSFORMS {

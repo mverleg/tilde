@@ -71,8 +71,10 @@ impl TextTransformation {
             return CowDictStr::Borrowed(input);
         }
         assert!(self.pop_start == 0, "pop_start not impl");
-        assert!(!self.reverse, "reverse not impl");
         let mut chars = input.chars().collect::<ArrayVec<[char; LONGEST_DICT_ENTRY_BYTES]>>();
+        if self.reverse {
+            chars.reverse();
+        }
         if self.case_all || self.case_first {
             // need to create string
             for _ in 0..self.pop_end {
@@ -194,6 +196,44 @@ mod capitalisation {
         let mut letter = '🦀';
         switch_capitalization_char(&mut letter);
         assert_eq!(letter, '🦀');
+    }
+}
+
+#[cfg(test)]
+mod transform {
+    use super::*;
+
+    #[test]
+    fn capitalize_first_and_all() {
+        let tt = TextTransformation {
+            case_first: true,
+            case_all: true,
+            ..TextTransformation::default()
+        };
+        let res = tt.apply_str("abc");
+        assert_eq!(res.as_ref(), "aBC")
+    }
+
+    #[test]
+    fn capitalize_pop() {
+        let tt = TextTransformation {
+            case_first: true,
+            pop_start: 2,
+            ..TextTransformation::default()
+        };
+        let res = tt.apply_str("abcd");
+        assert_eq!(res.as_ref(), "Cd")
+    }
+
+    #[test]
+    fn reverse_pop() {
+        let tt = TextTransformation {
+            reverse: true,
+            pop_end: 1,
+            ..TextTransformation::default()
+        };
+        let res = tt.apply_str("abc");
+        assert_eq!(res.as_ref(), "bc")
     }
 }
 
