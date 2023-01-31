@@ -68,44 +68,48 @@ impl TextTransformation {
             return CowDictStr::Borrowed(input);
         }
         if input.len() <= self.pop_start as usize + self.pop_end as usize {
-            return CowDictStr::Borrowed(input);
+            return CowDictStr::Borrowed("");
         }
-        assert!(self.pop_start == 0, "pop_start not impl");
         let mut chars = input.chars().collect::<ArrayVec<[char; LONGEST_DICT_ENTRY_BYTES]>>();
         if self.reverse {
             chars.reverse();
         }
-        if self.case_all || self.case_first {
-            // need to create string
-            for _ in 0..self.pop_end {
-                chars.pop();
+        let need_alloc = self.case_all || self.case_first || self.reverse;
+        if ! need_alloc {
+            let mut start_index = 0;
+            for chr in &chars[0..self.pop_start as usize] {
+                start_index += chr.len_utf8();
             }
-            if self.case_all {
-                if self.case_first {
-                    for i in self.pop_start + 1 .. self.pop_end {
-                        switch_capitalization_char(&mut chars[i as usize])
-                    }
-                } else {
-                    for i in self.pop_start .. self.pop_end {
-                        switch_capitalization_char(&mut chars[i as usize])
-                    }
-                }
-            } else if self.case_first {
-                switch_capitalization_char(&mut chars[self.pop_start as usize])
+            let mut end_index = 0;
+            for i in (chars.len()..chars.len().saturating_sub(self.pop_end as usize)).rev() {
+                end_index += chars[i].len_utf8();
             }
-            return CowDictStr::Owned(chars.into_iter()
-                .collect::<DictStrContent>()
-                .into())
-        }
-        // slice without alloc
-        let mut end_index = input.len();
-        for _ in 0..self.pop_end {
-            let Some(chr) = chars.pop() else {
+            if start_index >= end_index {
                 return CowDictStr::Borrowed("");
-            };
-            end_index -= chr.len_utf8();
+            }
+            return CowDictStr::Borrowed(&input[start_index..end_index])
         }
-        CowDictStr::Borrowed(&input[0..end_index])
+        // need to create string
+        assert!(self.pop_start == 0, "pop_start not impl");
+        for _ in 0..self.pop_end {
+            chars.pop();
+        }
+        if self.case_all {
+            if self.case_first {
+                for i in self.pop_start + 1 .. self.pop_end {
+                    switch_capitalization_char(&mut chars[i as usize])
+                }
+            } else {
+                for i in self.pop_start .. self.pop_end {
+                    switch_capitalization_char(&mut chars[i as usize])
+                }
+            }
+        } else if self.case_first {
+            switch_capitalization_char(&mut chars[self.pop_start as usize])
+        }
+        CowDictStr::Owned(chars.into_iter()
+            .collect::<DictStrContent>()
+            .into())
     }
 
     pub fn operation_indices(&self) -> OpIndices {
@@ -243,6 +247,19 @@ mod transform {
         };
         let res = tt.apply_str("abc");
         assert_eq!(res.as_ref(), "bc")
+    }
+
+    #[test]
+    fn pop_all() {
+        let tt = TextTransformation {
+            pop_start: 2,
+            pop_end: 1,
+            ..TextTransformation::default()
+        };
+        let res = tt.apply_str("abc");
+        assert_eq!(res, CowDictStr::Borrowed(""));
+        let res = tt.apply_str("你好!");
+        assert_eq!(res, CowDictStr::Borrowed(""))
     }
 }
 
