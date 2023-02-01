@@ -51,7 +51,7 @@ fn insert_if_cheapest(
         derivations: &mut FnvHashMap<CowDictStr, PartialDerivationInfo>,
         derived_text: CowDictStr,
         creator: impl Fn(COST) -> PartialDerivationInfo) {
-    let new_cost = (100 / derived_text.as_ref().len()) as COST;  //TODO @mverleg: TEMPORARY! REMOVE THIS!
+    let new_cost = (100 / (derived_text.as_ref().len() + 1)) as COST;  //TODO @mverleg: TEMPORARY! REMOVE THIS!
     match derivations.entry(derived_text) {
         Entry::Occupied(mut existing) => {
             if new_cost < existing.get().cost {

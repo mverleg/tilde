@@ -11,27 +11,34 @@ use ::std::time::Instant;
 
 use ::strum::IntoEnumIterator;
 use ::strum_macros::EnumIter;
+use ::tinyvec::ArrayVec;
 
-use crate::common::{OpIndices, UNICODE_MAGIC_INDX};
-use crate::dict::{DICT, DictEntry, INDX, LONGEST_DICT_ENTRY_BYTES, lookup_buffer};
-use crate::dict::derive::{DerivationInfo, with_derived_dict_entries};
+use crate::common::UNICODE_MAGIC_INDX;
+use crate::dict::derive::DerivationInfo;
+use crate::dict::derive::with_derived_dict_entries;
+use crate::dict::DICT;
+use crate::dict::DictEntry;
+use crate::dict::INDX;
+use crate::dict::LONGEST_DICT_ENTRY_BYTES;
+use crate::dict::lookup_buffer;
+use crate::dict::MAX_TEXT_TRANSFORMS;
 use crate::dict::prefix_data::PrefixMap;
-use crate::{tilde_gen_md_docs, tilde_log};
+use crate::tilde_gen_md_docs;
+use crate::tilde_log;
 
 thread_local! {
     static DICT_META: LazyCell<DictMeta> = LazyCell::new(DictMeta::new);
 }
 
 pub type COST = u16;
-//noinspection all
-type EXT_INDX = u32;
+type EXTINDX = u32;
+type ExtEntryIndices = ArrayVec<[INDX; MAX_TEXT_TRANSFORMS + 1]>;
 
 #[derive(Debug)]
 struct DictMeta {
     base_dict: &'static [DictEntry],
     extended_dict: Vec<DerivationInfo>,
-    prefix_map: PrefixMap<EXT_INDX>,
-    //TODO @mark: fewer allocations?
+    prefix_map: PrefixMap<EXTINDX>,
 }
 
 impl DictMeta {
@@ -60,7 +67,7 @@ impl DictMeta {
 #[derive(Debug, Clone, Copy)]
 struct BestSoFar {
     cost_from: COST,
-    compressed_nr: OpIndices,
+    compressed_nr: ExtEntryIndices,
     snippet_len: u8,
     //TODO @mark: smaller size?
 }
@@ -68,7 +75,7 @@ struct BestSoFar {
 pub fn compress_with_dict(text: &str) -> Vec<INDX> {
     let rev_chars = text.chars().rev().collect::<Vec<char>>();
     let mut transformed_snippet = String::with_capacity(LONGEST_DICT_ENTRY_BYTES);
-    let mut minimums = vec![BestSoFar { cost_from: COST::MAX, compressed_nr: OpIndices::new(), snippet_len: 1, }; text.len()];
+    let mut minimums = vec![BestSoFar { cost_from: COST::MAX, compressed_nr: ExtEntryIndices::new(), snippet_len: 1, }; text.len()];
     // only character boundaries in `minimums` will be used, that waste is acceptable
     let mut snippet_options_buffer = Vec::new();
     let mut tail_len = 0;
@@ -79,7 +86,7 @@ pub fn compress_with_dict(text: &str) -> Vec<INDX> {
             meta.prefix_map.all_prefixes_cloned_of(&text[tail_len..], &mut snippet_options_buffer);
             if snippet_options_buffer.is_empty() {
                 // Did not find a single entry that matches, in this case we fall back to unicode lookup.
-                let mut ops = OpIndices::new();
+                let mut ops = ExtEntryIndices::new();
                 ops.push((letter  as u32).try_into().expect("unicode lookup value too large for index data type"));
                 ops.push(UNICODE_MAGIC_INDX);
                 let snippet_len = 1;
@@ -93,7 +100,7 @@ pub fn compress_with_dict(text: &str) -> Vec<INDX> {
                 tilde_log!("compress index {} using unicode '{letter}' (only one option)", text.len() - tail_len)
             } else {
                 for snip_op in &snippet_options_buffer {
-                    let mut ops = OpIndices::new();
+                    let mut ops = ExtEntryIndices::new();
                     let derivation_info = &meta.extended_dict[*snip_op as usize];
                     ops.push(derivation_info.original_index.try_into().expect("could not convert to index from usize"));
                     ops.extend(derivation_info.transformation.operation_indices());
