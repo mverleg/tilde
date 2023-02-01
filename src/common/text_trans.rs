@@ -72,10 +72,8 @@ impl TextTransformation {
             return CowDictStr::Borrowed("");
         }
         let mut chars = input.chars().collect::<ArrayVec<[char; LONGEST_DICT_ENTRY_BYTES]>>();
+        debug_assert!(chars.len() >= 1);
         let chars_last_ix = chars.len() - 1;
-        if self.reverse {
-            chars.reverse();
-        }
         let need_alloc = self.case_all || self.case_first || self.reverse;
         if ! need_alloc {
             let mut start_index = 0;
@@ -92,22 +90,23 @@ impl TextTransformation {
             return CowDictStr::Borrowed(&input[start_index..input_len-end_index])
         }
         // need to create string
-        assert!(self.pop_start == 0, "pop_start not impl");
+        if self.reverse {
+            chars.reverse();
+        }
         for _ in 0..self.pop_end {
             chars.pop();
         }
+        if self.pop_start > 0 {
+            chars = chars.into_iter().skip(self.pop_start as usize).collect();
+        }
         if self.case_all {
             if self.case_first {
-                for i in self.pop_start + 1 .. self.pop_end {
-                    switch_capitalization_char(&mut chars[i as usize])
-                }
+                chars.iter_mut().skip(1).for_each(|c| switch_capitalization_char(c));
             } else {
-                for i in self.pop_start .. self.pop_end {
-                    switch_capitalization_char(&mut chars[i as usize])
-                }
+                chars.iter_mut().for_each(|c| switch_capitalization_char(c));
             }
         } else if self.case_first {
-            switch_capitalization_char(&mut chars[self.pop_start as usize])
+            switch_capitalization_char(&mut chars[0])
         }
         CowDictStr::Owned(chars.into_iter()
             .collect::<DictStrContent>()
@@ -230,6 +229,18 @@ mod transform {
     }
 
     #[test]
+    fn capitalize_all_reverse() {
+        let tt = TextTransformation {
+            reverse: true,
+            case_all: true,
+            pop_start: 1,
+            ..TextTransformation::default()
+        };
+        let res = tt.apply_str("abcdef");
+        assert_eq!(res.as_ref(), "EDCBA")
+    }
+
+    #[test]
     fn capitalize_pop() {
         let tt = TextTransformation {
             case_first: true,
@@ -248,7 +259,7 @@ mod transform {
             ..TextTransformation::default()
         };
         let res = tt.apply_str("abc");
-        assert_eq!(res.as_ref(), "bc")
+        assert_eq!(res.as_ref(), "cb")
     }
 
     #[test]
