@@ -64,13 +64,15 @@ impl TextTransformation {
     }
 
     pub fn apply_str(&self, input: &'static str) -> CowDictStr {
-        if self == &Self::new_noop() {
+        let input_len = input.len();
+        if self == &Self::new_noop() || input_len == 0 {
             return CowDictStr::Borrowed(input);
         }
-        if input.len() <= self.pop_start as usize + self.pop_end as usize {
+        if input_len <= self.pop_start as usize + self.pop_end as usize {
             return CowDictStr::Borrowed("");
         }
         let mut chars = input.chars().collect::<ArrayVec<[char; LONGEST_DICT_ENTRY_BYTES]>>();
+        let chars_last_ix = chars.len() - 1;
         if self.reverse {
             chars.reverse();
         }
@@ -81,13 +83,13 @@ impl TextTransformation {
                 start_index += chr.len_utf8();
             }
             let mut end_index = 0;
-            for i in (chars.len()..chars.len().saturating_sub(self.pop_end as usize)).rev() {
-                end_index += chars[i].len_utf8();
+            for i in 0..self.pop_end as usize {
+                end_index += match chars.get(chars_last_ix - i) {
+                    Some(c) => c.len_utf8(),
+                    None => break,
+                }
             }
-            if start_index >= end_index {
-                return CowDictStr::Borrowed("");
-            }
-            return CowDictStr::Borrowed(&input[start_index..end_index])
+            return CowDictStr::Borrowed(&input[start_index..input_len-end_index])
         }
         // need to create string
         assert!(self.pop_start == 0, "pop_start not impl");
@@ -250,13 +252,24 @@ mod transform {
     }
 
     #[test]
+    fn pop_partial() {
+        let tt = TextTransformation {
+            pop_start: 2,
+            pop_end: 2,
+            ..TextTransformation::default()
+        };
+        let res = tt.apply_str("hello你好!");
+        assert_eq!(res, CowDictStr::Borrowed("llo你"))
+    }
+
+    #[test]
     fn pop_all() {
         let tt = TextTransformation {
             pop_start: 2,
             pop_end: 1,
             ..TextTransformation::default()
         };
-        let res = tt.apply_str("abc");
+        let res = tt.apply_str("a");
         assert_eq!(res, CowDictStr::Borrowed(""));
         let res = tt.apply_str("你好!");
         assert_eq!(res, CowDictStr::Borrowed(""))
