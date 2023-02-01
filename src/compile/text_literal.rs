@@ -14,7 +14,7 @@ use crate::compile::var_uint::DecodeError;
 use crate::compile::var_uint::DecodeError::TooLarge;
 use crate::compile::var_uint::encode_uint_allow_modifiers;
 use crate::compile::var_uint::encode_uint_no_modifier_at_start;
-use crate::dict::{INDX, lookup_buffer};
+use crate::dict::{DictIx, lookup_buffer};
 use crate::NR;
 use crate::op::Op;
 use crate::tilde_log;
@@ -54,7 +54,7 @@ pub fn encode_uint_vec(
 pub fn decode_str(letters: &[Letter], string_buffer: &mut String, char_buffer: &mut Vec<char>, decode_buffer: &mut Vec<UINT>) -> Result<Pos<()>, DecodeError> {
     let closer = decode_uint_vec_buffer(letters, decode_buffer)?;
     assert!(Closer::Text == closer.value);  //TODO @mark: for now only decodes strings, not int arrays
-    let indices = decode_buffer.into_iter().map(|nr| *nr as INDX).collect::<Vec<_>>();
+    let indices = decode_buffer.into_iter().map(|nr| *nr as DictIx).collect::<Vec<_>>();
     lookup_buffer(&indices, string_buffer, char_buffer);
     Ok(Pos { value: (), length: closer.length })
 }

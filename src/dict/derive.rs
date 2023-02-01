@@ -7,25 +7,26 @@ use ::std::hash::Hasher;
 use ::fnv::{FnvBuildHasher, FnvHasher, FnvHashMap};
 
 use crate::common::TextTransformation;
-use crate::dict::{CowDictStr, DictEntry, INDX};
-use crate::dict::compress::COST;
+use crate::dict::{CowDictStr, DictEntry, DictIx};
+use crate::dict::compress::Cost;
 use crate::dict::entries::iter_snippets;
 
-pub const MAX_TEXT_TRANSFORMS: usize = 4;
+pub const MAX_TEXT_TRANSFORMS: usize = 2;
+//TODO @mark: increase^
 
 #[derive(Debug)]
 pub struct DerivationInfo {
     pub derived_text: CowDictStr,
-    pub original_index: INDX,
+    pub original_index: DictIx,
     pub transformation: TextTransformation,
-    pub cost: COST,
+    pub cost: Cost,
 }
 
 #[derive(Debug)]
 pub struct PartialDerivationInfo {
-    pub original_index: INDX,
+    pub original_index: DictIx,
     pub transformation: TextTransformation,
-    pub cost: COST,
+    pub cost: Cost,
 }
 
 pub fn with_derived_dict_entries(base_dict: &'static [DictEntry]) -> Vec<DerivationInfo> {
@@ -50,8 +51,8 @@ pub fn with_derived_dict_entries(base_dict: &'static [DictEntry]) -> Vec<Derivat
 fn insert_if_cheapest(
         derivations: &mut FnvHashMap<CowDictStr, PartialDerivationInfo>,
         derived_text: CowDictStr,
-        creator: impl Fn(COST) -> PartialDerivationInfo) {
-    let new_cost = (100 / (derived_text.as_ref().len() + 1)) as COST;  //TODO @mverleg: TEMPORARY! REMOVE THIS!
+        creator: impl Fn(Cost) -> PartialDerivationInfo) {
+    let new_cost = (100 / (derived_text.as_ref().len() + 1)) as Cost;  //TODO @mverleg: TEMPORARY! REMOVE THIS!
     match derivations.entry(derived_text) {
         Entry::Occupied(mut existing) => {
             if new_cost < existing.get().cost {

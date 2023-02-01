@@ -12,7 +12,7 @@ use ::strum_macros::EnumIter;
 
 use crate::common::TextTransformation;
 
-pub type INDX = u16;
+pub type DictIx = u16;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EnumIter)]
 pub enum DictEntry {

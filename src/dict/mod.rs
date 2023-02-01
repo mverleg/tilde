@@ -6,7 +6,7 @@ pub use self::dict_str::DictStrContent;
 pub use self::dict_str::LONGEST_DICT_ENTRY_BYTES;
 pub use self::entries::DICT;
 pub use self::entries::DictEntry;
-pub use self::entries::INDX;
+pub use self::entries::DictIx;
 pub use self::lookup::lookup_buffer;
 
 mod entries;

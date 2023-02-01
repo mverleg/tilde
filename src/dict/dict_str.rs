@@ -7,8 +7,8 @@ use ::fnv::FnvHasher;
 use ::tinyvec::ArrayVec;
 use ::tinyvec_string::ArrayString;
 
-#[allow(dead_code)]
-pub const LONGEST_DICT_ENTRY_BYTES: usize = 22; // located in this file because of build.rs
+pub const LONGEST_DICT_ENTRY_BYTES: usize = 22;  // located in this file because of build.rs
+//TODO @mark: try to decrease a bit if long entries do not add much ^
 pub type DictStrContent = ArrayString<[u8; LONGEST_DICT_ENTRY_BYTES]>;
 
 #[derive(Debug, Hash)]

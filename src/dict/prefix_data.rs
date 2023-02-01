@@ -99,13 +99,13 @@ impl <Word: Clone + Debug> PrefixMap<Word> {
 mod tests {
     use ::std::mem::size_of;
 
-    use crate::dict::INDX;
+    use crate::dict::DictIx;
 
     use super::*;
 
     #[test]
     fn index_size() {
-        assert!(size_of::<INDX>() <= size_of::<usize>(),
+        assert!(size_of::<DictIx>() <= size_of::<usize>(),
                 "usize is smaller than index on this platform, this is not supported");
     }
 

@@ -1,18 +1,18 @@
 use ::std::process::Output;
 
 use crate::common::{SnipOrChar, TextTransformation};
-use crate::dict::{DICT, INDX};
+use crate::dict::{DICT, DictIx};
 use crate::dict::entries::DictEntry;
 use crate::tilde_log;
 
-pub fn lookup_alloc(indices: &[INDX]) -> String {
+pub fn lookup_alloc(indices: &[DictIx]) -> String {
     let mut buffer = String::new();
     lookup_buffer(indices, &mut buffer, &mut vec![]);
     buffer
 }
 
 struct LatestSnippet {
-    indx: INDX,
+    indx: DictIx,
     snip: &'static str,
 }
 
@@ -31,7 +31,7 @@ impl LatestSnippet {
 
 ///
 /// String buffer is NOT cleared (can expand), char buffer IS overwritten.
-pub fn lookup_buffer(indices: &[INDX], buffer: &mut String, char_buffer: &mut Vec<char>) {
+pub fn lookup_buffer(indices: &[DictIx], buffer: &mut String, char_buffer: &mut Vec<char>) {
     //TODO @mark: remove `char_buffer` arg and rustdoc
     let mut current = LatestSnippet { indx: 0, snip: "" };
     let mut current_capitalize_next = false;
@@ -74,7 +74,7 @@ pub fn lookup_buffer(indices: &[INDX], buffer: &mut String, char_buffer: &mut Ve
 
 #[cfg(test)]
 mod tests {
-    use crate::dict::{DICT, INDX};
+    use crate::dict::{DICT, DictIx};
     use crate::dict::dict_str::LONGEST_DICT_ENTRY_BYTES;
     use crate::dict::entries::DictEntry;
 
@@ -82,7 +82,7 @@ mod tests {
 
     #[test]
     fn dict_index_width() {
-        assert!((DICT.len() as u64) < (INDX::MAX as u64));
+        assert!((DICT.len() as u64) < (DictIx::MAX as u64));
     }
 
     #[test]

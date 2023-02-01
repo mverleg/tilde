@@ -6,12 +6,12 @@ use ::std::hash::Hasher;
 use ::tinyvec::ArrayVec;
 use ::tinyvec_string::ArrayString;
 
-use crate::dict::{CowDictStr, DictStr, DictStrContent, INDX, LONGEST_DICT_ENTRY_BYTES, MAX_TEXT_TRANSFORMS};
+use crate::dict::{CowDictStr, DictStr, DictStrContent, DictIx, LONGEST_DICT_ENTRY_BYTES, MAX_TEXT_TRANSFORMS};
 use crate::tilde_log;
 
-pub type OpIndices = ArrayVec<[INDX; MAX_TEXT_TRANSFORMS]>;
+pub type OpIndices = ArrayVec<[DictIx; MAX_TEXT_TRANSFORMS]>;
 
-pub const UNICODE_MAGIC_INDX: INDX = 70;
+pub const UNICODE_MAGIC_INDX: DictIx = 70;
 //TODO @mark: move all derived data to one module, or generate from build.rs
 type Chars = ArrayVec<[char; LONGEST_DICT_ENTRY_BYTES]>;
 
