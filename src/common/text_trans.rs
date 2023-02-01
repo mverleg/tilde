@@ -13,6 +13,7 @@ pub type OpIndices = ArrayVec<[INDX; MAX_TEXT_TRANSFORMS]>;
 
 pub const UNICODE_MAGIC_INDX: INDX = 70;
 //TODO @mark: move all derived data to one module, or generate from build.rs
+type Chars = ArrayVec<[char; LONGEST_DICT_ENTRY_BYTES]>;
 
 #[derive(Debug, Default, Clone, PartialEq, Eq)]
 pub struct TextTransformation {
@@ -64,32 +65,43 @@ impl TextTransformation {
     }
 
     pub fn apply_str(&self, input: &'static str) -> CowDictStr {
-        let input_len = input.len();
-        if self == &Self::new_noop() || input_len == 0 {
+        if self == &Self::new_noop() || input.len() == 0 {
             return CowDictStr::Borrowed(input);
         }
-        if input_len <= self.pop_start as usize + self.pop_end as usize {
+        if input.len() <= self.pop_start as usize + self.pop_end as usize {
             return CowDictStr::Borrowed("");
         }
-        let mut chars = input.chars().collect::<ArrayVec<[char; LONGEST_DICT_ENTRY_BYTES]>>();
+        let mut chars: Chars = input.chars().collect();
         debug_assert!(chars.len() >= 1);
-        let chars_last_ix = chars.len() - 1;
         let need_alloc = self.case_all || self.case_first || self.reverse;
-        if ! need_alloc {
-            let mut start_index = 0;
-            for chr in &chars[0..self.pop_start as usize] {
-                start_index += chr.len_utf8();
-            }
-            let mut end_index = 0;
-            for i in 0..self.pop_end as usize {
-                end_index += match chars.get(chars_last_ix - i) {
-                    Some(c) => c.len_utf8(),
-                    None => break,
-                }
-            }
-            return CowDictStr::Borrowed(&input[start_index..input_len-end_index])
+        if need_alloc {
+            CowDictStr::Owned(self.apply_all_alloc(input, chars))
+        } else {
+            CowDictStr::Borrowed(self.apply_pop_noalloc(input, chars))
         }
-        // need to create string
+    }
+
+    fn apply_pop_noalloc(&self, input: &'static str, mut chars: Chars) -> &'static str {
+        debug_assert!(!self.reverse);
+        debug_assert!(!self.case_all);
+        debug_assert!(!self.case_first);
+        let chars_last_ix = chars.len() - 1;
+        let mut start_index = 0;
+        for chr in &chars[0..self.pop_start as usize] {
+            start_index += chr.len_utf8();
+        }
+        let mut end_index = 0;
+        for i in 0..self.pop_end as usize {
+            end_index += match chars.get(chars_last_ix - i) {
+                Some(c) => c.len_utf8(),
+                None => break,
+            }
+        }
+        &input[start_index..input.len()-end_index]
+    }
+
+    fn apply_all_alloc(&self, input: &'static str, mut chars: Chars) -> DictStr {
+        debug_assert!(self.reverse || self.case_all || self.case_first);
         if self.reverse {
             chars.reverse();
         }
@@ -108,9 +120,9 @@ impl TextTransformation {
         } else if self.case_first {
             switch_capitalization_char(&mut chars[0])
         }
-        CowDictStr::Owned(chars.into_iter()
+        chars.into_iter()
             .collect::<DictStrContent>()
-            .into())
+            .into()
     }
 
     pub fn operation_indices(&self) -> OpIndices {
