@@ -76,15 +76,15 @@ pub fn compress_with_dict(text: &str) -> Vec<DictIx> {
     if text.is_empty() {
         return Vec::new();
     }
-    let mut reverse_chars = text.chars().collect::<Vec<char>>();
-    reverse_chars.reverse();
+    let mut reverse_ix_chars = text.chars().enumerate().collect::<Vec<(usize, char)>>();
+    reverse_ix_chars.reverse();
     let worst = BestSoFar { cost_from: Cost::MAX, compressed_nr: ExtEntryIxs::new(), snippet_len: 1 };
-    let mut minimums = vec![worst; reverse_chars.len()];
+    let mut minimums = vec![worst; reverse_ix_chars.len()];
     let mut snippet_options_buffer = Vec::new();
     let mut len_from_here = text.len();
     tilde_log!("starting compression for {} (length {})", text.lines().next().unwrap(), text.len());
     DICT_META.with(|meta| {
-        for letter in reverse_chars {
+        for (ix, letter) in reverse_ix_chars {
             // Find the cheapest from here until end
             len_from_here -= letter.len_utf8();
             eprintln!("slice ix {} of {} has len {} (current char {} len: {})",  //TODO @mark: TEMPORARY! REMOVE THIS!
@@ -92,14 +92,14 @@ pub fn compress_with_dict(text: &str) -> Vec<DictIx> {
             meta.prefix_map.all_prefixes_cloned_of(&text[len_from_here..], &mut snippet_options_buffer);
             if true || snippet_options_buffer.is_empty() {
                 //TODO @mark: ^
-                let best_result = create_utf_lookup(letter, &minimums[len_from_here..]);
+                let best_result = create_utf_lookup(letter, &minimums[ix..]);
                 tilde_log!("compressed char {} from slice '{}' using utf8 lookup (cost {}) because no dict entry matches",
                     letter, &text[len_from_here..], best_result.cost_from);
-                minimums[len_from_here] = best_result;
+                minimums[ix] = best_result;
             } else {
                 tilde_log!("compressing slice '{}' using {} dict entries that share a prefix", &text[len_from_here..], snippet_options_buffer.len());
-                let best_result = select_best_match(&snippet_options_buffer, &minimums[len_from_here..]);
-                minimums[len_from_here] = best_result;
+                let best_result = select_best_match(&snippet_options_buffer, &minimums[ix..]);
+                minimums[ix] = best_result;
             }
         }
         debug_assert!(len_from_here == 0);
@@ -133,7 +133,7 @@ fn collect_cheapest_result(text: &str, minimums: &mut Vec<BestSoFar>) -> Vec<Dic
     let mut i = 0;
     let mut numbers = Vec::new();
     while i < text.len() {
-        debug_assert!(minimums[i].cost_from > Cost::MAX, "index {i} or later one not updated");
+        debug_assert!(minimums[i].cost_from < Cost::MAX, "index {i} or later one not updated");
         numbers.extend(&minimums[i].compressed_nr);
         i += minimums[i].snippet_len as usize;
     }
