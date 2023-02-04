@@ -76,72 +76,32 @@ pub fn compress_with_dict(text: &str) -> Vec<DictIx> {
     if text.is_empty() {
         return Vec::new();
     }
-    let chars = text.chars().collect::<Vec<char>>();
+    let mut reverse_chars = text.chars().collect::<Vec<char>>();
+    reverse_chars.reverse();
     let worst = BestSoFar { cost_from: Cost::MAX, compressed_nr: ExtEntryIxs::new(), snippet_len: 1 };
-    let mut minimums = vec![worst; chars.len()];
+    let mut minimums = vec![worst; reverse_chars.len()];
     let mut snippet_options_buffer = Vec::new();
     let mut len_from_here = text.len();
     tilde_log!("starting compression for {} (length {})", text.lines().next().unwrap(), text.len());
     DICT_META.with(|meta| {
-        for letter in chars {
+        for letter in reverse_chars {
             // Find the cheapest from here until end
             len_from_here -= letter.len_utf8();
-            eprintln!("slice ix {} of {} (current char {} len: {})", len_from_here, text.len(), letter, letter.len_utf8());
-            eprintln!("slice ix {} len {}", len_from_here, text[len_from_here..].len());
+            eprintln!("slice ix {} of {} has len {} (current char {} len: {})",  //TODO @mark: TEMPORARY! REMOVE THIS!
+                      len_from_here, text.len(), text[len_from_here..].len(), letter, letter.len_utf8());  //TODO @mark: TEMPORARY! REMOVE THIS!
             meta.prefix_map.all_prefixes_cloned_of(&text[len_from_here..], &mut snippet_options_buffer);
-
+            if true || snippet_options_buffer.is_empty() {
+                //TODO @mark: ^
+                let best_result = create_utf_lookup(letter, &minimums);
+                tilde_log!("compressed char {} from slice '{}' using utf8 lookup (cost {}) because no dict entry matches",
+                    letter, &text[len_from_here..], best_result.cost_from);
+                minimums[len_from_here] = best_result;
+            } else {
+                tilde_log!("compressing slice '{}' using {} dict entries that share a prefix", &text[len_from_here..], snippet_options_buffer.len());
+                todo!();
+            }
         }
         debug_assert!(len_from_here == 0);
-        // for letter in rev_chars.into_iter() {
-        //     // Find the cheapest from here until end
-        //     meta.prefix_map.all_prefixes_cloned_of(&text[tail_len..], &mut snippet_options_buffer);
-        //     //TODO @mark: maybe test if reversing is faster (by doing fewer updates - probably reversing itself takes longer than it saves)
-        //     if snippet_options_buffer.is_empty() {
-        //         // Did not find a single entry that matches, in this case we fall back to unicode lookup.
-        //         let mut ops = ExtEntryIxs::new();
-        //         ops.push((letter  as u32).try_into().expect("unicode lookup value too large for index data type"));
-        //         ops.push(UNICODE_MAGIC_INDX);
-        //         let snippet_len = 1;
-        //         let continuation_cost = if tail_len > snippet_len {
-        //             minimums[text.len() - snippet_len].cost_from
-        //         } else {
-        //             0
-        //         };
-        //         let cost_from = continuation_cost + 2;  //TODO @mark: not +2 but real cost
-        //         minimums[tail_len] = BestSoFar { cost_from, compressed_nr: ops, snippet_len: snippet_len as u8 };
-        //         tilde_log!("compress index {} using unicode '{letter}' (only one option)", text.len() - tail_len)
-        //     } else {
-        //         for snip_op in &snippet_options_buffer {
-        //             let mut ops = ExtEntryIxs::new();
-        //             let derivation_info = &meta.extended_dict[*snip_op as usize];
-        //             ops.push(derivation_info.original_index.try_into().expect("could not convert to index from usize"));
-        //             ops.extend(derivation_info.transformation.operation_indices());
-        //             let snippet_len = derivation_info.derived_text.as_ref().len();
-        //             //TODO @mverleg: this could also lookup the string, if it makes it faster to initialize the meta dict
-        //             debug_assert!(snippet_len >= 1, "no snippet for ops: {ops}");
-        //             //let continuation_ix = text.len() - tail_len + snippet_len;
-        //             eprintln!("full: {} ; rem: {} ; match: {} ; {}", text.len(), tail_len, snippet_len,  //TODO @mark: TEMPORARY! REMOVE THIS!
-        //                       minimums.iter().map(|val| if val.cost_from < Cost::MAX { val.cost_from.to_string() } else { "x".to_string() }).collect::<Vec<_>>().join(" | "));
-        //             let continuation_cost = if tail_len > snippet_len {
-        //                 debug_assert!(minimums[text.len() - snippet_len].cost_from < Cost::MAX,
-        //                               "previous entry ({}) not initialized", tail_len - snippet_len);
-        //                 minimums[tail_len - snippet_len].cost_from
-        //             } else {
-        //                 0
-        //             };
-        //             let cost_from = continuation_cost + derivation_info.cost;
-        //             if cost_from < minimums[tail_len].cost_from {
-        //                 tilde_log!("compress index {}, found a cheaper option #{snip_op}='{}' (out of {}): {} < {}", text.len() - tail_len,
-        //                     derivation_info.derived_text.as_ref(), snippet_options_buffer.len(), cost_from, minimums[tail_len].cost_from);
-        //                 minimums[tail_len] = BestSoFar { cost_from, compressed_nr: ops, snippet_len: snippet_len as u8 };
-        //             } else {
-        //                 tilde_log!("compress index {}, discarded more expensive option #{snip_op}='{}' (out of {}): {} >= {}", text.len() - tail_len,
-        //                     derivation_info.derived_text.as_ref(), snippet_options_buffer.len(), cost_from, minimums[tail_len].cost_from);
-        //             }
-        //         }
-        //     }
-        //     tail_len += minimums[tail_len].snippet_len as usize;
-        // }
     });
     for (q, min) in minimums.iter().enumerate() {  //TODO @mverleg: TEMPORARY! REMOVE THIS!
         println!("{q}\t{}\t{}\t{}", min.cost_from, min.compressed_nr, min.snippet_len)  //TODO @mverleg: TEMPORARY! REMOVE THIS!
@@ -156,8 +116,12 @@ pub fn compress_with_dict(text: &str) -> Vec<DictIx> {
     numbers
 }
 
+fn create_utf_lookup(letter: char, minimums: &[BestSoFar]) -> BestSoFar {
+    todo!();
+}
+
 //TODO @mark: TEMPORARY! remove old impl
-pub fn compress_with_dict0(text: &str) -> Vec<DictIx> {
+fn compress_with_dict0(text: &str) -> Vec<DictIx> {
     let rev_chars = text.chars().rev().collect::<Vec<char>>();
     let mut transformed_snippet = String::with_capacity(LONGEST_DICT_ENTRY_BYTES);
     let mut minimums = vec![BestSoFar { cost_from: Cost::MAX, compressed_nr: ExtEntryIxs::new(), snippet_len: 1, }; text.len()];
