@@ -97,7 +97,7 @@ pub fn compress_with_dict(text: &str) -> Vec<DictIx> {
                 minimums[len_from_here] = best_result;
             } else {
                 tilde_log!("compressing slice '{}' using {} dict entries that share a prefix", &text[len_from_here..], snippet_options_buffer.len());
-                let best_result = select_best_match(&snippet_options_buffer, &minimums[len_from_here..]);
+                let best_result = select_best_match(&snippet_options_buffer, &minimums[len_from_here..], &meta.extended_dict);
                 minimums[len_from_here] = best_result;
             }
         }
@@ -127,8 +127,30 @@ fn create_utf_lookup(letter: char, minimums_from: &[BestSoFar]) -> BestSoFar {
     }
 }
 
-fn select_best_match(options: &[ExtIx], mininums_from: &[BestSoFar]) -> BestSoFar {
-    todo!();
+fn select_best_match(options: &[ExtIx], minimums_from: &[BestSoFar], extended_dict: &[DerivationInfo]) -> BestSoFar {
+    let mut minimum = minimums_from[0];
+    for option in options {
+        let mut ops = ExtEntryIxs::new();
+        let derivation_info = &extended_dict[*option as usize];
+        ops.push(derivation_info.original_index.try_into().expect("could not convert to index from usize"));
+        ops.extend(derivation_info.transformation.operation_indices());
+        let snippet_len = derivation_info.derived_text.as_ref().len();
+        //TODO @mverleg: this could also lookup the string, if it makes it faster to initialize the meta dict
+        debug_assert!(snippet_len >= 1, "no snippet for ops: {ops}");
+        let continuation_cost = minimums_from.get(snippet_len)
+            .map(|next| next.cost_from)
+            .unwrap_or(0);
+        let cost_from = continuation_cost + derivation_info.cost;
+        if cost_from >= minimum.cost_from {
+            continue
+        }
+        minimum = BestSoFar {
+            cost_from,
+            compressed_nr: ops,
+            snippet_len: snippet_len as u8
+        };
+    }
+    minimum
 }
 
 fn collect_cheapest_result(text: &str, minimums: &[BestSoFar]) -> Vec<DictIx> {
@@ -268,7 +290,7 @@ mod compression {
     #[test]
     fn simple_text_compression() {
         let nrs = compress_with_dict("hello world, this is a test");
-        assert_eq!(nrs.len(), 15);
+        assert_eq!(nrs.len(), 14);
     }
 
     #[test]
