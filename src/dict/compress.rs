@@ -76,35 +76,40 @@ pub fn compress_with_dict(text: &str) -> Vec<DictIx> {
     if text.is_empty() {
         return Vec::new();
     }
-    let mut reverse_ix_chars = text.chars().enumerate().collect::<Vec<(usize, char)>>();
-    reverse_ix_chars.reverse();
-    let worst = BestSoFar { cost_from: Cost::MAX, compressed_nr: ExtEntryIxs::new(), snippet_len: 1 };
-    let mut minimums = vec![worst; reverse_ix_chars.len()];
+    let mut reverse_chars = text.chars().collect::<Vec<char>>();
+    reverse_chars.reverse();
+    let mut minimums = initialize_minimums(text);
     let mut snippet_options_buffer = Vec::new();
     let mut len_from_here = text.len();
     tilde_log!("starting compression for {} (length {})", text.lines().next().unwrap(), text.len());
     DICT_META.with(|meta| {
-        for (ix, letter) in reverse_ix_chars {
+        for letter in reverse_chars {
             // Find the cheapest from here until end
             len_from_here -= letter.len_utf8();
             eprintln!("slice ix {} of {} has len {} (current char {} len: {})",  //TODO @mark: TEMPORARY! REMOVE THIS!
                       len_from_here, text.len(), text[len_from_here..].len(), letter, letter.len_utf8());  //TODO @mark: TEMPORARY! REMOVE THIS!
             meta.prefix_map.all_prefixes_cloned_of(&text[len_from_here..], &mut snippet_options_buffer);
-            if true || snippet_options_buffer.is_empty() {
+            if snippet_options_buffer.is_empty() {
                 //TODO @mark: ^
-                let best_result = create_utf_lookup(letter, &minimums[ix..]);
+                let best_result = create_utf_lookup(letter, &minimums[len_from_here..]);
                 tilde_log!("compressed char {} from slice '{}' using utf8 lookup (cost {}) because no dict entry matches",
                     letter, &text[len_from_here..], best_result.cost_from);
-                minimums[ix] = best_result;
+                minimums[len_from_here] = best_result;
             } else {
                 tilde_log!("compressing slice '{}' using {} dict entries that share a prefix", &text[len_from_here..], snippet_options_buffer.len());
-                let best_result = select_best_match(&snippet_options_buffer, &minimums[ix..]);
-                minimums[ix] = best_result;
+                let best_result = select_best_match(&snippet_options_buffer, &minimums[len_from_here..]);
+                minimums[len_from_here] = best_result;
             }
         }
         debug_assert!(len_from_here == 0);
     });
-    collect_cheapest_result(text, &mut minimums)
+    collect_cheapest_result(text, &minimums)
+}
+
+fn initialize_minimums(text: &str) -> Vec<BestSoFar> {
+    // minimums are indexed by byte position instead of character position, leaving some gaps which is fine
+    let worst = BestSoFar { cost_from: Cost::MAX, compressed_nr: ExtEntryIxs::new(), snippet_len: 1 };
+    vec![worst; text.len()]
 }
 
 fn create_utf_lookup(letter: char, minimums_from: &[BestSoFar]) -> BestSoFar {
@@ -126,7 +131,7 @@ fn select_best_match(options: &[ExtIx], mininums_from: &[BestSoFar]) -> BestSoFa
     todo!();
 }
 
-fn collect_cheapest_result(text: &str, minimums: &mut Vec<BestSoFar>) -> Vec<DictIx> {
+fn collect_cheapest_result(text: &str, minimums: &[BestSoFar]) -> Vec<DictIx> {
     for (q, min) in minimums.iter().enumerate() {  //TODO @mverleg: TEMPORARY! REMOVE THIS!
         println!("{q}\t{}\t{}\t{}", min.cost_from, min.compressed_nr, min.snippet_len)  //TODO @mverleg: TEMPORARY! REMOVE THIS!
     }
