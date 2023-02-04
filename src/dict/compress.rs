@@ -92,17 +92,41 @@ pub fn compress_with_dict(text: &str) -> Vec<DictIx> {
             meta.prefix_map.all_prefixes_cloned_of(&text[len_from_here..], &mut snippet_options_buffer);
             if true || snippet_options_buffer.is_empty() {
                 //TODO @mark: ^
-                let best_result = create_utf_lookup(letter, &minimums);
+                let best_result = create_utf_lookup(letter, &minimums[len_from_here..]);
                 tilde_log!("compressed char {} from slice '{}' using utf8 lookup (cost {}) because no dict entry matches",
                     letter, &text[len_from_here..], best_result.cost_from);
                 minimums[len_from_here] = best_result;
             } else {
                 tilde_log!("compressing slice '{}' using {} dict entries that share a prefix", &text[len_from_here..], snippet_options_buffer.len());
-                todo!();
+                let best_result = select_best_match(&snippet_options_buffer, &minimums[len_from_here..]);
+                minimums[len_from_here] = best_result;
             }
         }
         debug_assert!(len_from_here == 0);
     });
+    collect_cheapest_result(text, &mut minimums)
+}
+
+fn create_utf_lookup(letter: char, minimums_from: &[BestSoFar]) -> BestSoFar {
+    let mut ops = ExtEntryIxs::new();
+    ops.push((letter as u32).try_into().expect("unicode lookup value too large for index data type"));
+    ops.push(UNICODE_MAGIC_INDX);
+    let snippet_len = letter.len_utf8();
+    let continuation_cost = minimums_from.get(snippet_len)
+        .map(|next| next.cost_from)
+        .unwrap_or(0);
+    BestSoFar {
+        cost_from: continuation_cost + 2,  //TODO @mark: not +2 but real cost
+        compressed_nr: ops,
+        snippet_len: snippet_len as u8
+    }
+}
+
+fn select_best_match(options: &[ExtIx], mininums_from: &[BestSoFar]) -> BestSoFar {
+    todo!();
+}
+
+fn collect_cheapest_result(text: &str, minimums: &mut Vec<BestSoFar>) -> Vec<DictIx> {
     for (q, min) in minimums.iter().enumerate() {  //TODO @mverleg: TEMPORARY! REMOVE THIS!
         println!("{q}\t{}\t{}\t{}", min.cost_from, min.compressed_nr, min.snippet_len)  //TODO @mverleg: TEMPORARY! REMOVE THIS!
     }
@@ -114,10 +138,6 @@ pub fn compress_with_dict(text: &str) -> Vec<DictIx> {
         i += minimums[i].snippet_len as usize;
     }
     numbers
-}
-
-fn create_utf_lookup(letter: char, minimums: &[BestSoFar]) -> BestSoFar {
-    todo!();
 }
 
 //TODO @mark: TEMPORARY! remove old impl
