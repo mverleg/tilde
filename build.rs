@@ -20,20 +20,21 @@ fn generate_base_dict_code(base_dict_entries: &[&str]) -> String {
     let mut buffer = format!("");
     write!(buffer, "pub const DICT: [DictEntry; {}] = [\n", base_dict_entries.len()).unwrap();
     for (pos, entry) in base_dict_entries.into_iter().enumerate() {
+        let cost = encode_snippet_len_estimate(pos.try_into().unwrap());
         let creator = match *entry {
-            "$magic-backspace$" => "DictEntry::Backspace".to_owned(),
-            "$magic-backspace-front$" => "DictEntry::BackspaceFront".to_owned(),
-            "$magic-newline$" => "s(\"\\n\")".to_owned(),
-            "$magic-capitalize-first$" => "DictEntry::CapitalizeFirst".to_owned(),
-            "$magic-capitalize-all$" => "DictEntry::CapitalizeAll".to_owned(),
-            "$magic-reverse$" => "DictEntry::Reverse".to_owned(),
-            "$magic-unicode$" => "DictEntry::UnicodeLookup".to_owned(),
-            "\"" => "s(\"\\\"\")".to_owned(),
+            "$magic-backspace$" => format!("DictEntry::Backspace({cost})"),
+            "$magic-backspace-front$" => format!("DictEntry::BackspaceFront({cost})"),
+            "$magic-newline$" => format!("s(\"\\n\",{cost})"),
+            "$magic-capitalize-first$" => format!("DictEntry::CapitalizeFirst({cost})"),
+            "$magic-capitalize-all$" => format!("DictEntry::CapitalizeAll({cost})"),
+            "$magic-reverse$" => format!("DictEntry::Reverse({cost})"),
+            "$magic-unicode$" => format!("DictEntry::UnicodeLookup({cost})"),
+            "\"" => format!("s(\"\\\"\",{cost})"),
             _ => if entry.ends_with("$magic-capitalize-next$") {
-                format!("S(\"{}\")", entry.strip_suffix("$magic-capitalize-next$").unwrap())
+                format!("S(\"{}\",{cost})", entry.strip_suffix("$magic-capitalize-next$").unwrap())
             } else {
                 assert!(!entry.contains("$magic"), "unknown: '{entry}'");
-                format!("s(\"{}\")", entry)
+                format!("s(\"{entry}\",{cost})")
             },
         };
         write!(buffer, "\t{creator},\n").unwrap();
