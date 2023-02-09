@@ -11,6 +11,7 @@ use ::std::slice::Iter;
 use ::strum_macros::EnumIter;
 
 use crate::common::TextTransformation;
+use crate::dict::Cost;
 
 pub type DictIx = u16;
 
@@ -23,6 +24,12 @@ pub enum DictEntry {
     CapitalizeAll,
     Reverse,
     UnicodeLookup,
+}
+
+impl DictEntry {
+    pub fn cost(&self) -> Cost {
+        todo!()  //TODO @mark: TEMPORARY! REMOVE THIS!
+    }
 }
 
 #[inline]

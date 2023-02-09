@@ -6,7 +6,7 @@ use ::std::hash::Hasher;
 use ::tinyvec::ArrayVec;
 use ::tinyvec_string::ArrayString;
 
-use crate::dict::{CowDictStr, DictStr, DictStrContent, DictIx, LONGEST_DICT_ENTRY_BYTES, MAX_TEXT_TRANSFORMS};
+use crate::dict::{Cost, CowDictStr, DictIx, DictStr, DictStrContent, LONGEST_DICT_ENTRY_BYTES, MAX_TEXT_TRANSFORMS};
 use crate::tilde_log;
 
 pub type OpIndices = ArrayVec<[DictIx; MAX_TEXT_TRANSFORMS]>;
@@ -143,6 +143,10 @@ impl TextTransformation {
             indices.push(0);
         }
         indices
+    }
+
+    pub fn cost(&self) -> Cost {
+        todo!()
     }
 
     pub fn name(&self) -> ArrayString<[u8; 6]> {
@@ -379,5 +383,21 @@ mod indices_in_sync_with_dict {
                 .unwrap()
         });
         assert_eq!(index, expected, "index should be {expected} but is {index}");
+    }
+}
+
+#[cfg(test)]
+mod cost {
+    use crate::dict::DICT;
+
+    use super::*;
+
+    #[test]
+    fn operation_cost_in_sync_with_transform_cost() {
+        let tt = TextTransformation::new_noop();
+        let token_cost = tt.operation_indices().into_iter()
+            .map(|ix| DICT.get(ix as usize).unwrap().cost())
+            .sum();
+        assert_eq!(tt.cost(), token_cost);
     }
 }
