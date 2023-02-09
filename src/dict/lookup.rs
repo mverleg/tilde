@@ -39,7 +39,7 @@ pub fn lookup_buffer(indices: &[DictIx], buffer: &mut String, char_buffer: &mut 
     let mut is_unicode = false;
     for indx in indices {
         match DICT[*indx as usize] {
-            DictEntry::Snippet { snip, capitalize_next } => {
+            DictEntry::Snippet { snip, capitalize_next, cost: _ } => {
                 buffer.push_str(transform.apply(current.into_str(is_unicode)).as_ref());
                 current = LatestSnippet { indx: *indx, snip };
                 transform = TextTransformation::new_noop();

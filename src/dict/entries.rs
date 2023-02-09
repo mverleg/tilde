@@ -17,7 +17,7 @@ pub type DictIx = u16;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EnumIter)]
 pub enum DictEntry {
-    Snippet { snip: &'static str, capitalize_next: bool },
+    Snippet { snip: &'static str, capitalize_next: bool, cost: Cost },
     Backspace,
     BackspaceFront,
     CapitalizeFirst,
@@ -26,21 +26,15 @@ pub enum DictEntry {
     UnicodeLookup,
 }
 
-impl DictEntry {
-    pub fn cost(&self) -> Cost {
-        todo!()  //TODO @mark: TEMPORARY! REMOVE THIS!
-    }
-}
-
 #[inline]
 const fn s(snip: &'static str, cost: Cost) -> DictEntry {
-    DictEntry::Snippet { snip, capitalize_next: false }
+    DictEntry::Snippet { snip, capitalize_next: false, cost }
 }
 
 //noinspection RsFunctionNaming
 #[inline]
 const fn S(snip: &'static str, cost: Cost) -> DictEntry {
-    DictEntry::Snippet { snip, capitalize_next: true }
+    DictEntry::Snippet { snip, capitalize_next: true, cost }
 }
 
 include!(concat!(env!("OUT_DIR"), "/dict_init.rs"));
@@ -49,7 +43,7 @@ pub fn iter_snippets(dict: &'static [DictEntry]) -> impl Iterator<Item=(usize, &
     dict.iter()
         .enumerate()
         .flat_map(|(index, entry)| match *entry {
-            DictEntry::Snippet { snip, capitalize_next } => Some(snip),
+            DictEntry::Snippet { snip, capitalize_next, cost } => Some(snip),
             DictEntry::Backspace => None,
             DictEntry::BackspaceFront => None,
             DictEntry::CapitalizeFirst => None,
@@ -98,7 +92,7 @@ mod dict_properties {
 
     #[test]
     fn first_is_whitespace() {
-        assert_eq!(DICT.get(1).copied(), Some(s(" ")), "first entry should be space (maybe stripped by editor?)");
+        assert_eq!(DICT.get(1).copied(), Some(s(" ", 1)), "first entry should be space (maybe stripped by editor?)");
     }
 
     #[test]
