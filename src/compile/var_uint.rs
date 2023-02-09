@@ -70,25 +70,6 @@ fn encode_uint_with_openers(
     return letters;
 }
 
-/// Estimate the number of letters needed to encode the uint argument.
-pub fn encode_snippet_len_estimate(nr: u64) -> usize {
-    let mut length: usize = 1;
-    let opener_n: u64 = 7;  // must be in sync with var_uint.rs
-    let follow_2n: u64 = 16;  // must be in sync with var_uint.rs
-    let follow_1n = follow_2n / 2;
-    let mut non_close_letter_cnt_doubled = 0;
-    let mut rem = nr / opener_n;
-    while rem > 0 {
-        rem -= 1;
-        let block_extra = non_close_letter_cnt_doubled / 2;
-        length += block_extra + 1;
-        let div = follow_1n * follow_2n.pow(block_extra as u32);
-        rem = rem / div;
-        non_close_letter_cnt_doubled += 1;
-    }
-    return length;
-}
-
 /// Inverse of [encode_pos_int_static_width_avoid_modifiers].
 pub fn decode_uint_no_modifier_at_start(letters: &[Letter]) -> Result<Pos<UINT>, DecodeError> {
     if letters.is_empty() {
@@ -209,12 +190,14 @@ impl fmt::Display for DecodeError {
     }
 }
 
+include!("./var_uint_build.rs");
+
 #[cfg(test)]
 mod size_estimate {
     use super::*;
 
     #[test]
-    fn size_estimate_close_to_actual() {
+    fn size_estimate_equal_actual_withmodi() {
         let n = 50_000;
         for i in 0..n {
             let estimate = encode_snippet_len_estimate(i);

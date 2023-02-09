@@ -146,7 +146,7 @@ impl TextTransformation {
     }
 
     pub fn cost(&self) -> Cost {
-        todo!()
+        todo!()  //TODO @mark:
     }
 
     pub fn name(&self) -> ArrayString<[u8; 6]> {
@@ -399,5 +399,10 @@ mod cost {
             .map(|ix| DICT.get(ix as usize).unwrap().cost())
             .sum();
         assert_eq!(tt.cost(), token_cost);
+    }
+
+    #[test]
+    fn compressed_length_matches_cost() {
+        todo!();   //TODO @mark: TEMPORARY! REMOVE THIS!
     }
 }

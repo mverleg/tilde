@@ -3,6 +3,8 @@ use ::std::fmt::Write;
 use ::std::fs;
 use ::std::path::PathBuf;
 
+include!("src/compile/var_uint_build.rs");
+
 fn main() {
     println!("cargo:rerun-if-changed=Cargo.toml");
     println!("cargo:rerun-if-changed=build.rs");
@@ -17,7 +19,7 @@ fn main() {
 fn generate_base_dict_code(base_dict_entries: &[&str]) -> String {
     let mut buffer = format!("");
     write!(buffer, "pub const DICT: [DictEntry; {}] = [\n", base_dict_entries.len()).unwrap();
-    for entry in base_dict_entries.iter() {
+    for (pos, entry) in base_dict_entries.into_iter().enumerate() {
         let creator = match *entry {
             "$magic-backspace$" => "DictEntry::Backspace".to_owned(),
             "$magic-backspace-front$" => "DictEntry::BackspaceFront".to_owned(),

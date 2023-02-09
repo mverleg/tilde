@@ -89,7 +89,7 @@ If you've cheated the guy in the glass.
 © 1934 - Dale Wimbrow (1895-1954)";
 
 #[cfg(test)]
-mod lookup {
+mod dict_properties {
     use ::std::collections::HashSet;
 
     use ::strum::IntoEnumIterator;
@@ -136,6 +136,20 @@ mod lookup {
                 continue;
             }
             assert!(seen.contains(&expect), "expected in dict: {expect:?}");
+        }
+    }
+}
+
+#[cfg(test)]
+mod cost {
+    use super::DICT;
+
+    use super::*;
+
+    #[test]
+    fn cost_matches_dict_position() {
+        for (pos, entry) in DICT.iter().enumerate() {
+            assert_eq!(pos, entry.cost().try_into().unwrap());
         }
     }
 }
