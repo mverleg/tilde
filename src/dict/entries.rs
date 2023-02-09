@@ -12,7 +12,7 @@ use ::strum_macros::EnumIter;
 
 use crate::common::TextTransformation;
 
-pub type Cost = u16;
+pub type Cost = u8;
 pub type DictIx = u16;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EnumIter)]
@@ -136,10 +136,10 @@ mod dict_properties {
 
 #[cfg(test)]
 mod cost {
-    use super::DICT;
     use crate::compile::encode_snippet_len_estimate;
 
     use super::*;
+    use super::DICT;
 
     #[test]
     fn cost_matches_dict_position() {
