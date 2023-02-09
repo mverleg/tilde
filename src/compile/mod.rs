@@ -4,6 +4,7 @@ pub use crate::exec::Value;
 use crate::op::Op;
 use crate::op::Prog;
 use crate::TildeRes;
+pub use self::var_uint::encode_snippet_len_estimate;
 
 pub use self::parse::parse;
 

@@ -59,7 +59,7 @@ fn generate_base_dict_code(base_dict_entries: &[&str]) -> String {
         write!(init_buffer, "\t{creator},\n").unwrap();
     }
     write!(init_buffer, "];\n\n").unwrap();
-    write!(init_buffer, "impl DictEntry {{\n\tfn calc_cost(&self) -> u16 {{\n\t\tmatch self {{\n\t\t\tDictEntry::Snippet {{ cost, .. }} => *cost,\n{cost_buffer}\t\t}}\n\t}}\n}}\n\n").unwrap();
+    write!(init_buffer, "impl DictEntry {{\n\tpub fn cost(&self) -> u16 {{\n\t\tmatch self {{\n\t\t\tDictEntry::Snippet {{ cost, .. }} => *cost,\n{cost_buffer}\t\t}}\n\t}}\n}}\n\n").unwrap();
     init_buffer
 }
 

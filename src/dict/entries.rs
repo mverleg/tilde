@@ -137,13 +137,14 @@ mod dict_properties {
 #[cfg(test)]
 mod cost {
     use super::DICT;
+    use crate::compile::encode_snippet_len_estimate;
 
     use super::*;
 
     #[test]
     fn cost_matches_dict_position() {
         for (pos, entry) in DICT.iter().enumerate() {
-            assert_eq!(pos, entry.cost().try_into().unwrap());
+            assert_eq!(encode_snippet_len_estimate(pos.try_into().unwrap()), entry.cost().try_into().unwrap());
         }
     }
 }
