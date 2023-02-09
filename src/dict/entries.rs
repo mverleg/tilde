@@ -11,8 +11,8 @@ use ::std::slice::Iter;
 use ::strum_macros::EnumIter;
 
 use crate::common::TextTransformation;
-use crate::dict::Cost;
 
+pub type Cost = u16;
 pub type DictIx = u16;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EnumIter)]
@@ -33,13 +33,13 @@ impl DictEntry {
 }
 
 #[inline]
-const fn s(snip: &'static str) -> DictEntry {
+const fn s(snip: &'static str, cost: Cost) -> DictEntry {
     DictEntry::Snippet { snip, capitalize_next: false }
 }
 
 //noinspection RsFunctionNaming
 #[inline]
-const fn S(snip: &'static str) -> DictEntry {
+const fn S(snip: &'static str, cost: Cost) -> DictEntry {
     DictEntry::Snippet { snip, capitalize_next: true }
 }
 

@@ -14,6 +14,7 @@ use ::strum_macros::EnumIter;
 use ::tinyvec::ArrayVec;
 
 use crate::common::UNICODE_MAGIC_INDX;
+use crate::dict::Cost;
 use crate::dict::derive::DerivationInfo;
 use crate::dict::derive::with_derived_dict_entries;
 use crate::dict::DICT;
@@ -30,7 +31,6 @@ thread_local! {
     static DICT_META: LazyCell<DictMeta> = LazyCell::new(DictMeta::new);
 }
 
-pub type Cost = u16;
 type ExtIx = u32;
 type ExtEntryIxs = ArrayVec<[DictIx; MAX_TEXT_TRANSFORMS + 1]>;
 

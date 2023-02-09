@@ -1,10 +1,10 @@
 pub use self::compress::compress_with_dict;
-pub use self::compress::Cost;
 pub use self::derive::MAX_TEXT_TRANSFORMS;
 pub use self::dict_str::CowDictStr;
 pub use self::dict_str::DictStr;
 pub use self::dict_str::DictStrContent;
 pub use self::dict_str::LONGEST_DICT_ENTRY_BYTES;
+pub use self::entries::Cost;
 pub use self::entries::DICT;
 pub use self::entries::DictEntry;
 pub use self::entries::DictIx;

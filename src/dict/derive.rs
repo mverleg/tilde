@@ -8,7 +8,7 @@ use ::fnv::{FnvBuildHasher, FnvHasher, FnvHashMap};
 
 use crate::common::TextTransformation;
 use crate::dict::{CowDictStr, DictEntry, DictIx};
-use crate::dict::compress::Cost;
+use crate::dict::Cost;
 use crate::dict::entries::iter_snippets;
 
 pub const MAX_TEXT_TRANSFORMS: usize = 2;
