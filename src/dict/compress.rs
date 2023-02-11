@@ -32,6 +32,7 @@ thread_local! {
     static DICT_META: LazyCell<DictMeta> = LazyCell::new(DictMeta::new);
 }
 
+type CostSum = u32;
 type ExtIx = u32;
 type ExtEntryIxs = ArrayVec<[DictIx; MAX_TEXT_TRANSFORMS + 1]>;
 
@@ -67,7 +68,7 @@ impl DictMeta {
 
 #[derive(Debug, Clone, Copy)]
 struct BestSoFar {
-    cost_from: Cost,
+    cost_from: CostSum,
     compressed_nr: ExtEntryIxs,
     snippet_len: u8,
     //TODO @mark: smaller size?
@@ -108,7 +109,7 @@ pub fn compress_with_dict(text: &str) -> Vec<DictIx> {
 
 fn initialize_minimums(text: &str) -> Vec<BestSoFar> {
     // minimums are indexed by byte position instead of character position, leaving some gaps which is fine
-    let worst = BestSoFar { cost_from: Cost::MAX, compressed_nr: ExtEntryIxs::new(), snippet_len: 1 };
+    let worst = BestSoFar { cost_from: CostSum::MAX, compressed_nr: ExtEntryIxs::new(), snippet_len: 1 };
     vec![worst; text.len()]
 }
 
@@ -140,7 +141,7 @@ fn select_best_match(options: &[ExtIx], minimums_from: &[BestSoFar], extended_di
         let continuation_cost = minimums_from.get(snippet_len)
             .map(|next| next.cost_from)
             .unwrap_or(0);
-        let cost_from = continuation_cost + derivation_info.cost;
+        let cost_from = continuation_cost + derivation_info.cost as CostSum;
         if cost_from >= minimum.cost_from {
             continue
         }
@@ -159,7 +160,7 @@ fn collect_cheapest_result(text: &str, minimums: &[BestSoFar]) -> Vec<DictIx> {
     let mut i = 0;
     let mut numbers = Vec::new();
     while i < text.len() {
-        debug_assert!(minimums[i].cost_from < Cost::MAX, "index {i} or later one not updated");
+        debug_assert!(minimums[i].cost_from < CostSum::MAX, "index {i} or later one not updated");
         numbers.extend(&minimums[i].compressed_nr);
         i += minimums[i].snippet_len as usize;
     }
@@ -202,11 +203,17 @@ mod compress_decode {
 
 #[cfg(test)]
 mod compression {
+    use ::std::mem::size_of;
     use ::std::thread;
 
     use crate::run_tilde;
 
     use super::*;
+
+    #[test]
+    fn cost_size() {
+        assert!(size_of::<Cost>() <= size_of::<CostSum>())
+    }
 
     #[test]
     fn simple_text_compression() {
