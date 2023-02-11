@@ -391,10 +391,11 @@ mod indices_in_sync_with_dict {
 
 #[cfg(test)]
 mod cost {
+    use crate::compile::{Closer, encode_uint_vec};
+    use crate::dict::all_transformations;
     use crate::dict::DICT;
 
     use super::*;
-    use crate::dict::all_transformations;
 
     #[test]
     fn operation_cost_in_sync_with_transform_cost() {
@@ -408,6 +409,14 @@ mod cost {
 
     #[test]
     fn compressed_length_matches_cost() {
-        todo!();   //TODO @mark: TEMPORARY! REMOVE THIS!
+        let mut ops = Vec::new();
+        for tt in all_transformations() {
+            ops.clear();
+            for op in tt.operation_indices() {
+                ops.push(op.try_into().unwrap());
+            }
+            let enc = encode_uint_vec(&ops, Closer::Text);
+            assert_eq!(enc.len() + 1, tt.cost() as usize);
+        }
     }
 }

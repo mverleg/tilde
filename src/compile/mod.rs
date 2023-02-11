@@ -4,9 +4,11 @@ pub use crate::exec::Value;
 use crate::op::Op;
 use crate::op::Prog;
 use crate::TildeRes;
-pub use self::var_uint::encode_snippet_len_estimate;
 
 pub use self::parse::parse;
+pub use self::text_literal::Closer;
+pub use self::text_literal::encode_uint_vec;
+pub use self::var_uint::encode_snippet_len_estimate;
 
 //TODO @mark: remove unused modules
 // mod alphabet;
