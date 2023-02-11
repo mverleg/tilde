@@ -46,7 +46,7 @@ pub fn lookup_buffer(indices: &[DictIx], buffer: &mut String, char_buffer: &mut 
                 is_unicode = false;
                 transform.case_first = current_capitalize_next;
                 current_capitalize_next = capitalize_next;
-                tilde_log!("snip = {} ({})", &current.snip, current.indx);
+                //tilde_log!("snip = {} ({})", &current.snip, current.indx);
                 //TODO @mark: do not count the capitalize next if it doesn't do anything? like on whitespace
             }
             DictEntry::UnicodeLookup => {

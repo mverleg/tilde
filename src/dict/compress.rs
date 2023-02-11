@@ -21,6 +21,7 @@ use crate::dict::DICT;
 use crate::dict::DictEntry;
 use crate::dict::DictIx;
 use crate::dict::LONGEST_DICT_ENTRY_BYTES;
+use crate::dict::lookup::lookup_alloc;
 use crate::dict::lookup_buffer;
 use crate::dict::MAX_TEXT_TRANSFORMS;
 use crate::dict::prefix_data::PrefixMap;
@@ -97,7 +98,7 @@ pub fn compress_with_dict(text: &str) -> Vec<DictIx> {
                 minimums[len_from_here] = best_result;
             } else {
                 tilde_log!("compressing slice '{}' using {} dict entries that share a prefix, e.g.: {}", &text[len_from_here..], snippet_options_buffer.len(),
-                    snippet_options_buffer.iter().take(3).map(|ix| meta.extended_dict[*ix as usize].derived_text.as_ref().to_string()).collect::<Vec<String>>().join(", "));
+                    snippet_options_buffer.iter().take(4).map(|ix| format!("{}({})", meta.extended_dict[*ix as usize].derived_text.as_ref(), meta.extended_dict[*ix as usize].cost)).collect::<Vec<String>>().join(", "));
                 let best_result = select_best_match(&snippet_options_buffer, &minimums[len_from_here..], &meta.extended_dict);
                 minimums[len_from_here] = best_result;
             }
@@ -151,6 +152,7 @@ fn select_best_match(options: &[ExtIx], minimums_from: &[BestSoFar], extended_di
             snippet_len: snippet_len as u8
         };
     }
+    tilde_log!(" selected '{}' (#ops {}, #char {}, cost {})", lookup_alloc(&minimum.compressed_nr), minimum.compressed_nr.len(), minimum.snippet_len, minimum.cost_from);
     minimum
 }
 
