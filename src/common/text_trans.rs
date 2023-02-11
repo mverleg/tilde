@@ -394,14 +394,16 @@ mod cost {
     use crate::dict::DICT;
 
     use super::*;
+    use crate::dict::all_transformations;
 
     #[test]
     fn operation_cost_in_sync_with_transform_cost() {
-        let tt = TextTransformation::new_noop();
-        let token_cost = tt.operation_indices().into_iter()
-            .map(|ix| DICT.get(ix as usize).unwrap().cost())
-            .sum();
-        assert_eq!(tt.cost(), token_cost);
+        for tt in all_transformations() {
+            let token_cost = tt.operation_indices().into_iter()
+                .map(|ix| DICT.get(ix as usize).unwrap().cost())
+                .sum();
+            assert_eq!(tt.cost(), token_cost, "wrong cost for {:?}", tt);
+        }
     }
 
     #[test]

@@ -76,6 +76,11 @@ fn collect_transformations(derivations: FnvHashMap<CowDictStr, PartialDerivation
         .collect()
 }
 
+#[cfg(test)]
+pub fn all_transformations() -> Vec<TextTransformation> {
+    generate_transformations()
+}
+
 fn generate_transformations() -> Vec<TextTransformation> {
     let mut transformations = vec![];
     for case_first in [false, true] {
