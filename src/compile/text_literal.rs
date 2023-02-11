@@ -32,6 +32,7 @@ pub enum Closer {
 /// and the closer is supposed to be number, we have too pick text token instead.
 pub fn encode_uint_vec(
     nrs: &[UINT],
+    //TODO @mark: should be DictIx here? ^
     closer: Closer,
 ) -> Vec<Letter> {
     if nrs.is_empty() {

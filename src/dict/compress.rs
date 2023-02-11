@@ -169,18 +169,31 @@ fn collect_cheapest_result(text: &str, minimums: &[BestSoFar]) -> Vec<DictIx> {
 
 #[cfg(test)]
 mod compress_decode {
+    use crate::compile::{Closer, encode_uint_vec};
     use crate::dict::entries::TEST_POEM;
     use crate::dict::lookup::lookup_alloc;
 
     use super::*;
 
     #[test]
+    fn tmp_debug() {  //TODO @mark: TEMPORARY! REMOVE THIS!
+        let n = 15;
+        let mut nrs = (700..(700 + n)).intersperse(0).collect::<Vec<_>>();
+        let orig_enc = encode_uint_vec(&nrs, Closer::Text);
+        let text = lookup_alloc(&nrs);
+        let compress = encode_uint_vec(&compress_with_dict(&text), Closer::Text);
+        assert_eq!(lookup_alloc(&compress), text);
+        assert!(compress.len() < orig_enc.len(), "compression did not help: {} >= {}", compress.len(), nrs.len())
+    }
+
+    #[test]
     fn decode_random_nrs() {
         let n = 1000;
         let mut nrs = (500..(500 + n)).intersperse(0).collect::<Vec<_>>();
+        let orig_enc = encode_uint_vec(&nrs, Closer::Text);
         let text = lookup_alloc(&nrs);
-        let compress = compress_with_dict(&text);
-        assert!(compress.len() < nrs.len())
+        let compress = encode_uint_vec(&compress_with_dict(&text), Closer::Text);
+        assert!(compress.len() < orig_enc.len(), "compression did not help: {} >= {}", compress.len(), nrs.len())
     }
 
     #[test]
