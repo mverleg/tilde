@@ -36,33 +36,23 @@ pub fn with_derived_dict_entries(base_dict: &'static [DictEntry]) -> Vec<Derivat
     let mut derivations: FnvHashMap<CowDictStr, PartialDerivationInfo> =
         FnvHashMap::with_capacity_and_hasher(capacity, FnvBuildHasher::default());
     for (original_index, snippet) in iter_snippets(base_dict) {
-        for transformation in &transformations {
+        for transformation in transformations.iter().cloned() {
             let derived_text = transformation.apply_str(snippet);
-            insert_if_cheapest(&mut derivations, derived_text, |cost| PartialDerivationInfo {
-                original_index: original_index.try_into().expect("usize too small"),
-                transformation: transformation.clone(),
-                cost,
-            })
+            let original_index = original_index.try_into().expect("usize too small");
+            let cost = (100 / (derived_text.as_ref().len() + 1)) as Cost;  //TODO @mverleg: TEMPORARY! REMOVE THIS!
+            match derivations.entry(derived_text) {
+                Entry::Occupied(mut existing) => {
+                    if cost < existing.get().cost {
+                        existing.insert(PartialDerivationInfo { original_index, transformation, cost });
+                    }
+                }
+                Entry::Vacant(vacancy) => {
+                    vacancy.insert(PartialDerivationInfo { original_index, transformation, cost });
+                }
+            }
         }
     }
     collect_transformations(derivations)
-}
-
-fn insert_if_cheapest(
-        derivations: &mut FnvHashMap<CowDictStr, PartialDerivationInfo>,
-        derived_text: CowDictStr,
-        creator: impl Fn(Cost) -> PartialDerivationInfo) {
-    let new_cost = (100 / (derived_text.as_ref().len() + 1)) as Cost;  //TODO @mverleg: TEMPORARY! REMOVE THIS!
-    match derivations.entry(derived_text) {
-        Entry::Occupied(mut existing) => {
-            if new_cost < existing.get().cost {
-                existing.insert(creator(new_cost));
-            }
-        }
-        Entry::Vacant(vacancy) => {
-            vacancy.insert(creator(new_cost));
-        }
-    }
 }
 
 fn collect_transformations(derivations: FnvHashMap<CowDictStr, PartialDerivationInfo>) -> Vec<DerivationInfo> {

@@ -20,8 +20,8 @@ macro_rules! log {
             }
             if is_on == ON {
                 // add time without external dependencies?
-                eprint!("# {}:{} ", file!(), line!());
-                eprintln!($templ, $($args, )*);
+                let s = format!($templ, $($args, )*);
+                eprintln!("# {}:{}  {}", file!(), line!(), s);
             }
         }
     }

@@ -152,7 +152,8 @@ fn select_best_match(options: &[ExtIx], minimums_from: &[BestSoFar], extended_di
             snippet_len: snippet_len as u8
         };
     }
-    tilde_log!(" selected '{}' (#ops {}, #char {}, cost {})", lookup_alloc(&minimum.compressed_nr), minimum.compressed_nr.len(), minimum.snippet_len, minimum.cost_from);
+    tilde_log!(" selected '{}' (#ops {}, #char {}, cost {}-{})", lookup_alloc(&minimum.compressed_nr), minimum.compressed_nr.len(),
+        minimum.snippet_len, minimum.cost_from, minimums_from.get(minimum.snippet_len as usize).map(|bsf| bsf.cost_from).unwrap_or(0));
     minimum
 }
 
