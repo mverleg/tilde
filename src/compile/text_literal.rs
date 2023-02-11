@@ -30,18 +30,18 @@ pub enum Closer {
 ///
 /// Note: the first letter cannot be a modifier or number token, so if the length is zero
 /// and the closer is supposed to be number, we have too pick text token instead.
-pub fn encode_uint_vec(
-    nrs: &[UINT],
-    //TODO @mark: should be DictIx here? ^
+pub fn encode_uint_vec<I>(
+    nrs: &[I],
     closer: Closer,
-) -> Vec<Letter> {
+) -> Vec<Letter> where I: Into<UINT> + Copy {
     if nrs.is_empty() {
         return vec![Text];
     }
     let mut letters = vec![];
-    letters.extend(encode_uint_no_modifier_at_start(nrs[0]));
+    letters.extend(encode_uint_no_modifier_at_start(nrs[0].into()));
     for nr in nrs.iter().skip(1) {
-        letters.extend(encode_uint_allow_modifiers(*nr));
+        let nr: UINT = (*nr).into();
+        letters.extend(encode_uint_allow_modifiers(nr));
     }
     letters.push(match closer {
         Closer::Text => Text,
@@ -103,37 +103,37 @@ mod encoding {
 
     #[test]
     fn encode_empty_nr() {
-        let enc = encode_uint_vec(&[], Closer::Number);
+        let enc = encode_uint_vec::<UINT>(&[], Closer::Number);
         assert_eq!(enc, vec![Text]);
     }
 
     #[test]
     fn encode_empty_txt() {
-        let enc = encode_uint_vec(&[], Closer::Text);
+        let enc = encode_uint_vec::<UINT>(&[], Closer::Text);
         assert_eq!(enc, vec![Text]);
     }
 
     #[test]
     fn encode_single_nr() {
-        let enc = encode_uint_vec(&[364], Closer::Number);
+        let enc = encode_uint_vec::<UINT>(&[364], Closer::Number);
         assert_eq!(enc, vec![Asterisk, Bracket, Text, Number]);
     }
 
     #[test]
     fn encode_single_txt() {
-        let enc = encode_uint_vec(&[364], Closer::Text);
+        let enc = encode_uint_vec::<UINT>(&[364], Closer::Text);
         assert_eq!(enc, vec![Asterisk, Bracket, Text, Text]);
     }
 
     #[test]
     fn encode_examples_nr() {
-        let enc = encode_uint_vec(&[44, 511, 0], Closer::Number);
+        let enc = encode_uint_vec::<UINT>(&[44, 511, 0], Closer::Number);
         assert_eq!(enc, vec![Asterisk, Text, Io, Io, Io, Io, Colon, Bracket, Number]);
     }
 
     #[test]
     fn encode_examples_txt() {
-        let enc = encode_uint_vec(&[44, 511, 0], Closer::Text);
+        let enc = encode_uint_vec::<UINT>(&[44, 511, 0], Closer::Text);
         assert_eq!(enc, vec![Asterisk, Text, Io, Io, Io, Io, Colon, Bracket, Text]);
     }
 }

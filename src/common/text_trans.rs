@@ -409,7 +409,7 @@ mod cost {
 
     #[test]
     fn compressed_length_matches_cost() {
-        let mut ops = Vec::new();
+        let mut ops: Vec<DictIx> = Vec::new();
         for tt in all_transformations() {
             ops.clear();
             for op in tt.operation_indices() {

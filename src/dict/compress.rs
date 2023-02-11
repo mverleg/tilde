@@ -181,8 +181,9 @@ mod compress_decode {
         let mut nrs = (700..(700 + n)).intersperse(0).collect::<Vec<_>>();
         let orig_enc = encode_uint_vec(&nrs, Closer::Text);
         let text = lookup_alloc(&nrs);
-        let compress = encode_uint_vec(&compress_with_dict(&text), Closer::Text);
-        assert_eq!(lookup_alloc(&compress), text);
+        let compress_ops = &compress_with_dict(&text);
+        let compress = encode_uint_vec(compress_ops, Closer::Text);
+        assert_eq!(lookup_alloc(&compress_ops), text);
         assert!(compress.len() < orig_enc.len(), "compression did not help: {} >= {}", compress.len(), nrs.len())
     }
 
@@ -192,7 +193,9 @@ mod compress_decode {
         let mut nrs = (500..(500 + n)).intersperse(0).collect::<Vec<_>>();
         let orig_enc = encode_uint_vec(&nrs, Closer::Text);
         let text = lookup_alloc(&nrs);
-        let compress = encode_uint_vec(&compress_with_dict(&text), Closer::Text);
+        let compress_ops = &compress_with_dict(&text);
+        let compress = encode_uint_vec(compress_ops, Closer::Text);
+        assert_eq!(lookup_alloc(&compress_ops), text);
         assert!(compress.len() < orig_enc.len(), "compression did not help: {} >= {}", compress.len(), nrs.len())
     }
 
