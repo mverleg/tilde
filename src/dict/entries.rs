@@ -39,18 +39,18 @@ const fn S(snip: &'static str, cost: Cost) -> DictEntry {
 
 include!(concat!(env!("OUT_DIR"), "/dict_init.rs"));
 
-pub fn iter_snippets(dict: &'static [DictEntry]) -> impl Iterator<Item=(usize, &'static str)> {
+pub fn iter_snippets(dict: &'static [DictEntry]) -> impl Iterator<Item=(usize, &'static str, Cost)> {
     dict.iter()
         .enumerate()
         .flat_map(|(index, entry)| match *entry {
-            DictEntry::Snippet { snip, capitalize_next, cost } => Some(snip),
+            DictEntry::Snippet { snip, capitalize_next, cost } => Some((snip, cost)),
             DictEntry::Backspace => None,
             DictEntry::BackspaceFront => None,
             DictEntry::CapitalizeFirst => None,
             DictEntry::CapitalizeAll => None,
             DictEntry::Reverse => None,
             DictEntry::UnicodeLookup => None,
-        }.map(|e| (index, e)).into_iter())
+        }.map(|(snip, cost)| (index, snip, cost)).into_iter())
 }
 
 #[cfg(test)]

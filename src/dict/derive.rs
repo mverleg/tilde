@@ -35,11 +35,13 @@ pub fn with_derived_dict_entries(base_dict: &'static [DictEntry]) -> Vec<Derivat
     let capacity = base_dict.len() * transformations.len();
     let mut derivations: FnvHashMap<CowDictStr, PartialDerivationInfo> =
         FnvHashMap::with_capacity_and_hasher(capacity, FnvBuildHasher::default());
-    for (original_index, snippet) in iter_snippets(base_dict) {
+    for (original_index, snippet, snippet_cost) in iter_snippets(base_dict) {
+        let original_cost = original_index;
         for transformation in transformations.iter().cloned() {
             let derived_text = transformation.apply_str(snippet);
             let original_index = original_index.try_into().expect("usize too small");
-            let cost = (100 / (derived_text.as_ref().len() + 1)) as Cost;  //TODO @mverleg: TEMPORARY! REMOVE THIS!
+            let cost = snippet_cost + transformation.cost();
+            debug_assert!(cost > 0);
             match derivations.entry(derived_text) {
                 Entry::Occupied(mut existing) => {
                     if cost < existing.get().cost {

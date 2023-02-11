@@ -218,7 +218,7 @@ mod compression {
     #[test]
     fn simple_text_compression() {
         let nrs = compress_with_dict("hello world, this is a test");
-        assert_eq!(nrs.len(), 14);
+        assert_eq!(nrs.len(), 13);
     }
 
     #[test]
