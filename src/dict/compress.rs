@@ -81,7 +81,7 @@ pub fn compress_with_dict(text: &str) -> Vec<DictIx> {
     let mut minimums = initialize_minimums(text);
     let mut snippet_options_buffer = Vec::new();
     let mut len_from_here = text.len();
-    tilde_log!("starting compression for {} (length {})", text.lines().next().unwrap(), text.len());
+    tilde_log!("starting compression for '{}' (length {})", text.lines().next().unwrap(), text.len());
     DICT_META.with(|meta| {
         for letter in reverse_chars {
             // Find the cheapest from here until end
@@ -96,7 +96,8 @@ pub fn compress_with_dict(text: &str) -> Vec<DictIx> {
                     letter, &text[len_from_here..], best_result.cost_from);
                 minimums[len_from_here] = best_result;
             } else {
-                tilde_log!("compressing slice '{}' using {} dict entries that share a prefix", &text[len_from_here..], snippet_options_buffer.len());
+                tilde_log!("compressing slice '{}' using {} dict entries that share a prefix, e.g.: {}", &text[len_from_here..], snippet_options_buffer.len(),
+                    snippet_options_buffer.iter().take(3).map(|ix| meta.extended_dict[*ix as usize].derived_text.as_ref().to_string()).collect::<Vec<String>>().join(", "));
                 let best_result = select_best_match(&snippet_options_buffer, &minimums[len_from_here..], &meta.extended_dict);
                 minimums[len_from_here] = best_result;
             }
