@@ -155,7 +155,6 @@ pub struct TrieIterator<'a> {
 impl <'a> TrieIterator<'a> {
     fn new_at(prefix: String, elem: &'a TrieNode) -> Self {
         let mut nodes = VecDeque::new();
-        eprintln!("pushing initial: {}", &prefix);  //TODO @mark: TEMPORARY! REMOVE THIS!
         nodes.push_back(TrieNodePrefix::new(prefix, elem));
         TrieIterator {
             nodes,
@@ -174,7 +173,6 @@ impl <'a> Iterator for TrieIterator<'a> {
         while let Some(elem) = self.nodes.pop_front() {
             for child in &elem.node.children {
                 let mut text = elem.prefix.to_owned();
-                eprintln!("pushing child: {} + {}", &text, child.0);  //TODO @mark: TEMPORARY! REMOVE THIS!
                 text.push(*child.0);
                 self.nodes.push_back(TrieNodePrefix::new(text, child.1))
             }

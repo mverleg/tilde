@@ -87,8 +87,6 @@ pub fn compress_with_dict(text: &str) -> Vec<DictIx> {
         for letter in reverse_chars {
             // Find the cheapest from here until end
             len_from_here -= letter.len_utf8();
-            eprintln!("slice ix {} of {} has len {} (current char {} len: {})",  //TODO @mark: TEMPORARY! REMOVE THIS!
-                      len_from_here, text.len(), text[len_from_here..].len(), letter, letter.len_utf8());  //TODO @mark: TEMPORARY! REMOVE THIS!
             meta.prefix_map.all_prefixes_cloned_of(&text[len_from_here..], &mut snippet_options_buffer);
             if snippet_options_buffer.is_empty() {
                 //TODO @mark: ^
@@ -158,9 +156,6 @@ fn select_best_match(options: &[ExtIx], minimums_from: &[BestSoFar], extended_di
 }
 
 fn collect_cheapest_result(text: &str, minimums: &[BestSoFar]) -> Vec<DictIx> {
-    for (q, min) in minimums.iter().enumerate() {  //TODO @mverleg: TEMPORARY! REMOVE THIS!
-        println!("{q}\t{}\t{}\t{}", min.cost_from, min.compressed_nr, min.snippet_len)  //TODO @mverleg: TEMPORARY! REMOVE THIS!
-    }
     let mut i = 0;
     let mut numbers = Vec::new();
     while i < text.len() {
@@ -184,8 +179,6 @@ mod compress_decode {
         let mut nrs = (500..(500 + n)).intersperse(0).collect::<Vec<_>>();
         let text = lookup_alloc(&nrs);
         let compress = compress_with_dict(&text);
-        eprintln!("{}", nrs.iter().map(|nr| nr.to_string()).collect::<Vec<_>>().join(" "));  //TODO @mark: TEMPORARY! REMOVE THIS!
-        eprintln!("{}", compress.iter().map(|nr| nr.to_string()).collect::<Vec<_>>().join(" "));  //TODO @mark: TEMPORARY! REMOVE THIS!
         assert!(compress.len() < nrs.len())
     }
 
