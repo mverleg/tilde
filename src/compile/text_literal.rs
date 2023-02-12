@@ -21,7 +21,7 @@ use crate::tilde_log;
 use crate::UINT;
 use crate::Value::Num;
 
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum Closer {
     Text,
     Number,

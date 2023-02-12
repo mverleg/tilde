@@ -160,7 +160,7 @@ fn decode_uint_with_openers(
     Err(DecodeError::NoEndMarker)
 }
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DecodeError {
     NoInput,
     TextNode,

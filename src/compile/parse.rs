@@ -73,7 +73,7 @@ pub fn parse(src: &str) -> TildeRes<Prog> {
     Ok(Prog::of(ops))
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct Pos<T: Debug + PartialEq> {
     pub value: T,
     pub length: usize,
