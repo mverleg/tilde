@@ -5,6 +5,7 @@ use crate::op::Op;
 use crate::op::Prog;
 use crate::TildeRes;
 
+pub use self::letter::Letter;
 pub use self::parse::parse;
 pub use self::text_literal::Closer;
 pub use self::text_literal::encode_uint_vec;

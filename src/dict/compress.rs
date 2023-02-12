@@ -25,7 +25,8 @@ use crate::dict::lookup::lookup_alloc;
 use crate::dict::lookup_buffer;
 use crate::dict::MAX_TEXT_TRANSFORMS;
 use crate::dict::prefix_data::PrefixMap;
-use crate::tilde_gen_md_docs;
+//use crate::tilde_gen_md_docs;
+//TODO @mark: ^ fix and enable `gen`
 use crate::tilde_log;
 
 thread_local! {

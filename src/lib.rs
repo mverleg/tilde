@@ -26,14 +26,16 @@ pub use crate::common::log as tilde_log;
 use crate::compile::{parse, Value};
 use crate::exec::execute;
 
-#[cfg(feature = "gen")]
-pub use self::gen::mddoc::tilde_gen_md_docs;
+// #[cfg(feature = "gen")]
+// pub use self::gen::mddoc::tilde_gen_md_docs;
+//TODO @mark: ^ fix and enable `gen`
 
 mod common;
 mod compile;
 mod exec;
-#[cfg(feature = "gen")]
-mod gen;
+//#[cfg(feature = "gen")]
+//mod gen;
+//TODO @mark: ^ fix and enable `gen`
 mod op;
 mod dict;
 
@@ -56,7 +58,8 @@ pub fn run_tilde(args: &TildeArgs) -> TildeRes<Value> {
         },
         CliOperation::Analyze(source) => Ok(tilde_analyze(&source)?.into()),
         CliOperation::DocGen => {
-            tilde_gen_md_docs()?;
+            //tilde_gen_md_docs()?;
+            todo!();  //TODO @mark: ^ fix and enable `gen`
             Ok(Value::None)
         },
     }
