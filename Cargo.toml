@@ -5,6 +5,8 @@ homepage = "tbd"
 version = "0.1.0"
 edition = "2021"
 authors = ["Mark <mverleg.noreply@gmail.com>"]
+license = "Apache-2.0"
+
 build = "build.rs"
 
 [features]
