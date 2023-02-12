@@ -11,7 +11,7 @@ pub const LONGEST_DICT_ENTRY_BYTES: usize = 22;  // located in this file because
 //TODO @mark: try to decrease a bit if long entries do not add much ^
 pub type DictStrContent = ArrayString<[u8; LONGEST_DICT_ENTRY_BYTES]>;
 
-#[derive(Debug, Hash)]
+#[derive(Debug)]
 pub struct DictStr {
     text: DictStrContent,
 }
@@ -48,6 +48,12 @@ impl PartialEq for DictStr {
 
 impl Eq for DictStr {}
 
+impl hash::Hash for DictStr {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        state.write_str(&self.text)
+    }
+}
+
 impl PartialOrd for DictStr {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         self.text.partial_cmp(&other.text)
@@ -76,7 +82,7 @@ impl ToOwned for DictStr {
     }
 }
 
-#[derive(Debug, Eq, Ord)]
+#[derive(Debug, Eq)]
 pub enum CowDictStr {
     Owned(DictStr),
     Borrowed(&'static str),
@@ -113,11 +119,17 @@ impl PartialEq for CowDictStr {
 
 impl PartialOrd for CowDictStr {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl Ord for CowDictStr {
+    fn cmp(&self, other: &Self) -> Ordering {
         match (self, other) {
-            (CowDictStr::Owned(left), CowDictStr::Owned(right)) => left.as_str().partial_cmp(right.as_str()),
-            (CowDictStr::Borrowed(left), CowDictStr::Owned(right)) => left.partial_cmp(&right.as_str()),
-            (CowDictStr::Owned(left), CowDictStr::Borrowed(right)) => left.as_str().partial_cmp(right),
-            (CowDictStr::Borrowed(left), CowDictStr::Borrowed(right)) => left.partial_cmp(right),
+            (CowDictStr::Owned(left), CowDictStr::Owned(right)) => left.as_str().cmp(right.as_str()),
+            (CowDictStr::Borrowed(left), CowDictStr::Owned(right)) => left.cmp(&right.as_str()),
+            (CowDictStr::Owned(left), CowDictStr::Borrowed(right)) => left.as_str().cmp(right),
+            (CowDictStr::Borrowed(left), CowDictStr::Borrowed(right)) => left.cmp(right),
         }
     }
 }

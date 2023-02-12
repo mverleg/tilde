@@ -52,11 +52,11 @@ pub fn encode_uint_vec<I>(
 
 ///
 /// String buffer is NOT cleared (can expand), decode buffer IS overwritten.
-pub fn decode_str(letters: &[Letter], string_buffer: &mut String, char_buffer: &mut Vec<char>, decode_buffer: &mut Vec<UINT>) -> Result<Pos<()>, DecodeError> {
+pub fn decode_str(letters: &[Letter], string_buffer: &mut String, decode_buffer: &mut Vec<UINT>) -> Result<Pos<()>, DecodeError> {
     let closer = decode_uint_vec_buffer(letters, decode_buffer)?;
     assert!(Closer::Text == closer.value);  //TODO @mark: for now only decodes strings, not int arrays
     let indices = decode_buffer.iter_mut().map(|nr| *nr as DictIx).collect::<Vec<_>>();
-    lookup_buffer(&indices, string_buffer, char_buffer);
+    lookup_buffer(&indices, string_buffer);
     Ok(Pos { value: (), length: closer.length })
 }
 

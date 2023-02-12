@@ -7,7 +7,7 @@ use crate::tilde_log;
 
 pub fn lookup_alloc(indices: &[DictIx]) -> String {
     let mut buffer = String::new();
-    lookup_buffer(indices, &mut buffer, &mut vec![]);
+    lookup_buffer(indices, &mut buffer);
     buffer
 }
 
@@ -29,10 +29,8 @@ impl LatestSnippet {
     }
 }
 
-///
-/// String buffer is NOT cleared (can expand), char buffer IS overwritten.
-pub fn lookup_buffer(indices: &[DictIx], buffer: &mut String, char_buffer: &mut Vec<char>) {
-    //TODO @mark: remove `char_buffer` arg and rustdoc
+/// String buffer is NOT cleared (can expand)
+pub fn lookup_buffer(indices: &[DictIx], buffer: &mut String) {
     let mut current = LatestSnippet { indx: 0, snip: "" };
     let mut current_capitalize_next = false;
     let mut transform = TextTransformation::new_noop();
@@ -99,14 +97,14 @@ mod tests {
     #[test]
     fn lookup_simple() {
         let mut out = String::new();
-        lookup_buffer(&[9, 2, 12, 12, 5, 1, 225], &mut out, &mut vec![]);
+        lookup_buffer(&[9, 2, 12, 12, 5, 1, 225], &mut out);
         assert_eq!(&out, "hello world ")
     }
 
     #[test]
     fn lookup_unicode() {
         let mut out = String::new();
-        lookup_buffer(&[20320, 70, 22909, 70], &mut out, &mut vec![]);
+        lookup_buffer(&[20320, 70, 22909, 70], &mut out);
         assert_eq!(&out, "你好")
     }
 
@@ -114,7 +112,7 @@ mod tests {
     fn lookup_with_magic() {
         // as-CAP/tea-BS-BS/risk-BS/!/capital-CAP-BS
         let mut out = String::new();
-        lookup_buffer(&[90, 71, 2546, 0, 0, 840, 0, 62, 758, 0], &mut out, &mut vec![]);
+        lookup_buffer(&[90, 71, 2546, 0, 0, 840, 0, 62, 758, 0], &mut out);
         assert_eq!(&out, "Asterisk! Capital")
     }
 }

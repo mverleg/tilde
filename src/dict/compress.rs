@@ -134,7 +134,7 @@ fn select_best_match(options: &[ExtIx], minimums_from: &[BestSoFar], extended_di
     for option in options {
         let mut ops = ExtEntryIxs::new();
         let derivation_info = &extended_dict[*option as usize];
-        ops.push(derivation_info.original_index.try_into().expect("could not convert to index from usize"));
+        ops.push(derivation_info.original_index);
         ops.extend(derivation_info.transformation.operation_indices());
         let snippet_len = derivation_info.derived_text.as_ref().len();
         //TODO @mverleg: this could also lookup the string, if it makes it faster to initialize the meta dict

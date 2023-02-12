@@ -166,7 +166,7 @@ impl TextTransformation {
         } else {
             write!(repr, "{}{}", self.pop_start, self.pop_end).unwrap();
         }
-        ArrayString::try_from(repr).expect("name is too long for array string")
+        repr
     }
 }
 
@@ -174,25 +174,19 @@ impl TextTransformation {
 fn switch_capitalization_char(orig_first: &mut char) {
     //TODO @mark: move this functions? add tests
     let mut upper = orig_first.to_uppercase();
-    match upper.next() {
-        Some(switch_first) => {
-            if switch_first != *orig_first {
-                assert!(upper.nth(1).is_none(), "multi-char uppercase representations not yet supported"); //TODO @mark
-                *orig_first = switch_first;
-                return;
-            }
+    if let Some(switch_first) = upper.next() {
+        if switch_first != *orig_first {
+            assert!(upper.nth(1).is_none(), "multi-char uppercase representations not yet supported"); //TODO @mark
+            *orig_first = switch_first;
+            return;
         }
-        None => {}
     };
     let mut lower = orig_first.to_lowercase();
-    match lower.next() {
-        Some(switch_first) => {
-            if switch_first != *orig_first {
-                assert!(lower.nth(1).is_none(), "multi-char lowercase representations not yet supported"); //TODO @mark
-                *orig_first = switch_first;
-            }
+    if let Some(switch_first) = lower.next() {
+        if switch_first != *orig_first {
+            assert!(lower.nth(1).is_none(), "multi-char lowercase representations not yet supported"); //TODO @mark
+            *orig_first = switch_first;
         }
-        None => {}
     }
 }
 
@@ -412,7 +406,7 @@ mod cost {
         for tt in all_transformations() {
             ops.clear();
             for op in tt.operation_indices() {
-                ops.push(op.try_into().unwrap());
+                ops.push(op);
             }
             let enc = encode_uint_vec(&ops, Closer::Text);
             assert_eq!(enc.len() - 1, tt.cost() as usize,

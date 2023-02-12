@@ -72,7 +72,7 @@ impl <K: Default + Eq + Hash, V: Default> TinyMap<K, V> {
 }
 
 #[cfg(test)]
-mod tiny_map {
+mod tiny_map_test {
     use super::*;
 
     #[test]
