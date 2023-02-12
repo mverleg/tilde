@@ -71,7 +71,7 @@ impl ToOwned for DictStr {
 
     fn to_owned(&self) -> Self::Owned {
         DictStr {
-            text: self.text.clone(),
+            text: self.text,
         }
     }
 }
@@ -95,7 +95,7 @@ impl AsRef<str> for CowDictStr {
     fn as_ref(&self) -> &str {
         match self {
             CowDictStr::Owned(text) => text.text.as_str(),
-            CowDictStr::Borrowed(text) => *text,
+            CowDictStr::Borrowed(text) => text,
         }
     }
 }

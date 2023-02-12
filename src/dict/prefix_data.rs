@@ -47,14 +47,14 @@ impl <Word: Debug> PrefixMap<Word> {
     }
 
     pub fn lookup<'a>(&'a self, value: &DictStr) -> PrefixMapLookup<'a, Word> {
-        match self.words.get(&*value) {
+        match self.words.get(value) {
             Some(word) => PrefixMapLookup::IsWord(word),
             None => PrefixMapLookup::NotFound,
         }
     }
 
     pub fn contains_exactly(&self, value: &DictStr) -> bool {
-        self.words.get(&*value).is_some()
+        self.words.get(value).is_some()
     }
 }
 
@@ -150,7 +150,7 @@ mod tests {
 
     fn value_for<T: Clone + Debug>(pm: &PrefixMap<T>, text: &str) -> T {
         let PrefixMapLookup::IsWord(word) = pm.lookup(&DictStr::from(text)) else {
-            panic!("did not find {}", text)
+            panic!("did not find {text}")
         };
         (*word).clone()
     }

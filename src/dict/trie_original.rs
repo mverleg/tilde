@@ -74,7 +74,7 @@ impl TrieNode {
 
     fn longest_prefix(&self, value_remaining: &str, longest_word: &mut String, post_word: &mut String) {
         if self.is_word {
-            longest_word.push_str(&post_word);
+            longest_word.push_str(post_word);
             post_word.clear();
         }
         let head = match value_remaining.chars().next() {

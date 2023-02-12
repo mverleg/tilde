@@ -65,14 +65,14 @@ impl TextTransformation {
     }
 
     pub fn apply_str(&self, input: &'static str) -> CowDictStr {
-        if self == &Self::new_noop() || input.len() == 0 {
+        if self == &Self::new_noop() || input.is_empty() {
             return CowDictStr::Borrowed(input);
         }
         if input.len() <= self.pop_start as usize + self.pop_end as usize {
             return CowDictStr::Borrowed("");
         }
         let mut chars: Chars = input.chars().collect();
-        debug_assert!(chars.len() >= 1);
+        debug_assert!(!chars.is_empty());
         let need_alloc = self.case_all || self.case_first || self.reverse;
         if need_alloc {
             CowDictStr::Owned(self.apply_all_alloc(input, chars))
@@ -113,9 +113,9 @@ impl TextTransformation {
         }
         if self.case_all {
             if self.case_first {
-                chars.iter_mut().skip(1).for_each(|c| switch_capitalization_char(c));
+                chars.iter_mut().skip(1).for_each(switch_capitalization_char);
             } else {
-                chars.iter_mut().for_each(|c| switch_capitalization_char(c));
+                chars.iter_mut().for_each(switch_capitalization_char);
             }
         } else if self.case_first {
             switch_capitalization_char(&mut chars[0])
@@ -174,7 +174,7 @@ impl TextTransformation {
 fn switch_capitalization_char(orig_first: &mut char) {
     //TODO @mark: move this functions? add tests
     let mut upper = orig_first.to_uppercase();
-    match upper.nth(0) {
+    match upper.next() {
         Some(switch_first) => {
             if switch_first != *orig_first {
                 assert!(upper.nth(1).is_none(), "multi-char uppercase representations not yet supported"); //TODO @mark

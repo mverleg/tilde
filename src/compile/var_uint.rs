@@ -60,14 +60,14 @@ fn encode_uint_with_openers(
         rem -= 1;
         for i in 0..(non_close_letter_cnt_doubled / 2) {
             letters.push(STRING_FOLLOWERS[(rem % follow_2n) as usize]);
-            rem = rem / follow_2n;
+            rem /= follow_2n;
         }
         let pos = if rem < follow_1n { rem + follow_1n } else { rem % follow_1n };
         letters.push(STRING_FOLLOWERS[pos as usize]);
-        rem = rem / follow_1n;
+        rem /= follow_1n;
         non_close_letter_cnt_doubled += 1;
     }
-    return letters;
+    letters
 }
 
 /// Inverse of [encode_pos_int_static_width_avoid_modifiers].

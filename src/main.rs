@@ -19,7 +19,7 @@ fn main() -> ExitCode {
             return ExitCode::from(0)
         },
         ArgParseRes::Err(err) => {
-            eprintln!("{}", err);
+            eprintln!("{err}");
             return ExitCode::from(2)
         }
     };
@@ -27,11 +27,11 @@ fn main() -> ExitCode {
     let res = run_tilde(&args);
     match res {
         Ok(value) => {
-            println!("{}", value);
+            println!("{value}");
             ExitCode::from(0)
         },
         Err(err) => {
-            eprintln!("{}", err);
+            eprintln!("{err}");
             ExitCode::from(1)
         },
     }

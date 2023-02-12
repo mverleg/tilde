@@ -166,7 +166,7 @@ mod tests {
             .map(|letter| letter.kind())
             .collect::<HashSet<_>>();
         for kind in LetterKind::iter() {
-            assert!(unique.contains(&kind), "unused kind: {:?}", kind);
+            assert!(unique.contains(&kind), "unused kind: {kind:?}");
         }
     }
 
@@ -185,7 +185,7 @@ mod tests {
     #[test]
     fn letters_fit_in_half_byte() {
         let count = Letter::iter().count();
-        assert!(count <= 16, "should fit in half byte (uses {})", count);
-        assert!(count >= 16, "should fully utilize all bits in half byte (uses {})", count);
+        assert!(count <= 16, "should fit in half byte (uses {count})");
+        assert!(count >= 16, "should fully utilize all bits in half byte (uses {count})");
     }
 }

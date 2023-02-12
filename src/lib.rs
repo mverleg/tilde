@@ -53,10 +53,10 @@ pub fn run_tilde(args: &TildeArgs) -> TildeRes<Value> {
         CliOperation::Run(source) => {
             //tilde_from();
             let inp = gather_input();
-            let prog = parse(&source)?;
+            let prog = parse(source)?;
             execute(prog, inp)
         },
-        CliOperation::Analyze(source) => Ok(tilde_analyze(&source)?.into()),
+        CliOperation::Analyze(source) => Ok(tilde_analyze(source)?.into()),
         CliOperation::DocGen => {
             //tilde_gen_md_docs()?;
             todo!();  //TODO @mark: ^ fix and enable `gen`
@@ -115,7 +115,7 @@ pub fn tilde_strs(
 ) -> TildeRes<String> {
     let mut output = vec![];
     tilde_from(code, BufReader::new(io::Cursor::new(input)), BufWriter::new(io::Cursor::new(&mut output)))?;
-    String::from_utf8(output).map_err(|err| format!("output was not utf8, err: {}", err))
+    String::from_utf8(output).map_err(|err| format!("output was not utf8, err: {err}"))
 }
 
 /// Run a Tilde routine, taking a single Value as input and producing a single value
@@ -131,7 +131,7 @@ pub fn tilde_eval(
 /// Analyze the Tilde source code and report stats as json.
 pub fn tilde_analyze(source: &str) -> TildeRes<String> {
     //use crate::dict::compress_with_dict;
-let prog = parse(&source)?;
+let prog = parse(source)?;
     let unsafe_long_code = prog.long_code();
     let golf_code = prog.golf_code();
     let base64_code = prog.golf_code();

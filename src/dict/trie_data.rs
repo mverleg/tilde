@@ -271,7 +271,7 @@ mod tests {
 
     fn value_for<T: Clone + Debug>(trie: &Trie<T>, text: &str) -> T {
         let TrieLookup::IsWord(word) = trie.lookup(text) else {
-            panic!("did not find {}", text)
+            panic!("did not find {text}")
         };
         (*word).clone()
     }

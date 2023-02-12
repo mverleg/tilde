@@ -46,7 +46,7 @@ mod tests {
                 continue;
             }
             let parse_op = lookup_op_name(name);
-            assert!(parse_op.is_some(), "could not parse op: {}, add it to `lookup_op_name`", name);
+            assert!(parse_op.is_some(), "could not parse op: {name}, add it to `lookup_op_name`");
         }
     }
 }

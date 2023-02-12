@@ -78,15 +78,15 @@ impl Op {
     pub fn long_code(&self) -> Cow<str> {
         match self {
             Op::Text(text) => Cow::Owned(format!("\"{}\"", escape_for_string(text))),
-            Op::Number(number) => Cow::Owned(format!("{}", number)),
+            Op::Number(number) => Cow::Owned(format!("{number}")),
             _ => todo!("impl long code"),
         }
     }
 
     pub fn gold_code(&self) -> Cow<str> {
         match self {
-            Op::Text(text) => Cow::Owned(format!("todo-golf-text:{}", text)),
-            Op::Number(number) => Cow::Owned(format!("todo-golf-number:{}", number)),
+            Op::Text(text) => Cow::Owned(format!("todo-golf-text:{text}")),
+            Op::Number(number) => Cow::Owned(format!("todo-golf-number:{number}")),
             _ => todo!("impl long code"),
         }
     }

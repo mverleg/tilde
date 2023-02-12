@@ -16,9 +16,9 @@ impl fmt::Display for Value {
     ) -> fmt::Result {
         match self {
             Value::None => Ok(()),
-            Value::Num(val) => write!(f, "{}", val),
-            Value::Txt(val) => write!(f, "{}", val),
-            Value::Arr(val) => write!(f, "{}", val),
+            Value::Num(val) => write!(f, "{val}"),
+            Value::Txt(val) => write!(f, "{val}"),
+            Value::Arr(val) => write!(f, "{val}"),
         }
     }
 }
@@ -108,7 +108,7 @@ impl fmt::Display for Array {
         f: &mut Formatter<'_>,
     ) -> fmt::Result {
         for item in &self.val {
-            write!(f, "{}", item)?
+            write!(f, "{item}")?
         }
         Ok(())
     }

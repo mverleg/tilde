@@ -184,7 +184,7 @@ mod compress_decode {
         let text = lookup_alloc(&nrs);
         let compress_ops = &compress_with_dict(&text);
         let compress = encode_uint_vec(compress_ops, Closer::Text);
-        assert_eq!(lookup_alloc(&compress_ops), text);
+        assert_eq!(lookup_alloc(compress_ops), text);
         assert!(compress.len() < orig_enc.len(), "compression did not help: {} >= {}", compress.len(), nrs.len())
     }
 

@@ -48,7 +48,7 @@ pub fn execute(
         }
         i += 1;
     }
-    Ok(stack.pop().unwrap_or_else(|| Value::None))
+    Ok(stack.pop().unwrap_or(Value::None))
 
     //TODO @mark: TEMPORARY! REMOVE THIS!
 

@@ -30,12 +30,12 @@ pub fn parse(src: &str) -> TildeRes<Prog> {
             tilde_log!("string literal (long mode): '{}'", &buffer);
             let op = Op::Text(buffer.clone());
             ops.push(op)
-        } else if (current >= '1' && current <= '9') || current == '.' || current == '-' {
+        } else if ('1'..='9').contains(&current) || current == '.' || current == '-' {
             // note that short-mode numbers start with 0, long-mode ones cannot
             buffer.clear();
             buffer.push(current);
             while let Some(token) = tokens.pop() {
-                if (token < '0' || token > '9') && token != '.' && current != '-' {
+                if !token.is_ascii_digit() && token != '.' && current != '-' {
                     tokens.push(token);
                     break;
                 }
@@ -45,7 +45,7 @@ pub fn parse(src: &str) -> TildeRes<Prog> {
             let op = Op::Number(
                 buffer
                     .parse::<f64>()
-                    .map_err(|err| format!("invalid number '{}', err {}", buffer, err))?,
+                    .map_err(|err| format!("invalid number '{buffer}', err {err}"))?,
             );
             ops.push(op)
         } else if current.is_alphabetic() || current == '-' {
