@@ -19,33 +19,33 @@ fn main() {
 fn generate_base_dict_code(base_dict_entries: &[&str]) -> String {
     let mut init_buffer = String::with_capacity(base_dict_entries.len() * 16);
     let mut cost_buffer = String::new();
-    write!(init_buffer, "pub const DICT: [DictEntry; {}] = [\n", base_dict_entries.len()).unwrap();
-    for (pos, entry) in base_dict_entries.into_iter().enumerate() {
+    writeln!(init_buffer, "pub const DICT: [DictEntry; {}] = [", base_dict_entries.len()).unwrap();
+    for (pos, entry) in base_dict_entries.iter().enumerate() {
         let cost = encode_snippet_len_estimate(pos.try_into().unwrap());
         let creator = match *entry {
             "$magic-backspace$" => {
-                write!(cost_buffer, "\t\t\tDictEntry::Backspace => {cost},\n").unwrap();
+                writeln!(cost_buffer, "\t\t\tDictEntry::Backspace => {cost},").unwrap();
                 "DictEntry::Backspace".to_owned()
             },
             "$magic-backspace-front$" => {
-                write!(cost_buffer, "\t\t\tDictEntry::BackspaceFront => {cost},\n").unwrap();
+                writeln!(cost_buffer, "\t\t\tDictEntry::BackspaceFront => {cost},").unwrap();
                 "DictEntry::BackspaceFront".to_owned()
             },
             "$magic-newline$" => format!("s(\"\\n\",{cost})"),
             "$magic-capitalize-first$" => {
-                write!(cost_buffer, "\t\t\tDictEntry::CapitalizeFirst => {cost},\n").unwrap();
+                writeln!(cost_buffer, "\t\t\tDictEntry::CapitalizeFirst => {cost},").unwrap();
                 "DictEntry::CapitalizeFirst".to_owned()
             },
             "$magic-capitalize-all$" => {
-                write!(cost_buffer, "\t\t\tDictEntry::CapitalizeAll => {cost},\n").unwrap();
+                writeln!(cost_buffer, "\t\t\tDictEntry::CapitalizeAll => {cost},").unwrap();
                 "DictEntry::CapitalizeAll".to_owned()
             },
             "$magic-reverse$" => {
-                write!(cost_buffer, "\t\t\tDictEntry::Reverse => {cost},\n").unwrap();
+                writeln!(cost_buffer, "\t\t\tDictEntry::Reverse => {cost},").unwrap();
                 "DictEntry::Reverse".to_owned()
             },
             "$magic-unicode$" => {
-                write!(cost_buffer, "\t\t\tDictEntry::UnicodeLookup => {cost},\n").unwrap();
+                writeln!(cost_buffer, "\t\t\tDictEntry::UnicodeLookup => {cost},").unwrap();
                 "DictEntry::UnicodeLookup".to_owned()
             },
             "\"" => format!("s(\"\\\"\",{cost})"),
@@ -56,10 +56,10 @@ fn generate_base_dict_code(base_dict_entries: &[&str]) -> String {
                 format!("s(\"{entry}\",{cost})")
             },
         };
-        write!(init_buffer, "\t{creator},\n").unwrap();
+        writeln!(init_buffer, "\t{creator},").unwrap();
     }
     write!(init_buffer, "];\n\n").unwrap();
-    write!(init_buffer, "impl DictEntry {{\n\tpub fn cost(&self) -> Cost {{\n\t\tmatch self {{\n\t\t\tDictEntry::Snippet {{ cost, .. }} => *cost,\n{cost_buffer}\t\t}}\n\t}}\n}}\n\n").unwrap();
+    writeln!(init_buffer, "impl DictEntry {{\n\tpub fn cost(&self) -> Cost {{\n\t\tmatch self {{\n\t\t\tDictEntry::Snippet {{ cost, .. }} => *cost,\n{cost_buffer}\t\t}}\n\t}}\n}}\n").unwrap();
     init_buffer
 }
 

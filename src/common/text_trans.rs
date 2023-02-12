@@ -49,7 +49,7 @@ impl TextTransformation {
         match input {
             SnipOrChar::Snip(text) => self.apply_str(text),
             SnipOrChar::Char(letter) => CowDictStr::Owned(self.apply_char(letter)
-                .map_or_else(|| DictStr::empty(), |c| DictStr::from_char(c))),
+                .map_or_else(DictStr::empty, DictStr::from_char)),
         }
     }
 
@@ -61,7 +61,7 @@ impl TextTransformation {
         if self.case_all || self.case_first {
             switch_capitalization_char(&mut letter);
         }
-        return Some(letter)
+        Some(letter)
     }
 
     pub fn apply_str(&self, input: &'static str) -> CowDictStr {
@@ -185,12 +185,11 @@ fn switch_capitalization_char(orig_first: &mut char) {
         None => {}
     };
     let mut lower = orig_first.to_lowercase();
-    match lower.nth(0) {
+    match lower.next() {
         Some(switch_first) => {
             if switch_first != *orig_first {
                 assert!(lower.nth(1).is_none(), "multi-char lowercase representations not yet supported"); //TODO @mark
                 *orig_first = switch_first;
-                return;
             }
         }
         None => {}
@@ -403,7 +402,7 @@ mod cost {
             let token_cost = tt.operation_indices().into_iter()
                 .map(|ix| DICT.get(ix as usize).unwrap().cost())
                 .sum();
-            assert_eq!(tt.cost(), token_cost, "wrong cost for {:?}", tt);
+            assert_eq!(tt.cost(), token_cost, "wrong cost for {tt:?}");
         }
     }
 

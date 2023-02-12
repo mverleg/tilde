@@ -13,8 +13,8 @@ pub fn encode_snippet_len_estimate(nr: u64) -> usize {
         let block_extra = non_close_letter_cnt_doubled / 2;
         length += block_extra + 1;
         let div = follow_1n * follow_2n.pow(block_extra as u32);
-        rem = rem / div;
+        rem /= div;
         non_close_letter_cnt_doubled += 1;
     }
-    return length;
+    length
 }
