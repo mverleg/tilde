@@ -162,7 +162,7 @@ fn collect_cheapest_result(text: &str, minimums: &[BestSoFar]) -> Vec<DictIx> {
     let mut numbers = Vec::new();
     while i < text.len() {
         debug_assert!(minimums[i].cost_from < CostSum::MAX, "index {i} or later one not updated");
-        numbers.extend(&minimums[i].compressed_nr);
+        numbers.extend(minimums[i].compressed_nr);
         i += minimums[i].snippet_len as usize;
     }
     numbers
