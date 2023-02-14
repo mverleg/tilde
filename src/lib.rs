@@ -134,7 +134,7 @@ pub fn tilde_analyze(source: &str) -> TildeRes<String> {
 let prog = parse(source)?;
     let unsafe_long_code = prog.long_code();
     let golf_code = prog.golf_code();
-    let base64_code = prog.golf_code();
+    let base64_code = prog.golf_code_b64();
     debug_assert!(is_safe_for_string(&golf_code), "golf code should never contain double quotes or trailing backslashes");
     debug_assert!(is_safe_for_string(&base64_code), "base64 code should never contain double quotes or trailing backslashes");
     let safe_long_code = escape_for_string(unsafe_long_code);

@@ -5,6 +5,7 @@ use ::std::vec;
 
 use crate::op::Op;
 use crate::op::typ::Typ;
+use crate::TildeRes;
 
 #[derive(Debug, PartialEq)]
 pub struct Prog {
@@ -52,11 +53,19 @@ impl Prog {
         code
     }
 
-    pub fn golf_code(&self) -> String {
+    pub fn golf_code(&self) -> TildeRes<String> {
         let mut code = String::with_capacity(self.ops.len() * 4);
         for op in &self.ops {
-            write!(code, "{}", op.golf_code().as_ref()).unwrap()  //TODO @mverleg:
+            for letter in op.golf_code()? {
+                write!(code, "{}", letter.symbol()).unwrap()
+            }
         }
-        code
+        Ok(code)
+    }
+
+    //TODO @mark: prevent generating golfed code twice (b64 and 'normal')
+    pub fn golf_code_b64(&self) -> TildeRes<String> {
+        //TODO @mark
+        Ok("todo-golf-text-b64".to_owned())
     }
 }
