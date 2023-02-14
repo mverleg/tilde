@@ -54,8 +54,8 @@ impl Prog {
         code
     }
 
-    pub fn golf_code(&self) -> TildeRes<String> {
-        let mut code = String::with_capacity(self.ops.len() * 4);
+    fn golf_letters(&self) -> TildeRes<Vec<Letter>> {
+        //TODO @mark: cache?
         let mut letters = Vec::with_capacity(self.ops.len() * 4);
         for op in &self.ops {
             letters.extend(op.golf_code()?)
@@ -64,13 +64,21 @@ impl Prog {
         if letters.last() == Some(&Letter::Text) {
             letters.pop();
         }
-        for letter in letters {
+        Ok(letters)
+    }
+
+    pub fn golf_len(&self) -> TildeRes<usize> {
+        Ok((self.golf_letters()?.len() + 1) / 2)
+    }
+
+    pub fn golf_code(&self) -> TildeRes<String> {
+        let mut code = String::with_capacity(self.ops.len() * 4);
+        for letter in self.golf_letters()? {
             write!(code, "{}", letter.symbol()).unwrap()
         }
         Ok(code)
     }
 
-    //TODO @mark: prevent generating golfed code twice (b64 and 'normal')
     pub fn golf_code_b64(&self) -> TildeRes<String> {
         //TODO @mark
         Ok("todo-golf-text-b64".to_owned())
