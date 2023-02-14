@@ -62,6 +62,7 @@ jobs:
                   echo "found changes in $changed_file but not recognized as a dependency file"
               fi
           done <<< "$(git diff --name-only HEAD "$basecmt")"
+          echo "::notice No dependency check needed"
       - name: Log
         if: ${{ steps.is_changed.outputs.IS_CHANGED == '1' }}
         run: |
