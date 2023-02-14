@@ -2,6 +2,7 @@ use ::std::fmt::Write;
 use ::std::ops::Index;
 pub use ::std::slice;
 use ::std::vec;
+use crate::compile::Letter;
 
 use crate::op::Op;
 use crate::op::typ::Typ;
@@ -55,10 +56,16 @@ impl Prog {
 
     pub fn golf_code(&self) -> TildeRes<String> {
         let mut code = String::with_capacity(self.ops.len() * 4);
+        let mut letters = Vec::with_capacity(self.ops.len() * 4);
         for op in &self.ops {
-            for letter in op.golf_code()? {
-                write!(code, "{}", letter.symbol()).unwrap()
-            }
+            letters.extend(op.golf_code()?)
+        }
+        //TODO @mark: make a minify function with more tricks
+        if letters.last() == Some(&Letter::Text) {
+            letters.pop();
+        }
+        for letter in letters {
+            write!(code, "{}", letter.symbol()).unwrap()
         }
         Ok(code)
     }
