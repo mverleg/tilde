@@ -30,8 +30,8 @@ jobs:
           file: ./ci/test-lint.Dockerfile
           context: .
           build-args: |
-            STRICT=${{ STRICT }}
-            TEST=${{ TEST }}
-            LINT=${{ LINT }}
-            FMT=${{ FMT }}
+            STRICT=${ STRICT }
+            TEST=${ TEST }
+            LINT=${ LINT }
+            FMT=${ FMT }
           push: false
