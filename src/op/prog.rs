@@ -80,7 +80,18 @@ impl Prog {
     }
 
     pub fn golf_code_b64(&self) -> TildeRes<String> {
-        //TODO @mark
+        let mut bytes = Vec::with_capacity(self.ops.len() * 4);
+        let letters = self.golf_letters()?;
+        let mut i = 0;
+        while i + 1 < letters.len() {
+            bytes.push(16 * letters[i].nr() + letters[i + 1].nr());
+            i += 2;
+        }
+        if i < letters.len() {
+            bytes.push(16 * letters[i].nr())
+            //TODO @mark: need to to something to make the last letter not interpreted (or no-op)
+        }
+        //TODO @mark: bas64
         Ok("todo-golf-text-b64".to_owned())
     }
 }
