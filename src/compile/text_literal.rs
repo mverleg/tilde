@@ -14,8 +14,8 @@ use crate::compile::var_uint::DecodeError;
 use crate::compile::var_uint::DecodeError::TooLarge;
 use crate::compile::var_uint::encode_uint_allow_modifiers;
 use crate::compile::var_uint::encode_uint_no_modifier_at_start;
-use crate::dict::{DictIx, lookup_buffer};
-use crate::NR;
+use crate::dict::{compress_with_dict, DictIx, lookup_buffer};
+use crate::{NR, TildeRes};
 use crate::op::Op;
 use crate::tilde_log;
 use crate::UINT;
@@ -67,6 +67,11 @@ pub fn decode_uint_vec(letters: &[Letter]) -> Result<(Pos<Vec<UINT>>, Closer), D
         value: buffer,
         length: closer.length,
     }, closer.value))
+}
+
+pub fn encode_str(text: &str) -> TildeRes<Vec<Letter>> {
+    let compress_ops = &compress_with_dict(&text);
+    Ok(encode_uint_vec(compress_ops, Closer::Text))
 }
 
 //TODO @mark: buffer version used?

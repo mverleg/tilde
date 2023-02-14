@@ -3,7 +3,10 @@ use ::std::borrow::Cow;
 use ::strum_macros::EnumIter;
 
 use crate::common::escape_for_string;
+use crate::compile::{encode_str, Letter};
+use crate::dict::compress_with_dict;
 use crate::op::typ::Typ;
+use crate::TildeRes;
 
 #[derive(Debug, Clone, PartialEq, EnumIter)]
 pub enum Op {
@@ -83,10 +86,10 @@ impl Op {
         }
     }
 
-    pub fn gold_code(&self) -> Cow<str> {
+    pub fn golf_code(&self) -> TildeRes<Vec<Letter>> {
         match self {
-            Op::Text(text) => Cow::Owned(format!("todo-golf-text:{text}")),
-            Op::Number(number) => Cow::Owned(format!("todo-golf-number:{number}")),
+            Op::Text(text) => encode_str(text),
+            Op::Number(number) => todo!(),
             _ => todo!("impl long code"),
         }
     }

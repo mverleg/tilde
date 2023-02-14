@@ -55,7 +55,7 @@ impl Prog {
     pub fn golf_code(&self) -> String {
         let mut code = String::with_capacity(self.ops.len() * 4);
         for op in &self.ops {
-            write!(code, "{}", op.gold_code().as_ref()).unwrap()  //TODO @mverleg:
+            write!(code, "{}", op.golf_code().as_ref()).unwrap()  //TODO @mverleg:
         }
         code
     }
