@@ -1,8 +1,8 @@
+use ::std::array::IntoIter;
 use ::std::fmt;
 use ::std::fmt::Formatter;
 use ::std::hash::Hash;
 use ::std::hash::Hasher;
-use ::std::array::IntoIter;
 
 //TODO @mark: meaningful names
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -165,7 +165,7 @@ impl LetterKind {
 #[cfg(test)]
 mod tests {
     use ::std::collections::HashSet;
-    use std::intrinsics::variant_count;
+    use ::std::mem::variant_count;
 
     use super::*;
 

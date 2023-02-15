@@ -1,4 +1,5 @@
 use ::std::borrow::Cow;
+use ::std::array::IntoIter;
 
 use crate::common::escape_for_string;
 use crate::compile::{encode_str, Letter};
@@ -6,7 +7,7 @@ use crate::dict::compress_with_dict;
 use crate::op::typ::Typ;
 use crate::TildeRes;
 
-#[derive(Debug, Clone, PartialEq, EnumIter)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Op {
     // Value
     Text(String),
@@ -76,6 +77,35 @@ impl Op {
         }
     }
 
+    pub fn iter() -> IntoIter<Op, 23> {
+        use self::Op::*;
+        [
+            Text("".to_owned()),
+            Number(0.0),
+            Neg,
+            Abs,
+            Incr,
+            Decr,
+            Plus,
+            Minus,
+            Mul,
+            Div,
+            IntDiv,
+            Mod,
+            Eq,
+            Neq,
+            Gt,
+            Gte,
+            Lt,
+            Lte,
+            And,
+            Or,
+            Nand,
+            Xor,
+            Impl,
+        ].into_iter()
+    }
+
     pub fn long_code(&self) -> Cow<str> {
         match self {
             Op::Text(text) => Cow::Owned(format!("\"{}\"", escape_for_string(text))),
@@ -95,7 +125,14 @@ impl Op {
 
 #[cfg(test)]
 mod tests {
+    use ::std::mem::variant_count;
+
     use super::*;
+
+    #[test]
+    fn iter_is_complete() {
+        assert_eq!(Op::iter().count(), variant_count::<Op>());
+    }
 
     #[test]
     fn ops_iterable() {

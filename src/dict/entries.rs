@@ -5,15 +5,15 @@
 //TODO @mark: maybe a reverse operation?
 
 use ::std::iter::FlatMap;
-use ::std::option::IntoIter;
 use ::std::slice::Iter;
+use ::std::array::IntoIter;
 
 use crate::common::TextTransformation;
 
 pub type Cost = u8;
 pub type DictIx = u16;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EnumIter)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum DictEntry {
     Snippet { snip: &'static str, capitalize_next: bool, cost: Cost },
     Backspace,
@@ -22,6 +22,20 @@ pub enum DictEntry {
     CapitalizeAll,
     Reverse,
     UnicodeLookup,
+}
+
+impl DictEntry {
+    pub fn iter_specials() -> IntoIter<DictEntry, 6> {
+        use self::DictEntry::*;
+        [
+            Backspace,
+            BackspaceFront,
+            CapitalizeFirst,
+            CapitalizeAll,
+            Reverse,
+            UnicodeLookup,
+        ].into_iter()
+    }
 }
 
 #[inline]
@@ -83,6 +97,7 @@ If you've cheated the guy in the glass.
 #[cfg(test)]
 mod dict_properties {
     use ::std::collections::HashSet;
+    use std::mem::variant_count;
 
     use super::*;
 
@@ -117,14 +132,16 @@ mod dict_properties {
     }
 
     #[test]
+    fn letter_iter_is_complete() {
+        assert_eq!(DictEntry::iter_specials().count(), variant_count::<DictEntry>() - 1);
+    }
+
+    #[test]
     fn all_specials_encountered() {
         let seen = DICT.iter()
             .filter(|entry| !matches!(entry, DictEntry::Snippet { .. }))
             .collect::<HashSet<_>>();
-        for expect in DictEntry::iter() {
-            if matches!(expect, DictEntry::Snippet { .. }) {
-                continue;
-            }
+        for expect in DictEntry::iter_specials() {
             assert!(seen.contains(&expect), "expected in dict: {expect:?}");
         }
     }
