@@ -1,3 +1,5 @@
+pub use self::base64::b64_decode;
+pub use self::base64::b64_encode;
 pub use self::escape_str::escape_for_string;
 pub use self::escape_str::is_safe_for_string;
 pub use self::log::log;
@@ -12,3 +14,4 @@ mod text_trans;
 mod tiny_map;
 mod escape_str;
 mod base64;
+

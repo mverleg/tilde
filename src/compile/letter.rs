@@ -45,6 +45,37 @@ pub enum LetterKind {
 }
 
 impl Letter {
+    fn all_ordered() -> [Letter; 16] {
+        use self::Letter::*;
+        [
+            Io,
+            Seq,
+            More,
+            Plus,
+            Asterisk,
+            Slash,
+            Right,
+            Bracket,
+            Colon,
+            Hat,
+            Exclamation,
+            Question,
+            Hash,
+            Tilde,
+            Number,
+            Text,
+        ]
+    }
+
+    pub fn iter() -> IntoIter<Letter, 16> {
+        Self::all_ordered().into_iter()
+    }
+
+    pub fn from_nr(nr: u8) -> Letter {
+        //TODO @mark: is this fast? hard-code?
+        *Self::all_ordered().get(nr as usize).expect("there are 16 letters to nr must be between 0 and 15 inclusive")
+    }
+
     pub fn nr(&self) -> u8 {
         use self::Letter::*;
         match self {
@@ -68,28 +99,6 @@ impl Letter {
             Number => 14,
             Text => 15,
         }
-    }
-
-    pub fn iter() -> IntoIter<Letter, 16> {
-        use self::Letter::*;
-        [
-            Io,
-            Seq,
-            More,
-            Plus,
-            Asterisk,
-            Slash,
-            Right,
-            Bracket,
-            Colon,
-            Hat,
-            Exclamation,
-            Question,
-            Hash,
-            Tilde,
-            Number,
-            Text,
-        ].into_iter()
     }
 
     pub fn symbol(&self) -> char {

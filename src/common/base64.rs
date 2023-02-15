@@ -1,10 +1,12 @@
 use ::std::str::from_utf8;
+
+use ::base64::Engine;
 use ::base64::engine::general_purpose::URL_SAFE_NO_PAD;
 
 use crate::{tilde_log, TildeRes};
 use crate::compile::Letter;
 
-pub fn b64_encode(source: Vec<Letter>) -> TildeRes<Vec<Letter>> {
+pub fn b64_encode(source: Vec<Letter>) -> TildeRes<String> {
     let mut bytes = Vec::with_capacity(source.len() * 4);
     let letters = source;
     let mut i = 0;
@@ -20,11 +22,8 @@ pub fn b64_encode(source: Vec<Letter>) -> TildeRes<Vec<Letter>> {
 }
 
 pub fn b64_decode(base64_source: &str) -> TildeRes<Vec<Letter>> {
-    let Some(src_bytes) = URL_SAFE_NO_PAD.decode(base64_source) else {
+    let Ok(src_bytes) = URL_SAFE_NO_PAD.decode(base64_source) else {
         return Err("base64 encoding not valid, alphabet should be A-Za-z0-9-_ without padding".to_string());
     };
-    let Ok(src) = from_utf8(&src_bytes) else {
-        tilde_log!("base64 decoded bytes: {:?}", &src_bytes);
-        return Err("source is not valid utf8 after base64-decoding; should contain valid, golfed tilde input, which is ascii".to_string())
-    };
+    todo!()
 }

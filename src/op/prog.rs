@@ -6,6 +6,7 @@ use ::std::vec;
 use ::base64::Engine;
 use ::base64::engine::general_purpose::URL_SAFE_NO_PAD;
 
+use crate::common::b64_encode;
 use crate::compile::Letter;
 use crate::op::Op;
 use crate::op::typ::Typ;
@@ -83,18 +84,6 @@ impl Prog {
     }
 
     pub fn golf_code_b64(&self) -> TildeRes<String> {
-        let mut bytes = Vec::with_capacity(self.ops.len() * 4);
-        let letters = self.golf_letters()?;
-        let mut i = 0;
-        while i + 1 < letters.len() {
-            bytes.push(16 * letters[i].nr() + letters[i + 1].nr());
-            i += 2;
-        }
-        if i < letters.len() {
-            bytes.push(16 * letters[i].nr())
-            //TODO @mark: need to to something to make the last letter not interpreted (or no-op)
-        }
-        eprintln!("{:?} bytes: {:?}", self.golf_letters(), bytes);  //TODO @mark: TEMPORARY! REMOVE THIS!
-        Ok(URL_SAFE_NO_PAD.encode(bytes))
+        b64_encode(self.golf_letters()?)
     }
 }
