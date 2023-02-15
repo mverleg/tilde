@@ -2,8 +2,11 @@ use ::std::fmt::Write;
 use ::std::ops::Index;
 pub use ::std::slice;
 use ::std::vec;
-use crate::compile::Letter;
 
+use ::base64::Engine;
+use ::base64::engine::general_purpose::URL_SAFE_NO_PAD;
+
+use crate::compile::Letter;
 use crate::op::Op;
 use crate::op::typ::Typ;
 use crate::TildeRes;
@@ -91,7 +94,7 @@ impl Prog {
             bytes.push(16 * letters[i].nr())
             //TODO @mark: need to to something to make the last letter not interpreted (or no-op)
         }
-        //TODO @mark: bas64
-        Ok("todo-golf-text-b64".to_owned())
+        eprintln!("{:?} bytes: {:?}", self.golf_letters(), bytes);  //TODO @mark: TEMPORARY! REMOVE THIS!
+        Ok(URL_SAFE_NO_PAD.encode(bytes))
     }
 }
