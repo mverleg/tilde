@@ -11,3 +11,4 @@ mod log;
 mod text_trans;
 mod tiny_map;
 mod escape_str;
+mod base64;

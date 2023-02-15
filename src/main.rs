@@ -73,6 +73,7 @@ fn parse_operation(mut args: Vec<String>) -> ArgParseRes {
             let src = match URL_SAFE_NO_PAD.decode(b64src) {
                 Ok(src_bytes) => {
                     let Ok(src) = from_utf8(&src_bytes) else {
+                        tilde_log!("base64 decoded bytes: {:?}", &src_bytes);
                         return Err("source is not valid utf8 after base64-decoding; should contain valid, golfed tilde input, which is ascii".to_string())
                     };
                     src.to_owned()
