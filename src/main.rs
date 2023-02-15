@@ -7,7 +7,6 @@ use ::std::process::ExitCode;
 use ::std::str::from_utf8;
 use ::base64::Engine;
 use ::base64::engine::general_purpose::URL_SAFE_NO_PAD;
-use ::base64::prelude::BASE64_URL_SAFE_NO_PAD;
 
 use ::tilde::CliOperation;
 use ::tilde::run_tilde;
@@ -71,11 +70,15 @@ fn parse_operation(mut args: Vec<String>) -> ArgParseRes {
                 return Err("argument --base64source expects a single argument containing base64-encoded source code".to_string())
             };
             tilde_log!("getting base64 source from command line (length in bytes: {})", b64src.len());
-            let src_bytes = URL_SAFE_NO_PAD.decode(b64src)
-                .map_err(|_| Err("base64 encoding not valid, alphabet should be A-Za-z0-9-_ without padding".to_string()))?;
-            let src = from_utf8(src_bytes)
-                .map_err(|_| Err("source is not valid utf8 after base64-decoding; should contain valid, golfed tilde input, which is ascii".to_string()))?
-                .to_owned();
+            let src = match URL_SAFE_NO_PAD.decode(b64src) {
+                Ok(src_bytes) => {
+                    let Ok(src) = from_utf8(&src_bytes) else {
+                        return Err("source is not valid utf8 after base64-decoding; should contain valid, golfed tilde input, which is ascii".to_string())
+                    };
+                    src.to_owned()
+                },
+                Result::Err(_) => return Err("base64 encoding not valid, alphabet should be A-Za-z0-9-_ without padding".to_string()),
+            };
             Lib(CliOperation::Run(src))
         },
         Some("-F") | Some("--analyze-file") => {
