@@ -1,7 +1,5 @@
 use ::std::borrow::Cow;
 
-use ::strum_macros::EnumIter;
-
 use crate::common::escape_for_string;
 use crate::compile::{encode_str, Letter};
 use crate::dict::compress_with_dict;
@@ -97,8 +95,6 @@ impl Op {
 
 #[cfg(test)]
 mod tests {
-    use ::strum::IntoEnumIterator;
-
     use super::*;
 
     #[test]

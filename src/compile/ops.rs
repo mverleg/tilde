@@ -34,8 +34,6 @@ pub fn lookup_op_name(op_name: &str) -> Option<Op> {
 
 #[cfg(test)]
 mod tests {
-    use ::strum::IntoEnumIterator;
-
     use super::*;
 
     #[test]

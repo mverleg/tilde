@@ -2,11 +2,10 @@ use ::std::fmt;
 use ::std::fmt::Formatter;
 use ::std::hash::Hash;
 use ::std::hash::Hasher;
-
-use ::strum_macros::EnumIter;
+use ::std::array::IntoIter;
 
 //TODO @mark: meaningful names
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EnumIter)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Letter {
     // Fixed
     Io,
@@ -33,7 +32,7 @@ pub enum Letter {
     Text,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EnumIter)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum LetterKind {
     /// Special letter that starts a number or text literal.
     Literal,
@@ -69,6 +68,28 @@ impl Letter {
             Number => 14,
             Text => 15,
         }
+    }
+
+    pub fn iter() -> IntoIter<Letter, 16> {
+        use self::Letter::*;
+        [
+            Io,
+            Seq,
+            More,
+            Plus,
+            Asterisk,
+            Slash,
+            Right,
+            Bracket,
+            Colon,
+            Hat,
+            Exclamation,
+            Question,
+            Hash,
+            Tilde,
+            Number,
+            Text,
+        ].into_iter()
     }
 
     pub fn symbol(&self) -> char {
@@ -129,13 +150,34 @@ impl Letter {
     }
 }
 
+impl LetterKind {
+    pub fn iter() -> IntoIter<LetterKind, 4> {
+        use self::LetterKind::*;
+        [
+            Literal,
+            VariableOpen,
+            FixedOpen,
+            Modifier,
+        ].into_iter()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use ::std::collections::HashSet;
-
-    use ::strum::IntoEnumIterator;
+    use std::intrinsics::variant_count;
 
     use super::*;
+
+    #[test]
+    fn letter_iter_is_complete() {
+        assert_eq!(Letter::iter().count(), variant_count::<Letter>());
+    }
+
+    #[test]
+    fn letter_kind_iter_is_complete() {
+        assert_eq!(LetterKind::iter().count(), variant_count::<LetterKind>());
+    }
 
     #[test]
     fn unique_nr() {

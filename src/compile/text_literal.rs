@@ -3,8 +3,6 @@ use ::std::fmt;
 use ::std::fmt::Formatter;
 use ::std::iter::Iterator;
 
-use ::strum::IntoEnumIterator;
-
 use crate::compile::letter::Letter;
 use crate::compile::letter::Letter::*;
 use crate::compile::parse::Pos;

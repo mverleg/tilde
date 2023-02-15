@@ -304,8 +304,6 @@ mod indices_in_sync_with_dict {
     use ::std::cell::LazyCell;
     use ::std::collections::HashMap;
 
-    use ::strum::IntoEnumIterator;
-
     use crate::dict::DICT;
     use crate::dict::DictEntry;
 

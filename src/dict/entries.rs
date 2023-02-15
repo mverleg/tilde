@@ -8,8 +8,6 @@ use ::std::iter::FlatMap;
 use ::std::option::IntoIter;
 use ::std::slice::Iter;
 
-use ::strum_macros::EnumIter;
-
 use crate::common::TextTransformation;
 
 pub type Cost = u8;
@@ -85,8 +83,6 @@ If you've cheated the guy in the glass.
 #[cfg(test)]
 mod dict_properties {
     use ::std::collections::HashSet;
-
-    use ::strum::IntoEnumIterator;
 
     use super::*;
 

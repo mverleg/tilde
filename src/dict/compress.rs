@@ -9,8 +9,6 @@ use ::std::slice::Iter;
 use ::std::sync::LazyLock;
 use ::std::time::Instant;
 
-use ::strum::IntoEnumIterator;
-use ::strum_macros::EnumIter;
 use ::tinyvec::ArrayVec;
 
 use crate::common::UNICODE_MAGIC_INDX;

@@ -4,6 +4,7 @@
 #![feature(hasher_prefixfree_extras)]
 #![feature(iter_intersperse)]
 #![allow(unused)] //TODO @mark: TEMPORARY! REMOVE THIS!
+#![feature(core_intrinsics)]
 
 use ::std::env;
 use ::std::io;

@@ -1,8 +1,6 @@
 use ::std::fmt;
 use ::std::fmt::Formatter;
 
-use ::strum::IntoEnumIterator;
-
 use crate::compile::letter::Letter;
 use crate::compile::letter::Letter::*;
 use crate::compile::parse::Pos;
