@@ -47,6 +47,16 @@ mod tests {
     use super::*;
 
     #[test]
+    fn encoding_unchanged() {
+        use Letter::*;
+        let input = &[Slash, Colon, Asterisk, Hash, Hat, Number, Question, Text,
+            Slash, Right, Plus, More, Seq, Exclamation, Io, Hat, Seq, Bracket, Asterisk, Question,
+            Right, Plus, Tilde, Number, Hash, Exclamation, Tilde, Text, More, Colon, Io,];
+        let enc = b64_encode(input).unwrap();
+        assert_eq!(enc, "WEyev1YyGgkXS2Peyt8oAA");
+    }
+
+    #[test]
     fn encode_decode() {
         use Letter::*;
         let inputs: &[&[Letter]] = &[
