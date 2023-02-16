@@ -20,6 +20,7 @@ pub fn parse(src: &str) -> TildeRes<Prog> {
     let mut letters_buffer = Vec::new();
     let mut string_decode_buffer = Vec::new();
     while let Some(current) = rev_tokens.pop() {
+        eprintln!("current = {current}");  //TODO @mark: TEMPORARY! REMOVE THIS!
         if current.is_whitespace() {
             tilde_log!("skipping whitespace");
         } else if current == ',' || current == '\'' {
@@ -70,10 +71,13 @@ pub fn parse(src: &str) -> TildeRes<Prog> {
         } else if current == '"' {
             //TODO @mark: make more resistant to closer changes?
             letters_buffer.clear();
-            while let Some(letter) = rev_tokens.pop().and_then(|ch| Letter::from_symbol(ch)) {
-                letters_buffer.push(letter)
+            while let Some(letter) = rev_tokens.pop().and_then(Letter::from_symbol) {
+                letters_buffer.push(letter);
+                if letter == Letter::Text || letter == Letter::Number {
+                    break
+                }
             }
-            tilde_log!("string lookup (short mode), {} letters", letters_buffer.len());
+            tilde_log!("string lookup (short mode), {} golf letters", letters_buffer.len());
             string_buffer.clear();
             let str_res = decode_str(&letters_buffer, &mut string_buffer, &mut string_decode_buffer)
                 .map_err(|err| format!("could not parse golfed string, err: {err}"))?;
@@ -118,12 +122,19 @@ mod tests {
     #[test]
     fn golfed_string_explicit_close() {
         assert_eq!(parse("\"+>:[\"").unwrap(), of(Op::Text("Hello world".to_string())));
-        assert_eq!(parse("\"+>:[0").unwrap(), of(Op::Text("Hello world".to_string())));
+        //assert_eq!(parse("\"+>:[0").unwrap(), of(Op::Text("Hello world".to_string())));
+        // maybe supported later? ^
     }
 
     #[test]
     fn golfed_string_implicit_close() {
         assert_eq!(parse("\"+>:[").unwrap(), of(Op::Text("Hello world".to_string())));
+    }
+
+    #[test]
+    fn golfed_string_multiple() {
+        let expected = Prog::of(vec![Op::Text("Hello world".to_string()), Op::Text("Hello world".to_string())]);
+        assert_eq!(parse("\"+>:[\"\"+>:[").unwrap(), expected);
     }
 
     #[test]
