@@ -1,7 +1,9 @@
 use ::std::env::current_exe;
 use ::std::fmt::Debug;
+use crate::compile::Letter;
 
 use crate::compile::ops::lookup_op_name;
+use crate::compile::text_literal::decode_str;
 use crate::op::Op;
 use crate::op::Prog;
 use crate::tilde_log;
@@ -14,43 +16,46 @@ pub fn parse(src: &str) -> TildeRes<Prog> {
         .collect::<Vec<_>>();
     tokens.reverse();
     tilde_log!("parsing {} tokens", tokens.len());
-    let mut buffer = String::new();
-    while let Some(current) = tokens.pop() {
+    let mut string_buffer = String::new();
+    let mut letters_buffer = Vec::new();
+    let mut string_decode_buffer = Vec::new();
+    for i in 0 .. tokens.len() {
+        let current = tokens[i];
         if current.is_whitespace() {
             tilde_log!("skipping whitespace");
         } else if current == ',' || current == '\'' {
-            buffer.clear();
+            string_buffer.clear();
             while let Some(token) = tokens.pop() {
                 if token == ',' || token == '\'' {
                     //TODO @mark: build a way to escape commas
                     break;
                 }
-                buffer.push(token)
+                string_buffer.push(token)
             }
-            tilde_log!("string literal (long mode): '{}'", &buffer);
-            let op = Op::Text(buffer.clone());
+            tilde_log!("string literal (long mode): '{}'", &string_buffer);
+            let op = Op::Text(string_buffer.clone());
             ops.push(op)
         } else if ('1'..='9').contains(&current) || current == '.' || current == '-' {
             // note that short-mode numbers start with 0, long-mode ones cannot
-            buffer.clear();
-            buffer.push(current);
+            string_buffer.clear();
+            string_buffer.push(current);
             while let Some(token) = tokens.pop() {
                 if !token.is_ascii_digit() && token != '.' && current != '-' {
                     tokens.push(token);
                     break;
                 }
-                buffer.push(token)
+                string_buffer.push(token)
             }
-            tilde_log!("integer literal (long mode): \"{}\"", &buffer);
+            tilde_log!("integer literal (long mode): \"{}\"", &string_buffer);
             let op = Op::Number(
-                buffer
+                string_buffer
                     .parse::<f64>()
-                    .map_err(|err| format!("invalid number '{buffer}', err {err}"))?,
+                    .map_err(|err| format!("invalid number '{string_buffer}', err {err}"))?,
             );
             ops.push(op)
         } else if current.is_alphabetic() || current == '-' {
-            buffer.clear();
-            buffer.push(current);
+            string_buffer.clear();
+            string_buffer.push(current);
             while let Some(token) = tokens.pop() {
                 if !token.is_alphabetic() && token != '-' {
                     if !current.is_whitespace() {
@@ -58,12 +63,24 @@ pub fn parse(src: &str) -> TildeRes<Prog> {
                     }
                     break;
                 }
-                buffer.push(token)
+                string_buffer.push(token)
             }
-            tilde_log!("operator by long name: \"{}\"", &buffer);
-            let op = lookup_op_name(&buffer).ok_or_else(|| format!("could not find an identifier by name '{}'", &buffer))?;
+            tilde_log!("operator by long name: \"{}\"", &string_buffer);
+            let op = lookup_op_name(&string_buffer).ok_or_else(|| format!("could not find an identifier by name '{}'", &string_buffer))?;
             ops.push(op)
         } else if current == '"' {
+            //TODO @mark: better way to collect tokens? no alloc, more resistant to closer changes?
+            for ch in &tokens[i..] {
+                let Some(letter) = Letter::from_symbol(*ch) else {
+                    return Err("found a non-golf token inside a golfed String".to_owned());  //TODO @mark: can this happen?
+                };
+                letters_buffer.push(letter);
+                if letter == Letter::Text || letters_buffer == Letter::Number {
+                    break
+                }
+            }
+            //.iter().map(|ch| Letter::from_nr(*nr)).take_while().collect();
+            let str_res = decode_str(&letters_buffer, &mut string_buffer, &mut string_decode_buffer);
             tilde_log!("string lookup (short mode)");
             todo!(); //TODO @mark: TEMPORARY! REMOVE THIS!
         } else {
