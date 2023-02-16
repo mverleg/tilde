@@ -19,8 +19,10 @@ pub fn parse(src: &str) -> TildeRes<Prog> {
     let mut string_buffer = String::new();
     let mut letters_buffer = Vec::new();
     let mut string_decode_buffer = Vec::new();
-    for i in 0 .. tokens.len() {
+    let mut i = 0;
+    while i < tokens.len() {
         let current = tokens[i];
+        eprintln!("token at {i} is {}", current);  //TODO @mark: TEMPORARY! REMOVE THIS!
         if current.is_whitespace() {
             tilde_log!("skipping whitespace");
         } else if current == ',' || current == '\'' {
@@ -70,22 +72,24 @@ pub fn parse(src: &str) -> TildeRes<Prog> {
             ops.push(op)
         } else if current == '"' {
             //TODO @mark: better way to collect tokens? no alloc, more resistant to closer changes?
+            tilde_log!("string lookup (short mode)");
             for ch in &tokens[i..] {
                 let Some(letter) = Letter::from_symbol(*ch) else {
                     return Err("found a non-golf token inside a golfed String".to_owned());  //TODO @mark: can this happen?
                 };
                 letters_buffer.push(letter);
-                if letter == Letter::Text || letters_buffer == Letter::Number {
+                if letter == Letter::Text || letter == Letter::Number {
                     break
                 }
             }
-            //.iter().map(|ch| Letter::from_nr(*nr)).take_while().collect();
-            let str_res = decode_str(&letters_buffer, &mut string_buffer, &mut string_decode_buffer);
-            tilde_log!("string lookup (short mode)");
-            todo!(); //TODO @mark: TEMPORARY! REMOVE THIS!
+            let str_res = decode_str(&letters_buffer, &mut string_buffer, &mut string_decode_buffer)
+                .map_err(|err| format!("could not parse golfed string, err: {err}"))?;
+            i += str_res.length;  // this is one too few because of opener, but will +1 at the end
+            ops.push(Op::Text(string_buffer.clone()))
         } else {
             todo!(); //TODO @mark: TEMPORARY! REMOVE THIS!
         }
+        i += 1;
     }
     Ok(Prog::of(ops))
 }
@@ -116,6 +120,17 @@ mod tests {
     fn long_string_implicit_close() {
         assert_eq!(parse(",hello world").unwrap(), of(Op::Text("hello world".to_string())));
         assert_eq!(parse("'hello world").unwrap(), of(Op::Text("hello world".to_string())));
+    }
+
+    #[test]
+    fn golfed_string_explicit_close() {
+        assert_eq!(parse("\"+>:[\"").unwrap(), of(Op::Text("Hello world".to_string())));
+        assert_eq!(parse("\"+>:[0").unwrap(), of(Op::Text("Hello world".to_string())));
+    }
+
+    #[test]
+    fn golfed_string_implicit_close() {
+        assert_eq!(parse("\"+>:[").unwrap(), of(Op::Text("Hello world".to_string())));
     }
 
     #[test]
