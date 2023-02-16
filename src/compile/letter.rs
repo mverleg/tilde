@@ -76,6 +76,33 @@ impl Letter {
         *Self::all_ordered().get(nr as usize).expect("there are 16 letters to nr must be between 0 and 15 inclusive")
     }
 
+    pub fn from_symbol(sym: char) -> Option<Letter> {
+        use self::Letter::*;
+        Some(match sym {
+            '0' => Number,
+            '"' => Text,
+
+            '$' => Io,
+            '%' => Seq,
+            '&' => More,
+
+            '+' => Plus,
+            '*' => Asterisk,
+            '/' => Slash,
+            '>' => Right,
+            '[' => Bracket,
+            ':' => Colon,
+
+            '^' => Hat,
+            '!' => Exclamation,
+            '?' => Question,
+            '#' => Hash,
+            '~' => Tilde,
+
+            _ => return None
+        })
+    }
+
     pub fn nr(&self) -> u8 {
         use self::Letter::*;
         match self {
@@ -200,6 +227,20 @@ mod tests {
     fn nr_follows_listing_order() {
         for (index, letter) in Letter::iter().enumerate() {
             assert_eq!(letter.nr() as usize, index)
+        }
+    }
+
+    #[test]
+    fn from_nr_and_to_nr_sync() {
+        for letter in Letter::iter() {
+            assert_eq!(letter, Letter::from_nr(letter.nr()))
+        }
+    }
+
+    #[test]
+    fn from_symbol_and_to_symbol_sync() {
+        for letter in Letter::iter() {
+            assert_eq!(letter, Letter::from_symbol(letter.symbol()).unwrap())
         }
     }
 
