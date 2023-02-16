@@ -11,23 +11,20 @@ use crate::TildeRes;
 
 pub fn parse(src: &str) -> TildeRes<Prog> {
     let mut ops = vec![];
-    let mut tokens = src
+    let mut rev_tokens = src
         .chars()
         .collect::<Vec<_>>();
-    tokens.reverse();
-    tilde_log!("parsing {} tokens", tokens.len());
+    rev_tokens.reverse();
+    tilde_log!("parsing {} tokens", rev_tokens.len());
     let mut string_buffer = String::new();
     let mut letters_buffer = Vec::new();
     let mut string_decode_buffer = Vec::new();
-    let mut i = 0;
-    while i < tokens.len() {
-        let current = tokens[i];
-        eprintln!("token at {i} is {}", current);  //TODO @mark: TEMPORARY! REMOVE THIS!
+    while let Some(current) = rev_tokens.pop() {
         if current.is_whitespace() {
             tilde_log!("skipping whitespace");
         } else if current == ',' || current == '\'' {
             string_buffer.clear();
-            while let Some(token) = tokens.pop() {
+            while let Some(token) = rev_tokens.pop() {
                 if token == ',' || token == '\'' {
                     //TODO @mark: build a way to escape commas
                     break;
@@ -41,9 +38,9 @@ pub fn parse(src: &str) -> TildeRes<Prog> {
             // note that short-mode numbers start with 0, long-mode ones cannot
             string_buffer.clear();
             string_buffer.push(current);
-            while let Some(token) = tokens.pop() {
+            while let Some(token) = rev_tokens.pop() {
                 if !token.is_ascii_digit() && token != '.' && current != '-' {
-                    tokens.push(token);
+                    rev_tokens.push(token);
                     break;
                 }
                 string_buffer.push(token)
@@ -58,10 +55,10 @@ pub fn parse(src: &str) -> TildeRes<Prog> {
         } else if current.is_alphabetic() || current == '-' {
             string_buffer.clear();
             string_buffer.push(current);
-            while let Some(token) = tokens.pop() {
+            while let Some(token) = rev_tokens.pop() {
                 if !token.is_alphabetic() && token != '-' {
                     if !current.is_whitespace() {
-                        tokens.push(token);
+                        rev_tokens.push(token);
                     }
                     break;
                 }
@@ -71,28 +68,21 @@ pub fn parse(src: &str) -> TildeRes<Prog> {
             let op = lookup_op_name(&string_buffer).ok_or_else(|| format!("could not find an identifier by name '{}'", &string_buffer))?;
             ops.push(op)
         } else if current == '"' {
-            //TODO @mark: better way to collect tokens? no alloc, more resistant to closer changes?
-            tilde_log!("string lookup (short mode)");
-            for ch in &tokens[i..] {
-                let Some(letter) = Letter::from_symbol(*ch) else {
-                    return Err("found a non-golf token inside a golfed String".to_owned());  //TODO @mark: can this happen?
-                };
-                letters_buffer.push(letter);
-                if letter == Letter::Text || letter == Letter::Number {
-                    break
-                }
+            //TODO @mark: make more resistant to closer changes?
+            letters_buffer.clear();
+            while let Some(letter) = rev_tokens.pop().and_then(|ch| Letter::from_symbol(ch)) {
+                letters_buffer.push(letter)
             }
+            tilde_log!("string lookup (short mode), {} letters", letters_buffer.len());
             string_buffer.clear();
             let str_res = decode_str(&letters_buffer, &mut string_buffer, &mut string_decode_buffer)
                 .map_err(|err| format!("could not parse golfed string, err: {err}"))?;
-            i += str_res.length;  // this is one too few because of opener, but will +1 at the end
             ops.push(Op::Text(string_buffer.clone()))
         } else if let Some(golf_letter) = Letter::from_symbol(current) {
             todo!(); //TODO @mark: TEMPORARY! REMOVE THIS!
         } else {
             return Err(format!("unrecognized: {current}"))
         }
-        i += 1;
     }
     Ok(Prog::of(ops))
 }
