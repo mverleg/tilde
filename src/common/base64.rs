@@ -15,8 +15,9 @@ pub fn b64_encode(source: Vec<Letter>) -> TildeRes<String> {
         i += 2;
     }
     if i < letters.len() {
-        bytes.push(16 * letters[i].nr())
-        //TODO @mark: need to to something to make the last letter not interpreted (or no-op)
+        let pad = Letter::Io;
+        debug_assert!(pad.kind() == LetterKind::FixedOpen);
+        bytes.push(16 * letters[i].nr() + pad)
     }
     Ok(URL_SAFE_NO_PAD.encode(bytes))
 }
@@ -31,8 +32,7 @@ pub fn b64_decode(base64_source: &str) -> TildeRes<Vec<Letter>> {
         letters.push(Letter::from_nr(byte / 16));
         letters.push(Letter::from_nr(byte % 16));
     }
-    if letters.last() == Some(&Letter::from_nr(0)) {
-        //TODO @mark: may need to be handled better, Letter0 could have meaning, see todo in encode
+    if letters.last().map(|pad| pad.kind() == LetterKind::FixedOpen).unwrap_or(false) {
         letters.pop();
     }
     Ok(letters)
