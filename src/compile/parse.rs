@@ -82,12 +82,15 @@ pub fn parse(src: &str) -> TildeRes<Prog> {
                     break
                 }
             }
+            string_buffer.clear();
             let str_res = decode_str(&letters_buffer, &mut string_buffer, &mut string_decode_buffer)
                 .map_err(|err| format!("could not parse golfed string, err: {err}"))?;
             i += str_res.length;  // this is one too few because of opener, but will +1 at the end
             ops.push(Op::Text(string_buffer.clone()))
-        } else {
+        } else if let Some(golf_letter) = Letter::from_symbol(current) {
             todo!(); //TODO @mark: TEMPORARY! REMOVE THIS!
+        } else {
+            return Err(format!("unrecognized: {current}"))
         }
         i += 1;
     }
