@@ -25,5 +25,12 @@ pub fn b64_decode(base64_source: &str) -> TildeRes<Vec<Letter>> {
     let Ok(src_bytes) = URL_SAFE_NO_PAD.decode(base64_source) else {
         return Err("base64 encoding not valid, alphabet should be A-Za-z0-9-_ without padding".to_string());
     };
-    todo!()
+    debug_assert!(src_bytes.len() % 2 == 0);
+    let mut letters = Vec::with_capacity(src_bytes.len() / 2);
+    for byte in src_bytes {
+        letters.push(Letter::from_nr(byte / 16));
+        letters.push(Letter::from_nr(byte % 16));
+    }
+    Ok(letters)
 }
+
