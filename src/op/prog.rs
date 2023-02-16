@@ -84,6 +84,6 @@ impl Prog {
     }
 
     pub fn golf_code_b64(&self) -> TildeRes<String> {
-        b64_encode(self.golf_letters()?)
+        b64_encode(&self.golf_letters()?)
     }
 }
