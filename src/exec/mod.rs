@@ -1,8 +1,8 @@
 use crate::common::log;
+use crate::compile::Prog;
 // use crate::exec::mathbool::exec_math1;
 // use crate::exec::mathbool::exec_math2;
 use crate::op::Op;
-use crate::op::Prog;
 use crate::TildeRes;
 
 pub use self::data::Array;

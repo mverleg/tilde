@@ -9,7 +9,6 @@ use ::base64::engine::general_purpose::URL_SAFE_NO_PAD;
 use crate::common::b64_encode;
 use crate::compile::Letter;
 use crate::op::Op;
-use crate::op::typ::Typ;
 use crate::TildeRes;
 
 #[derive(Debug, PartialEq)]

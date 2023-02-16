@@ -1,11 +1,11 @@
 use ::std::env::current_exe;
 use ::std::fmt::Debug;
-use crate::compile::Letter;
 
+use crate::compile::Letter;
 use crate::compile::ops::lookup_op_name;
+use crate::compile::Prog;
 use crate::compile::text_literal::decode_str;
 use crate::op::Op;
-use crate::op::Prog;
 use crate::tilde_log;
 use crate::TildeRes;
 
