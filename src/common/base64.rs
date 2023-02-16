@@ -31,6 +31,10 @@ pub fn b64_decode(base64_source: &str) -> TildeRes<Vec<Letter>> {
         letters.push(Letter::from_nr(byte / 16));
         letters.push(Letter::from_nr(byte % 16));
     }
+    if letters.last() == Some(&Letter::from_nr(0)) {
+        //TODO @mark: may need to be handled better, Letter0 could have meaning, see todo in encode
+        letters.pop();
+    }
     Ok(letters)
 }
 
