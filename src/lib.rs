@@ -46,7 +46,7 @@ pub fn tilde_gen_md_docs() -> TildeRes<()> {
 }
 
 pub type TildeRes<T> = Result<T, String>;
-pub type NR = f64;
+pub use crate::common::Nr;
 pub type UINT = u64;
 
 pub fn run_tilde(args: &TildeArgs) -> TildeRes<Value> {

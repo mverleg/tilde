@@ -4,14 +4,14 @@ use ::std::borrow::Cow;
 use crate::common::escape_for_string;
 use crate::compile::{encode_str, Letter};
 use crate::dict::compress_with_dict;
-use crate::NR;
+use crate::Nr;
 use crate::TildeRes;
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Op {
     // Value
     Text(String),
-    Number(NR),
+    Number(Nr),
     // TODO @mverleg: ^ change to something exact
 
     // Unary

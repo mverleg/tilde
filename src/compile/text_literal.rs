@@ -13,7 +13,7 @@ use crate::compile::var_uint::DecodeError::TooLarge;
 use crate::compile::var_uint::encode_uint_allow_modifiers;
 use crate::compile::var_uint::encode_uint_no_modifier_at_start;
 use crate::dict::{compress_with_dict, DictIx, lookup_buffer};
-use crate::{NR, TildeRes};
+use crate::{Nr, TildeRes};
 use crate::op::Op;
 use crate::tilde_log;
 use crate::UINT;

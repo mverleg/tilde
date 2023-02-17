@@ -1,6 +1,10 @@
 use ::std::cmp::Ordering;
 use ::std::hash;
 use ::std::hash::Hasher;
+use ::std::fmt;
+use ::std::fmt::Formatter;
+use ::std::num::ParseFloatError;
+use ::std::str::FromStr;
 
 #[derive(Debug, Clone, Copy)]
 pub struct Nr {
@@ -77,5 +81,19 @@ impl From<i32> for Nr {
 impl From<i64> for Nr {
     fn from(value: i64) -> Self {
         Self::new(value as f64)  // there is no TryInto
+    }
+}
+
+impl fmt::Display for Nr {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.value)
+    }
+}
+
+impl FromStr for Nr {
+    type Err = ParseFloatError;
+
+    fn from_str(text: &str) -> Result<Self, Self::Err> {
+        Ok(Nr::new(f64::from_str(text)?))
     }
 }

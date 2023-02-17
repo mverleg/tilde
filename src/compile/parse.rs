@@ -6,7 +6,7 @@ use crate::compile::ops::lookup_op_name;
 use crate::compile::Prog;
 use crate::compile::text_literal::decode_str;
 use crate::op::Op;
-use crate::tilde_log;
+use crate::{Nr, tilde_log};
 use crate::TildeRes;
 
 pub fn parse(src: &str) -> TildeRes<Prog> {
@@ -49,7 +49,7 @@ pub fn parse(src: &str) -> TildeRes<Prog> {
             tilde_log!("integer literal (long mode): \"{}\"", &string_buffer);
             let op = Op::Number(
                 string_buffer
-                    .parse::<f64>()
+                    .parse::<Nr>()
                     .map_err(|err| format!("invalid number '{string_buffer}', err {err}"))?,
             );
             ops.push(op)
