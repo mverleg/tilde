@@ -128,29 +128,29 @@ mod tests {
 
     #[test]
     fn golfed_string_implicit_close() {
-        assert_eq!(parse("\"+>:[").unwrap(), of(Op::Text("Hello world".to_string())));
+        assert_eq!(parse("\"+>:[").unwrap(), of(Op::text("Hello world")));
     }
 
     #[test]
     fn golfed_string_multiple() {
-        let expected = Prog::of(vec![Op::Text("Hello world".to_string()), Op::Text("Hello world".to_string())]);
+        let expected = Prog::of(vec![Op::text("Hello world"), Op::text("Hello world")]);
         assert_eq!(parse("\"+>:[\"\"+>:[").unwrap(), expected);
     }
 
     #[test]
     fn long_integer() {
-        assert_eq!(parse("123").unwrap(), of(Op::Number(123.)));
-        assert_eq!(parse("-123").unwrap(), of(Op::Number(-123.)));
+        assert_eq!(parse("123").unwrap(), of(Op::number(123)));
+        assert_eq!(parse("-123").unwrap(), of(Op::number(-123)));
     }
 
     #[test]
     fn long_float() {
-        assert_eq!(parse("1.23").unwrap(), of(Op::Number(1.23)));
-        assert_eq!(parse(".123").unwrap(), of(Op::Number(0.123)));
-        assert_eq!(parse("123.").unwrap(), of(Op::Number(123.)));
-        assert_eq!(parse("-1.23").unwrap(), of(Op::Number(-1.23)));
-        assert_eq!(parse("-.123").unwrap(), of(Op::Number(-0.123)));
-        assert_eq!(parse("-123.").unwrap(), of(Op::Number(-123.)));
+        assert_eq!(parse("1.23").unwrap(), of(Op::number(1.23)));
+        assert_eq!(parse(".123").unwrap(), of(Op::number(0.123)));
+        assert_eq!(parse("123.").unwrap(), of(Op::number(123.)));
+        assert_eq!(parse("-1.23").unwrap(), of(Op::number(-1.23)));
+        assert_eq!(parse("-.123").unwrap(), of(Op::number(-0.123)));
+        assert_eq!(parse("-123.").unwrap(), of(Op::number(-123.)));
     }
 
     #[test]
@@ -172,17 +172,17 @@ mod tests {
 
     #[test]
     fn split_on_whitespace() {
-        let op = Op::Number(1.23);
-        assert_eq!(parse("'hello' 1.0").unwrap(), Prog::of(vec![Op::Text("hello".to_string()), Op::Number(1.0)]));
-        assert_eq!(parse("div   1").unwrap(), Prog::of(vec![Op::Div, Op::Number(1.0)]),);
-        assert_eq!(parse("int-div1.0").unwrap(), Prog::of(vec![Op::IntDiv, Op::Number(1.0)]),);
+        let op = Op::number(1.23);
+        assert_eq!(parse("'hello' 1.0").unwrap(), Prog::of(vec![Op::text("hello"), Op::number(1.0)]));
+        assert_eq!(parse("div   1").unwrap(), Prog::of(vec![Op::Div, Op::number(1.0)]),);
+        assert_eq!(parse("int-div1.0").unwrap(), Prog::of(vec![Op::IntDiv, Op::number(1.0)]),);
     }
 
     #[test]
     fn allow_newlines() {
-        let op = Op::Number(1.23);
-        assert_eq!(parse("'hello'\n1.0").unwrap(), Prog::of(vec![Op::Text("hello".to_string()), Op::Number(1.0)]));
-        assert_eq!(parse("div\n1").unwrap(), Prog::of(vec![Op::Div, Op::Number(1.0)]),);
+        let op = Op::number(1.23);
+        assert_eq!(parse("'hello'\n1.0").unwrap(), Prog::of(vec![Op::text("hello"), Op::number(1.0)]));
+        assert_eq!(parse("div\n1").unwrap(), Prog::of(vec![Op::Div, Op::number(1.0)]),);
     }
 
     //TODO @mark: add some golfed testcases to existing tests, like whitespace ones

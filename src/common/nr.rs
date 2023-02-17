@@ -13,11 +13,20 @@ pub struct Nr {
 
 impl Nr {
     pub fn new(value: f64) -> Self {
-        if value.is_finite() {
-            Nr { value }
-        } else {
-            Nr { value: 0.0 }
+        if value == f64::INFINITY {
+            return Nr { value: f64::MAX }
         }
+        if value == f64::NEG_INFINITY {
+            return Nr { value: f64::MIN }
+        }
+        if value.is_nan() {
+            return Nr { value: 0.0 }
+        }
+        Nr { value }
+    }
+
+    pub fn zero() -> Self {
+        Nr { value: 0.0 }
     }
 }
 

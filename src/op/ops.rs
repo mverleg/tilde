@@ -45,6 +45,14 @@ pub enum Op {
 }
 
 impl Op {
+    pub fn text(txt: impl Into<String>) -> Self {
+        Op::Text(txt.into())
+    }
+
+    pub fn number(nr: impl Into<Nr>) -> Self {
+        Op::Number(nr.into())
+    }
+
     pub fn name(&self) -> &str {
         match self {
             Self::Text(_) => "text",
@@ -81,7 +89,7 @@ impl Op {
         use self::Op::*;
         [
             Text("".to_owned()),
-            Number(0.0),
+            Number(Nr::zero()),
             Neg,
             Abs,
             Incr,

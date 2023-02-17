@@ -1,5 +1,6 @@
 use ::std::fmt;
 use ::std::fmt::Formatter;
+use crate::Nr;
 
 #[derive(Debug, PartialEq)]
 pub enum Value {
@@ -49,15 +50,15 @@ impl From<Array> for Value {
 
 #[derive(Debug, PartialEq)]
 pub struct Number {
-    val: f64,
+    val: Nr,
 }
 
 impl Number {
-    pub fn of(val: f64) -> Self {
-        Number { val }
+    pub fn of(val: impl Into<Nr>) -> Self {
+        Number { val: val.into() }
     }
 
-    pub fn value(&self) -> f64 {
+    pub fn value(&self) -> Nr {
         self.val
     }
 }
