@@ -1,4 +1,3 @@
-use crate::common::log;
 use crate::compile::Prog;
 // use crate::exec::mathbool::exec_math1;
 // use crate::exec::mathbool::exec_math2;
@@ -16,7 +15,7 @@ mod data;
 
 pub fn execute(
     prog: Prog,
-    mut inp: Vec<String>,
+    inp: Vec<String>,
 ) -> TildeRes<Value> {
     let mut i = 0;
     let mut stack = Vec::new();

@@ -1,10 +1,7 @@
 use ::std::collections::hash_map::Entry;
-use ::std::collections::HashMap;
-use ::std::collections::HashSet;
-use ::std::hash;
-use ::std::hash::Hasher;
 
-use ::fnv::{FnvBuildHasher, FnvHasher, FnvHashMap};
+use ::fnv::FnvBuildHasher;
+use ::fnv::FnvHashMap;
 
 use crate::common::TextTransformation;
 use crate::dict::{CowDictStr, DictEntry, DictIx};

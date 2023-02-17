@@ -4,17 +4,11 @@
 
 //TODO @mverleg: is there a data structure with more efficient hashcode? arrayvec-specific map?
 
-use ::std::collections::hash_map::Entry;
 use ::std::collections::HashMap;
-use ::std::collections::VecDeque;
 use ::std::fmt::Debug;
-use ::std::hash;
-use ::std::hash::{BuildHasher, BuildHasherDefault, Hash, Hasher};
-use ::std::vec::IntoIter;
 
 use ::fnv::FnvBuildHasher;
 use ::fnv::FnvHashMap;
-use ::tinyvec_string::ArrayString;
 
 use crate::dict::{DictStr, LONGEST_DICT_ENTRY_BYTES};
 
@@ -157,51 +151,50 @@ mod tests {
 
     #[test]
     fn longest_prefix_out_of_input_while_at_word() {
-        let mut pm = build_test_prefix_map();
+        let pm = build_test_prefix_map();
         assert_eq!(pm.longest_prefix("hell").unwrap(), value_for(&pm, "hell"));
     }
 
     #[test]
     fn longest_prefix_out_of_input_while_not_at_word() {
-        let mut pm = build_test_prefix_map();
+        let pm = build_test_prefix_map();
         assert_eq!(pm.longest_prefix("her").unwrap(), value_for(&pm, "he"));
     }
 
     #[test]
     fn longest_prefix_out_of_matches_while_deepest_is_word() {
-        let mut pm = build_test_prefix_map();
+        let pm = build_test_prefix_map();
         assert_eq!(pm.longest_prefix("helpless").unwrap(), value_for(&pm, "help"));
     }
 
     #[test]
     fn longest_prefix_out_of_matches_while_deepest_is_not_word() {
-        let mut pm = build_test_prefix_map();
+        let pm = build_test_prefix_map();
         assert_eq!(pm.longest_prefix("helve").unwrap(), value_for(&pm, "he"));
     }
 
     #[test]
     fn longest_prefix_unknown_prefix() {
-        let mut pm = build_test_prefix_map();
+        let pm = build_test_prefix_map();
         assert!(pm.longest_prefix("abacus").is_none());
     }
 
     #[test]
     fn test_all_prefixes_of_no_match() {
-        let mut pm = build_test_prefix_map();
+        let pm = build_test_prefix_map();
         assert!(pm.all_prefixes_of("abacus").is_empty());
     }
 
     #[test]
     fn test_all_prefixes_of_exact_match() {
-        let mut pm = build_test_prefix_map();
+        let pm = build_test_prefix_map();
         assert_eq!(pm.all_prefixes_of("hell"),
                    vec![value_for(&pm, "he"), value_for(&pm, "hell")]);
     }
 
     #[test]
     fn test_all_prefixes_of_sub_matches() {
-        let mut pm = build_test_prefix_map();
-        let mut pm = build_test_prefix_map();
+        let pm = build_test_prefix_map();
         assert_eq!(pm.all_prefixes_of("helpless"),
                    vec![value_for(&pm, "he"), value_for(&pm, "help")]);
     }

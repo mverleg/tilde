@@ -6,10 +6,7 @@
 //  trie is more useful to e.g. find all things with a prefix, not all prefixes of a thing (although it works for that, just not faster)
 //TODO @mverleg: remove this file once replaced
 
-use ::std::collections::hash_map::Entry;
-use ::std::collections::VecDeque;
 use ::std::fmt::Debug;
-use ::std::vec::IntoIter;
 
 use crate::common::TinyMap;
 
@@ -278,49 +275,49 @@ mod tests {
 
     #[test]
     fn longest_prefix_out_of_input_while_at_word() {
-        let mut trie = build_test_trie();
+        let trie = build_test_trie();
         assert_eq!(trie.longest_prefix("hell").unwrap(), value_for(&trie, "hell"));
     }
 
     #[test]
     fn longest_prefix_out_of_input_while_not_at_word() {
-        let mut trie = build_test_trie();
+        let trie = build_test_trie();
         assert_eq!(trie.longest_prefix("her").unwrap(), value_for(&trie, "he"));
     }
 
     #[test]
     fn longest_prefix_out_of_matches_while_deepest_is_word() {
-        let mut trie = build_test_trie();
+        let trie = build_test_trie();
         assert_eq!(trie.longest_prefix("helpless").unwrap(), value_for(&trie, "help"));
     }
 
     #[test]
     fn longest_prefix_out_of_matches_while_deepest_is_not_word() {
-        let mut trie = build_test_trie();
+        let trie = build_test_trie();
         assert_eq!(trie.longest_prefix("helve").unwrap(), value_for(&trie, "he"));
     }
 
     #[test]
     fn longest_prefix_unknown_prefix() {
-        let mut trie = build_test_trie();
+        let trie = build_test_trie();
         assert!(trie.longest_prefix("abacus").is_none());
     }
 
     #[test]
     fn test_all_prefixes_of_no_match() {
-        let mut trie = build_test_trie();
+        let trie = build_test_trie();
         assert!(trie.all_prefixes_of("abacus").is_empty());
     }
 
     #[test]
     fn test_all_prefixes_of_exact_match() {
-        let mut trie = build_test_trie();
+        let trie = build_test_trie();
         assert_eq!(trie.all_prefixes_of("hell"), vec![&value_for(&trie, "he"), &value_for(&trie, "hell")]);
     }
 
     #[test]
     fn test_all_prefixes_of_sub_matches() {
-        let mut trie = build_test_trie();
+        let trie = build_test_trie();
         assert_eq!(trie.all_prefixes_of("helpless"), vec![&value_for(&trie, "he"), &value_for(&trie, "help")]);
     }
 }

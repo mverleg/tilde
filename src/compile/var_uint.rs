@@ -4,8 +4,6 @@ use ::std::fmt::Formatter;
 use crate::compile::letter::Letter;
 use crate::compile::letter::Letter::*;
 use crate::compile::parse::Pos;
-use crate::compile::var_uint::DecodeError::TooLarge;
-use crate::op::Op;
 use crate::UINT;
 
 //TODO: maybe make this a separate crate, if it can be decoupled from Letter?
@@ -292,11 +290,6 @@ mod constants_in_sync {
 
 #[cfg(test)]
 mod test_util {
-    use ::std::collections::HashSet;
-
-    use crate::compile::letter::LetterKind;
-    use crate::compile::var_uint::DecodeError::TextNode;
-
     use super::*;
 
     pub fn encoding_to_str_for_debug(letters: &[Letter]) -> String {
@@ -317,9 +310,6 @@ mod test_util {
 #[cfg(test)]
 mod dynamic_width_common_without_modifiers {
     use ::std::collections::HashSet;
-
-    use crate::compile::letter::LetterKind;
-    use crate::compile::var_uint::DecodeError::TextNode;
 
     use super::*;
     use super::test_util::*;
@@ -391,9 +381,6 @@ mod dynamic_width_common_without_modifiers {
 mod dynamic_width_common_allow_modifiers {
     use ::std::collections::HashSet;
 
-    use crate::compile::letter::LetterKind;
-    use crate::compile::var_uint::DecodeError::TextNode;
-
     use super::*;
     use super::test_util::*;
 
@@ -461,6 +448,7 @@ mod dynamic_width_common_allow_modifiers {
     common_tests!(encode_uint_allow_modifiers, decode_uint_allow_modifiers);
 }
 
+#[cfg(test)]
 macro_rules! common_tests {
     ($encode: ident, $decode: ident) => {
         #[test]
@@ -525,7 +513,6 @@ macro_rules! common_tests {
                     eprintln!("no unused letters")
                 }
                 for letter in unused {
-                    pub(self) use common_tests;
                     let dec = $decode(&[Number, letter, Hash]);
                     assert_eq!(dec, Err(DecodeError::UnexpectedNode), "list len: {}, letter: {}", list.len(), letter.symbol());
                 }
@@ -548,5 +535,6 @@ macro_rules! common_tests {
     };
 }
 
+#[cfg(test)]
 pub(self) use common_tests;
 

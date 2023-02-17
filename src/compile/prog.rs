@@ -1,10 +1,6 @@
 use ::std::fmt::Write;
 use ::std::ops::Index;
 pub use ::std::slice;
-use ::std::vec;
-
-use ::base64::Engine;
-use ::base64::engine::general_purpose::URL_SAFE_NO_PAD;
 
 use crate::common::b64_encode;
 use crate::compile::Letter;

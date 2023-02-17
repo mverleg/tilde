@@ -4,9 +4,9 @@
 //TODO @mark: add a pop-first operation
 //TODO @mark: maybe a reverse operation?
 
+use ::std::array::IntoIter;
 use ::std::iter::FlatMap;
 use ::std::slice::Iter;
-use ::std::array::IntoIter;
 
 use crate::common::TextTransformation;
 

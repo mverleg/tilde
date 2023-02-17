@@ -1,26 +1,15 @@
-use ::std::borrow::Cow;
 use ::std::cell::LazyCell;
-use ::std::cell::OnceCell;
-use ::std::collections::HashMap;
-use ::std::iter::Cloned;
-use ::std::iter::FlatMap;
-use ::std::process::Output;
-use ::std::slice::Iter;
-use ::std::sync::LazyLock;
 use ::std::time::Instant;
 
 use ::tinyvec::ArrayVec;
 
 use crate::common::UNICODE_MAGIC_INDX;
-use crate::dict::Cost;
 use crate::dict::derive::DerivationInfo;
 use crate::dict::derive::with_derived_dict_entries;
 use crate::dict::DICT;
 use crate::dict::DictEntry;
 use crate::dict::DictIx;
-use crate::dict::LONGEST_DICT_ENTRY_BYTES;
 use crate::dict::lookup::lookup_alloc;
-use crate::dict::lookup_buffer;
 use crate::dict::MAX_TEXT_TRANSFORMS;
 use crate::dict::prefix_data::PrefixMap;
 //use crate::tilde_gen_md_docs;
@@ -177,7 +166,7 @@ mod compress_decode {
     #[test]
     fn decode_random_nrs() {
         let n = 1000;
-        let mut nrs = (500..(500 + n)).intersperse(0).collect::<Vec<_>>();
+        let nrs = (500..(500 + n)).intersperse(0).collect::<Vec<_>>();
         let orig_enc = encode_uint_vec(&nrs, Closer::Text);
         let text = lookup_alloc(&nrs);
         let compress_ops = &compress_with_dict(&text);
@@ -209,7 +198,7 @@ mod compression {
     use ::std::mem::size_of;
     use ::std::thread;
 
-    use crate::run_tilde;
+    use crate::dict::Cost;
 
     use super::*;
 

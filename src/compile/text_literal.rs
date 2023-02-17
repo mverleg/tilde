@@ -11,8 +11,8 @@ use crate::compile::var_uint::encode_uint_no_modifier_at_start;
 use crate::dict::compress_with_dict;
 use crate::dict::DictIx;
 use crate::dict::lookup_buffer;
-use crate::TildeRes;
 use crate::tilde_log;
+use crate::TildeRes;
 use crate::UINT;
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]

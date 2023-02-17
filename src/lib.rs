@@ -6,6 +6,7 @@
 #![feature(variant_count)]
 
 #![allow(unused_variables)]  //TODO @mark: TEMPORARY! REMOVE THIS!
+#![allow(unreachable_code)]  //TODO @mark: TEMPORARY! REMOVE THIS!
 #![allow(dead_code)]  //TODO @mark: TEMPORARY! REMOVE THIS!
 
 use ::std::io;
@@ -22,6 +23,7 @@ use ::std::time::Duration;
 
 use crate::common::{escape_for_string, is_safe_for_string};
 pub use crate::common::log as tilde_log;
+pub use crate::common::Nr;
 use crate::compile::{parse, Value};
 use crate::exec::execute;
 
@@ -44,7 +46,6 @@ pub fn tilde_gen_md_docs() -> TildeRes<()> {
 }
 
 pub type TildeRes<T> = Result<T, String>;
-pub use crate::common::Nr;
 pub type UINT = u64;
 
 pub fn run_tilde(args: &TildeArgs) -> TildeRes<Value> {

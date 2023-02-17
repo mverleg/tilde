@@ -5,7 +5,6 @@
 use ::std::collections::hash_map::Entry;
 use ::std::collections::HashMap;
 use ::std::collections::VecDeque;
-use ::std::vec::IntoIter;
 
 #[derive(Debug)]
 struct TrieNode {
@@ -40,7 +39,7 @@ impl TrieNode {
         let tail = &text[head.len_utf8()..];
         match self.children.entry(head) {
             Entry::Occupied(mut child) => child.get_mut().push(tail),
-            Entry::Vacant(mut entry) => {
+            Entry::Vacant(entry) => {
                 let mut child = TrieNode::new_empty();
                 if tail.is_empty() {
                     child.is_word = true;
@@ -284,7 +283,7 @@ mod tests {
 
     #[test]
     fn prefix_iter_shallow() {
-        let mut trie = build_test_trie();
+        let trie = build_test_trie();
         let mut matches = trie.iter_one_extra_letter("hel")
             .collect::<Vec<_>>();
         matches.sort();
@@ -293,31 +292,31 @@ mod tests {
 
     #[test]
     fn longest_prefix_out_of_input_while_at_word() {
-        let mut trie = build_test_trie();
+        let trie = build_test_trie();
         assert_eq!(trie.longest_prefix("hell"), "hell");
     }
 
     #[test]
     fn longest_prefix_out_of_input_while_not_at_word() {
-        let mut trie = build_test_trie();
+        let trie = build_test_trie();
         assert_eq!(trie.longest_prefix("her"), "he");
     }
 
     #[test]
     fn longest_prefix_out_of_matches_while_deepest_is_word() {
-        let mut trie = build_test_trie();
+        let trie = build_test_trie();
         assert_eq!(trie.longest_prefix("helpless"), "help");
     }
 
     #[test]
     fn longest_prefix_out_of_matches_while_deepest_is_not_word() {
-        let mut trie = build_test_trie();
+        let trie = build_test_trie();
         assert_eq!(trie.longest_prefix("helve"), "he");
     }
 
     #[test]
     fn longest_prefix_unknown_prefix() {
-        let mut trie = build_test_trie();
+        let trie = build_test_trie();
         assert_eq!(trie.longest_prefix("abacus"), "");
     }
 
@@ -325,7 +324,7 @@ mod tests {
     fn longest_prefix_with_buffer() {
         let mut result_buffer = "clear this".to_owned();
         let mut postfix_buffer = "clear this".to_owned();
-        let mut trie = build_test_trie();
+        let trie = build_test_trie();
         trie.longest_prefix_with("her", &mut result_buffer, &mut postfix_buffer);
         assert_eq!(result_buffer, "he");
         assert_eq!(postfix_buffer, "r");

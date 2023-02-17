@@ -68,7 +68,7 @@ impl TextTransformation {
         if input.len() <= self.pop_start as usize + self.pop_end as usize {
             return CowDictStr::Borrowed("");
         }
-        let mut chars: Chars = input.chars().collect();
+        let chars: Chars = input.chars().collect();
         debug_assert!(!chars.is_empty());
         let need_alloc = self.case_all || self.case_first || self.reverse;
         if need_alloc {
@@ -78,7 +78,7 @@ impl TextTransformation {
         }
     }
 
-    fn apply_pop_noalloc(&self, input: &'static str, mut chars: Chars) -> &'static str {
+    fn apply_pop_noalloc(&self, input: &'static str, chars: Chars) -> &'static str {
         debug_assert!(!self.reverse);
         debug_assert!(!self.case_all);
         debug_assert!(!self.case_first);

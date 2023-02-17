@@ -1,5 +1,6 @@
 use ::std::fmt;
 use ::std::fmt::Formatter;
+
 use crate::Nr;
 
 #[derive(Debug, PartialEq)]

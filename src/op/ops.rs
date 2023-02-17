@@ -2,8 +2,8 @@ use ::std::array::IntoIter;
 use ::std::borrow::Cow;
 
 use crate::common::escape_for_string;
-use crate::compile::{encode_str, Letter};
-use crate::dict::compress_with_dict;
+use crate::compile::encode_str;
+use crate::compile::Letter;
 use crate::Nr;
 use crate::TildeRes;
 

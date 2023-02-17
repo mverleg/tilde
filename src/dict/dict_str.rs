@@ -1,10 +1,7 @@
 use ::std::cmp::Ordering;
-use ::std::fmt::Write;
 use ::std::hash;
 use ::std::hash::Hasher;
 
-use ::fnv::FnvHasher;
-use ::tinyvec::ArrayVec;
 use ::tinyvec_string::ArrayString;
 
 pub const LONGEST_DICT_ENTRY_BYTES: usize = 22;  // located in this file because of build.rs

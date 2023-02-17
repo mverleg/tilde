@@ -1,9 +1,6 @@
-use ::std::process::Output;
-
 use crate::common::{SnipOrChar, TextTransformation};
 use crate::dict::{DICT, DictIx};
 use crate::dict::entries::DictEntry;
-use crate::tilde_log;
 
 pub fn lookup_alloc(indices: &[DictIx]) -> String {
     let mut buffer = String::new();
