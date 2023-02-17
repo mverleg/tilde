@@ -7,6 +7,8 @@ use crate::compile::Letter;
 use crate::Nr;
 use crate::TildeRes;
 
+//TODO @mark: delete file?
+
 #[derive(Debug, Clone, PartialEq)]
 pub enum Op {
     // Value
@@ -112,22 +114,6 @@ impl Op {
             Xor,
             Impl,
         ].into_iter()
-    }
-
-    pub fn long_code(&self) -> Cow<str> {
-        match self {
-            Op::Text(text) => Cow::Owned(format!("\"{}\"", escape_for_string(text))),
-            Op::Number(number) => Cow::Owned(format!("{number}")),
-            _ => todo!("impl long code"),
-        }
-    }
-
-    pub fn golf_code(&self) -> TildeRes<Vec<Letter>> {
-        match self {
-            Op::Text(text) => encode_str(text),
-            Op::Number(number) => todo!(),
-            _ => todo!("impl long code"),
-        }
     }
 }
 
