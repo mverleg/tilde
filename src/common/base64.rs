@@ -1,11 +1,8 @@
-use ::std::str::from_utf8;
-
 use ::base64::Engine;
 use ::base64::engine::general_purpose::URL_SAFE_NO_PAD;
 
 use crate::compile::Letter;
 use crate::compile::LetterKind;
-use crate::tilde_log;
 use crate::TildeRes;
 
 pub fn b64_encode(source: &[Letter]) -> TildeRes<String> {

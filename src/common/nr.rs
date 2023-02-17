@@ -1,8 +1,6 @@
 use ::std::cmp::Ordering;
 use ::std::hash;
-use ::std::hash::Hasher;
 use ::std::fmt;
-use ::std::fmt::Formatter;
 use ::std::num::ParseFloatError;
 use ::std::str::FromStr;
 

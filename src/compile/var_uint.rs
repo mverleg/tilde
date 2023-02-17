@@ -321,7 +321,6 @@ mod dynamic_width_common_without_modifiers {
     use crate::compile::letter::LetterKind;
     use crate::compile::var_uint::DecodeError::TextNode;
 
-    #[macro_use]
     use super::*;
     use super::test_util::*;
 
@@ -395,7 +394,6 @@ mod dynamic_width_common_allow_modifiers {
     use crate::compile::letter::LetterKind;
     use crate::compile::var_uint::DecodeError::TextNode;
 
-    #[macro_use]
     use super::*;
     use super::test_util::*;
 

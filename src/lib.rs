@@ -3,18 +3,16 @@
 #![feature(once_cell)]
 #![feature(hasher_prefixfree_extras)]
 #![feature(iter_intersperse)]
-#![allow(unused)] //TODO @mark: TEMPORARY! REMOVE THIS!
 #![feature(variant_count)]
 
-use ::std::env;
+#![allow(unused_variables)]  //TODO @mark: TEMPORARY! REMOVE THIS!
+#![allow(dead_code)]  //TODO @mark: TEMPORARY! REMOVE THIS!
+
 use ::std::io;
 use ::std::io::BufRead;
 use ::std::io::BufReader;
 use ::std::io::BufWriter;
-use ::std::io::Read;
 use ::std::io::stdin;
-use ::std::path::Path;
-use ::std::process::ExitCode;
 use ::std::sync::Arc;
 use ::std::sync::atomic::AtomicBool;
 use ::std::sync::atomic::Ordering;

@@ -1,4 +1,3 @@
-use ::std::env::current_exe;
 use ::std::fmt::Debug;
 
 use crate::compile::Letter;

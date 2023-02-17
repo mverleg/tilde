@@ -1,8 +1,5 @@
 use ::std::array::IntoIter;
-use ::std::fmt;
-use ::std::fmt::Formatter;
 use ::std::hash::Hash;
-use ::std::hash::Hasher;
 
 //TODO @mark: meaningful names
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

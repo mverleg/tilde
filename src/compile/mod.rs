@@ -1,7 +1,4 @@
-use ::std::env::current_exe;
-
 pub use crate::exec::Value;
-use crate::TildeRes;
 
 pub use self::letter::Letter;
 pub use self::letter::LetterKind;

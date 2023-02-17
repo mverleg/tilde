@@ -1,7 +1,4 @@
-use ::std::cmp::Ordering;
 use ::std::fmt::Write;
-use ::std::hash;
-use ::std::hash::Hasher;
 
 use ::tinyvec::ArrayVec;
 use ::tinyvec_string::ArrayString;
@@ -75,7 +72,7 @@ impl TextTransformation {
         debug_assert!(!chars.is_empty());
         let need_alloc = self.case_all || self.case_first || self.reverse;
         if need_alloc {
-            CowDictStr::Owned(self.apply_all_alloc(input, chars))
+            CowDictStr::Owned(self.apply_all_alloc(chars))
         } else {
             CowDictStr::Borrowed(self.apply_pop_noalloc(input, chars))
         }
@@ -100,7 +97,7 @@ impl TextTransformation {
         &input[start_index..input.len()-end_index]
     }
 
-    fn apply_all_alloc(&self, input: &'static str, mut chars: Chars) -> DictStr {
+    fn apply_all_alloc(&self, mut chars: Chars) -> DictStr {
         debug_assert!(self.reverse || self.case_all || self.case_first);
         if self.reverse {
             chars.reverse();
