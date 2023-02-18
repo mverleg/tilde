@@ -72,7 +72,3 @@ impl PartialEq for Op {
         self.val.is_equal(&*other.val)
     }
 }
-
-//TODO @mark: long and gold not both empty
-//TODO @mark: id unique and sequential
-//TODO @mark: name unique and identifier-safe

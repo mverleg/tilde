@@ -19,6 +19,6 @@ pub fn all_non_literals() -> [Op; 2] {
 }
 
 
-//TODO @mark: long and gold not both empty
+//TODO @mark: long and golf not both empty
 //TODO @mark: id unique and sequential
 //TODO @mark: name unique and identifier-safe

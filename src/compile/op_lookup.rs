@@ -1,8 +1,9 @@
 use ::std::cell::LazyCell;
 use ::std::collections::HashMap;
+use ::std::borrow::Cow;
 
 use crate::compile::GolfWord;
-use crate::op::Op;
+use crate::op::{all_non_literals, Op};
 use crate::tilde_log;
 
 thread_local! {
@@ -24,7 +25,14 @@ fn init_golf_op_lookup() -> HashMap<GolfWord, Op> {
 
 fn init_long_op_lookup() -> HashMap<&'static str, Op> {
     tilde_log!("initializing lookup map by long identifier");
-    todo!()   //TODO @mark:
+    all_non_literals().into_iter()
+        .map(|op| {
+            let Cow::Borrowed(name) = op.long_code() else {
+                unreachable!()
+            };
+            (name, op)
+        })
+        .collect::<HashMap<&'static str, Op>>()
 }
 
 #[cfg(test)]
