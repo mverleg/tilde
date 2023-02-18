@@ -1,7 +1,8 @@
+use ::std::any::Any;
 use ::std::borrow::Cow;
 use ::std::fmt::Debug;
 use ::std::ops::Deref;
-use ::std::any::Any;
+
 use crate::compile::GolfWord;
 
 #[derive(Debug)]

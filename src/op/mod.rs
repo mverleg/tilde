@@ -1,4 +1,3 @@
-
 pub use self::arithmetic::Div;
 pub use self::arithmetic::IntDiv;
 pub use self::literal::NumberOp;
@@ -20,12 +19,24 @@ pub fn all_non_literals() -> [Op; 2] {
 
 #[cfg(test)]
 mod op_properties {
-    use std::collections::HashSet;
+    use ::std::collections::HashSet;
+
     use super::*;
 
     #[test]
     fn long_identifiers_valid() {
-        unimplemented!();  //TODO @mark
+        let options = "abcdefghijklmnopqrstuvwxyz0123456789-".chars().collect::<HashSet<_>>();
+        let start_options = "abcdefghijklmnopqrstuvwxyz".chars().collect::<HashSet<_>>();
+        let end_options = "abcdefghijklmnopqrstuvwxyz0123456789".chars().collect::<HashSet<_>>();
+        for op in all_non_literals() {
+            let name = op.long_code().to_string().chars().collect::<Vec<_>>();
+            assert!(!name.is_empty());
+            for chr in &name {
+                assert!(options.contains(&name[0]));
+            }
+            assert!(start_options.contains(&name[0]));
+            assert!(end_options.contains(&name[name.len() - 1]));
+        }
     }
 
     #[test]
@@ -40,13 +51,13 @@ mod op_properties {
         let mut names = Vec::with_capacity(2 * ops.len() + 8);
         for op in ops {
             names.push(op.long_code().into_owned());
-            names.push(op.golf_code().unwrap().to_string());
+            if let Some(name) = op.golf_code() {
+                names.push(name.to_string());
+            }
         }
         let unique_names = names.iter().collect::<HashSet<_>>();
         assert_eq!(names.len(), unique_names.len());
     }
 }
 
-//TODO @mark: long and golf not both empty
-//TODO @mark: id unique and sequential
 //TODO @mark: name unique and identifier-safe
