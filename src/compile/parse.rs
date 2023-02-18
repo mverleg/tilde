@@ -98,7 +98,7 @@ pub struct Pos<T: Debug + PartialEq> {
 
 #[cfg(test)]
 mod tests {
-    use crate::op::Op;
+    use crate::op::{Div, IntDiv, Op};
 
     use super::*;
 
@@ -161,8 +161,8 @@ mod tests {
 
     #[test]
     fn operator_by_name() {
-        assert_eq!(parse("div").unwrap(), of(Op::Div));
-        assert_eq!(parse("int-div").unwrap(), of(Op::IntDiv));
+        assert_eq!(parse("div").unwrap(), of(Div::new()));
+        assert_eq!(parse("int-div").unwrap(), of(IntDiv::new()));
     }
 
     #[test]
@@ -175,15 +175,15 @@ mod tests {
     fn split_on_whitespace() {
         let op = NumberOp::new(1.23);
         assert_eq!(parse("'hello' 1.0").unwrap(), Prog::of(vec![TextOp::new("hello"), NumberOp::new(1.0)]));
-        assert_eq!(parse("div   1").unwrap(), Prog::of(vec![Op::Div, NumberOp::new(1.0)]),);
-        assert_eq!(parse("int-div1.0").unwrap(), Prog::of(vec![Op::IntDiv, NumberOp::new(1.0)]),);
+        assert_eq!(parse("div   1").unwrap(), Prog::of(vec![Div::new(), NumberOp::new(1.0)]),);
+        assert_eq!(parse("int-div1.0").unwrap(), Prog::of(vec![IntDiv::new(), NumberOp::new(1.0)]),);
     }
 
     #[test]
     fn allow_newlines() {
         let op = NumberOp::new(1.23);
         assert_eq!(parse("'hello'\n1.0").unwrap(), Prog::of(vec![TextOp::new("hello"), NumberOp::new(1.0)]));
-        assert_eq!(parse("div\n1").unwrap(), Prog::of(vec![Op::Div, NumberOp::new(1.0)]),);
+        assert_eq!(parse("div\n1").unwrap(), Prog::of(vec![Div::new(), NumberOp::new(1.0)]),);
     }
 
     //TODO @mark: add some golfed testcases to existing tests, like whitespace ones

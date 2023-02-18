@@ -7,8 +7,11 @@ use crate::compile::GolfWord;
 
 pub use self::literal::NumberOp;
 pub use self::literal::TextOp;
+pub use self::arithmetic::Div;
+pub use self::arithmetic::IntDiv;
 
 mod literal;
+mod arithmetic;
 
 #[derive(Debug)]
 pub struct Op {
@@ -53,10 +56,11 @@ impl Deref for Op {
     }
 }
 
-pub fn all_non_literals() -> [&'static Op; 0] {
+pub fn all_non_literals() -> [Op; 2] {
     //TODO @mark:
     [
-        //NumberOp::new(Nr::zero()),  //TODO @mark: remove (special only)
+        Op::of(Div),
+        Op::of(IntDiv),
     ]
 }
 

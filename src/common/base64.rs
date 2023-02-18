@@ -11,7 +11,7 @@ pub fn b64_encode(source: &[Letter]) -> TildeRes<String> {
     let mut i = 0;
     let possible_letter_cnt = Letter::option_count() as u8;
     while i + 1 < letters.len() {
-        bytes.push(possible_letter_cnt as u8 * letters[i].nr() + letters[i + 1].nr());
+        bytes.push(possible_letter_cnt * letters[i].nr() + letters[i + 1].nr());
         i += 2;
     }
     if i < letters.len() {

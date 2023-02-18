@@ -8,6 +8,7 @@
 #![allow(unused_variables)]  //TODO @mark: TEMPORARY! REMOVE THIS!
 #![allow(unreachable_code)]  //TODO @mark: TEMPORARY! REMOVE THIS!
 #![allow(dead_code)]  //TODO @mark: TEMPORARY! REMOVE THIS!
+#![allow(clippy::new_ret_no_self)]
 
 use ::std::io;
 use ::std::io::BufRead;
