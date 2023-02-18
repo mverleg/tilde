@@ -1,7 +1,7 @@
 use ::std::borrow::Cow;
 
 use crate::common::escape_for_string;
-use crate::compile::encode_str;
+use crate::compile::encode_small_str;
 use crate::compile::GolfWord;
 use crate::Nr;
 use crate::op::{Op, OpTyp};
@@ -24,7 +24,7 @@ impl OpTyp for TextOp {
     }
 
     fn golf_code(&self) -> Option<GolfWord> {
-        Some(encode_str(&self.0).unwrap().into())
+        Some(GolfWord::new(encode_small_str(&self.0).unwrap()))
         //TODO @mark: is this unwrap safe?
     }
 }
@@ -35,7 +35,7 @@ impl TextOp {
     }
 
     pub fn new(txt: impl Into<String>) -> Op {
-        Op(TextOp(txt))
+        Op::of(TextOp(txt))
     }
 }
 

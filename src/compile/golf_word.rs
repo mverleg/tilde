@@ -1,11 +1,15 @@
 use ::std::hash;
 use ::std::hash::Hasher;
 use ::std::mem::size_of;
-use ::tinyvec::ArrayVec;
+
+use ::tinyvec::TinyVec;
+
 use crate::compile::Letter;
 
+// max length does not apply to literals, which are unbounded,
+// which is why TinyVec instead of ArrayVec is used
 const MAX_WORD_LENGTH: usize = 3;
-type GolfWordContent = ArrayVec<[Letter; MAX_WORD_LENGTH]>;
+pub type GolfWordContent = TinyVec<[Letter; MAX_WORD_LENGTH]>;
 type WordId = u32;
 
 #[derive(Debug, Clone)]

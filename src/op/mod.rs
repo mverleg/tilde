@@ -1,9 +1,8 @@
 use ::std::borrow::Cow;
 use ::std::fmt::Debug;
 use ::std::ops::Deref;
+
 use crate::compile::GolfWord;
-
-
 use crate::Nr;
 
 pub use self::literal::NumberOp;
@@ -15,6 +14,12 @@ mod literal;
 pub struct Op {
     // This only allocates for the Ops with data, i.e. literals
     val: Box<dyn OpTyp>,
+}
+
+impl Op {
+    pub fn of(op: impl OpTyp) -> Self {
+        Op { val: Box::new(op) }
+    }
 }
 
 pub trait OpTyp: Debug {
@@ -40,7 +45,7 @@ impl Deref for Op {
 
 pub fn all_non_literals() -> [&'static Op; 1] {
     [
-        NumberOp::new(Nr::zero()).into(),  //TODO @mark: remove (special only)
+        &NumberOp::new(Nr::zero()),  //TODO @mark: remove (special only)
     ]
 }
 

@@ -99,6 +99,7 @@ pub struct Pos<T: Debug + PartialEq> {
 #[cfg(test)]
 mod tests {
     use crate::op::Op;
+
     use super::*;
 
     fn of(op: Op) -> Prog {

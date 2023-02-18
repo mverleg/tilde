@@ -17,7 +17,7 @@ name = "startup_analyze"
 harness = false
 
 [dependencies]
-tinyvec = { version = "1.6.0", default-features = false, features = ["rustc_1_57"] }
+tinyvec = { version = "1.6.0", default-features = false, features = ["alloc", "rustc_1_57"] }
 tinyvec_string = { version = "0.3.2", default-features = false, features = ["rustc_1_57"] }
 fnv = { version = "1.0.7", default-features = false, features = ["std"] }
 base64 = { version = "0.21.0", default-features = false, features = ["std"] }

@@ -36,6 +36,7 @@ pub fn lookup_op_name(op_name: &str) -> Option<Op> {
 #[cfg(test)]
 mod tests {
     use crate::op::all_non_literals;
+
     use super::*;
 
     #[test]

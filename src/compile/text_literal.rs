@@ -1,5 +1,8 @@
 use ::std::iter::Iterator;
 
+use ::tinyvec::TinyVec;
+
+use crate::compile::golf_word::GolfWordContent;
 use crate::compile::letter::Letter;
 use crate::compile::letter::Letter::*;
 use crate::compile::parse::Pos;
@@ -66,6 +69,16 @@ pub fn decode_uint_vec(letters: &[Letter]) -> Result<(Pos<Vec<UINT>>, Closer), D
 pub fn encode_str(text: &str) -> TildeRes<Vec<Letter>> {
     let compress_ops = &compress_with_dict(text);
     let mut encoding = vec![Text];
+    encoding.extend(encode_uint_vec(compress_ops, Closer::Text));
+    //TODO @mark: no allocation?
+    Ok(encoding)
+}
+
+//TODO @mark: is this worth the duplication with `encode_str`?
+pub fn encode_small_str(text: &str) -> TildeRes<GolfWordContent> {
+    let compress_ops = &compress_with_dict(text);
+    let mut encoding = TinyVec::new();
+    encoding.push(Text);
     encoding.extend(encode_uint_vec(compress_ops, Closer::Text));
     //TODO @mark: no allocation?
     Ok(encoding)

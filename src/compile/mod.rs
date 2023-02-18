@@ -6,6 +6,7 @@ pub use self::letter::LetterKind;
 pub use self::parse::parse;
 pub use self::prog::Prog;
 pub use self::text_literal::Closer;
+pub use self::text_literal::encode_small_str;
 pub use self::text_literal::encode_str;
 pub use self::text_literal::encode_uint_vec;
 pub use self::typ::Typ;
