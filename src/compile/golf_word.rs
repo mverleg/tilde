@@ -34,6 +34,12 @@ impl From<GolfWordContent> for GolfWord {
     }
 }
 
+impl AsRef<[Letter]> for GolfWord {
+    fn as_ref(&self) -> &[Letter] {
+        &self.letters
+    }
+}
+
 impl PartialEq for GolfWord {
     fn eq(&self, other: &Self) -> bool {
         self.id.eq(&other.id)

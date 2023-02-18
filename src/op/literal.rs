@@ -3,7 +3,7 @@ use ::std::borrow::Cow;
 use ::tinyvec::ArrayVec;
 
 use crate::common::escape_for_string;
-use crate::compile::{encode_str, Letter};
+use crate::compile::{encode_str, GolfWord, Letter};
 use crate::Nr;
 use crate::op::{Op, OpTyp};
 
@@ -24,7 +24,7 @@ impl OpTyp for TextOp {
         Some(Cow::Owned(format!("\"{}\"", escape_for_string(self.0))))
     }
 
-    fn golf_code(&self) -> Option<ArrayVec<Letter>> {
+    fn golf_code(&self) -> Option<GolfWord> {
         Some(encode_str(&self.0).unwrap().into())
         //TODO @mark: is this unwrap safe?
     }
@@ -57,7 +57,7 @@ impl OpTyp for NumberOp {
         Some(Cow::Owned(format!("{}", self.0)))
     }
 
-    fn golf_code(&self) -> Option<ArrayVec<Letter>> {
+    fn golf_code(&self) -> Option<GolfWord> {
         todo!()  //TODO @mark:
     }
 }

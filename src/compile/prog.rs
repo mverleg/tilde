@@ -1,8 +1,10 @@
 use ::std::fmt::Write;
 use ::std::ops::Index;
 pub use ::std::slice;
+use ::tinyvec::ArrayVec;
 
 use crate::common::b64_encode;
+use crate::compile::golf_word::GolfWord;
 use crate::compile::Letter;
 use crate::op::Op;
 use crate::TildeRes;
@@ -59,9 +61,7 @@ impl Prog {
         for op in &self.ops {
             let word = op.golf_code()
                 .ok_or_else(|| format!("operation {:?} has no golf representation", op))?;
-            for letter in word.as_ref() {
-                letters.push(letter);
-            }
+            letters.extend(&letters);
         }
         //TODO @mark: make a minify function with more tricks
         if letters.last() == Some(&Letter::Text) {
@@ -83,6 +83,6 @@ impl Prog {
     }
 
     pub fn golf_code_b64(&self) -> TildeRes<String> {
-        b64_encode(&self.golf_letters()?)
+        b64_encode(self.golf_letters()?.as_ref())
     }
 }

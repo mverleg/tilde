@@ -4,7 +4,7 @@ use ::std::ops::Deref;
 
 use ::tinyvec::ArrayVec;
 
-use crate::compile::Letter;
+use crate::compile::{GolfWord, Letter};
 use crate::Nr;
 
 pub use self::literal::NumberOp;
@@ -26,7 +26,7 @@ pub trait OpTyp: Debug {
 
     fn long_code(&self) -> Cow<str>;
 
-    fn golf_code(&self) -> Option<ArrayVec<Letter>>;
+    fn golf_code(&self) -> Option<GolfWord>;
 
     //TODO @mark: evaluation methods
 }
