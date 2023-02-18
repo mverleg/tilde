@@ -6,7 +6,8 @@ use ::std::mem::size_of;
 use ::tinyvec::TinyVec;
 use ::tinyvec::TinyVecIterator;
 
-use crate::compile::{Letter, LetterKind};
+use crate::compile::Letter;
+use crate::compile::LetterKind;
 use crate::TildeRes;
 
 // max length does not apply to literals, which are unbounded,
@@ -105,17 +106,37 @@ impl fmt::Display for GolfWord {
 }
 
 pub fn calculate_id(letters: &[Letter]) -> WordId {
-    debug_assert!(letters.len() <= 2 * size_of::<WordId>());
-    //TODO @mark: this condition isn't true for literals, refactor?
     let mut scale = 1;
     let mut id = 0;
     for letter in letters {
         let letter_val: WordId = letter.nr().into();
         id += letter_val * scale;
         scale *= Letter::option_count() as WordId;
+        if scale >= WordId::MAX {
+            scale = scale / WordId::MAX + 1;
+        }
     }
     id
 }
+
+#[cfg(test)]
+mod id_tests {
+    use super::*;
+
+    #[test]
+    fn non_literal() {
+        let id = calculate_id(&[Letter::Seq, Letter::Number, Letter::Hat]);
+        assert_eq!(id, 1);
+    }
+
+    #[test]
+    fn literal() {
+        let id = calculate_id(&[Letter::Text, Letter::Seq, Letter::Seq, Letter::Seq, Letter::Seq, Letter::Seq,
+            Letter::Seq, Letter::Seq, Letter::Seq, Letter::Seq, Letter::Seq, Letter::Seq, Letter::Seq, Letter::Seq]);
+        assert_eq!(id, 1);
+    }
+}
+
 
 //TODO @mark: test that no words are longer than MAX_WORD_LENGTH
 //TODO @mark: test that at least one word is as long as MAX_WORD_LENGTH
