@@ -5,7 +5,7 @@ use crate::compile::GolfWord;
 use crate::op::Op;
 use crate::op::OpTyp;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Div;
 
 impl Div {
@@ -31,13 +31,9 @@ impl OpTyp for Div {
     fn as_any(&self) -> &dyn Any {
         self
     }
-
-    fn is_equal(&self, other: &dyn OpTyp) -> bool {
-        todo!()
-    }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct IntDiv;
 
 impl IntDiv {
@@ -62,10 +58,6 @@ impl OpTyp for IntDiv {
 
     fn as_any(&self) -> &dyn Any {
         self
-    }
-
-    fn is_equal(&self, other: &dyn OpTyp) -> bool {
-        todo!()
     }
 }
 

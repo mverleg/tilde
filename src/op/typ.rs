@@ -16,7 +16,7 @@ impl Op {
     }
 }
 
-pub trait OpTyp: Debug + OpClone {
+pub trait OpTyp: Debug + OpClone + OpEq {
 
     fn description(&self) -> &'static str;
 
@@ -26,15 +26,7 @@ pub trait OpTyp: Debug + OpClone {
 
     fn as_any(&self) -> &dyn Any;
 
-    fn is_equal(&self, other: &dyn OpTyp) -> bool;
-
     //TODO @mark: evaluation methods
-}
-
-impl PartialEq for Op {
-    fn eq(&self, other: &Op) -> bool {
-        self.val.is_equal(&*other.val)
-    }
 }
 
 impl Deref for Op {
@@ -45,6 +37,7 @@ impl Deref for Op {
     }
 }
 
+// implemented automatically if Clone is derived/impl for an operation
 pub trait OpClone {
     fn clone_box(&self) -> Box<dyn OpTyp>;
 }
@@ -58,6 +51,25 @@ impl<T> OpClone for T where T: 'static + OpTyp + Clone {
 impl Clone for Op {
     fn clone(&self) -> Self {
         Op { val: self.val.clone_box() }
+    }
+}
+
+// implemented automatically if PartialEq is derived/impl for an operation
+pub trait OpEq {
+    fn is_equal(&self, other: &dyn OpTyp) -> bool;
+}
+
+impl<T> OpEq for T where T: 'static + OpTyp + PartialEq {
+    fn is_equal(&self, other: &dyn OpTyp) -> bool {
+        other.as_any()
+            .downcast_ref::<Self>()
+            .map_or(false, |other_cast| self == other_cast)
+    }
+}
+
+impl PartialEq for Op {
+    fn eq(&self, other: &Self) -> bool {
+        self.val.is_equal(other)
     }
 }
 

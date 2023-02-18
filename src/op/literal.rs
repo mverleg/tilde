@@ -8,7 +8,7 @@ use crate::compile::{encode_str, GolfWord};
 use crate::Nr;
 use crate::op::{Op, OpTyp};
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct TextOp(String);
 
 impl OpTyp for TextOp {
@@ -32,12 +32,6 @@ impl OpTyp for TextOp {
     fn as_any(&self) -> &dyn Any {
         self
     }
-
-    fn is_equal(&self, other: &dyn OpTyp) -> bool {
-        other.as_any()
-            .downcast_ref::<Self>()
-            .map_or(false, |other_cast| self == other_cast)
-    }
 }
 
 impl TextOp {
@@ -50,7 +44,7 @@ impl TextOp {
     }
 }
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct NumberOp(Nr);
 
 impl OpTyp for NumberOp {
@@ -69,12 +63,6 @@ impl OpTyp for NumberOp {
 
     fn as_any(&self) -> &dyn Any {
         self
-    }
-
-    fn is_equal(&self, other: &dyn OpTyp) -> bool {
-        other.as_any()
-            .downcast_ref::<Self>()
-            .map_or(false, |other_cast| self == other_cast)
     }
 }
 
