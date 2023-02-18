@@ -48,11 +48,11 @@ pub enum Op {
 
 impl Op {
     pub fn text(txt: impl Into<String>) -> Self {
-        Op::Text(txt.into())
+        TextOp::new(txt.into())
     }
 
     pub fn number(nr: impl Into<Nr>) -> Self {
-        Op::Number(nr.into())
+        NumberOp::new(nr.into())
     }
 
     pub fn name(&self) -> &str {

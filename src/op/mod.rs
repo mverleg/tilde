@@ -1,10 +1,14 @@
 use ::std::borrow::Cow;
 use ::std::fmt::Debug;
+use ::std::ops::Deref;
 
 use ::tinyvec::ArrayVec;
 
 use crate::compile::Letter;
-use crate::op::literal::Number;
+use crate::Nr;
+
+pub use self::literal::NumberOp;
+pub use self::literal::TextOp;
 
 mod literal;
 
@@ -20,15 +24,25 @@ pub trait OpTyp: Debug {
 
     fn description(&self) -> &'static str;
 
-    fn long_code(&self) -> Option<Cow<str>>;
+    fn long_code(&self) -> Cow<str>;
 
     fn golf_code(&self) -> Option<ArrayVec<Letter>>;
 
     //TODO @mark: evaluation methods
 }
 
+impl Deref for Op {
+    type Target = dyn OpTyp;
+
+    fn deref(&self) -> &Self::Target {
+        *self.val
+    }
+}
+
 pub fn all_non_literals() -> [&'static Op; 1] {
-    [Number.into()]
+    [
+        NumberOp(Nr::zero()).into(),  //TODO @mark: remove (special only)
+    ]
 }
 
 

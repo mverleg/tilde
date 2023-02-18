@@ -7,7 +7,7 @@ use crate::compile::Letter;
 use crate::op::{Op, OpTyp};
 use crate::TildeRes;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug)]
 pub struct Prog {
     ops: Vec<Op>,
 }
@@ -47,7 +47,7 @@ impl Prog {
     pub fn long_code(&self) -> String {
         let mut code = String::with_capacity(self.ops.len() * 16);
         for op in &self.ops {
-            write!(code, "{} ", op.long_code().as_ref()).unwrap()  //TODO @mverleg:
+             write!(code, "{} ", op.long_code().as_ref()).unwrap()  //TODO @mverleg:
         }
         code.pop();
         code
