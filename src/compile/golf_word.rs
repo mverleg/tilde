@@ -6,7 +6,9 @@ use ::std::mem::size_of;
 use ::tinyvec::TinyVec;
 use ::tinyvec::TinyVecIterator;
 
-use crate::compile::Letter;
+use crate::compile::{Letter, LetterKind};
+use crate::compile::LetterKind::Modifier;
+use crate::TildeRes;
 
 // max length does not apply to literals, which are unbounded,
 // which is why TinyVec instead of ArrayVec is used
@@ -23,14 +25,38 @@ pub struct GolfWord {
 }
 
 impl GolfWord {
-    pub fn new(letters: GolfWordContent) -> Self {
+    pub fn try_new(letters: GolfWordContent) -> TildeRes<Self> {
+        use LetterKind::*;
         debug_assert!(!letters.is_empty());
-        //TODO @mark: validate that this is a real word
-        todo!();
+        match letters[0].kind() {
+            Literal => {}
+            VariableOpen => {
+                for following in letters.iter().skip(1) {
+                    if following.kind() != Modifier {
+                        return Err(format!("golf identifier starting with variable opener ({}) must be followed by only modifiers (found '{}')", letters[0], following))
+                    }
+                }
+            }
+            FixedOpen => {
+                for following in letters.iter().skip(2) {
+                    if following.kind() != Modifier {
+                        return Err(format!("golf identifier starting with variable opener ({}) must be followed by only modifiers (found '{}')", letters[0], following))
+                    }
+                }
+            }
+            Modifier => return Err(format!("golf identifier cannot start with modifier token {}", letters[0]))
+        }
         let mut hash = calculate_id(&letters);
-        GolfWord {
+        Ok(GolfWord {
             letters,
             id: hash,
+        })
+    }
+
+    pub fn new(letters: GolfWordContent) -> Self {
+        match Self::try_new(letters) {
+            Ok(gw) => gw,
+            Err(err) => panic!("invalid golf identifier '{letters:?}', err: {err}"),
         }
     }
 }
