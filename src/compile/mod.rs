@@ -16,7 +16,7 @@ pub use self::var_uint::encode_snippet_len_estimate;
 mod letter;
 mod parse;
 // mod word;
-mod ops;
+mod op_lookup;
 mod text_literal;
 mod var_uint;
 pub mod prog;

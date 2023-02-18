@@ -1,10 +1,11 @@
 use ::std::any::Any;
 use ::std::borrow::Cow;
-use crate::compile::GolfWord;
-use crate::op::OpTyp;
-use crate::op::Op;
 
-#[derive(Debug)]
+use crate::compile::GolfWord;
+use crate::op::Op;
+use crate::op::OpTyp;
+
+#[derive(Debug, Clone)]
 pub struct Div;
 
 impl Div {
@@ -19,7 +20,7 @@ impl OpTyp for Div {
         "divide without rounding"
     }
 
-    fn long_code(&self) -> Cow<str> {
+    fn long_code(&self) -> Cow<'static, str> {
         Cow::Borrowed("div")
     }
 
@@ -36,7 +37,7 @@ impl OpTyp for Div {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct IntDiv;
 
 impl IntDiv {
@@ -51,7 +52,7 @@ impl OpTyp for IntDiv {
         todo!()
     }
 
-    fn long_code(&self) -> Cow<str> {
+    fn long_code(&self) -> Cow<'static, str> {
         Cow::Borrowed("int-div")
     }
 

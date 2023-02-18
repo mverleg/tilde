@@ -2,7 +2,7 @@ use ::std::fmt::Debug;
 
 use crate::{Nr, tilde_log};
 use crate::compile::Letter;
-use crate::compile::ops::lookup_op_long;
+use crate::compile::op_lookup::lookup_op_long;
 use crate::compile::Prog;
 use crate::compile::text_literal::decode_str;
 use crate::op::{NumberOp, TextOp};

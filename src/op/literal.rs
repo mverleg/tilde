@@ -8,7 +8,7 @@ use crate::compile::{encode_str, GolfWord};
 use crate::Nr;
 use crate::op::{Op, OpTyp};
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct TextOp(String);
 
 impl OpTyp for TextOp {
@@ -17,7 +17,7 @@ impl OpTyp for TextOp {
         todo!()  //TODO @mark:
     }
 
-    fn long_code(&self) -> Cow<str> {
+    fn long_code(&self) -> Cow<'static, str> {
         Cow::Owned(format!("\"{}\"", escape_for_string(&self.0)))
     }
 
@@ -50,7 +50,7 @@ impl TextOp {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct NumberOp(Nr);
 
 impl OpTyp for NumberOp {
@@ -59,7 +59,7 @@ impl OpTyp for NumberOp {
         todo!()  //TODO @mark:
     }
 
-    fn long_code(&self) -> Cow<str> {
+    fn long_code(&self) -> Cow<'static, str> {
         Cow::Owned(format!("{}", self.0))
     }
 

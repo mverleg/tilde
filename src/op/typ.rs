@@ -16,11 +16,11 @@ impl Op {
     }
 }
 
-pub trait OpTyp: Debug {
+pub trait OpTyp: Debug + OpClone {
 
     fn description(&self) -> &'static str;
 
-    fn long_code(&self) -> Cow<str>;
+    fn long_code(&self) -> Cow<'static, str>;
 
     fn golf_code(&self) -> Option<GolfWord>;
 
@@ -45,6 +45,21 @@ impl Deref for Op {
     }
 }
 
+pub trait OpClone {
+    fn clone_box(&self) -> Box<dyn OpTyp>;
+}
+
+impl<T> OpClone for T where T: 'static + OpTyp + Clone {
+    fn clone_box(&self) -> Box<dyn OpTyp> {
+        Box::new(self.clone())
+    }
+}
+
+impl Clone for Op {
+    fn clone(&self) -> Self {
+        Op { val: self.val.clone_box() }
+    }
+}
 
 //TODO @mark: long and gold not both empty
 //TODO @mark: id unique and sequential
