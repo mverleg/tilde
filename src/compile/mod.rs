@@ -20,3 +20,4 @@ mod text_literal;
 mod var_uint;
 pub mod prog;
 pub mod typ;
+mod golf_word;
