@@ -1,7 +1,7 @@
 use ::std::borrow::Cow;
 
 use crate::common::escape_for_string;
-use crate::compile::encode_small_str;
+use crate::compile::encode_str_buffer;
 use crate::compile::GolfWord;
 use crate::Nr;
 use crate::op::{Op, OpTyp};

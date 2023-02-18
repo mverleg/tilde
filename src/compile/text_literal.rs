@@ -33,6 +33,7 @@ pub fn encode_uint_vec<I>(
 ) -> Vec<Letter> where I: Into<UINT> + Copy {
     if nrs.is_empty() {
         return vec![Text];
+        //TODO @mark: shoudln't this be Closer? or is this related to the skip1 later?
     }
     let mut letters = vec![];
     letters.extend(encode_uint_no_modifier_at_start(nrs[0].into()));
@@ -66,19 +67,33 @@ pub fn decode_uint_vec(letters: &[Letter]) -> Result<(Pos<Vec<UINT>>, Closer), D
     }, closer.value))
 }
 
+//TODO @mark: switch to `encode_str_buffer` for performance-critical code
 pub fn encode_str(text: &str) -> TildeRes<Vec<Letter>> {
-    let compress_ops = &compress_with_dict(text);
-    let mut encoding = vec![Text];
-    encoding.extend(encode_uint_vec(compress_ops, Closer::Text));
-    //TODO @mark: no allocation?
+    let mut encoding = Vec::new();
+    encode_str_buffer(text, |letter| encoding.push(letter))?;
     Ok(encoding)
 }
 
-//TODO @mark: is this worth the duplication with `encode_str`?
-pub fn encode_small_str(text: &str) -> TildeRes<GolfWordContent> {
+//TODO @mark: should `compress_with_dict` also take a buffer? at time of writing, now no buffer reuse possible
+pub fn encode_str_buffer(text: &str, writer: impl FnMut(Letter)) -> TildeRes<()> {
     let compress_ops = &compress_with_dict(text);
-    let mut encoding = TinyVec::new();
-    encoding.push(Text);
+    writer(Text);
+
+
+    {
+        let mut letters = vec![];
+        letters.extend(encode_uint_no_modifier_at_start(nrs[0].into()));
+        for nr in nrs.iter().skip(1) {
+            let nr: UINT = (*nr).into();
+            letters.extend(encode_uint_allow_modifiers(nr));
+        }
+        letters.push(match closer {
+            Closer::Text => Text,
+            Closer::Number => Number,
+        });
+        letters
+    }
+
     encoding.extend(encode_uint_vec(compress_ops, Closer::Text));
     //TODO @mark: no allocation?
     Ok(encoding)
