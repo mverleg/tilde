@@ -78,7 +78,7 @@ impl Letter {
         use self::Letter::*;
         Some(match sym {
             '0' => Number,
-            '"' => Text,
+            '\'' => Text,
 
             '$' => Io,
             '%' => Seq,
@@ -135,7 +135,7 @@ impl Letter {
         use self::Letter::*;
         match self {
             Number => '0',
-            Text => '"',
+            Text => '\'',
 
             Io => '$',
             Seq => '%',
