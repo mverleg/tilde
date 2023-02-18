@@ -7,7 +7,6 @@ pub use self::parse::parse;
 pub use self::prog::Prog;
 pub use self::text_literal::Closer;
 pub use self::text_literal::encode_str;
-pub use self::text_literal::encode_str_buffer;
 pub use self::text_literal::encode_uint_vec;
 pub use self::typ::Typ;
 pub use self::var_uint::encode_snippet_len_estimate;

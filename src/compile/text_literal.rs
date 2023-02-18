@@ -1,8 +1,5 @@
 use ::std::iter::Iterator;
 
-use ::tinyvec::TinyVec;
-
-use crate::compile::golf_word::GolfWordContent;
 use crate::compile::letter::Letter;
 use crate::compile::letter::Letter::*;
 use crate::compile::parse::Pos;
@@ -11,8 +8,7 @@ use crate::compile::var_uint::decode_uint_no_modifier_at_start;
 use crate::compile::var_uint::DecodeError;
 use crate::compile::var_uint::encode_uint_allow_modifiers;
 use crate::compile::var_uint::encode_uint_no_modifier_at_start;
-use crate::dict::compress_with_dict;
-use crate::dict::DictIx;
+use crate::dict::{compress_with_dict, DictIx};
 use crate::dict::lookup_buffer;
 use crate::tilde_log;
 use crate::TildeRes;
@@ -67,33 +63,9 @@ pub fn decode_uint_vec(letters: &[Letter]) -> Result<(Pos<Vec<UINT>>, Closer), D
     }, closer.value))
 }
 
-//TODO @mark: switch to `encode_str_buffer` for performance-critical code
 pub fn encode_str(text: &str) -> TildeRes<Vec<Letter>> {
-    let mut encoding = Vec::new();
-    encode_str_buffer(text, |letter| encoding.push(letter))?;
-    Ok(encoding)
-}
-
-//TODO @mark: should `compress_with_dict` also take a buffer? at time of writing, now no buffer reuse possible
-pub fn encode_str_buffer(text: &str, writer: impl FnMut(Letter)) -> TildeRes<()> {
     let compress_ops = &compress_with_dict(text);
-    writer(Text);
-
-
-    {
-        let mut letters = vec![];
-        letters.extend(encode_uint_no_modifier_at_start(nrs[0].into()));
-        for nr in nrs.iter().skip(1) {
-            let nr: UINT = (*nr).into();
-            letters.extend(encode_uint_allow_modifiers(nr));
-        }
-        letters.push(match closer {
-            Closer::Text => Text,
-            Closer::Number => Number,
-        });
-        letters
-    }
-
+    let mut encoding = vec![Letter::Text];
     encoding.extend(encode_uint_vec(compress_ops, Closer::Text));
     //TODO @mark: no allocation?
     Ok(encoding)

@@ -1,8 +1,8 @@
 use ::std::borrow::Cow;
+use ::tinyvec::TinyVec;
 
 use crate::common::escape_for_string;
-use crate::compile::encode_str_buffer;
-use crate::compile::GolfWord;
+use crate::compile::{encode_str, GolfWord};
 use crate::Nr;
 use crate::op::{Op, OpTyp};
 
@@ -24,8 +24,11 @@ impl OpTyp for TextOp {
     }
 
     fn golf_code(&self) -> Option<GolfWord> {
-        Some(GolfWord::new(encode_small_str(&self.0).unwrap()))
+        //TODO @mark: make a version that doesn't allocate in encode_str?
+        let mut content = TinyVec::new();
+        content.extend(encode_str(&self.0).unwrap());
         //TODO @mark: is this unwrap safe?
+        Some(GolfWord::new(content))
     }
 }
 
