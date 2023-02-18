@@ -1,31 +1,37 @@
-use ::std::cell::LazyCell;
-use ::std::collections::HashMap;
 use ::std::borrow::Cow;
+use ::std::cell::LazyCell;
+
+use ::fnv::FnvHashMap;
 
 use crate::compile::GolfWord;
 use crate::op::{all_non_literals, Op};
 use crate::tilde_log;
 
 thread_local! {
-    static GOLF_OP_LOOKUP: LazyCell<HashMap<GolfWord, Op>> = LazyCell::new(init_golf_op_lookup);
-    static LONG_OP_LOOKUP: LazyCell<HashMap<&'static str, Op>> = LazyCell::new(init_long_op_lookup);
+    static LONG_OP_LOOKUP: LazyCell<FnvHashMap<&'static str, Op>> = LazyCell::new(init_long_op_lookup);
+    static GOLF_OP_LOOKUP: LazyCell<FnvHashMap<GolfWord, Op>> = LazyCell::new(init_golf_op_lookup);
     //TODO @mark: fnv map
 }
 
-/// Find [OpTyp] by identifeir. Not applicable for literals (text, number).
+/// Find [Op] by identifier. Not applicable for literals (text, number).
 pub fn lookup_op_long(op_name: &str) -> Option<Op> {
     LONG_OP_LOOKUP.with(|lookup| lookup.get(op_name).cloned())
 }
 
+/// Find [Op] by golf code, if it has a golf code (experimental ops may not). Not applicable for literals (text, number).
+pub fn lookup_op_golf(op_name: &GolfWord) -> Option<Op> {
+    GOLF_OP_LOOKUP.with(|lookup| lookup.get(op_name).cloned())
+}
+
 //TODO @mark: use
-fn init_golf_op_lookup() -> HashMap<GolfWord, Op> {
+fn init_golf_op_lookup() -> FnvHashMap<GolfWord, Op> {
     tilde_log!("initializing lookup map by golf code");
     all_non_literals().into_iter()
         .flat_map(|op| op.golf_code().map(|name| (name, op)).into_iter())
-        .collect::<HashMap<GolfWord, Op>>()
+        .collect()
 }
 
-fn init_long_op_lookup() -> HashMap<&'static str, Op> {
+fn init_long_op_lookup() -> FnvHashMap<&'static str, Op> {
     tilde_log!("initializing lookup map by long identifier");
     all_non_literals().into_iter()
         .map(|op| {
@@ -34,7 +40,7 @@ fn init_long_op_lookup() -> HashMap<&'static str, Op> {
             };
             (name, op)
         })
-        .collect::<HashMap<&'static str, Op>>()
+        .collect()
 }
 
 #[cfg(test)]
@@ -44,11 +50,22 @@ mod tests {
     use super::*;
 
     #[test]
-    fn all_ops_parseable() {
+    fn all_long_ops_parseable() {
         for orig_op in all_non_literals() {
             let name = orig_op.long_code();
             let parse_op = lookup_op_long(name.as_ref());
-            assert!(parse_op.is_some(), "could not parse op: {name}, add it to `lookup_op_name`");
+            assert!(parse_op.is_some(), "could not parse op by long name: {name}");
+        }
+    }
+
+    #[test]
+    fn all_golf_ops_parseable() {
+        for orig_op in all_non_literals() {
+            let Some(name) = orig_op.golf_code() else {
+                continue
+            };
+            let parse_op = lookup_op_golf(&name);
+            assert!(parse_op.is_some(), "could not parse op by golf name: {name:?}");
         }
     }
     //TODO @mark: similar to ^ for golf name

@@ -25,7 +25,7 @@ impl OpTyp for Div {
     }
 
     fn golf_code(&self) -> Option<GolfWord> {
-        todo!()
+        None  //TODO @mark:
     }
 
     fn as_any(&self) -> &dyn Any {
@@ -45,7 +45,7 @@ impl IntDiv {
 impl OpTyp for IntDiv {
 
     fn description(&self) -> &'static str {
-        todo!()
+        "divide rounding down"
     }
 
     fn long_code(&self) -> Cow<'static, str> {
@@ -53,7 +53,7 @@ impl OpTyp for IntDiv {
     }
 
     fn golf_code(&self) -> Option<GolfWord> {
-        todo!()
+        None  //TODO @mark:
     }
 
     fn as_any(&self) -> &dyn Any {
