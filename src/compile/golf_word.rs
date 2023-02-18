@@ -7,7 +7,6 @@ use ::tinyvec::TinyVec;
 use ::tinyvec::TinyVecIterator;
 
 use crate::compile::{Letter, LetterKind};
-use crate::compile::LetterKind::Modifier;
 use crate::TildeRes;
 
 // max length does not apply to literals, which are unbounded,
@@ -46,7 +45,7 @@ impl GolfWord {
             }
             Modifier => return Err(format!("golf identifier cannot start with modifier token {}", letters[0]))
         }
-        let mut hash = calculate_id(&letters);
+        let hash = calculate_id(&letters);
         Ok(GolfWord {
             letters,
             id: hash,
@@ -56,7 +55,7 @@ impl GolfWord {
     pub fn new(letters: GolfWordContent) -> Self {
         match Self::try_new(letters) {
             Ok(gw) => gw,
-            Err(err) => panic!("invalid golf identifier '{letters:?}', err: {err}"),
+            Err(err) => panic!("{err}"),
         }
     }
 }

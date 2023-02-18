@@ -50,12 +50,12 @@ mod op_properties {
         ops.push(NumberOp::new(123_456_789));
         let mut names = HashSet::with_capacity(2 * ops.len() + 8);
         for op in ops {
-            assert!(!names.insert(op.long_code().into_owned()));
+            eprintln!("names1 = {:?}", names);  //TODO @mark: TEMPORARY! REMOVE THIS!
+            assert!(names.insert(op.long_code().into_owned()), "duplicate Op identifier (long): {}", op.long_code());
             if let Some(name) = op.golf_code() {
-                assert!(!names.insert(name.to_string()));
+                eprintln!("names2 = {:?}", names);  //TODO @mark: TEMPORARY! REMOVE THIS!
+                assert!(names.insert(name.to_string()), "duplicate Op identifier (short): {}", name);
             }
         }
-        let unique_names = names.iter().collect::<HashSet<_>>();
-        assert_eq!(names.len(), unique_names.len());
     }
 }
