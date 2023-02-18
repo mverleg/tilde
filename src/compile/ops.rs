@@ -13,7 +13,8 @@ thread_local! {
 
 /// Find [OpTyp] by identifeir. Not applicable for literals (text, number).
 pub fn lookup_op_long(op_name: &str) -> Option<Op> {
-    LONG_OP_LOOKUP.with(|lookup| lookup.get(op_name).cloned())
+    //LONG_OP_LOOKUP.with(|lookup| lookup.get(op_name).cloned())
+    todo!()  //TODO @mark:
 }
 
 //TODO @mark: use
