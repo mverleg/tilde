@@ -1,9 +1,8 @@
 use ::std::borrow::Cow;
 
-use ::tinyvec::ArrayVec;
-
 use crate::common::escape_for_string;
-use crate::compile::{encode_str, GolfWord, Letter};
+use crate::compile::encode_str;
+use crate::compile::GolfWord;
 use crate::Nr;
 use crate::op::{Op, OpTyp};
 
@@ -21,7 +20,7 @@ impl OpTyp for TextOp {
     }
 
     fn long_code(&self) -> Cow<str> {
-        Some(Cow::Owned(format!("\"{}\"", escape_for_string(self.0))))
+        Cow::Owned(format!("\"{}\"", escape_for_string(self.0)))
     }
 
     fn golf_code(&self) -> Option<GolfWord> {
@@ -54,7 +53,7 @@ impl OpTyp for NumberOp {
     }
 
     fn long_code(&self) -> Cow<str> {
-        Some(Cow::Owned(format!("{}", self.0)))
+        Cow::Owned(format!("{}", self.0))
     }
 
     fn golf_code(&self) -> Option<GolfWord> {

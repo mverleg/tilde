@@ -56,11 +56,12 @@ impl hash::Hash for GolfWord {
 
 pub fn calculate_id(letters: &[Letter]) -> WordId {
     debug_assert!(letters.len() <= 2 * size_of::<WordId>());
-    let mut scale: WordId = 1;
+    let mut scale = 1;
     let mut id = 0;
     for letter in letters {
-        id += scale * letter.nr().into();
-        scale *= Letter::option_count();
+        let letter_val: WordId = letter.nr().into();
+        id += letter_val * scale;
+        scale *= Letter::option_count() as WordId;
     }
     id
 }

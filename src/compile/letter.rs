@@ -187,6 +187,13 @@ impl Letter {
     }
 }
 
+/// Purely for technical reasons like ArrayVec
+impl Default for Letter {
+    fn default() -> Self {
+        Letter::Number
+    }
+}
+
 impl LetterKind {
     pub fn iter() -> IntoIter<LetterKind, 4> {
         use self::LetterKind::*;

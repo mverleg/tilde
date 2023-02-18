@@ -1,10 +1,9 @@
 use ::std::borrow::Cow;
 use ::std::fmt::Debug;
 use ::std::ops::Deref;
+use crate::compile::GolfWord;
 
-use ::tinyvec::ArrayVec;
 
-use crate::compile::{GolfWord, Letter};
 use crate::Nr;
 
 pub use self::literal::NumberOp;
@@ -35,13 +34,13 @@ impl Deref for Op {
     type Target = dyn OpTyp;
 
     fn deref(&self) -> &Self::Target {
-        *self.val
+        &*self.val
     }
 }
 
 pub fn all_non_literals() -> [&'static Op; 1] {
     [
-        NumberOp(Nr::zero()).into(),  //TODO @mark: remove (special only)
+        NumberOp::new(Nr::zero()).into(),  //TODO @mark: remove (special only)
     ]
 }
 

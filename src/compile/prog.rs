@@ -1,10 +1,8 @@
 use ::std::fmt::Write;
 use ::std::ops::Index;
 pub use ::std::slice;
-use ::tinyvec::ArrayVec;
 
 use crate::common::b64_encode;
-use crate::compile::golf_word::GolfWord;
 use crate::compile::Letter;
 use crate::op::Op;
 use crate::TildeRes;
