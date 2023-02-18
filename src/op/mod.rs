@@ -13,7 +13,7 @@ pub use self::arithmetic::IntDiv;
 mod literal;
 mod arithmetic;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Op {
     // This only allocates for the Ops with data, i.e. literals
     val: Box<dyn OpTyp>,
@@ -25,9 +25,7 @@ impl Op {
     }
 }
 
-pub trait OpTyp: Debug {
-
-    fn name(&self) -> &'static str;
+pub trait OpTyp: Debug + Clone {
 
     fn description(&self) -> &'static str;
 

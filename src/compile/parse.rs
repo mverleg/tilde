@@ -2,7 +2,7 @@ use ::std::fmt::Debug;
 
 use crate::{Nr, tilde_log};
 use crate::compile::Letter;
-use crate::compile::ops::lookup_op_name;
+use crate::compile::ops::lookup_op_long;
 use crate::compile::Prog;
 use crate::compile::text_literal::decode_str;
 use crate::op::{NumberOp, TextOp};
@@ -65,7 +65,7 @@ pub fn parse(src: &str) -> TildeRes<Prog> {
                 string_buffer.push(token)
             }
             tilde_log!("operator by long name: \"{}\"", &string_buffer);
-            let op = lookup_op_name(&string_buffer).ok_or_else(|| format!("could not find an identifier by name '{}'", &string_buffer))?;
+            let op = lookup_op_long(&string_buffer).ok_or_else(|| format!("could not find an identifier by name '{}'", &string_buffer))?;
             ops.push(op)
         } else if current == '"' {
             //TODO @mark: make more resistant to closer changes?

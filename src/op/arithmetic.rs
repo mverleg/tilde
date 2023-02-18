@@ -15,10 +15,6 @@ impl Div {
 
 impl OpTyp for Div {
 
-    fn name(&self) -> &'static str {
-        "div"
-    }
-
     fn description(&self) -> &'static str {
         "divide without rounding"
     }
@@ -50,10 +46,6 @@ impl IntDiv {
 }
 
 impl OpTyp for IntDiv {
-
-    fn name(&self) -> &'static str {
-        "int-div"
-    }
 
     fn description(&self) -> &'static str {
         todo!()

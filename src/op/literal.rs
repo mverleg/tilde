@@ -13,10 +13,6 @@ pub struct TextOp(String);
 
 impl OpTyp for TextOp {
 
-    fn name(&self) -> &'static str {
-        todo!()  //TODO @mark:
-    }
-
     fn description(&self) -> &'static str {
         todo!()  //TODO @mark:
     }
@@ -58,10 +54,6 @@ impl TextOp {
 pub struct NumberOp(Nr);
 
 impl OpTyp for NumberOp {
-
-    fn name(&self) -> &'static str {
-        todo!()  //TODO @mark:
-    }
 
     fn description(&self) -> &'static str {
         todo!()  //TODO @mark:

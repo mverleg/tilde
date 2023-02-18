@@ -71,6 +71,7 @@ impl hash::Hash for GolfWord {
 
 pub fn calculate_id(letters: &[Letter]) -> WordId {
     debug_assert!(letters.len() <= 2 * size_of::<WordId>());
+    //TODO @mark: this condition isn't true for literals, refactor?
     let mut scale = 1;
     let mut id = 0;
     for letter in letters {
