@@ -69,7 +69,7 @@ impl<T> OpEq for T where T: 'static + OpTyp + PartialEq {
 
 impl PartialEq for Op {
     fn eq(&self, other: &Self) -> bool {
-        self.val.is_equal(other)
+        self.val.is_equal(&*other.val)
     }
 }
 
