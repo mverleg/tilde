@@ -100,7 +100,7 @@ fn decode_uint_with_openers(
         return Err(DecodeError::TextNode);
     }
     let value = opener_values[opener.nr() as usize];
-    if value >= 16 {
+    if value >= Letter::option_count() as u64 {
         return Err(DecodeError::UnexpectedNode);
     }
     let open_n = (openers.len() / 2) as UINT;
@@ -239,8 +239,7 @@ mod constants_in_sync {
             expected[letter.nr() as usize] = value.try_into().unwrap();
         }
         assert_eq!(
-            expected
-                .iter()
+            expected.iter()
                 .filter(|val| **val < 16)
                 .count(),
             letters.len()

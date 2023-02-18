@@ -9,8 +9,9 @@ pub fn b64_encode(source: &[Letter]) -> TildeRes<String> {
     let mut bytes = Vec::with_capacity(source.len() * 4);
     let letters = source;
     let mut i = 0;
+    let possible_letter_cnt = Letter::option_count() as u8;
     while i + 1 < letters.len() {
-        bytes.push(16 * letters[i].nr() + letters[i + 1].nr());
+        bytes.push(possible_letter_cnt as u8 * letters[i].nr() + letters[i + 1].nr());
         i += 2;
     }
     if i < letters.len() {
@@ -19,7 +20,7 @@ pub fn b64_encode(source: &[Letter]) -> TildeRes<String> {
         //TODO @mverleg: They may actually already be part of a string, right? in which case we could add text close, but that requires parsing
         let pad = Letter::Io;
         debug_assert!(pad.kind() == LetterKind::FixedOpen);
-        bytes.push(16 * letters[i].nr() + pad.nr())
+        bytes.push(possible_letter_cnt * letters[i].nr() + pad.nr())
     }
     Ok(URL_SAFE_NO_PAD.encode(bytes))
 }
@@ -29,9 +30,10 @@ pub fn b64_decode(base64_source: &str) -> TildeRes<Vec<Letter>> {
         return Err("base64 encoding not valid, alphabet should be A-Za-z0-9-_ without padding".to_string());
     };
     let mut letters = Vec::with_capacity(src_bytes.len() * 2);
+    let possible_letter_cnt = Letter::option_count() as u8;
     for byte in src_bytes {
-        letters.push(Letter::from_nr(byte / 16));
-        letters.push(Letter::from_nr(byte % 16));
+        letters.push(Letter::from_nr(byte / possible_letter_cnt));
+        letters.push(Letter::from_nr(byte % possible_letter_cnt));
     }
     if letters.last().map(|pad| pad.kind() == LetterKind::FixedOpen).unwrap_or(false) {
         letters.pop();

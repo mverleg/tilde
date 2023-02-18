@@ -18,11 +18,19 @@ pub struct GolfWord {
 
 impl GolfWord {
     pub fn new(letters: GolfWordContent) -> Self {
+        debug_assert!(!letters.is_empty());
+        //TODO @mark: validate that this is a real word
         let mut hash = 0;
         GolfWord {
             letters,
             id: hash,
         }
+    }
+}
+
+impl From<GolfWordContent> for GolfWord {
+    fn from(value: GolfWordContent) -> Self {
+        GolfWord::new(value)
     }
 }
 
@@ -46,7 +54,7 @@ pub fn calculate_id(letters: &[Letter]) -> WordId {
     let mut id = 0;
     for letter in letters {
         id += scale * letter.nr().into();
-        scale *= 16;
+        scale *= Letter::option_count();
     }
     id
 }

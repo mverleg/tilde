@@ -42,7 +42,7 @@ pub enum LetterKind {
 }
 
 impl Letter {
-    fn all_ordered() -> [Letter; 16] {
+    const fn all_ordered() -> [Letter; 16] {
         use self::Letter::*;
         [
             Io,
@@ -98,6 +98,10 @@ impl Letter {
 
             _ => return None
         })
+    }
+
+    pub const fn option_count() -> usize {
+        Self::all_ordered().len()
     }
 
     pub fn nr(&self) -> u8 {
