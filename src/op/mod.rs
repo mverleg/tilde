@@ -1,6 +1,7 @@
 use ::std::borrow::Cow;
 use ::std::fmt::Debug;
 use ::std::ops::Deref;
+use ::std::any::Any;
 
 use crate::compile::GolfWord;
 
@@ -31,7 +32,17 @@ pub trait OpTyp: Debug {
 
     fn golf_code(&self) -> Option<GolfWord>;
 
+    fn as_any(&self) -> &dyn Any;
+
+    fn is_equal(&self, other: &dyn OpTyp) -> bool;
+
     //TODO @mark: evaluation methods
+}
+
+impl PartialEq for Op {
+    fn eq(&self, other: &Op) -> bool {
+        self.val.is_equal(&*other.val)
+    }
 }
 
 impl Deref for Op {

@@ -1,4 +1,6 @@
 use ::std::borrow::Cow;
+use ::std::any::Any;
+
 use ::tinyvec::TinyVec;
 
 use crate::common::escape_for_string;
@@ -6,7 +8,7 @@ use crate::compile::{encode_str, GolfWord};
 use crate::Nr;
 use crate::op::{Op, OpTyp};
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct TextOp(String);
 
 impl OpTyp for TextOp {
@@ -30,6 +32,16 @@ impl OpTyp for TextOp {
         //TODO @mark: is this unwrap safe?
         Some(GolfWord::new(content))
     }
+
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+
+    fn is_equal(&self, other: &dyn OpTyp) -> bool {
+        other.as_any()
+            .downcast_ref::<Self>()
+            .map_or(false, |other_cast| self == other_cast)
+    }
 }
 
 impl TextOp {
@@ -42,7 +54,7 @@ impl TextOp {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct NumberOp(Nr);
 
 impl OpTyp for NumberOp {
@@ -61,6 +73,16 @@ impl OpTyp for NumberOp {
 
     fn golf_code(&self) -> Option<GolfWord> {
         todo!()  //TODO @mark:
+    }
+
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+
+    fn is_equal(&self, other: &dyn OpTyp) -> bool {
+        other.as_any()
+            .downcast_ref::<Self>()
+            .map_or(false, |other_cast| self == other_cast)
     }
 }
 

@@ -7,7 +7,7 @@ use crate::compile::Letter;
 use crate::op::Op;
 use crate::TildeRes;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct Prog {
     ops: Vec<Op>,
 }
