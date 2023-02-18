@@ -1,7 +1,6 @@
 use ::std::fmt;
 use ::std::hash;
 use ::std::hash::Hasher;
-use ::std::mem::size_of;
 
 use ::tinyvec::TinyVec;
 use ::tinyvec::TinyVecIterator;
@@ -107,13 +106,15 @@ impl fmt::Display for GolfWord {
 
 pub fn calculate_id(letters: &[Letter]) -> WordId {
     let mut scale = 1;
-    let mut id = 0;
+    let mut id: u32 = 0;
     for letter in letters {
         let letter_val: WordId = letter.nr().into();
-        id += letter_val * scale;
-        scale *= Letter::option_count() as WordId;
-        if scale >= WordId::MAX {
-            scale = scale / WordId::MAX + 1;
+        id = id.overflowing_add(letter_val.saturating_mul(scale)).0;
+        let new_scale_res = scale.overflowing_mul(Letter::option_count() as WordId);
+        scale = new_scale_res.0;
+        if new_scale_res.1 {
+            scale += 1;
+            //TODO @mark: useful? does this help entropy?
         }
     }
     id
@@ -126,14 +127,14 @@ mod id_tests {
     #[test]
     fn non_literal() {
         let id = calculate_id(&[Letter::Seq, Letter::Number, Letter::Hat]);
-        assert_eq!(id, 1);
+        assert_eq!(id, 2529);
     }
 
     #[test]
     fn literal() {
         let id = calculate_id(&[Letter::Text, Letter::Seq, Letter::Seq, Letter::Seq, Letter::Seq, Letter::Seq,
             Letter::Seq, Letter::Seq, Letter::Seq, Letter::Seq, Letter::Seq, Letter::Seq, Letter::Seq, Letter::Seq]);
-        assert_eq!(id, 1);
+        assert_eq!(id, 287449648);
     }
 }
 

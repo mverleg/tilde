@@ -57,5 +57,6 @@ mod op_properties {
                 assert!(names.insert(name.to_string()), "duplicate Op identifier (short): {}", name);
             }
         }
+        //todo!("why is this doing compression?")
     }
 }

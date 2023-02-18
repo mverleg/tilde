@@ -58,7 +58,7 @@ impl OpTyp for NumberOp {
     }
 
     fn golf_code(&self) -> Option<GolfWord> {
-        todo!()  //TODO @mark:
+        None
     }
 
     fn as_any(&self) -> &dyn Any {
