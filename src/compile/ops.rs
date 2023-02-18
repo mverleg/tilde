@@ -1,32 +1,33 @@
 use crate::op::Op;
+use crate::op::OpTyp;
 
-/// Find [Op] by identifeir. Not applicable for literals (text, number).
+/// Find [OpTyp] by identifeir. Not applicable for literals (text, number).
 pub fn lookup_op_name(op_name: &str) -> Option<Op> {
     Some(match op_name {
-        "neg" => Op::Neg,
-        "abs" => Op::Abs,
-        "incr" => Op::Incr,
-        "decr" => Op::Decr,
+        "neg" => OpTyp::Neg,
+        "abs" => OpTyp::Abs,
+        "incr" => OpTyp::Incr,
+        "decr" => OpTyp::Decr,
 
-        "plus" => Op::Plus,
-        "minus" => Op::Minus,
-        "mul" => Op::Mul,
-        "div" => Op::Div,
-        "int-div" => Op::IntDiv,
-        "modulo" => Op::Mod,
+        "plus" => OpTyp::Plus,
+        "minus" => OpTyp::Minus,
+        "mul" => OpTyp::Mul,
+        "div" => OpTyp::Div,
+        "int-div" => OpTyp::IntDiv,
+        "modulo" => OpTyp::Mod,
 
-        "eq" => Op::Eq,
-        "neq" => Op::Neq,
-        "gt" => Op::Gt,
-        "gte" => Op::Gte,
-        "lt" => Op::Lt,
-        "lte" => Op::Lte,
+        "eq" => OpTyp::Eq,
+        "neq" => OpTyp::Neq,
+        "gt" => OpTyp::Gt,
+        "gte" => OpTyp::Gte,
+        "lt" => OpTyp::Lt,
+        "lte" => OpTyp::Lte,
 
-        "and" => Op::And,
-        "or" => Op::Or,
-        "nand" => Op::Nand,
-        "xor" => Op::Xor,
-        "impl" => Op::Impl,
+        "and" => OpTyp::And,
+        "or" => OpTyp::Or,
+        "nand" => OpTyp::Nand,
+        "xor" => OpTyp::Xor,
+        "impl" => OpTyp::Impl,
 
         _ => return None,
     })
@@ -38,7 +39,7 @@ mod tests {
 
     #[test]
     fn all_ops_parseable() {
-        for orig_op in Op::iter() {
+        for orig_op in OpTyp::iter() {
             let name = orig_op.name();
             if name == "text" || name == "nr" {
                 continue;

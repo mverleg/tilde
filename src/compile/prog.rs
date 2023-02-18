@@ -4,7 +4,7 @@ pub use ::std::slice;
 
 use crate::common::b64_encode;
 use crate::compile::Letter;
-use crate::op::Op;
+use crate::op::{Op, OpTyp};
 use crate::TildeRes;
 
 #[derive(Debug, PartialEq)]

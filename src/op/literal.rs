@@ -5,12 +5,12 @@ use ::tinyvec::ArrayVec;
 use crate::common::escape_for_string;
 use crate::compile::{encode_str, Letter};
 use crate::Nr;
-use crate::op::Op;
+use crate::op::{Op, OpTyp};
 
 #[derive(Debug)]
 pub struct Text(String);
 
-impl Op for Text {
+impl OpTyp for Text {
 
     fn name(&self) -> &'static str {
         todo!()  //TODO @mark:
@@ -33,7 +33,7 @@ impl Op for Text {
 #[derive(Debug)]
 pub struct Number(Nr);
 
-impl Op for Number {
+impl OpTyp for Number {
 
     fn name(&self) -> &'static str {
         todo!()  //TODO @mark:
@@ -47,7 +47,7 @@ impl Op for Number {
         Some(Cow::Owned(format!("{}", self.0)))
     }
 
-    fn golf_code(&self) -> Option<()> {
+    fn golf_code(&self) -> Option<ArrayVec<Letter>> {
         todo!()  //TODO @mark:
     }
 }

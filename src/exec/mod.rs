@@ -1,7 +1,7 @@
 use crate::compile::Prog;
 // use crate::exec::mathbool::exec_math1;
 // use crate::exec::mathbool::exec_math2;
-use crate::op::Op;
+use crate::op::OpTyp;
 use crate::TildeRes;
 
 pub use self::data::Array;
@@ -21,29 +21,29 @@ pub fn execute(
     let mut stack = Vec::new();
     while let Some(op) = prog.get(i) {
         match op {
-            Op::Text(text) => stack.push(Value::Txt(Text::of(text))),
-            Op::Number(nr) => stack.push(Value::Num(Number::of(*nr))),
-            Op::Neg => todo!(),
-            Op::Abs => todo!(),
-            Op::Incr => todo!(),
-            Op::Decr => todo!(),
-            Op::Plus => todo!(),
-            Op::Minus => todo!(),
-            Op::Mul => todo!(),
-            Op::Div => todo!(),
-            Op::IntDiv => todo!(),
-            Op::Mod => todo!(),
-            Op::Eq => todo!(),
-            Op::Neq => todo!(),
-            Op::Gt => todo!(),
-            Op::Gte => todo!(),
-            Op::Lt => todo!(),
-            Op::Lte => todo!(),
-            Op::And => todo!(),
-            Op::Or => todo!(),
-            Op::Nand => todo!(),
-            Op::Xor => todo!(),
-            Op::Impl => todo!(),
+            OpTyp::Text(text) => stack.push(Value::Txt(Text::of(text))),
+            OpTyp::Number(nr) => stack.push(Value::Num(Number::of(*nr))),
+            OpTyp::Neg => todo!(),
+            OpTyp::Abs => todo!(),
+            OpTyp::Incr => todo!(),
+            OpTyp::Decr => todo!(),
+            OpTyp::Plus => todo!(),
+            OpTyp::Minus => todo!(),
+            OpTyp::Mul => todo!(),
+            OpTyp::Div => todo!(),
+            OpTyp::IntDiv => todo!(),
+            OpTyp::Mod => todo!(),
+            OpTyp::Eq => todo!(),
+            OpTyp::Neq => todo!(),
+            OpTyp::Gt => todo!(),
+            OpTyp::Gte => todo!(),
+            OpTyp::Lt => todo!(),
+            OpTyp::Lte => todo!(),
+            OpTyp::And => todo!(),
+            OpTyp::Or => todo!(),
+            OpTyp::Nand => todo!(),
+            OpTyp::Xor => todo!(),
+            OpTyp::Impl => todo!(),
         }
         i += 1;
     }
