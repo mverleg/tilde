@@ -4,7 +4,7 @@ pub use ::std::slice;
 
 use crate::common::b64_encode;
 use crate::compile::Letter;
-use crate::op::{Op, OpTyp};
+use crate::op::Op;
 use crate::TildeRes;
 
 #[derive(Debug)]
@@ -57,7 +57,11 @@ impl Prog {
         //TODO @mark: cache?
         let mut letters = Vec::with_capacity(self.ops.len() * 4);
         for op in &self.ops {
-            letters.extend(op.golf_code()?)
+            let word = op.golf_code()
+                .ok_or_else(|| format!("operation {:?} has no golf representation", op))?;
+            for letter in word.as_ref() {
+                letters.push(letter);
+            }
         }
         //TODO @mark: make a minify function with more tricks
         if letters.last() == Some(&Letter::Text) {

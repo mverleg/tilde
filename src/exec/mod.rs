@@ -1,7 +1,6 @@
 use crate::compile::Prog;
 // use crate::exec::mathbool::exec_math1;
 // use crate::exec::mathbool::exec_math2;
-use crate::op::OpTyp;
 use crate::TildeRes;
 
 pub use self::data::Array;
@@ -20,31 +19,32 @@ pub fn execute(
     let mut i = 0;
     let mut stack = Vec::new();
     while let Some(op) = prog.get(i) {
-        match op {
-            OpTyp::Text(text) => stack.push(Value::Txt(Text::of(text))),
-            OpTyp::Number(nr) => stack.push(Value::Num(Number::of(*nr))),
-            OpTyp::Neg => todo!(),
-            OpTyp::Abs => todo!(),
-            OpTyp::Incr => todo!(),
-            OpTyp::Decr => todo!(),
-            OpTyp::Plus => todo!(),
-            OpTyp::Minus => todo!(),
-            OpTyp::Mul => todo!(),
-            OpTyp::Div => todo!(),
-            OpTyp::IntDiv => todo!(),
-            OpTyp::Mod => todo!(),
-            OpTyp::Eq => todo!(),
-            OpTyp::Neq => todo!(),
-            OpTyp::Gt => todo!(),
-            OpTyp::Gte => todo!(),
-            OpTyp::Lt => todo!(),
-            OpTyp::Lte => todo!(),
-            OpTyp::And => todo!(),
-            OpTyp::Or => todo!(),
-            OpTyp::Nand => todo!(),
-            OpTyp::Xor => todo!(),
-            OpTyp::Impl => todo!(),
-        }
+        todo!();
+        // match op {
+        //     OpTyp::Text(text) => stack.push(Value::Txt(Text::of(text))),
+        //     OpTyp::Number(nr) => stack.push(Value::Num(Number::of(*nr))),
+        //     OpTyp::Neg => todo!(),
+        //     OpTyp::Abs => todo!(),
+        //     OpTyp::Incr => todo!(),
+        //     OpTyp::Decr => todo!(),
+        //     OpTyp::Plus => todo!(),
+        //     OpTyp::Minus => todo!(),
+        //     OpTyp::Mul => todo!(),
+        //     OpTyp::Div => todo!(),
+        //     OpTyp::IntDiv => todo!(),
+        //     OpTyp::Mod => todo!(),
+        //     OpTyp::Eq => todo!(),
+        //     OpTyp::Neq => todo!(),
+        //     OpTyp::Gt => todo!(),
+        //     OpTyp::Gte => todo!(),
+        //     OpTyp::Lt => todo!(),
+        //     OpTyp::Lte => todo!(),
+        //     OpTyp::And => todo!(),
+        //     OpTyp::Or => todo!(),
+        //     OpTyp::Nand => todo!(),
+        //     OpTyp::Xor => todo!(),
+        //     OpTyp::Impl => todo!(),
+        // }
         i += 1;
     }
     Ok(stack.pop().unwrap_or(Value::None))
