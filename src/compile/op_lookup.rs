@@ -20,7 +20,9 @@ pub fn lookup_op_long(op_name: &str) -> Option<Op> {
 //TODO @mark: use
 fn init_golf_op_lookup() -> HashMap<GolfWord, Op> {
     tilde_log!("initializing lookup map by golf code");
-    todo!()   //TODO @mark:
+    all_non_literals().into_iter()
+        .flat_map(|op| op.golf_code().map(|name| (name, op)).into_iter())
+        .collect::<HashMap<GolfWord, Op>>()
 }
 
 fn init_long_op_lookup() -> HashMap<&'static str, Op> {
