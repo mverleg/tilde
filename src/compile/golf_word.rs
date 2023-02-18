@@ -1,3 +1,4 @@
+use ::std::fmt;
 use ::std::hash;
 use ::std::hash::Hasher;
 use ::std::mem::size_of;
@@ -66,6 +67,15 @@ impl Eq for GolfWord {}
 impl hash::Hash for GolfWord {
     fn hash<H: Hasher>(&self, state: &mut H) {
         state.write_u32(self.id)
+    }
+}
+
+impl fmt::Display for GolfWord {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        for letter in &self.letters {
+            write!(f, "{}", letter)?
+        }
+        Ok(())
     }
 }
 

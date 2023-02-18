@@ -1,4 +1,5 @@
 use ::std::array::IntoIter;
+use ::std::fmt;
 use ::std::hash::Hash;
 
 //TODO @mark: meaningful names
@@ -191,6 +192,12 @@ impl Letter {
 impl Default for Letter {
     fn default() -> Self {
         Letter::Number
+    }
+}
+
+impl fmt::Display for Letter {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.symbol())
     }
 }
 
