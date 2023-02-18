@@ -20,7 +20,7 @@ impl OpTyp for TextOp {
     }
 
     fn long_code(&self) -> Cow<str> {
-        Cow::Owned(format!("\"{}\"", escape_for_string(self.0)))
+        Cow::Owned(format!("\"{}\"", escape_for_string(&self.0)))
     }
 
     fn golf_code(&self) -> Option<GolfWord> {
@@ -34,11 +34,11 @@ impl OpTyp for TextOp {
 
 impl TextOp {
     pub fn new_pure(txt: impl Into<String>) -> Self {
-        TextOp(txt)
+        TextOp(txt.into())
     }
 
     pub fn new(txt: impl Into<String>) -> Op {
-        Op::of(TextOp(txt))
+        Op::of(TextOp::new_pure(txt))
     }
 }
 
@@ -70,6 +70,6 @@ impl NumberOp {
     }
 
     pub fn new(nr: impl Into<Nr>) -> Op {
-        Op(Self::new_pure(nr))
+        Op::of(Self::new_pure(nr))
     }
 }

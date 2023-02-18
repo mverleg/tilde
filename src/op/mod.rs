@@ -3,7 +3,6 @@ use ::std::fmt::Debug;
 use ::std::ops::Deref;
 
 use crate::compile::GolfWord;
-use crate::Nr;
 
 pub use self::literal::NumberOp;
 pub use self::literal::TextOp;
@@ -17,7 +16,7 @@ pub struct Op {
 }
 
 impl Op {
-    pub fn of(op: impl OpTyp) -> Self {
+    pub fn of(op: impl OpTyp + 'static) -> Self {
         Op { val: Box::new(op) }
     }
 }
@@ -43,9 +42,10 @@ impl Deref for Op {
     }
 }
 
-pub fn all_non_literals() -> [&'static Op; 1] {
+pub fn all_non_literals() -> [&'static Op; 0] {
+    //TODO @mark:
     [
-        &NumberOp::new(Nr::zero()),  //TODO @mark: remove (special only)
+        //NumberOp::new(Nr::zero()),  //TODO @mark: remove (special only)
     ]
 }
 

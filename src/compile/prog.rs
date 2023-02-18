@@ -59,7 +59,7 @@ impl Prog {
         for op in &self.ops {
             let word = op.golf_code()
                 .ok_or_else(|| format!("operation {:?} has no golf representation", op))?;
-            letters.extend(&letters);
+            letters.extend(word);
         }
         //TODO @mark: make a minify function with more tricks
         if letters.last() == Some(&Letter::Text) {

@@ -3,6 +3,7 @@ use ::std::hash::Hasher;
 use ::std::mem::size_of;
 
 use ::tinyvec::TinyVec;
+use ::tinyvec::TinyVecIterator;
 
 use crate::compile::Letter;
 
@@ -24,7 +25,8 @@ impl GolfWord {
     pub fn new(letters: GolfWordContent) -> Self {
         debug_assert!(!letters.is_empty());
         //TODO @mark: validate that this is a real word
-        let mut hash = 0;
+        todo!();
+        let mut hash = calculate_id(&letters);
         GolfWord {
             letters,
             id: hash,
@@ -41,6 +43,15 @@ impl From<GolfWordContent> for GolfWord {
 impl AsRef<[Letter]> for GolfWord {
     fn as_ref(&self) -> &[Letter] {
         &self.letters
+    }
+}
+
+impl IntoIterator for GolfWord {
+    type Item = Letter;
+    type IntoIter = TinyVecIterator<[Letter; 3]>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.letters.into_iter()
     }
 }
 

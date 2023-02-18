@@ -16,7 +16,7 @@ pub fn execute(
     prog: Prog,
     inp: Vec<String>,
 ) -> TildeRes<Value> {
-    let mut i = 0;
+    let i = 0;
     let mut stack = Vec::new();
     while let Some(op) = prog.get(i) {
         todo!();
