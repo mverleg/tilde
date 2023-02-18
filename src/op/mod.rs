@@ -48,16 +48,14 @@ mod op_properties {
         ops.push(NumberOp::new(0));
         ops.push(NumberOp::new(-1));
         ops.push(NumberOp::new(123_456_789));
-        let mut names = Vec::with_capacity(2 * ops.len() + 8);
+        let mut names = HashSet::with_capacity(2 * ops.len() + 8);
         for op in ops {
-            names.push(op.long_code().into_owned());
+            assert!(!names.insert(op.long_code().into_owned()));
             if let Some(name) = op.golf_code() {
-                names.push(name.to_string());
+                assert!(!names.insert(name.to_string()));
             }
         }
         let unique_names = names.iter().collect::<HashSet<_>>();
         assert_eq!(names.len(), unique_names.len());
     }
 }
-
-//TODO @mark: name unique and identifier-safe
