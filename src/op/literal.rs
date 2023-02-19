@@ -5,8 +5,10 @@ use ::tinyvec::TinyVec;
 
 use crate::common::escape_for_string;
 use crate::compile::{encode_str, GolfWord};
+use crate::exec::{Text, Value};
 use crate::Nr;
 use crate::op::{Op, OpTyp};
+use crate::op::typ::Executor;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct TextOp(String);
@@ -31,6 +33,10 @@ impl OpTyp for TextOp {
 
     fn as_any(&self) -> &dyn Any {
         self
+    }
+
+    fn executor<'a>(&'a self) -> Executor<'a> {
+        Executor::Nullary(|| Value::Txt(Text::of(self.0)))
     }
 }
 

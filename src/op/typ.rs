@@ -4,6 +4,7 @@ use ::std::fmt::Debug;
 use ::std::ops::Deref;
 
 use crate::compile::GolfWord;
+use crate::exec::Values;
 
 #[derive(Debug)]
 pub struct Op {
@@ -17,6 +18,21 @@ impl Op {
     }
 }
 
+/// Different types of execution, based on input.
+/// Each of these may push any number of outputs.
+pub enum Executor<'a> {
+    /// Does not consume any stack values
+    Nullary(&'a dyn FnOnce() -> Values),
+    /// Consumes one stack value
+    Unary,
+    ///
+    Binary,
+    ///
+    BinaryOpaque,
+    ///
+    TernaryOpaque,
+}
+
 pub trait OpTyp: Debug + OpClone + OpEq {
 
     fn description(&self) -> &'static str;
@@ -26,6 +42,8 @@ pub trait OpTyp: Debug + OpClone + OpEq {
     fn golf_code(&self) -> Option<GolfWord>;
 
     fn as_any(&self) -> &dyn Any;
+
+    fn executor<'a>(&'a self) -> Executor<'a>;
 
     //TODO @mark: evaluation methods
 }

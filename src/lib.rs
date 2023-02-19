@@ -63,7 +63,7 @@ pub fn run_tilde(args: &TildeArgs) -> TildeRes<Value> {
         CliOperation::DocGen => {
             //tilde_gen_md_docs()?;
             todo!();  //TODO @mark: ^ fix and enable `gen`
-            Ok(Value::None)
+            Ok(Value::default())
         },
     }
 }

@@ -4,9 +4,9 @@ use crate::compile::Prog;
 use crate::TildeRes;
 
 pub use self::data::Array;
-pub use self::data::Number;
 pub use self::data::Text;
 pub use self::data::Value;
+pub use self::data::Values;
 
 mod data;
 // mod mathbool;
@@ -47,7 +47,7 @@ pub fn execute(
         // }
         i += 1;
     }
-    Ok(stack.pop().unwrap_or(Value::None))
+    Ok(stack.pop().unwrap_or(Value::default()))
 
     //TODO @mark: TEMPORARY! REMOVE THIS!
 
