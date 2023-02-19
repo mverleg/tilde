@@ -24,10 +24,15 @@ use ::std::time::Duration;
 
 use crate::common::{escape_for_string, is_safe_for_string};
 pub use crate::common::log as tilde_log;
-pub use crate::common::Nr;
-use crate::compile::{parse, Value};
+use crate::compile::parse;
 use crate::dict::ALLOW_COMPRESSION;
 use crate::exec::execute;
+
+pub use self::data::Array;
+pub use self::data::Nr;
+pub use self::data::Text;
+pub use self::data::Value;
+pub use self::data::Values;
 
 // #[cfg(feature = "gen")]
 // pub use self::gen::mddoc::tilde_gen_md_docs;

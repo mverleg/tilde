@@ -5,10 +5,9 @@ use ::tinyvec::TinyVec;
 
 use crate::common::escape_for_string;
 use crate::compile::{encode_str, GolfWord};
-use crate::exec::{Text, Value};
 use crate::Nr;
-use crate::op::{Op, OpTyp};
-use crate::op::typ::Executor;
+use crate::op::Op;
+use crate::op::OpTyp;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct TextOp(String);

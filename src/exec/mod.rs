@@ -1,16 +1,9 @@
 use crate::compile::Prog;
-// use crate::exec::mathbool::exec_math1;
-// use crate::exec::mathbool::exec_math2;
-use crate::TildeRes;
+use crate::{TildeRes, Value};
 
-pub use self::value::Array;
-pub use self::value::Text;
-pub use self::value::Value;
-pub use self::value::Values;
+mod executor;
 
-// mod mathbool;
-//TODO @mark: ^
-
+//TODO @mark: remove?
 pub fn execute(
     prog: Prog,
     inp: Vec<String>,

@@ -1,5 +1,3 @@
-pub use crate::exec::Value;
-
 pub use self::golf_word::GolfWord;
 pub use self::letter::Letter;
 pub use self::letter::LetterKind;

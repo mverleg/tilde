@@ -1,8 +1,11 @@
 use ::std::fmt;
 use ::std::fmt::Formatter;
+
 use ::tinyvec::TinyVec;
 
+use crate::Array;
 use crate::Nr;
+use crate::Text;
 
 #[derive(Debug, PartialEq)]
 pub enum Value {
