@@ -3,12 +3,11 @@ use crate::compile::Prog;
 // use crate::exec::mathbool::exec_math2;
 use crate::TildeRes;
 
-pub use self::data::Array;
-pub use self::data::Text;
-pub use self::data::Value;
-pub use self::data::Values;
+pub use self::value::Array;
+pub use self::value::Text;
+pub use self::value::Value;
+pub use self::value::Values;
 
-mod data;
 // mod mathbool;
 //TODO @mark: ^
 

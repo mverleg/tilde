@@ -36,6 +36,7 @@ use crate::exec::execute;
 mod common;
 mod compile;
 mod exec;
+mod data;
 //#[cfg(feature = "gen")]
 //mod gen;
 //TODO @mark: ^ fix and enable `gen`
