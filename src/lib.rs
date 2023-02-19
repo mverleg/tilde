@@ -26,6 +26,7 @@ use crate::common::{escape_for_string, is_safe_for_string};
 pub use crate::common::log as tilde_log;
 pub use crate::common::Nr;
 use crate::compile::{parse, Value};
+use crate::dict::ALLOW_COMPRESSION;
 use crate::exec::execute;
 
 // #[cfg(feature = "gen")]
@@ -52,6 +53,7 @@ pub type UINT = u64;
 pub fn run_tilde(args: &TildeArgs) -> TildeRes<Value> {
     match &args.operation {
         CliOperation::Run(source) => {
+            ALLOW_COMPRESSION.store(false, Ordering::Release);
             //tilde_from();
             let inp = gather_input();
             let prog = parse(source)?;

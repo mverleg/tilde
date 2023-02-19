@@ -1,5 +1,6 @@
 use ::std::cell::LazyCell;
 use ::std::time::Instant;
+use ::std::sync::atomic::{AtomicBool, Ordering};
 
 use ::tinyvec::ArrayVec;
 
@@ -15,6 +16,9 @@ use crate::dict::prefix_data::PrefixMap;
 //use crate::tilde_gen_md_docs;
 //TODO @mark: ^ fix and enable `gen`
 use crate::tilde_log;
+
+/// Exists to make sure normal run doesn't initialize compression dict
+pub static ALLOW_COMPRESSION: AtomicBool = AtomicBool::new(true);
 
 thread_local! {
     static DICT_META: LazyCell<DictMeta> = LazyCell::new(DictMeta::new);
@@ -63,6 +67,7 @@ struct BestSoFar {
 }
 
 pub fn compress_with_dict(text: &str) -> Vec<DictIx> {
+    assert!(ALLOW_COMPRESSION.load(Ordering::Acquire));
     if text.is_empty() {
         return Vec::new();
     }
