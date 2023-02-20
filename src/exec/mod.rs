@@ -1,5 +1,9 @@
 use crate::compile::Prog;
-use crate::{TildeRes, Value};
+use crate::TildeRes;
+use crate::Value;
+
+pub use self::executor::Executor;
+pub use self::executor::NullaryExecutor;
 
 mod executor;
 
@@ -37,7 +41,7 @@ pub fn execute(
         //     OpTyp::Xor => todo!(),
         //     OpTyp::Impl => todo!(),
         // }
-        i += 1;
+        // i += 1;
     }
     Ok(stack.pop().unwrap_or(Value::default()))
 

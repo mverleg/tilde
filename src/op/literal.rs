@@ -5,7 +5,9 @@ use ::tinyvec::TinyVec;
 
 use crate::common::escape_for_string;
 use crate::compile::{encode_str, GolfWord};
-use crate::Nr;
+use crate::{Nr, Text, Value, Values};
+use crate::exec::{Executor, NullaryExecutor};
+use crate::exec::Executor::Nullary;
 use crate::op::Op;
 use crate::op::OpTyp;
 
@@ -34,8 +36,8 @@ impl OpTyp for TextOp {
         self
     }
 
-    fn executor<'a>(&'a self) -> Executor<'a> {
-        Executor::Nullary(|| Value::Txt(Text::of(self.0)))
+    fn executor<'a>(&'a self) -> Executor {
+        TextExecutor::new(&self.0)
     }
 }
 
@@ -46,6 +48,21 @@ impl TextOp {
 
     pub fn new(txt: impl Into<String>) -> Op {
         Op::of(TextOp::new_pure(txt))
+    }
+}
+
+#[derive(Debug)]
+struct TextExecutor;
+
+impl NullaryExecutor for TextExecutor {
+    fn exec(&self) -> Values {
+        todo!()
+    }
+}
+
+impl TextExecutor {
+    pub fn new(text: &str) -> Executor {
+        Executor::Nullary(TextExecutor(text))
     }
 }
 
@@ -68,6 +85,10 @@ impl OpTyp for NumberOp {
 
     fn as_any(&self) -> &dyn Any {
         self
+    }
+
+    fn executor<'a>(&'a self) -> Executor {
+        todo!()
     }
 }
 

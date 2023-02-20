@@ -4,6 +4,7 @@ use ::std::fmt::Debug;
 use ::std::ops::Deref;
 
 use crate::compile::GolfWord;
+use crate::exec::Executor;
 
 #[derive(Debug)]
 pub struct Op {
@@ -27,7 +28,8 @@ pub trait OpTyp: Debug + OpClone + OpEq {
 
     fn as_any(&self) -> &dyn Any;
 
-    fn executor<'a>(&'a self) -> dyn Executor<'a>;
+    //TODO @mark: don't like allocating here, but probably necessary, since cannot be sized, and associated types aren't object-safe
+    fn executor<'a>(&'a self) -> Executor;
 
     //TODO @mark: evaluation methods
 }
