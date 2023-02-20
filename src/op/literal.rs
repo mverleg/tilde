@@ -5,9 +5,8 @@ use ::tinyvec::TinyVec;
 
 use crate::common::escape_for_string;
 use crate::compile::{encode_str, GolfWord};
-use crate::{Nr, Text, Value, Values};
+use crate::{Nr, Values};
 use crate::exec::{Executor, NullaryExecutor};
-use crate::exec::Executor::Nullary;
 use crate::op::Op;
 use crate::op::OpTyp;
 
@@ -36,7 +35,7 @@ impl OpTyp for TextOp {
         self
     }
 
-    fn executor<'a>(&'a self) -> Executor {
+    fn executor<'a>(&'a self) -> Executor<TextExecutor> {
         TextExecutor::new(&self.0)
     }
 }
@@ -52,7 +51,7 @@ impl TextOp {
 }
 
 #[derive(Debug)]
-struct TextExecutor;
+struct TextExecutor(String);
 
 impl NullaryExecutor for TextExecutor {
     fn exec(&self) -> Values {
@@ -61,7 +60,7 @@ impl NullaryExecutor for TextExecutor {
 }
 
 impl TextExecutor {
-    pub fn new(text: &str) -> Executor {
+    pub fn new(text: impl Into<String>) -> Executor<TextExecutor> {
         Executor::Nullary(TextExecutor(text))
     }
 }

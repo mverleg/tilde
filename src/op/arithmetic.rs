@@ -2,6 +2,7 @@ use ::std::any::Any;
 use ::std::borrow::Cow;
 
 use crate::compile::GolfWord;
+use crate::exec::Executor;
 use crate::op::Op;
 use crate::op::OpTyp;
 
@@ -31,6 +32,10 @@ impl OpTyp for Div {
     fn as_any(&self) -> &dyn Any {
         self
     }
+
+    fn executor<'a>(&'a self) -> Executor {
+        todo!()
+    }
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -58,6 +63,10 @@ impl OpTyp for IntDiv {
 
     fn as_any(&self) -> &dyn Any {
         self
+    }
+
+    fn executor<'a>(&'a self) -> Executor {
+        todo!()
     }
 }
 
