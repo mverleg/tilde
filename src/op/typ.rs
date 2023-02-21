@@ -29,7 +29,7 @@ pub trait OpTyp: Debug + OpClone + OpEq {
     fn as_any(&self) -> &dyn Any;
 
     //TODO @mark: don't like allocating here, but probably necessary, since cannot be sized, and associated types aren't object-safe
-    fn executor<'a>(&'a self) -> Executor<_>;
+    fn executor<'a>(&'a self) -> Executor;
 
     //TODO @mark: evaluation methods
 }
