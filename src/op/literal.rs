@@ -55,7 +55,7 @@ struct TextExecutor(String);
 
 impl NullaryExecutor for TextExecutor {
     fn exec(self) -> Values {
-        values![Value::txt(self.0)]
+        values![self.0]
     }
 }
 
