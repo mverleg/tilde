@@ -2,9 +2,10 @@ use ::std::any::Any;
 use ::std::borrow::Cow;
 
 use crate::compile::GolfWord;
-use crate::exec::Executor;
+use crate::exec::{BinaryExecutor, Executor};
 use crate::op::Op;
 use crate::op::OpTyp;
+use crate::{Array, Nr, Text, Values, values};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Div;
@@ -37,6 +38,48 @@ impl OpTyp for Div {
         todo!()
     }
 }
+
+#[derive(Debug, Clone, PartialEq)]
+struct DivExecutor;
+
+impl BinaryExecutor for DivExecutor {
+    fn exec_nn(self, left: Nr, right: Nr) -> Values {
+        values![left.div(right)]
+    }
+
+    fn exec_nt(self, left: Nr, right: Text) -> Values {
+        todo!()
+    }
+
+    fn exec_na(self, left: Nr, right: Array) -> Values {
+        todo!()
+    }
+
+    fn exec_tn(self, left: Text, right: Nr) -> Values {
+        todo!()
+    }
+
+    fn exec_tt(self, left: Text, right: Text) -> Values {
+        todo!()
+    }
+
+    fn exec_ta(self, left: Text, right: Array) -> Values {
+        todo!()
+    }
+
+    fn exec_an(self, left: Array, right: Nr) -> Values {
+        todo!()
+    }
+
+    fn exec_at(self, left: Array, right: Text) -> Values {
+        todo!()
+    }
+
+    fn exec_aa(self, left: Array, right: Array) -> Values {
+        todo!()
+    }
+}
+
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct IntDiv;

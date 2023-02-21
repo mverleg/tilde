@@ -26,6 +26,10 @@ impl Nr {
     pub fn zero() -> Self {
         Nr { value: 0.0 }
     }
+
+    pub fn div(&self, other: Nr) -> Nr {
+        Nr::new(self.value / other.value)
+    }
 }
 
 impl PartialEq for Nr {

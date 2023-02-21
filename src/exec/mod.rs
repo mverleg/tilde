@@ -2,6 +2,7 @@ use crate::compile::Prog;
 use crate::TildeRes;
 use crate::Value;
 
+pub use self::executor::BinaryExecutor;
 pub use self::executor::Executor;
 pub use self::executor::NullaryExecutor;
 
