@@ -28,10 +28,9 @@ pub trait OpTyp: Debug + OpClone + OpEq {
 
     fn as_any(&self) -> &dyn Any;
 
-    //TODO @mark: don't like allocating here, but probably necessary, since cannot be sized, and associated types aren't object-safe
+    /// For any given implementation, this method should always return the same
+    /// arity executor (and probably just the same executor, but especially arity).
     fn executor<'a>(&'a self) -> Executor;
-
-    //TODO @mark: evaluation methods
 }
 
 impl Deref for Op {

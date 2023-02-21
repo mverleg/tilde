@@ -4,17 +4,19 @@ use ::std::borrow::Cow;
 use ::tinyvec::TinyVec;
 
 use crate::common::escape_for_string;
-use crate::compile::{encode_str, GolfWord};
-use crate::{Nr, Values, values};
+use crate::compile::encode_str;
+use crate::compile::GolfWord;
 use crate::exec::{Executor, NullaryExecutor};
+use crate::Nr;
 use crate::op::Op;
 use crate::op::OpTyp;
+use crate::Values;
+use crate::values;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct TextOp(TextExecutor);
 
 impl OpTyp for TextOp {
-
     fn description(&self) -> &'static str {
         todo!()  //TODO @mark:
     }
@@ -60,16 +62,15 @@ impl NullaryExecutor for TextExecutor {
 }
 
 #[derive(Debug, Clone, PartialEq)]
-pub struct NumberOp(Nr);
+pub struct NumberOp(NumberExecutor);
 
 impl OpTyp for NumberOp {
-
     fn description(&self) -> &'static str {
         todo!()  //TODO @mark:
     }
 
     fn long_code(&self) -> Cow<'static, str> {
-        Cow::Owned(format!("{}", self.0))
+        Cow::Owned(format!("{}", self.0.0))
     }
 
     fn golf_code(&self) -> Option<GolfWord> {
@@ -81,13 +82,22 @@ impl OpTyp for NumberOp {
     }
 
     fn executor<'a>(&'a self) -> Executor {
-        todo!()
+        Executor::Nullary(&self.0)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+struct NumberExecutor(Nr);
+
+impl NullaryExecutor for NumberExecutor {
+    fn exec(self) -> Values {
+        values![self.0]
     }
 }
 
 impl NumberOp {
     pub fn new_pure(nr: impl Into<Nr>) -> Self {
-        NumberOp(nr.into())
+        NumberOp(NumberExecutor(nr.into()))
     }
 
     pub fn new(nr: impl Into<Nr>) -> Op {
