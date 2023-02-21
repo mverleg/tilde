@@ -17,15 +17,6 @@ pub enum Executor<'a> {
     TernaryOpaque,
 }
 
-#[derive(Debug)]
-struct NoExec;
-
 pub trait NullaryExecutor: Debug {
-    fn exec(&self) -> Values;
-}
-
-impl NullaryExecutor for NoExec {
-    fn exec(&self) -> Values {
-        unimplemented!("use a different executor")
-    }
+    fn exec(self) -> Values;
 }

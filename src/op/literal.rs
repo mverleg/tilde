@@ -5,7 +5,7 @@ use ::tinyvec::TinyVec;
 
 use crate::common::escape_for_string;
 use crate::compile::{encode_str, GolfWord};
-use crate::{Nr, Values};
+use crate::{Nr, Values, values};
 use crate::exec::{Executor, NullaryExecutor};
 use crate::op::Op;
 use crate::op::OpTyp;
@@ -55,7 +55,7 @@ struct TextExecutor(String);
 
 impl NullaryExecutor for TextExecutor {
     fn exec(self) -> Values {
-        values![self.0]
+        values![Value::txt(self.0)]
     }
 }
 
