@@ -3,7 +3,7 @@ use ::std::borrow::Cow;
 
 use crate::Array;
 use crate::compile::GolfWord;
-use crate::exec::BinaryExecutor;
+use crate::exec::{BinaryExecutor, Executor};
 use crate::Nr;
 use crate::op::Op;
 use crate::op::OpTyp;
@@ -36,6 +36,10 @@ impl OpTyp for Div {
 
     fn as_any(&self) -> &dyn Any {
         self
+    }
+
+    fn as_executor(&self) -> Executor {
+        Executor::Binary(self)
     }
 }
 
@@ -122,6 +126,10 @@ impl OpTyp for IntDiv {
 
     fn as_any(&self) -> &dyn Any {
         self
+    }
+
+    fn as_executor(&self) -> Executor {
+        todo!()  //TODO @mark: TEMPORARY! REMOVE THIS!
     }
 }
 

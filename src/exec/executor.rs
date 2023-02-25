@@ -1,6 +1,9 @@
 use ::std::fmt::Debug;
+use ::std::any::Any;
+use ::std::borrow::Cow;
 
 use crate::Array;
+use crate::compile::GolfWord;
 use crate::Nr;
 use crate::op::OpTyp;
 use crate::Text;
@@ -9,13 +12,14 @@ use crate::Values;
 /// Different types of execution, based on input.
 /// Each of these may push any number of outputs.
 #[derive(Debug)]
-pub enum Executor {
+pub enum Executor<'a> {
     /// Does not consume any stack values
-    Nullary(dyn NullaryExecutor),
+    Nullary(&'a dyn NullaryExecutor),
+    //TODO @mark: prevent boxing here ^
     /// Consumes one stack value
     Unary,
     ///
-    Binary(dyn BinaryExecutor),
+    Binary(&'a dyn BinaryExecutor),
     ///
     BinaryOpaque,
     ///

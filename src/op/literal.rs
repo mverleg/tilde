@@ -6,7 +6,7 @@ use ::tinyvec::TinyVec;
 use crate::common::escape_for_string;
 use crate::compile::encode_str;
 use crate::compile::GolfWord;
-use crate::exec::NullaryExecutor;
+use crate::exec::{Executor, NullaryExecutor};
 use crate::Nr;
 use crate::op::Op;
 use crate::op::OpTyp;
@@ -37,11 +37,15 @@ impl OpTyp for TextOp {
     fn as_any(&self) -> &dyn Any {
         self
     }
+
+    fn as_executor(&self) -> Executor {
+        Executor::Nullary(self)
+    }
 }
 
 impl TextOp {
     pub fn new_pure(txt: impl Into<String>) -> Self {
-        TextOp(txt.into())
+        TextOp(txt.into().into())
     }
 
     pub fn new(txt: impl Into<String>) -> Op {
@@ -73,6 +77,10 @@ impl OpTyp for NumberOp {
 
     fn as_any(&self) -> &dyn Any {
         self
+    }
+
+    fn as_executor(&self) -> Executor {
+        Executor::Nullary(self)
     }
 }
 

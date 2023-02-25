@@ -16,7 +16,7 @@ pub fn execute(
     let mut i = 0;
     let mut stack = Vec::new();
     while let Some(op) = prog.get(i) {
-        let ret = match op {
+        let ret = match op.as_executor() {
             Executor::Nullary(exec) => exec.exec(),
             Executor::Unary => todo!(),
             Executor::Binary(exec) => {
