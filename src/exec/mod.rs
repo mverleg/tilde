@@ -13,36 +13,35 @@ pub fn execute(
     prog: Prog,
     inp: Vec<String>,
 ) -> TildeRes<Value> {
-    let i = 0;
+    let mut i = 0;
     let mut stack = Vec::new();
     while let Some(op) = prog.get(i) {
-        todo!();
-        // match op {
-        //     OpTyp::Text(text) => stack.push(Value::Txt(Text::of(text))),
-        //     OpTyp::Number(nr) => stack.push(Value::Num(Number::of(*nr))),
-        //     OpTyp::Neg => todo!(),
-        //     OpTyp::Abs => todo!(),
-        //     OpTyp::Incr => todo!(),
-        //     OpTyp::Decr => todo!(),
-        //     OpTyp::Plus => todo!(),
-        //     OpTyp::Minus => todo!(),
-        //     OpTyp::Mul => todo!(),
-        //     OpTyp::Div => todo!(),
-        //     OpTyp::IntDiv => todo!(),
-        //     OpTyp::Mod => todo!(),
-        //     OpTyp::Eq => todo!(),
-        //     OpTyp::Neq => todo!(),
-        //     OpTyp::Gt => todo!(),
-        //     OpTyp::Gte => todo!(),
-        //     OpTyp::Lt => todo!(),
-        //     OpTyp::Lte => todo!(),
-        //     OpTyp::And => todo!(),
-        //     OpTyp::Or => todo!(),
-        //     OpTyp::Nand => todo!(),
-        //     OpTyp::Xor => todo!(),
-        //     OpTyp::Impl => todo!(),
-        // }
-        // i += 1;
+        let ret = match op.executor() {
+            Executor::Nullary(exec) => exec.exec(),
+            Executor::Unary => todo!(),
+            Executor::Binary(exec) => {
+                let top = stack.pop();
+                let deep = stack.pop();
+                match (deep, top) {
+                    (Some(Value::Num(deep)), Some(Value::Num(top))) => exec.exec_nn(deep, top),
+                    (Some(Value::Num(deep)), Some(Value::Txt(top))) => exec.exec_nt(deep, top),
+                    (Some(Value::Num(deep)), Some(Value::Arr(top))) => exec.exec_na(deep, top),
+                    (Some(Value::Txt(deep)), Some(Value::Num(top))) => exec.exec_tn(deep, top),
+                    (Some(Value::Txt(deep)), Some(Value::Txt(top))) => exec.exec_tt(deep, top),
+                    (Some(Value::Txt(deep)), Some(Value::Arr(top))) => exec.exec_ta(deep, top),
+                    (Some(Value::Arr(deep)), Some(Value::Num(top))) => exec.exec_an(deep, top),
+                    (Some(Value::Arr(deep)), Some(Value::Txt(top))) => exec.exec_at(deep, top),
+                    (Some(Value::Arr(deep)), Some(Value::Arr(top))) => exec.exec_aa(deep, top),
+                    (None, Some(top)) => todo!(),
+                    (Some(_), None) => unreachable!(),
+                    (None, None) => todo!(),
+                }
+            }
+            Executor::BinaryOpaque => todo!(),
+            Executor::TernaryOpaque => todo!(),
+        };
+        stack.extend(ret);
+        i += 1;
     }
     Ok(stack.pop().unwrap_or(Value::default()))
 

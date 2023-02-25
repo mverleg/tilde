@@ -19,7 +19,6 @@ pub fn parse(src: &str) -> TildeRes<Prog> {
     let mut letters_buffer = Vec::new();
     let mut string_decode_buffer = Vec::new();
     while let Some(current) = rev_tokens.pop() {
-        eprintln!("current = {current}");  //TODO @mark: TEMPORARY! REMOVE THIS!
         if current.is_whitespace() {
             tilde_log!("skipping whitespace");
         } else if current == ',' || current == '\'' {

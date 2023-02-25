@@ -43,39 +43,39 @@ impl OpTyp for Div {
 struct DivExecutor;
 
 impl BinaryExecutor for DivExecutor {
-    fn exec_nn(self, left: Nr, right: Nr) -> Values {
-        values![left.div(right)]
+    fn exec_nn(&self, deep: Nr, top: Nr) -> Values {
+        values![deep.div(top)]
     }
 
-    fn exec_nt(self, left: Nr, right: Text) -> Values {
+    fn exec_nt(&self, deep: Nr, top: Text) -> Values {
         todo!()
     }
 
-    fn exec_na(self, left: Nr, right: Array) -> Values {
+    fn exec_na(&self, deep: Nr, top: Array) -> Values {
         todo!()
     }
 
-    fn exec_tn(self, left: Text, right: Nr) -> Values {
+    fn exec_tn(&self, deep: Text, top: Nr) -> Values {
         todo!()
     }
 
-    fn exec_tt(self, left: Text, right: Text) -> Values {
+    fn exec_tt(&self, deep: Text, top: Text) -> Values {
         todo!()
     }
 
-    fn exec_ta(self, left: Text, right: Array) -> Values {
+    fn exec_ta(&self, deep: Text, top: Array) -> Values {
         todo!()
     }
 
-    fn exec_an(self, left: Array, right: Nr) -> Values {
+    fn exec_an(&self, deep: Array, top: Nr) -> Values {
         todo!()
     }
 
-    fn exec_at(self, left: Array, right: Text) -> Values {
+    fn exec_at(&self, deep: Array, top: Text) -> Values {
         todo!()
     }
 
-    fn exec_aa(self, left: Array, right: Array) -> Values {
+    fn exec_aa(&self, deep: Array, top: Array) -> Values {
         todo!()
     }
 }

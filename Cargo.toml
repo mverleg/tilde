@@ -32,6 +32,6 @@ tinyvec_string = { version = "0.3.2", features = ["rustc_1_57"] }
 [profile.release]
 opt-level = 3       # Optimize for speed ('z' for size).
 lto = true          # Enable Link Time Optimization
-codegen-units = 1   # Reduce number of codegen units to increase optimizations.
+codegen-units = 1   # Reduce number of codegen units to increase optimizations.c
 panic = 'abort'     # Abort on panic
 strip = true        # Strip symbols from binary

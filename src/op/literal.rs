@@ -56,8 +56,8 @@ impl TextOp {
 struct TextExecutor(String);
 
 impl NullaryExecutor for TextExecutor {
-    fn exec(self) -> Values {
-        values![self.0]
+    fn exec(&self) -> Values {
+        values![self.0.clone()]
     }
 }
 
@@ -90,8 +90,8 @@ impl OpTyp for NumberOp {
 struct NumberExecutor(Nr);
 
 impl NullaryExecutor for NumberExecutor {
-    fn exec(self) -> Values {
-        values![self.0]
+    fn exec(&self) -> Values {
+        values![self.0.clone()]
     }
 }
 

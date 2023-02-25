@@ -12,8 +12,6 @@
 
 use ::std::io;
 use ::std::io::BufRead;
-use ::std::io::BufReader;
-use ::std::io::BufWriter;
 use ::std::io::stdin;
 use ::std::sync::Arc;
 use ::std::sync::atomic::AtomicBool;
@@ -112,8 +110,9 @@ pub fn tilde_from<R: io::Read, W: io::Write>(
     writer: io::BufWriter<W>,
 ) -> TildeRes<()> {
     let prog = parse(code)?;
-    dbg!(&prog);  //TODO @mark: TEMPORARY! REMOVE THIS!
-    todo!();
+    //TODO @mark: input
+    let val = execute(prog, vec![])?;
+    println!("{}", val);
     Ok(())
 }
 
@@ -123,19 +122,20 @@ pub fn tilde_strs(
     input: &str,
 ) -> TildeRes<String> {
     let mut output = vec![];
-    tilde_from(code, BufReader::new(io::Cursor::new(input)), BufWriter::new(io::Cursor::new(&mut output)))?;
+    tilde_from(code, io::BufReader::new(io::Cursor::new(input)), io::BufWriter::new(io::Cursor::new(&mut output)))?;
     String::from_utf8(output).map_err(|err| format!("output was not utf8, err: {err}"))
 }
 
-/// Run a Tilde routine, taking a single Value as input and producing a single value
-/// as output if successful, or failing with an error message if unsuccessful.
-pub fn tilde_eval(
-    code: &str,
-    input: Value,
-) -> TildeRes<Value> {
-    todo!()
-    //TODO @mark:
-}
+// /// Run a Tilde routine, taking a single Value as input and producing a single value
+// /// as output if successful, or failing with an error message if unsuccessful.
+// pub fn tilde_eval(
+//     code: &str,
+//     input: Value,
+// ) -> TildeRes<Value> {
+//     todo!()
+//     //TODO @mark:
+// }
+//TODO @mark: TEMPORARY! REMOVE THIS!
 
 /// Analyze the Tilde source code and report stats as json.
 pub fn tilde_analyze(source: &str) -> TildeRes<String> {
