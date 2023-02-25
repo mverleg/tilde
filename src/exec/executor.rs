@@ -1,9 +1,6 @@
 use ::std::fmt::Debug;
-use ::std::any::Any;
-use ::std::borrow::Cow;
 
 use crate::Array;
-use crate::compile::GolfWord;
 use crate::Nr;
 use crate::op::OpTyp;
 use crate::Text;

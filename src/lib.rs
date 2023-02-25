@@ -21,7 +21,8 @@ use ::std::thread;
 use ::std::thread::sleep;
 use ::std::time::Duration;
 
-use crate::common::{escape_for_string, is_safe_for_string};
+use crate::common::escape_for_string;
+use crate::common::is_safe_for_string;
 pub use crate::common::log as tilde_log;
 use crate::compile::parse;
 use crate::dict::ALLOW_COMPRESSION;
@@ -61,8 +62,7 @@ pub fn run_tilde(args: &TildeArgs) -> TildeRes<Value> {
             ALLOW_COMPRESSION.store(false, Ordering::Release);
             //tilde_from();
             let inp = gather_input();
-            let prog = parse(source)?;
-            execute(prog, inp)
+            tilde_from(source, inp)
         },
         CliOperation::Analyze(source) => Ok(tilde_analyze(source)?.into()),
         CliOperation::DocGen => {

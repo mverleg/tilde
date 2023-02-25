@@ -76,7 +76,9 @@ impl Array {
 
 #[cfg(test)]
 mod tests {
-    use crate::{Nr, Text};
+    use crate::Nr;
+    use crate::Text;
+
     use super::*;
 
     #[test]

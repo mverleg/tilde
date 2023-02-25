@@ -8,7 +8,6 @@ pub use self::executor::NullaryExecutor;
 
 mod executor;
 
-//TODO @mark: remove?
 pub fn execute(
     prog: Prog,
     inp: Vec<String>,
@@ -47,7 +46,7 @@ pub fn execute(
     }
     Ok(match stack.pop() {
         Some(top) => {
-            tilde_log!("execution done, top item out of {} is {}", stack.len(), &top);
+            tilde_log!("execution done, top item out of {} is {:?}", stack.len(), &top);
             top
         },
         None => {
