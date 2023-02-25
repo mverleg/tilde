@@ -32,9 +32,11 @@ pub fn execute(
                     (Some(Value::Arr(deep)), Some(Value::Num(top))) => exec.exec_an(deep, top),
                     (Some(Value::Arr(deep)), Some(Value::Txt(top))) => exec.exec_at(deep, top),
                     (Some(Value::Arr(deep)), Some(Value::Arr(top))) => exec.exec_aa(deep, top),
-                    (None, Some(top)) => todo!(),
-                    (Some(_), None) => unreachable!(),
-                    (None, None) => todo!(),
+                    (None, Some(Value::Num(single))) => exec.exec_single_n(single),
+                    (None, Some(Value::Txt(single))) => exec.exec_single_t(single),
+                    (None, Some(Value::Arr(single))) => exec.exec_single_a(single),
+                    (None, None) => exec.exec_empty(),
+                    (Some(top), None) => unreachable!(),
                 }
             }
             Executor::BinaryOpaque => todo!(),

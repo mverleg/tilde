@@ -43,4 +43,16 @@ pub trait BinaryExecutor: Debug {
     fn exec_at(&self, deep: Array, top: Text) -> Values;
 
     fn exec_aa(&self, deep: Array, top: Array) -> Values;
+
+    /// Fallback for if there is only 1 value on the stack and it is a number
+    fn exec_single_n(&self, single: Nr) -> Values;
+
+    /// Fallback for if there is only 1 value on the stack and it is a text
+    fn exec_single_t(&self, single: Text) -> Values;
+
+    /// Fallback for if there is only 1 value on the stack and it is a array
+    fn exec_single_a(&self, single: Array) -> Values;
+
+    /// Fallback for if the stack is empty
+    fn exec_empty(&self) -> Values;
 }

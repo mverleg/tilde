@@ -78,6 +78,22 @@ impl BinaryExecutor for DivExecutor {
     fn exec_aa(&self, deep: Array, top: Array) -> Values {
         todo!()
     }
+
+    fn exec_single_n(&self, single: Nr) -> Values {
+        todo!()
+    }
+
+    fn exec_single_t(&self, single: Text) -> Values {
+        todo!()
+    }
+
+    fn exec_single_a(&self, single: Array) -> Values {
+        todo!()
+    }
+
+    fn exec_empty(&self) -> Values {
+        todo!()
+    }
 }
 
 
