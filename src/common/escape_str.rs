@@ -1,7 +1,7 @@
 
 /// Escape double quotes, newlines and backslashes.
-pub fn escape_for_string(input: impl Into<String>) -> String {
-    let input = input.into();
+pub fn escape_for_string(input: impl AsRef<str>) -> String {
+    let input = input.as_ref();
     let mut result = String::with_capacity(input.len() + 4);
     for ch in input.chars() {
         match ch {

@@ -1,11 +1,15 @@
 use ::std::any::Any;
 use ::std::borrow::Cow;
 
+use crate::Array;
 use crate::compile::GolfWord;
-use crate::exec::{BinaryExecutor, Executor};
+use crate::exec::BinaryExecutor;
+use crate::Nr;
 use crate::op::Op;
 use crate::op::OpTyp;
-use crate::{Array, Nr, Text, Values, values};
+use crate::Text;
+use crate::Values;
+use crate::values;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Div;
@@ -33,16 +37,12 @@ impl OpTyp for Div {
     fn as_any(&self) -> &dyn Any {
         self
     }
-
-    fn executor<'a>(&'a self) -> Executor {
-        todo!()
-    }
 }
 
 #[derive(Debug, Clone, PartialEq)]
 struct DivExecutor;
 
-impl BinaryExecutor for DivExecutor {
+impl BinaryExecutor for Div {
     fn exec_nn(&self, deep: Nr, top: Nr) -> Values {
         values![deep.div(top)]
     }
@@ -122,10 +122,6 @@ impl OpTyp for IntDiv {
 
     fn as_any(&self) -> &dyn Any {
         self
-    }
-
-    fn executor<'a>(&'a self) -> Executor {
-        todo!()
     }
 }
 

@@ -1,6 +1,6 @@
 use ::std::fmt;
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Text {
     val: String,
 }
@@ -8,6 +8,10 @@ pub struct Text {
 impl Text {
     pub fn of(val: impl Into<String>) -> Self {
         Text { val: val.into() }
+    }
+
+    pub fn as_str(&self) -> &str {
+        &self.val
     }
 }
 

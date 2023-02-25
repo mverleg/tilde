@@ -4,7 +4,6 @@ use ::std::fmt::Debug;
 use ::std::ops::Deref;
 
 use crate::compile::GolfWord;
-use crate::exec::Executor;
 
 #[derive(Debug)]
 pub struct Op {
@@ -27,10 +26,6 @@ pub trait OpTyp: Debug + OpClone + OpEq {
     fn golf_code(&self) -> Option<GolfWord>;
 
     fn as_any(&self) -> &dyn Any;
-
-    /// For any given implementation, this method should always return the same
-    /// arity executor (and probably just the same executor, but especially arity).
-    fn executor<'a>(&'a self) -> Executor;
 }
 
 impl Deref for Op {
