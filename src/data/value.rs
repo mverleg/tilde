@@ -7,7 +7,7 @@ use crate::Array;
 use crate::Nr;
 use crate::Text;
 
-#[derive(Debug, PartialEq)]
+#[derive(PartialEq)]
 pub enum Value {
     Num(Nr),
     Txt(Text),
@@ -28,13 +28,20 @@ pub type Values = TinyVec<[Value; 2]>;
 //TODO @mark: TEMPORARY! REMOVE THIS!
 
 impl fmt::Display for Value {
-    fn fmt(
-        &self,
-        f: &mut Formatter<'_>,
-    ) -> fmt::Result {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         match self {
             Value::Num(val) => write!(f, "{val}"),
             Value::Txt(val) => write!(f, "{val}"),
+            Value::Arr(val) => write!(f, "{val}"),
+        }
+    }
+}
+
+impl fmt::Debug for Value {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        match self {
+            Value::Num(val) => write!(f, "{val}"),
+            Value::Txt(val) => write!(f, "\"{val}\""),
             Value::Arr(val) => write!(f, "{val}"),
         }
     }
