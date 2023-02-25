@@ -28,6 +28,7 @@ pub trait OpTyp: Debug + OpClone + OpEq {
 
     fn as_any(&self) -> &dyn Any;
 
+    //TODO @mark: can we do without this somehow? Maybe Op should already contain executor info?
     fn as_executor(&self) -> Executor;
 }
 

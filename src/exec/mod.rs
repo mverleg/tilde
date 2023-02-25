@@ -1,5 +1,5 @@
 use crate::compile::Prog;
-use crate::TildeRes;
+use crate::{tilde_log, TildeRes};
 use crate::Value;
 
 pub use self::executor::BinaryExecutor;
@@ -45,5 +45,14 @@ pub fn execute(
         stack.extend(ret);
         i += 1;
     }
-    Ok(stack.pop().unwrap_or(Value::default()))
+    Ok(match stack.pop() {
+        Some(top) => {
+            tilde_log!("execution done, top item out of {} is {}", stack.len(), &top);
+            top
+        },
+        None => {
+            tilde_log!("execution done, but stack is empty");
+            Value::default()
+        }
+    })
 }
