@@ -13,6 +13,7 @@
 use ::std::io;
 use ::std::io::BufRead;
 use ::std::io::stdin;
+use ::std::io::Write;
 use ::std::sync::Arc;
 use ::std::sync::atomic::AtomicBool;
 use ::std::sync::atomic::Ordering;
@@ -112,7 +113,8 @@ pub fn tilde_from<R: io::Read, W: io::Write>(
     let prog = parse(code)?;
     //TODO @mark: input
     let val = execute(prog, vec![])?;
-    println!("{}", val);
+    let mut writer = writer;
+    write!(writer, "{}", val).unwrap();
     Ok(())
 }
 
