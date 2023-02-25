@@ -11,7 +11,6 @@
 #![allow(clippy::new_ret_no_self)]
 
 use ::std::io;
-use ::std::io::BufRead;
 use ::std::io::stdin;
 use ::std::io::Write;
 use ::std::sync::Arc;
@@ -20,6 +19,7 @@ use ::std::sync::atomic::Ordering;
 use ::std::thread;
 use ::std::thread::sleep;
 use ::std::time::Duration;
+use ::std::io::Read;
 
 use crate::common::escape_for_string;
 use crate::common::is_safe_for_string;
@@ -62,9 +62,12 @@ pub fn run_tilde(args: &TildeArgs) -> TildeRes<Value> {
             ALLOW_COMPRESSION.store(false, Ordering::Release);
             //tilde_from();
             let inp = gather_input();
-            tilde_from(source, inp)
+            let res = tilde_strs(source, &inp)?;
+            Ok(Value::Txt(Text::of(res)))
+            //TODO @mark: change to tilde_from ^
         },
-        CliOperation::Analyze(source) => Ok(tilde_analyze(source)?.into()),
+        CliOperation::Analyze(source) =>
+            Ok(tilde_analyze(source)?.into()),
         CliOperation::DocGen => {
             //tilde_gen_md_docs()?;
             todo!();  //TODO @mark: ^ fix and enable `gen`
@@ -86,7 +89,7 @@ pub enum CliOperation {
 }
 
 //TODO @mverleg: move this code?
-fn gather_input() -> Vec<String> {
+fn gather_input() -> String {
     let is_ready = Arc::new(AtomicBool::new(false));
     let is_ready_clone = is_ready.clone();
     thread::spawn(move || {
@@ -95,11 +98,9 @@ fn gather_input() -> Vec<String> {
             eprintln!("waiting for input on stdin; stdin needs to be closed before tilde can start")
         }
     });
-    let inp = stdin()
-        .lock()
-        .lines()
-        .map(|l| l.expect("cannot read line from stdin, not utf8?"))
-        .collect();
+    let mut inp = String::new();
+    stdin().read_to_string(&mut inp)
+        .expect("failed to read stdin");  //TODO @mark:
     is_ready.store(true, Ordering::Release);
     inp
 }
@@ -114,6 +115,7 @@ pub fn tilde_from<R: io::Read, W: io::Write>(
     //TODO @mark: input
     let val = execute(prog, vec![])?;
     let mut writer = writer;
+    tilde_log!("tilde result: {}", val);
     write!(writer, "{}", val).unwrap();
     Ok(())
 }
