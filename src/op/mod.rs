@@ -1,3 +1,4 @@
+use crate::op::stack::{Drop, Duplicate};
 pub use self::arithmetic::Div;
 pub use self::arithmetic::IntDiv;
 pub use self::literal::NumberOp;
@@ -10,11 +11,13 @@ mod literal;
 mod arithmetic;
 mod stack;
 
-pub fn all_non_literals() -> [Op; 2] {
+pub fn all_non_literals() -> [Op; 4] {
     //TODO @mark:
     [
         Op::of(Div),
         Op::of(IntDiv),
+        Op::of(Drop),
+        Op::of(Duplicate),
     ]
 }
 

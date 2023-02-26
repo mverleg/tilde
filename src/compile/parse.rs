@@ -1,8 +1,8 @@
 use ::std::fmt::Debug;
 
 use crate::{Nr, tilde_log};
-use crate::compile::Letter;
-use crate::compile::op_lookup::lookup_op_long;
+use crate::compile::{GolfWord, Letter, LetterKind};
+use crate::compile::op_lookup::{lookup_op_golf, lookup_op_long};
 use crate::compile::Prog;
 use crate::compile::text_literal::decode_str;
 use crate::op::{NumberOp, TextOp};
@@ -64,7 +64,24 @@ pub fn parse(src: &str) -> TildeRes<Prog> {
                 string_buffer.push(token)
             }
             tilde_log!("operator by long name: \"{}\"", &string_buffer);
-            let op = lookup_op_long(&string_buffer).ok_or_else(|| format!("could not find an identifier by name '{}'", &string_buffer))?;
+            let op = lookup_op_long(&string_buffer).ok_or_else(|| {
+                tilde_log!("did not find long '{}', make sure it is in `all_non_literals`", &string_buffer);
+                format!("could not find an identifier by name '{}'", &string_buffer)
+            })?;
+            ops.push(op)
+        } else if let Some(golf_letter) = Letter::from_symbol(current) {
+            let word = GolfWord::new1(golf_letter);
+            match golf_letter.kind() {
+                LetterKind::Literal => unreachable!(),
+                LetterKind::VariableOpen => todo!(),  //TODO @mark:
+                LetterKind::FixedOpen => todo!(),  //TODO @mark:
+                LetterKind::Modifier => unimplemented!("cannot start with modifier"),
+            }
+            tilde_log!("operator by short name: \"{}\"", &word);
+            let op = lookup_op_golf(&word).ok_or_else(|| {
+                tilde_log!("did not find short '{}', make sure it is in `all_non_literals`", &word);
+                format!("could not find golf code '{}'", &word)
+            })?;
             ops.push(op)
         } else if current == '"' {
             //TODO @mark: make more resistant to closer changes?
@@ -80,8 +97,6 @@ pub fn parse(src: &str) -> TildeRes<Prog> {
             let str_res = decode_str(&letters_buffer, &mut string_buffer, &mut string_decode_buffer)
                 .map_err(|err| format!("could not parse golfed string, err: {err}"))?;
             ops.push(TextOp::new(string_buffer.clone()))
-        } else if let Some(golf_letter) = Letter::from_symbol(current) {
-            todo!(); //TODO @mark: TEMPORARY! REMOVE THIS!
         } else {
             return Err(format!("unrecognized: {current}"))
         }
