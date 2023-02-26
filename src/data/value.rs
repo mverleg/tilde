@@ -7,7 +7,7 @@ use crate::Array;
 use crate::Nr;
 use crate::Text;
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Clone)]
 pub enum Value {
     Num(Nr),
     Txt(Text),

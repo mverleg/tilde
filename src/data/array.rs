@@ -2,7 +2,7 @@ use ::std::fmt;
 
 use crate::data::value::Value;
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Clone)]
 pub struct Array {
     val: Vec<Value>,
 }
