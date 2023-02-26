@@ -2,6 +2,7 @@ use ::std::fmt::Debug;
 
 use crate::{Nr, tilde_log};
 use crate::compile::{GolfWord, Letter, LetterKind};
+use crate::compile::golf_word::GolfWordContent;
 use crate::compile::op_lookup::{lookup_op_golf, lookup_op_long};
 use crate::compile::Prog;
 use crate::compile::text_literal::decode_str;
@@ -70,15 +71,22 @@ pub fn parse(src: &str) -> TildeRes<Prog> {
             })?;
             ops.push(op)
         } else if let Some(golf_letter) = Letter::from_symbol(current) {
-            let word = GolfWord::new1(golf_letter);
+            let mut word = GolfWordContent::new();
+            word.push(golf_letter);
             match golf_letter.kind() {
                 LetterKind::Literal => unreachable!(),
-                LetterKind::VariableOpen => todo!(),  //TODO @mark:
-                LetterKind::FixedOpen => todo!(),  //TODO @mark:
+                LetterKind::VariableOpen => {},
+                LetterKind::FixedOpen => match rev_tokens.pop().map(|c| Letter::from_symbol(c)) {
+                    Some(Some(second)) => word.push(second),
+                    Some(None) => todo!("handle golf fixed opener expected next to be golf letter"),  //TODO @mark:
+                    None => todo!("handle unexpected end"),  //TODO @mark:
+                },
                 LetterKind::Modifier => unimplemented!("cannot start with modifier"),
             }
+            todo!("parse all modifiers");
             tilde_log!("operator by short name: \"{}\"", &word);
-            let op = lookup_op_golf(&word).ok_or_else(|| {
+            let op = lookup_op_golf(&GolfWord::new(word.clone())).ok_or_else(|| {
+                //TODO @mark: get rid of clone? ^
                 tilde_log!("did not find short '{}', make sure it is in `all_non_literals`", &word);
                 format!("could not find golf code '{}'", &word)
             })?;
