@@ -58,6 +58,27 @@ impl GolfWord {
             Err(err) => panic!("{err}"),
         }
     }
+
+    pub fn new1(letter: Letter) -> Self {
+        let mut content = GolfWordContent::new();
+        content.push(letter);
+        Self::new(content)
+    }
+
+    pub fn new2(letter1: Letter, letter2: Letter) -> Self {
+        let mut content = GolfWordContent::new();
+        content.push(letter1);
+        content.push(letter2);
+        Self::new(content)
+    }
+
+    pub fn new3(letter1: Letter, letter2: Letter, letter3: Letter) -> Self {
+        let mut content = GolfWordContent::new();
+        content.push(letter1);
+        content.push(letter2);
+        content.push(letter3);
+        Self::new(content)
+    }
 }
 
 impl From<GolfWordContent> for GolfWord {

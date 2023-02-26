@@ -2,7 +2,7 @@ use ::std::any::Any;
 use ::std::borrow::Cow;
 
 use crate::Array;
-use crate::compile::GolfWord;
+use crate::compile::{GolfWord, Letter};
 use crate::exec::{Executor, UnaryExecutor};
 use crate::Nr;
 use crate::op::Op;
@@ -16,12 +16,15 @@ pub struct Drop;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Duplicate;
+//TODO @mark:
 
 #[derive(Debug, Clone, PartialEq)]
-pub struct Clockwise3;
+pub struct Rotate3;
+//TODO @mark:
 
 #[derive(Debug, Clone, PartialEq)]
-pub struct CounterClockwise3;
+pub struct RevRotate3;
+//TODO @mark:
 
 impl Drop {
     pub fn new() -> Op {
@@ -32,15 +35,15 @@ impl Drop {
 impl OpTyp for Drop {
 
     fn description(&self) -> &'static str {
-        "divide without rounding"
+        "drop the top value from the stack"
     }
 
     fn long_code(&self) -> Cow<'static, str> {
-        Cow::Borrowed("div")
+        Cow::Borrowed("drop")
     }
 
     fn golf_code(&self) -> Option<GolfWord> {
-        None  //TODO @mark:
+        Some(GolfWord::new1(Letter::Slash))
     }
 
     fn as_any(&self) -> &dyn Any {
