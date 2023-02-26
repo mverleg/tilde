@@ -12,9 +12,8 @@ use crate::Values;
 pub enum Executor<'a> {
     /// Does not consume any stack values
     Nullary(&'a dyn NullaryExecutor),
-    //TODO @mark: prevent boxing here ^
     /// Consumes one stack value
-    Unary,
+    Unary(&'a dyn UnaryExecutor),
     ///
     Binary(&'a dyn BinaryExecutor),
     ///
@@ -25,6 +24,17 @@ pub enum Executor<'a> {
 
 pub trait NullaryExecutor: OpTyp {
     fn exec(&self) -> Values;
+}
+
+pub trait UnaryExecutor: OpTyp {
+    fn exec_n(&self, value: Nr) -> Values;
+
+    fn exec_t(&self, value: Text) -> Values;
+
+    fn exec_a(&self, value: Array) -> Values;
+
+    /// Fallback for if the stack is empty
+    fn exec_empty(&self) -> Values;
 }
 
 pub trait BinaryExecutor: OpTyp {

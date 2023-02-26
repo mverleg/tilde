@@ -43,9 +43,6 @@ impl OpTyp for Div {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
-struct DivExecutor;
-
 impl BinaryExecutor for Div {
     fn exec_nn(&self, deep: Nr, top: Nr) -> Values {
         values![deep.div(top)]
@@ -99,7 +96,6 @@ impl BinaryExecutor for Div {
         todo!()
     }
 }
-
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct IntDiv;

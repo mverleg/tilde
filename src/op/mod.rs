@@ -8,6 +8,7 @@ pub use self::typ::OpTyp;
 mod typ;
 mod literal;
 mod arithmetic;
+mod stack;
 
 pub fn all_non_literals() -> [Op; 2] {
     //TODO @mark:

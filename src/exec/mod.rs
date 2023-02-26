@@ -1,10 +1,12 @@
 use crate::compile::Prog;
-use crate::{tilde_log, TildeRes};
+use crate::tilde_log;
+use crate::TildeRes;
 use crate::Value;
 
 pub use self::executor::BinaryExecutor;
 pub use self::executor::Executor;
 pub use self::executor::NullaryExecutor;
+pub use self::executor::UnaryExecutor;
 
 mod executor;
 
@@ -17,7 +19,7 @@ pub fn execute(
     while let Some(op) = prog.get(i) {
         let ret = match op.as_executor() {
             Executor::Nullary(exec) => exec.exec(),
-            Executor::Unary => todo!(),
+            Executor::Unary(exec) => todo!(),
             Executor::Binary(exec) => {
                 let top = stack.pop();
                 let deep = stack.pop();
