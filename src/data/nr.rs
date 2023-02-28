@@ -3,6 +3,7 @@ use ::std::fmt;
 use ::std::hash;
 use ::std::num::ParseFloatError;
 use ::std::str::FromStr;
+use crate::UINT;
 
 #[derive(Debug, Clone, Copy)]
 pub struct Nr {
@@ -41,6 +42,11 @@ impl Nr {
 
     pub fn div(&self, other: Nr) -> Nr {
         Nr::new(self.value / other.value)
+    }
+
+    pub fn floor(&self) -> UINT {
+        self.value as UINT
+        //TODO @mark: no try-into, why?
     }
 }
 

@@ -74,9 +74,12 @@ impl Array {
         &mut self.val
     }
 
-    pub fn index(&mut self, nr: Nr) -> Value {
-        match self.val.get(nr) {
-            Some(val) => val.clone(),
+    pub fn index(&self, nr: Nr) -> Value {
+        let ix: usize = nr.floor().try_into().expect("value to large to use as index");
+        match self.val.get(ix) {
+            Some(val) => {
+                val.clone()
+            },
             None => Value::default(),
         }
     }

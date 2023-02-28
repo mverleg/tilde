@@ -77,11 +77,11 @@ impl Lookup {
 impl OpTyp for Lookup {
 
     fn description(&self) -> &'static str {
-        "look up by index"
+        "look up by index or key"
     }
 
     fn long_code(&self) -> Cow<'static, str> {
-        Cow::Borrowed("index")
+        Cow::Borrowed("lookup")
     }
 
     fn golf_code(&self) -> Option<GolfWord> {

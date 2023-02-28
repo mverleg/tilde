@@ -1,3 +1,5 @@
+use crate::op::array::Lookup;
+use crate::op::array::Last;
 pub use crate::op::stack::Drop;
 pub use crate::op::stack::Duplicate;
 
@@ -17,7 +19,7 @@ mod arithmetic;
 mod stack;
 mod array;
 
-pub fn all_non_literals() -> [Op; 7] {
+pub fn all_non_literals() -> [Op; 9] {
     //TODO @mark:
     [
         Op::of(Plus),
@@ -27,6 +29,8 @@ pub fn all_non_literals() -> [Op; 7] {
         Op::of(IntDiv),
         Op::of(Drop),
         Op::of(Duplicate),
+        Op::of(Last),
+        Op::of(Lookup),
     ]
 }
 
