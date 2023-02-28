@@ -109,7 +109,7 @@ impl UnaryExecutor for Duplicate {
 
     fn exec_n(&self, value: Nr) -> Values {
         // no action, just drop the input
-        values![value.clone(), value]
+        values![value, value]
     }
 
     fn exec_t(&self, value: Text) -> Values {

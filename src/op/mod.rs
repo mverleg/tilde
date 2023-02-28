@@ -3,6 +3,9 @@ pub use crate::op::stack::Duplicate;
 
 pub use self::arithmetic::Div;
 pub use self::arithmetic::IntDiv;
+pub use self::arithmetic::Minus;
+pub use self::arithmetic::Mul;
+pub use self::arithmetic::Plus;
 pub use self::literal::NumberOp;
 pub use self::literal::TextOp;
 pub use self::typ::Op;

@@ -27,6 +27,18 @@ impl Nr {
         Nr { value: 0.0 }
     }
 
+    pub fn plus(&self, other: Nr) -> Nr {
+        Nr::new(self.value + other.value)
+    }
+
+    pub fn minus(&self, other: Nr) -> Nr {
+        Nr::new(self.value - other.value)
+    }
+
+    pub fn mul(&self, other: Nr) -> Nr {
+        Nr::new(self.value * other.value)
+    }
+
     pub fn div(&self, other: Nr) -> Nr {
         Nr::new(self.value / other.value)
     }

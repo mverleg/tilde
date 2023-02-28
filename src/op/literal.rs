@@ -29,7 +29,7 @@ impl OpTyp for TextOp {
     fn golf_code(&self) -> Option<GolfWord> {
         //TODO @mark: make a version that doesn't allocate in encode_str?
         let mut content = TinyVec::new();
-        content.extend(encode_str(&self.0.as_str()).unwrap());
+        content.extend(encode_str(self.0.as_str()).unwrap());
         //TODO @mark: is this unwrap safe?
         Some(GolfWord::new(content))
     }
@@ -86,7 +86,7 @@ impl OpTyp for NumberOp {
 
 impl NullaryExecutor for NumberOp {
     fn exec(&self) -> Values {
-        values![self.0.clone()]
+        values![self.0]
     }
 }
 

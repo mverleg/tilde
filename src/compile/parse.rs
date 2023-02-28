@@ -76,7 +76,7 @@ pub fn parse(src: &str) -> TildeRes<Prog> {
             match golf_letter.kind() {
                 LetterKind::Literal => unreachable!(),
                 LetterKind::VariableOpen => {},
-                LetterKind::FixedOpen => match rev_tokens.pop().map(|c| Letter::from_symbol(c)) {
+                LetterKind::FixedOpen => match rev_tokens.pop().map(Letter::from_symbol) {
                     Some(Some(second)) => word.push(second),
                     Some(None) => todo!("handle golf fixed opener expected next to be golf letter"),  //TODO @mark:
                     None => todo!("handle unexpected end"),  //TODO @mark:

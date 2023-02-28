@@ -98,7 +98,7 @@ macro_rules! values {
     }};
     ($($vals:expr),+ $(,)?) => {{
         use ::tinyvec::TinyVec;
-        use crate::Value;
+        use $crate::Value;
         let mut vs: Values = TinyVec::new();
         $({
             let v: Value = $vals.into();
