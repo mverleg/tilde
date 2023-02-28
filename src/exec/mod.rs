@@ -19,7 +19,15 @@ pub fn execute(
     while let Some(op) = prog.get(i) {
         let ret = match op.as_executor() {
             Executor::Nullary(exec) => exec.exec(),
-            Executor::Unary(exec) => todo!(),
+            Executor::Unary(exec) => {
+                let top = stack.pop();
+                match top {
+                    Some(Value::Num(top)) => exec.exec_n(top),
+                    Some(Value::Txt(top)) => exec.exec_t(top),
+                    Some(Value::Arr(top)) => exec.exec_a(top),
+                    None => exec.exec_empty(),
+                }
+            },
             Executor::Binary(exec) => {
                 let top = stack.pop();
                 let deep = stack.pop();

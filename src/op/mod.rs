@@ -16,9 +16,12 @@ mod literal;
 mod arithmetic;
 mod stack;
 
-pub fn all_non_literals() -> [Op; 4] {
+pub fn all_non_literals() -> [Op; 7] {
     //TODO @mark:
     [
+        Op::of(Plus),
+        Op::of(Minus),
+        Op::of(Mul),
         Op::of(Div),
         Op::of(IntDiv),
         Op::of(Drop),
