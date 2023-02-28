@@ -83,7 +83,16 @@ pub fn parse(src: &str) -> TildeRes<Prog> {
                 },
                 LetterKind::Modifier => unimplemented!("cannot start with modifier"),
             }
-            todo!("parse all modifiers");
+            while let Some(chr) = rev_tokens.pop() {
+                if let Some(letter) = Letter::from_symbol(chr) {
+                    if letter.kind() == LetterKind::Modifier {
+                        word.push(letter);
+                        continue
+                    }
+                }
+                rev_tokens.push(chr);
+                break
+            }
             tilde_log!("operator by short name: \"{}\"", &word);
             let op = lookup_op_golf(&GolfWord::new(word.clone())).ok_or_else(|| {
                 //TODO @mark: get rid of clone? ^
