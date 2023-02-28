@@ -1,6 +1,7 @@
 use ::std::fmt;
 
 use crate::data::value::Value;
+use crate::Nr;
 
 #[derive(PartialEq, Clone)]
 pub struct Array {
@@ -71,6 +72,13 @@ impl Array {
 
     pub fn get_mut(&mut self) -> &mut Vec<Value> {
         &mut self.val
+    }
+
+    pub fn index(&mut self, nr: Nr) -> Value {
+        match self.val.get(nr) {
+            Some(val) => val.clone(),
+            None => Value::default(),
+        }
     }
 }
 

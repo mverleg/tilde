@@ -15,6 +15,7 @@ mod typ;
 mod literal;
 mod arithmetic;
 mod stack;
+mod array;
 
 pub fn all_non_literals() -> [Op; 7] {
     //TODO @mark:
