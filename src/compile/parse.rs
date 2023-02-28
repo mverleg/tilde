@@ -129,7 +129,11 @@ pub struct Pos<T: Debug + PartialEq> {
 
 #[cfg(test)]
 mod tests {
-    use crate::op::{Div, IntDiv, Op};
+    use crate::op::Div;
+    use crate::op::Drop;
+    use crate::op::Duplicate;
+    use crate::op::IntDiv;
+    use crate::op::Op;
 
     use super::*;
 
@@ -200,6 +204,12 @@ mod tests {
     fn unknown_operator_by_name() {
         assert!(parse("unknownOperator").is_err());
         assert!(parse("unknown-operator").is_err());
+    }
+
+    #[test]
+    fn operator_by_gold() {
+        assert_eq!(parse("/").unwrap(), of(Drop::new()));
+        assert_eq!(parse("+").unwrap(), of(Duplicate::new()));
     }
 
     #[test]

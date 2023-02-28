@@ -1,4 +1,6 @@
-use crate::op::stack::{Drop, Duplicate};
+pub use crate::op::stack::Drop;
+pub use crate::op::stack::Duplicate;
+
 pub use self::arithmetic::Div;
 pub use self::arithmetic::IntDiv;
 pub use self::literal::NumberOp;
