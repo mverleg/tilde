@@ -12,14 +12,14 @@ mod executor;
 
 pub fn execute(
     prog: Prog,
-    inp: Vec<String>,
+    inp: Vec<Value>,
 ) -> TildeRes<Value> {
     let mut i = 0;
     let mut stack = Vec::new();
     stack.push(Value::Arr(Array::of(inp.into_iter()
-        .map(|txt| Value::Txt(Text::of(txt)))
         .collect())));
     while let Some(op) = prog.get(i) {
+        println!("stack: {}", Value::Arr(Array::of(stack.clone())));  //TODO @mark: TEMPORARY! REMOVE THIS!
         let ret = match op.as_executor() {
             Executor::Nullary(exec) => exec.exec(),
             Executor::Unary(exec) => {

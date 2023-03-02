@@ -20,6 +20,7 @@ use ::std::thread;
 use ::std::thread::sleep;
 use ::std::time::Duration;
 use ::std::io::Read;
+use ::std::io::BufRead;
 
 use crate::common::escape_for_string;
 use crate::common::is_safe_for_string;
@@ -108,12 +109,16 @@ fn gather_input() -> String {
 /// Run tilde with input lines produces by a reader, and results handled by a writer.
 pub fn tilde_from<R: io::Read, W: io::Write>(
     code: &str,
-    reader: io::BufReader<R>,
+    mut reader: io::BufReader<R>,
     writer: io::BufWriter<W>,
 ) -> TildeRes<()> {
     let prog = parse(code)?;
-    //TODO @mark: input
-    let val = execute(prog, vec![])?;
+    let mut inp = Vec::new();
+    while Ok(line) = reader.read_line() {
+        //TODO @mark: extract method to build input
+        inp.push(Value::Txt(Text::of(line)))
+    }
+    let val = execute(prog, inp)?;
     let mut writer = writer;
     tilde_log!("tilde result: {}", val);
     write!(writer, "{}", val).unwrap();
