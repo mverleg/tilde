@@ -1,5 +1,5 @@
 use crate::compile::Prog;
-use crate::tilde_log;
+use crate::{Array, Text, tilde_log};
 use crate::TildeRes;
 use crate::Value;
 
@@ -16,6 +16,9 @@ pub fn execute(
 ) -> TildeRes<Value> {
     let mut i = 0;
     let mut stack = Vec::new();
+    stack.push(Value::Arr(Array::of(inp.into_iter()
+        .map(|txt| Value::Txt(Text::of(txt)))
+        .collect())));
     while let Some(op) = prog.get(i) {
         let ret = match op.as_executor() {
             Executor::Nullary(exec) => exec.exec(),

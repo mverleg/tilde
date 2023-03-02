@@ -46,8 +46,9 @@ impl UnaryExecutor for BaseWords {
     }
 
     fn exec_t(&self, value: Text) -> Values {
-        let mut words = Split::split_str(value.as_str());
-        for word in &mut words {
+        let orig_words = Split::split_str(value.as_str());
+        let mut san_words = Vec::with_capacity(orig_words.len());
+        for mut word in orig_words {
             let lc= word.to_lowercase();
             word.clear();
             for ch in lc.chars() {
@@ -55,8 +56,11 @@ impl UnaryExecutor for BaseWords {
                     word.push(ch)
                 }
             }
+            if ! word.is_empty() {
+                san_words.push(word)
+            }
         }
-        values![Array::of(words)]
+        values![Array::of(san_words)]
     }
 
     fn exec_a(&self, value: Array) -> Values {
