@@ -18,6 +18,7 @@ mod literal;
 mod arithmetic;
 mod stack;
 mod array;
+mod sanitize;
 
 pub fn all_non_literals() -> [Op; 9] {
     //TODO @mark:
