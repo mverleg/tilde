@@ -1,8 +1,5 @@
 use ::std::any::Any;
 use ::std::borrow::Cow;
-use ::std::cell::LazyCell;
-
-use ::regex::Regex;
 
 use crate::Array;
 use crate::compile::GolfWord;
@@ -16,9 +13,9 @@ use crate::Text;
 use crate::Values;
 use crate::values;
 
-thread_local! {
-    static SPLIT_RE: LazyCell<Regex> = LazyCell::new(|| Regex::new("\\s+").unwrap());
-}
+// thread_local! {
+//     static SPLIT_RE: LazyCell<Regex> = LazyCell::new(|| Regex::new("\\s+").unwrap());
+// }
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Last;
@@ -166,6 +163,13 @@ impl Split {
     pub fn new() -> Op {
         Op::of(Split)
     }
+
+    pub fn split_str(text: &str) -> Vec<String> {
+        text
+            .split_whitespace()
+            .map(|slice| slice.to_owned())
+            .collect::<Vec<_>>()
+    }
 }
 
 impl OpTyp for Split {
@@ -191,21 +195,19 @@ impl OpTyp for Split {
     }
 }
 
-impl UnaryExecutor for Lookup {
+impl UnaryExecutor for Split {
 
     fn exec_n(&self, value: Nr) -> Values {
         todo!()
     }
 
     fn exec_t(&self, value: Text) -> Values {
-        todo!()
+        let words = Split::split_str(value.as_str());
+        values![Array::of(words)]
     }
 
     fn exec_a(&self, value: Array) -> Values {
-        let words = SPLIT_RE
-            .with(|re| re.split(value.as_str()).to_owned())
-            .collect::<Vec<_>>();
-        values![Array::of(words)]
+        todo!()
     }
 
     fn exec_empty(&self) -> Values {
