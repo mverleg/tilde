@@ -1,5 +1,6 @@
-use crate::op::array::Lookup;
-use crate::op::array::Last;
+use crate::op::collection::{Lookup, Split};
+use crate::op::collection::Last;
+use crate::op::sanitize::BaseWords;
 pub use crate::op::stack::Drop;
 pub use crate::op::stack::Duplicate;
 
@@ -17,10 +18,10 @@ mod typ;
 mod literal;
 mod arithmetic;
 mod stack;
-mod array;
+mod collection;
 mod sanitize;
 
-pub fn all_non_literals() -> [Op; 9] {
+pub fn all_non_literals() -> [Op; 11] {
     //TODO @mark:
     [
         Op::of(Plus),
@@ -32,6 +33,8 @@ pub fn all_non_literals() -> [Op; 9] {
         Op::of(Duplicate),
         Op::of(Last),
         Op::of(Lookup),
+        Op::of(Split),
+        Op::of(BaseWords),
     ]
 }
 

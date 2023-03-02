@@ -1,15 +1,10 @@
 use ::std::any::Any;
 use ::std::borrow::Cow;
-use ::std::cell::LazyCell;
 
 use crate::{Array, Nr, Text, Values, values};
-use crate::compile::{GolfWord, Letter};
+use crate::compile::GolfWord;
 use crate::exec::{Executor, UnaryExecutor};
 use crate::op::{Op, OpTyp};
-
-thread_local! {
-    static SPLIT_RE: LazyCell<Regex> = LazyCell::new(|| Regex::new("\\s+").unwrap());
-}
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct BaseWords;
@@ -23,11 +18,11 @@ impl BaseWords {
 impl OpTyp for BaseWords {
 
     fn description(&self) -> &'static str {
-        "drop (pop) the top value from the stack"
+        "split into words, turn the words into base versions (lowercase, remove special symbols)"
     }
 
     fn long_code(&self) -> Cow<'static, str> {
-        Cow::Borrowed("drop")
+        Cow::Borrowed("base-words")
     }
 
     fn golf_code(&self) -> Option<GolfWord> {
@@ -50,7 +45,7 @@ impl UnaryExecutor for BaseWords {
     }
 
     fn exec_t(&self, value: Text) -> Values {
-        value.as_str().split()
+        //TODO @mark:
     }
 
     fn exec_a(&self, value: Array) -> Values {

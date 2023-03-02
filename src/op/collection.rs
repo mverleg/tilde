@@ -1,5 +1,8 @@
 use ::std::any::Any;
 use ::std::borrow::Cow;
+use ::std::cell::LazyCell;
+
+use ::regex::Regex;
 
 use crate::Array;
 use crate::compile::GolfWord;
@@ -12,6 +15,10 @@ use crate::op::OpTyp;
 use crate::Text;
 use crate::Values;
 use crate::values;
+
+thread_local! {
+    static SPLIT_RE: LazyCell<Regex> = LazyCell::new(|| Regex::new("\\s+").unwrap());
+}
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Last;
@@ -145,6 +152,60 @@ impl BinaryExecutor for Lookup {
 
     fn exec_single_a(&self, single: Array) -> Values {
         values![single.index(Nr::zero())]
+    }
+
+    fn exec_empty(&self) -> Values {
+        todo!()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct Split;
+
+impl Split {
+    pub fn new() -> Op {
+        Op::of(Split)
+    }
+}
+
+impl OpTyp for Split {
+
+    fn description(&self) -> &'static str {
+        "split a string or array by a separator"
+    }
+
+    fn long_code(&self) -> Cow<'static, str> {
+        Cow::Borrowed("split")
+    }
+
+    fn golf_code(&self) -> Option<GolfWord> {
+        None
+    }
+
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+
+    fn as_executor(&self) -> Executor {
+        Executor::Unary(self)
+    }
+}
+
+impl UnaryExecutor for Lookup {
+
+    fn exec_n(&self, value: Nr) -> Values {
+        todo!()
+    }
+
+    fn exec_t(&self, value: Text) -> Values {
+        todo!()
+    }
+
+    fn exec_a(&self, value: Array) -> Values {
+        let words = SPLIT_RE
+            .with(|re| re.split(value.as_str()).to_owned())
+            .collect::<Vec<_>>();
+        values![Array::of(words)]
     }
 
     fn exec_empty(&self) -> Values {
