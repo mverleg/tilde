@@ -1,5 +1,6 @@
+use crate::Array;
 use crate::compile::Prog;
-use crate::{Array, Text, tilde_log};
+use crate::tilde_log;
 use crate::TildeRes;
 use crate::Value;
 
@@ -12,12 +13,11 @@ mod executor;
 
 pub fn execute(
     prog: Prog,
-    inp: Vec<Value>,
+    inp: Value,
 ) -> TildeRes<Value> {
     let mut i = 0;
     let mut stack = Vec::new();
-    stack.push(Value::Arr(Array::of(inp.into_iter()
-        .collect())));
+    stack.push(inp);
     while let Some(op) = prog.get(i) {
         println!("stack: {}", Value::Arr(Array::of(stack.clone())));  //TODO @mark: TEMPORARY! REMOVE THIS!
         let ret = match op.as_executor() {

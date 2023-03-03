@@ -113,16 +113,23 @@ pub fn tilde_from<R: io::Read, W: io::Write>(
     writer: io::BufWriter<W>,
 ) -> TildeRes<()> {
     let prog = parse(code)?;
-    let mut inp = Vec::new();
-    while Ok(line) = reader.read_line() {
-        //TODO @mark: extract method to build input
-        inp.push(Value::Txt(Text::of(line)))
-    }
-    let val = execute(prog, inp)?;
+    let val = execute(prog, build_input(reader))?;
     let mut writer = writer;
     tilde_log!("tilde result: {}", val);
     write!(writer, "{}", val).unwrap();
     Ok(())
+}
+
+fn build_input<R: io::Read>(mut reader: io::BufReader<R>) -> Value {
+    let mut lines = Vec::new();
+    let mut line = String::new();
+    while let Ok(siz) = reader.read_line(&mut line) {
+        if siz == 0 {
+            break
+        }
+        lines.push(Value::Txt(Text::of(&line)));
+    }
+    Value::Arr(Array::of(lines))
 }
 
 /// Run tilde with strings as input and output, useful for testing.
