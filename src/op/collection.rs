@@ -2,12 +2,11 @@ use ::std::any::Any;
 use ::std::borrow::Cow;
 use ::std::collections::HashSet;
 
-use crate::Array;
+use crate::{Array, Nr};
 use crate::compile::GolfWord;
 use crate::exec::BinaryExecutor;
 use crate::exec::Executor;
 use crate::exec::UnaryExecutor;
-use crate::Nr;
 use crate::op::Op;
 use crate::op::OpTyp;
 use crate::Text;
@@ -275,6 +274,66 @@ impl UnaryExecutor for Unique {
             }
         }
         values![Value::Arr(Array::of(result))]
+    }
+
+    fn exec_empty(&self) -> Values {
+        todo!()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct Count;
+
+impl Count {
+    pub fn new() -> Op {
+        Op::of(Count)
+    }
+
+    pub fn split_str(text: &str) -> Vec<String> {
+        text
+            .split_whitespace()
+            .map(|slice| slice.to_owned())
+            .collect::<Vec<_>>()
+    }
+}
+
+impl OpTyp for Count {
+
+    fn description(&self) -> &'static str {
+        "count number of items (length)"
+    }
+
+    fn long_code(&self) -> Cow<'static, str> {
+        Cow::Borrowed("count")
+    }
+
+    fn golf_code(&self) -> Option<GolfWord> {
+        None
+    }
+
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+
+    fn as_executor(&self) -> Executor {
+        Executor::Unary(self)
+    }
+}
+
+impl UnaryExecutor for Count {
+
+    fn exec_n(&self, value: Nr) -> Values {
+        todo!()
+    }
+
+    fn exec_t(&self, value: Text) -> Values {
+        let len = value.len() as f64;
+        values![Value::Num(Nr::new(len))]
+    }
+
+    fn exec_a(&self, value: Array) -> Values {
+        let len = value.len() as f64;
+        values![Value::Num(Nr::new(len))]
     }
 
     fn exec_empty(&self) -> Values {

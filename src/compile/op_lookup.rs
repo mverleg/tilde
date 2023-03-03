@@ -23,7 +23,6 @@ pub fn lookup_op_golf(op_name: &GolfWord) -> Option<Op> {
     GOLF_OP_LOOKUP.with(|lookup| lookup.get(op_name).cloned())
 }
 
-//TODO @mark: use
 fn init_golf_op_lookup() -> FnvHashMap<GolfWord, Op> {
     tilde_log!("initializing lookup map by golf code");
     all_non_literals().into_iter()

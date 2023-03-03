@@ -13,6 +13,10 @@ impl Text {
     pub fn as_str(&self) -> &str {
         &self.val
     }
+
+    pub fn len(&self) -> usize {
+        self.val.len()
+    }
 }
 
 impl fmt::Display for Text {
