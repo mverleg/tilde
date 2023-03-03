@@ -1,7 +1,8 @@
 use ::std::any::Any;
 use ::std::borrow::Cow;
+use ::std::collections::HashSet;
 
-use crate::Array;
+use crate::{Array, Value};
 use crate::compile::GolfWord;
 use crate::exec::BinaryExecutor;
 use crate::exec::Executor;
@@ -208,6 +209,71 @@ impl UnaryExecutor for Split {
 
     fn exec_a(&self, value: Array) -> Values {
         todo!()
+    }
+
+    fn exec_empty(&self) -> Values {
+        todo!()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct Unique;
+
+impl Unique {
+    pub fn new() -> Op {
+        Op::of(Unique)
+    }
+
+    pub fn split_str(text: &str) -> Vec<String> {
+        text
+            .split_whitespace()
+            .map(|slice| slice.to_owned())
+            .collect::<Vec<_>>()
+    }
+}
+
+impl OpTyp for Unique {
+
+    fn description(&self) -> &'static str {
+        "remove any duplicates, keeping the first occurence"
+    }
+
+    fn long_code(&self) -> Cow<'static, str> {
+        Cow::Borrowed("unique")
+    }
+
+    fn golf_code(&self) -> Option<GolfWord> {
+        None
+    }
+
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+
+    fn as_executor(&self) -> Executor {
+        Executor::Unary(self)
+    }
+}
+
+impl UnaryExecutor for Unique {
+
+    fn exec_n(&self, value: Nr) -> Values {
+        todo!()
+    }
+
+    fn exec_t(&self, value: Text) -> Values {
+        todo!()
+    }
+
+    fn exec_a(&self, value: Array) -> Values {
+        let mut seen = HashSet::with_capacity(value.len());
+        let mut result = Vec::with_capacity(value.len());
+        for val in value.into_iter() {
+            if seen.insert(&val) {
+                result.push(val)
+            }
+        }
+        values![Value::Arr(Array::of(result))]
     }
 
     fn exec_empty(&self) -> Values {

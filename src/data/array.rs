@@ -1,9 +1,10 @@
 use ::std::fmt;
+use ::std::vec::IntoIter;
 
 use crate::data::value::Value;
 use crate::Nr;
 
-#[derive(PartialEq, Clone)]
+#[derive(PartialEq, Eq, Hash, Clone)]
 pub struct Array {
     val: Vec<Value>,
 }
@@ -82,6 +83,14 @@ impl Array {
             },
             None => Value::default(),
         }
+    }
+
+    pub fn len(&self) -> usize {
+        self.val.len()
+    }
+
+    pub fn into_iter(self) -> IntoIter<Value> {
+        self.val.into_iter()
     }
 }
 
