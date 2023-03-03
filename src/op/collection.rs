@@ -2,7 +2,7 @@ use ::std::any::Any;
 use ::std::borrow::Cow;
 use ::std::collections::HashSet;
 
-use crate::{Array, Value};
+use crate::Array;
 use crate::compile::GolfWord;
 use crate::exec::BinaryExecutor;
 use crate::exec::Executor;
@@ -269,7 +269,8 @@ impl UnaryExecutor for Unique {
         let mut seen = HashSet::with_capacity(value.len());
         let mut result = Vec::with_capacity(value.len());
         for val in value.into_iter() {
-            if seen.insert(&val) {
+            if seen.insert(val.clone()) {
+                //TODO @mark: ^ remove clone
                 result.push(val)
             }
         }

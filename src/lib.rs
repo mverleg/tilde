@@ -109,7 +109,7 @@ fn gather_input() -> String {
 /// Run tilde with input lines produces by a reader, and results handled by a writer.
 pub fn tilde_from<R: io::Read, W: io::Write>(
     code: &str,
-    mut reader: io::BufReader<R>,
+    reader: io::BufReader<R>,
     writer: io::BufWriter<W>,
 ) -> TildeRes<()> {
     let prog = parse(code)?;
