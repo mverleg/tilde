@@ -9,8 +9,11 @@
 #![allow(unreachable_code)]  //TODO @mark: TEMPORARY! REMOVE THIS!
 #![allow(dead_code)]  //TODO @mark: TEMPORARY! REMOVE THIS!
 #![allow(clippy::new_ret_no_self)]
+#![allow(clippy::len_without_is_empty)]
 
 use ::std::io;
+use ::std::io::BufRead;
+use ::std::io::Read;
 use ::std::io::stdin;
 use ::std::io::Write;
 use ::std::sync::Arc;
@@ -19,8 +22,6 @@ use ::std::sync::atomic::Ordering;
 use ::std::thread;
 use ::std::thread::sleep;
 use ::std::time::Duration;
-use ::std::io::Read;
-use ::std::io::BufRead;
 
 use crate::common::escape_for_string;
 use crate::common::is_safe_for_string;

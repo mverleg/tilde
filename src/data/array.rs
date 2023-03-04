@@ -89,6 +89,7 @@ impl Array {
         self.val.len()
     }
 
+    #[allow(clippy::should_implement_trait)]
     pub fn into_iter(self) -> IntoIter<Value> {
         self.val.into_iter()
     }

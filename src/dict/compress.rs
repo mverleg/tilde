@@ -1,6 +1,6 @@
 use ::std::cell::LazyCell;
-use ::std::time::Instant;
 use ::std::sync::atomic::{AtomicBool, Ordering};
+use ::std::time::Instant;
 
 use ::tinyvec::ArrayVec;
 

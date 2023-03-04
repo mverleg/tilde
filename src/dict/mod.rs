@@ -1,5 +1,5 @@
-pub use self::compress::compress_with_dict;
 pub use self::compress::ALLOW_COMPRESSION;
+pub use self::compress::compress_with_dict;
 #[cfg(test)] pub use self::derive::all_transformations;
 pub use self::derive::MAX_TEXT_TRANSFORMS;
 pub use self::dict_str::CowDictStr;

@@ -11,9 +11,9 @@ use ::base64::engine::general_purpose::URL_SAFE_NO_PAD;
 
 use ::tilde::CliOperation;
 use ::tilde::run_tilde;
+use ::tilde::RunMode;
 use ::tilde::tilde_log;
 use ::tilde::TildeArgs;
-use ::tilde::RunMode;
 
 fn main() -> ExitCode {
     assert!(size_of::<usize>() >= size_of::<u32>(), "due to indexing tricks, platforms with narrow pointers are not supported at this time");
