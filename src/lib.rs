@@ -184,28 +184,31 @@ pub fn tilde_analyze(source: &str) -> TildeRes<String> {
     //use crate::dict::compress_with_dict;
     let prog = parse(source, RunMode::Any)?;
     let unsafe_long_code = prog.long_code();
-    let golf_code = prog.golf_code()?;
-    let base64_code = prog.golf_code_b64()?;
-    debug_assert!(is_safe_for_string(&base64_code), "base64 code should never contain double quotes or trailing backslashes");
     let safe_long_code = escape_for_string(unsafe_long_code);
-    let safe_golf_code = escape_for_string(golf_code);
+    let (golf, base64, golf_len) = if let Ok(golf_code) = prog.golf_code() {
+        let safe_golf_code = escape_for_string(golf_code);
+        let base64_code = prog.golf_code_b64()?;
+        debug_assert!(is_safe_for_string(&base64_code), "base64 code should never contain double quotes or trailing backslashes");
+        (format!("\"{}\"", safe_golf_code), format!("\"{}\"", base64_code), format!("{}", prog.golf_len()?))
+        //TODO @mark: inefficient, generates golf code 3 times
+    } else {
+        ("null".to_owned(), "null".to_owned(), "null".to_owned())
+    };
     let mut analysis = String::with_capacity(512);
     analysis.push_str("{\n");
     analysis.push_str("\"uses_preview_features\": false,\n");
-    analysis.push_str("\"golf_code\": \"");
-    analysis.push_str(&safe_golf_code);
-    analysis.push_str("\",\n");
-    analysis.push_str("\"base64_golf_code\": \"");
-    analysis.push_str(&base64_code);
-    analysis.push_str("\",\n");
+    analysis.push_str("\"golf_code\": ");
+    analysis.push_str(&golf);
+    analysis.push_str(",\n");
+    analysis.push_str("\"base64_golf_code\": ");
+    analysis.push_str(&base64);
+    analysis.push_str(",\n");
     analysis.push_str("\"long_command_code\": \"");
     analysis.push_str(&safe_long_code);
     analysis.push_str("\",\n");
-    analysis.push_str("\"length_valid_in_bytes\": ");
-    analysis.push_str(&format!("{}", -1));
-    analysis.push_str(",\n");
+    analysis.push_str("\"length_valid_in_bytes\": null,\n");
     analysis.push_str("\"length_preview_features_in_bytes\": ");
-    analysis.push_str(&format!("{}", prog.golf_len()?));
+    analysis.push_str(&golf_len);
     analysis.push_str("\n}\n");
     //TODO @mverleg: explanation
     //if 1 == 1 { return Ok(compress_with_dict(code).len().to_string()); }
