@@ -59,7 +59,8 @@ pub type UINT = u64;
 
 pub fn run_tilde(args: &TildeArgs) -> TildeRes<Value> {
     match &args.operation {
-        CliOperation::Run(source) => {
+        CliOperation::Run(source, mode) => {
+            assert!(*mode == RunMode::Any);
             ALLOW_COMPRESSION.store(false, Ordering::Release);
             //tilde_from();
             let inp = gather_input();
@@ -77,6 +78,8 @@ pub fn run_tilde(args: &TildeArgs) -> TildeRes<Value> {
     }
 }
 
+fn reject_n
+
 #[derive(Debug)]
 pub struct TildeArgs {
     pub operation: CliOperation,
@@ -84,9 +87,15 @@ pub struct TildeArgs {
 
 #[derive(Debug)]
 pub enum CliOperation {
-    Run(String),
+    Run(String, RunMode),
     Analyze(String),
     DocGen,
+}
+
+#[derive(Debug, PartialEq, Eq)]
+pub enum RunMode {
+    Any,
+    GolfOnly,
 }
 
 //TODO @mverleg: move this code?
