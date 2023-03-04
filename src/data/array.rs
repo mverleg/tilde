@@ -97,8 +97,6 @@ impl Array {
 
 #[cfg(test)]
 mod tests {
-    use ::std::f64::consts::PI;
-
     use crate::Nr;
     use crate::Text;
 
@@ -106,25 +104,25 @@ mod tests {
 
     #[test]
     fn fmt_array_single() {
-        let arr = Array::single(Value::Num(Nr::new(PI)));
-        assert_eq!(format!("{}", arr), "[3.14]")
+        let arr = Array::single(Value::Num(Nr::new(2.718)));
+        assert_eq!(format!("{}", arr), "[2.718]")
     }
 
     #[test]
     fn debug_array_single() {
-        let arr = Array::single(Value::Num(Nr::new(PI)));
-        assert_eq!(format!("{:?}", arr), "[3.14]")
+        let arr = Array::single(Value::Num(Nr::new(2.718)));
+        assert_eq!(format!("{:?}", arr), "[2.718]")
     }
 
     #[test]
     fn fmt_array_multi() {
-        let arr = Array::of(vec![Value::Num(Nr::new(PI)), Value::Txt(Text::of("hello"))]);
-        assert_eq!(format!("{}", arr), "[3.14,hello]")
+        let arr = Array::of(vec![Value::Num(Nr::new(2.718)), Value::Txt(Text::of("hello"))]);
+        assert_eq!(format!("{}", arr), "[2.718,hello]")
     }
 
     #[test]
     fn debug_array_multi() {
-        let arr = Array::of(vec![Value::Num(Nr::new(PI)), Value::Txt(Text::of("hello"))]);
-        assert_eq!(format!("{:?}", arr), "[3.14,\"hello\"]")
+        let arr = Array::of(vec![Value::Num(Nr::new(2.718)), Value::Txt(Text::of("hello"))]);
+        assert_eq!(format!("{:?}", arr), "[2.718,\"hello\"]")
     }
 }
