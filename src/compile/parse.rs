@@ -21,8 +21,14 @@ pub fn parse(src: &str, mode: RunMode) -> TildeRes<Prog> {
     let mut string_decode_buffer = Vec::new();
     while let Some(current) = rev_tokens.pop() {
         if current.is_whitespace() {
+            if mode.golf_only() {
+                return Err("golf-only mode does not allow whitespace".to_owned())
+            }
             tilde_log!("skipping whitespace");
         } else if current == ',' || current == '\'' {
+            if mode.golf_only() {
+                return Err(format!("golf-only mode does not allow plain-text (long-mode) string literals ({current})"))
+            }
             string_buffer.clear();
             while let Some(token) = rev_tokens.pop() {
                 if token == ',' || token == '\'' {
@@ -35,6 +41,9 @@ pub fn parse(src: &str, mode: RunMode) -> TildeRes<Prog> {
             let op = TextOp::new(string_buffer.clone());
             ops.push(op)
         } else if ('1'..='9').contains(&current) || current == '.' || current == '-' {
+            if mode.golf_only() {
+                return Err(format!("golf-only mode does not allow decimal integer literals string literals ({current})"))
+            }
             // note that short-mode numbers start with 0, long-mode ones cannot
             string_buffer.clear();
             string_buffer.push(current);
@@ -53,6 +62,9 @@ pub fn parse(src: &str, mode: RunMode) -> TildeRes<Prog> {
             );
             ops.push(op)
         } else if current.is_alphabetic() || current == '-' {
+            if mode.golf_only() {
+                return Err(format!("golf-only mode does not allow alphanumeric (long-mode) operator names ({current})"))
+            }
             string_buffer.clear();
             string_buffer.push(current);
             while let Some(token) = rev_tokens.pop() {
@@ -141,90 +153,94 @@ mod tests {
         Prog::of(vec![op])
     }
 
+    fn parse_any(src: &str) -> Prog {
+        parse(src, RunMode::Any).unwrap()
+    }
+
     #[test]
     fn long_string_explicit_close() {
-        assert_eq!(parse(",hello world,", ).unwrap(), of(TextOp::new("hello world".to_string())));
-        assert_eq!(parse(",hello world'", ).unwrap(), of(TextOp::new("hello world".to_string())));
-        assert_eq!(parse("'hello world,", ).unwrap(), of(TextOp::new("hello world".to_string())));
-        assert_eq!(parse("'hello world'", ).unwrap(), of(TextOp::new("hello world".to_string())));
+        assert_eq!(parse_any(",hello world,"), of(TextOp::new("hello world".to_string())));
+        assert_eq!(parse_any(",hello world'"), of(TextOp::new("hello world".to_string())));
+        assert_eq!(parse_any("'hello world,"), of(TextOp::new("hello world".to_string())));
+        assert_eq!(parse_any("'hello world'"), of(TextOp::new("hello world".to_string())));
     }
 
     #[test]
     fn long_string_implicit_close() {
-        assert_eq!(parse(",hello world", ).unwrap(), of(TextOp::new("hello world".to_string())));
-        assert_eq!(parse("'hello world", ).unwrap(), of(TextOp::new("hello world".to_string())));
+        assert_eq!(parse_any(",hello world"), of(TextOp::new("hello world".to_string())));
+        assert_eq!(parse_any("'hello world"), of(TextOp::new("hello world".to_string())));
     }
 
     #[test]
     fn golfed_string_explicit_close() {
-        assert_eq!(parse("\"+>:[\"", ).unwrap(), of(TextOp::new("Hello world".to_string())));
-        //assert_eq!(parse("\"+>:[0").unwrap(), of(TextOp::new("Hello world".to_string())));
+        assert_eq!(parse_any("\"+>:[\""), of(TextOp::new("Hello world".to_string())));
+        //assert_eq!(parse_any("\"+>:[0").unwrap(), of(TextOp::new("Hello world".to_string())));
         // maybe supported later? ^
     }
 
     #[test]
     fn golfed_string_implicit_close() {
-        assert_eq!(parse("\"+>:[", ).unwrap(), of(TextOp::new("Hello world")));
+        assert_eq!(parse_any("\"+>:["), of(TextOp::new("Hello world")));
     }
 
     #[test]
     fn golfed_string_multiple() {
         let expected = Prog::of(vec![TextOp::new("Hello world"), TextOp::new("Hello world")]);
-        assert_eq!(parse("\"+>:[\"\"+>:[", ).unwrap(), expected);
+        assert_eq!(parse_any("\"+>:[\"\"+>:["), expected);
     }
 
     #[test]
     fn long_integer() {
-        assert_eq!(parse("123", ).unwrap(), of(NumberOp::new(123)));
-        assert_eq!(parse("-123", ).unwrap(), of(NumberOp::new(-123)));
+        assert_eq!(parse_any("123"), of(NumberOp::new(123)));
+        assert_eq!(parse_any("-123"), of(NumberOp::new(-123)));
     }
 
     #[test]
     fn long_float() {
-        assert_eq!(parse("1.23", ).unwrap(), of(NumberOp::new(1.23)));
-        assert_eq!(parse(".123", ).unwrap(), of(NumberOp::new(0.123)));
-        assert_eq!(parse("123.", ).unwrap(), of(NumberOp::new(123.)));
-        assert_eq!(parse("-1.23", ).unwrap(), of(NumberOp::new(-1.23)));
-        assert_eq!(parse("-.123", ).unwrap(), of(NumberOp::new(-0.123)));
-        assert_eq!(parse("-123.", ).unwrap(), of(NumberOp::new(-123.)));
+        assert_eq!(parse_any("1.23"), of(NumberOp::new(1.23)));
+        assert_eq!(parse_any(".123"), of(NumberOp::new(0.123)));
+        assert_eq!(parse_any("123."), of(NumberOp::new(123.)));
+        assert_eq!(parse_any("-1.23"), of(NumberOp::new(-1.23)));
+        assert_eq!(parse_any("-.123"), of(NumberOp::new(-0.123)));
+        assert_eq!(parse_any("-123."), of(NumberOp::new(-123.)));
     }
 
     #[test]
     fn long_invalid_number() {
-        assert!(parse("1.2.3", ).is_err());
+        assert!(parse("1.2.3", RunMode::Any).is_err());
     }
 
     #[test]
     fn operator_by_name() {
-        assert_eq!(parse("div", ).unwrap(), of(Div::new()));
-        assert_eq!(parse("int-div", ).unwrap(), of(IntDiv::new()));
+        assert_eq!(parse_any("div"), of(Div::new()));
+        assert_eq!(parse_any("int-div"), of(IntDiv::new()));
     }
 
     #[test]
     fn unknown_operator_by_name() {
-        assert!(parse("unknownOperator", ).is_err());
-        assert!(parse("unknown-operator", ).is_err());
+        assert!(parse("unknownOperator", RunMode::Any).is_err());
+        assert!(parse("unknown-operator", RunMode::Any).is_err());
     }
 
     #[test]
     fn operator_by_gold() {
-        assert_eq!(parse("/", ).unwrap(), of(Drop::new()));
-        assert_eq!(parse("+", ).unwrap(), of(Duplicate::new()));
+        assert_eq!(parse_any("/"), of(Drop::new()));
+        assert_eq!(parse_any("+"), of(Duplicate::new()));
     }
 
     #[test]
     fn split_on_whitespace() {
         let op = NumberOp::new(1.23);
-        assert_eq!(parse("'hello' 1.0", ).unwrap(), Prog::of(vec![TextOp::new("hello"), NumberOp::new(1.0)]));
-        assert_eq!(parse("div   1", ).unwrap(), Prog::of(vec![Div::new(), NumberOp::new(1.0)]),);
-        assert_eq!(parse("int-div1.0", ).unwrap(), Prog::of(vec![IntDiv::new(), NumberOp::new(1.0)]),);
+        assert_eq!(parse_any("'hello' 1.0"), Prog::of(vec![TextOp::new("hello"), NumberOp::new(1.0)]));
+        assert_eq!(parse_any("div   1"), Prog::of(vec![Div::new(), NumberOp::new(1.0)]),);
+        assert_eq!(parse_any("int-div1.0"), Prog::of(vec![IntDiv::new(), NumberOp::new(1.0)]),);
     }
 
     #[test]
     fn allow_newlines() {
         let op = NumberOp::new(1.23);
-        assert_eq!(parse("'hello'\n1.0", ).unwrap(), Prog::of(vec![TextOp::new("hello"), NumberOp::new(1.0)]));
-        assert_eq!(parse("div\n1", ).unwrap(), Prog::of(vec![Div::new(), NumberOp::new(1.0)]),);
+        assert_eq!(parse_any("'hello'\n1.0"), Prog::of(vec![TextOp::new("hello"), NumberOp::new(1.0)]));
+        assert_eq!(parse_any("div\n1"), Prog::of(vec![Div::new(), NumberOp::new(1.0)]),);
     }
 
     //TODO @mark: add some golfed testcases to existing tests, like whitespace ones

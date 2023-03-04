@@ -13,6 +13,7 @@ use ::tilde::CliOperation;
 use ::tilde::run_tilde;
 use ::tilde::tilde_log;
 use ::tilde::TildeArgs;
+use ::tilde::RunMode;
 
 fn main() -> ExitCode {
     assert!(size_of::<usize>() >= size_of::<u32>(), "due to indexing tricks, platforms with narrow pointers are not supported at this time");
@@ -57,21 +58,21 @@ fn parse_operation(mut args: Vec<String>) -> ArgParseRes {
                 Ok(src) => src,
                 Result::Err(err) => return Err(format!("failed to read source file, err {err}"))
             };
-            Lib(CliOperation::Run(src))
+            Lib(CliOperation::Run(src, RunMode::Any))
         },
         Some("-s") | Some("--source") => {
             let Some(src) = args.pop() else {
                 return Err("argument -s/--source expects a single argument containing source code".to_string())
             };
             tilde_log!("getting source from command line (length in utf8 bytes: {})", src.len());
-            Lib(CliOperation::Run(src))
+            Lib(CliOperation::Run(src, RunMode::Any))
         },
         Some("-g") | Some("--golf-source") => {
             let Some(src) = args.pop() else {
                 return Err("argument -g/--golf-source expects a single argument containing source code with golf-character only".to_string())
             };
             tilde_log!("getting golf-only source from command line (length in utf8 bytes: {})", src.len());
-            Lib(CliOperation::Run(src))
+            Lib(CliOperation::Run(src, RunMode::GolfOnly))
         },
         Some("--base64source") => {
             let Some(b64src) = args.pop() else {
@@ -88,7 +89,7 @@ fn parse_operation(mut args: Vec<String>) -> ArgParseRes {
                 },
                 Result::Err(_) => return Err("base64 encoding not valid, alphabet should be A-Za-z0-9-_ without padding".to_string()),
             };
-            Lib(CliOperation::Run(src))
+            Lib(CliOperation::Run(src, RunMode::GolfOnly))
         },
         Some("-F") | Some("--analyze-file") => {
             let Some(pth) = args.pop() else {

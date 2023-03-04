@@ -95,6 +95,12 @@ pub enum RunMode {
     GolfOnly,
 }
 
+impl RunMode {
+    pub fn golf_only(&self) -> bool {
+        *self == RunMode::GolfOnly
+    }
+}
+
 //TODO @mverleg: move this code?
 fn gather_input() -> String {
     let is_ready = Arc::new(AtomicBool::new(false));
