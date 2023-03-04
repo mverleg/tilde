@@ -60,11 +60,10 @@ pub type UINT = u64;
 pub fn run_tilde(args: &TildeArgs) -> TildeRes<Value> {
     match &args.operation {
         CliOperation::Run(source, mode) => {
-            assert!(*mode == RunMode::Any);
             ALLOW_COMPRESSION.store(false, Ordering::Release);
             //tilde_from();
             let inp = gather_input();
-            let res = tilde_strs(source, &inp)?;
+            let res = tilde_strs_mode(source, &inp, *mode)?;
             Ok(Value::Txt(Text::of(res)))
             //TODO @mark: change to tilde_from ^
         },
@@ -78,8 +77,6 @@ pub fn run_tilde(args: &TildeArgs) -> TildeRes<Value> {
     }
 }
 
-fn reject_n
-
 #[derive(Debug)]
 pub struct TildeArgs {
     pub operation: CliOperation,
@@ -92,7 +89,7 @@ pub enum CliOperation {
     DocGen,
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum RunMode {
     Any,
     GolfOnly,
@@ -120,8 +117,9 @@ pub fn tilde_from<R: io::Read, W: io::Write>(
     code: &str,
     reader: io::BufReader<R>,
     writer: io::BufWriter<W>,
+    mode: RunMode,
 ) -> TildeRes<()> {
-    let prog = parse(code)?;
+    let prog = parse(code, mode)?;
     let val = execute(prog, build_input(reader))?;
     let mut writer = writer;
     tilde_log!("tilde result: {}", val);
@@ -146,8 +144,20 @@ pub fn tilde_strs(
     code: &str,
     input: &str,
 ) -> TildeRes<String> {
+    tilde_strs_mode(code, input, RunMode::Any)
+}
+
+pub fn tilde_strs_mode(
+    code: &str,
+    input: &str,
+    mode: RunMode,
+) -> TildeRes<String> {
     let mut output = vec![];
-    tilde_from(code, io::BufReader::new(io::Cursor::new(input)), io::BufWriter::new(io::Cursor::new(&mut output)))?;
+    tilde_from(
+        code,
+        io::BufReader::new(io::Cursor::new(input)),
+        io::BufWriter::new(io::Cursor::new(&mut output)),
+        mode)?;
     String::from_utf8(output).map_err(|err| format!("output was not utf8, err: {err}"))
 }
 
@@ -165,7 +175,7 @@ pub fn tilde_strs(
 /// Analyze the Tilde source code and report stats as json.
 pub fn tilde_analyze(source: &str) -> TildeRes<String> {
     //use crate::dict::compress_with_dict;
-let prog = parse(source)?;
+    let prog = parse(source, RunMode::Any)?;
     let unsafe_long_code = prog.long_code();
     let golf_code = prog.golf_code()?;
     let base64_code = prog.golf_code_b64()?;
