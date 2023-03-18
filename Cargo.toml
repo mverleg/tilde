@@ -29,6 +29,7 @@ regex = { version = "1.7.1", default-features = false, features = ["std"] }
 [build-dependencies]
 tinyvec = { version = "1.6.0", default-features = false, features = ["rustc_1_57"] }
 tinyvec_string = { version = "0.3.2", features = ["rustc_1_57"] }
+regex = { version = "1.7.1", default-features = false, features = ["std"] }
 
 [profile.release]
 opt-level = 3       # Optimize for speed ('z' for size).
