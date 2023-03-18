@@ -3,6 +3,7 @@ use crate::op::collection::Last;
 use crate::op::collection::Lookup;
 use crate::op::collection::Split;
 use crate::op::collection::Unique;
+use crate::op::func::Arg;
 use crate::op::sanitize::BaseWords;
 pub use crate::op::stack::Drop;
 pub use crate::op::stack::Duplicate;
@@ -23,8 +24,9 @@ mod arithmetic;
 mod stack;
 mod collection;
 mod sanitize;
+mod func;
 
-pub fn all_non_literals() -> [Op; 13] {
+pub fn all_non_literals() -> [Op; 14] {
     //TODO @mark:
     [
         Op::of(Plus),
@@ -40,6 +42,7 @@ pub fn all_non_literals() -> [Op; 13] {
         Op::of(BaseWords),
         Op::of(Unique),
         Op::of(Count),
+        Op::of(Arg),
     ]
 }
 
