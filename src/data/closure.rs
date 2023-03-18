@@ -13,6 +13,11 @@ impl Func {
     pub fn new() -> Self {
         Func { ops: Vec::with_capacity(4) }
     }
+
+    pub fn with(mut self, op: Op) -> Self {
+        self.push(op);
+        self
+    }
 }
 
 impl PartialEq for Func {
