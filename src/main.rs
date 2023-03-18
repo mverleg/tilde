@@ -198,27 +198,39 @@ mod executable {
 
     fn find_all_examples() -> Vec<String> {
         let re = Regex::new("^(?:.*/)?([^/]*).rs").unwrap();
-        let entries = read_dir("./examples")
-            .expect("no example directory");
-        entries
-            .map(|entry| entry.unwrap().file_name())
-            .map(|os_str| os_str.to_str().unwrap())
-            .flat_map(|pth| re.captures(&pth).into_iter())
-            .map(|caps| caps.get(1).unwrap().as_str().to_owned())
-            .collect()
+        let mut examples = Vec::new();
+        for example_res in read_dir("./examples").expect("no example directory") {
+            let path_os = example_res.unwrap().file_name();
+            let path = path_os.to_str().unwrap();
+            if let Some(caps) = re.captures(path) {
+                let name = caps.get(1).unwrap().as_str().to_owned();
+                examples.push(name);
+            }
+        }
+        examples
     }
 
     // #[test]
     // fn text_examples() {
-    //     let bins = get_all_bins();
-    //     assert!(!bins.is_empty(), "no binaries found");
-    //     for bin in bins {
-    //         let out = Command::new("cargo")
-    //             .args(["run", "--bin", &bin, "--all-features", "--", "--help"])
-    //             .output()
-    //             .expect("failed to execute binary");
-    //         assert_eq!(out.status.code(), Some(0), "failed binary {bin} --help because exit code was not 0");
-    //         println!("ran binary {bin} --help");
+    //     let re = Regex::new("^(?:.*/)?([^/]*).rs").unwrap();
+    //     let mut cnt = 0;
+    //     for example_res in read_dir("./examples").expect("no example directory") {
+    //         let path_os = example_res.unwrap().file_name();
+    //         let path = path_os.to_str().unwrap();
+    //         if let Some(caps) = re.captures(path) {
+    //             let name = caps.get(1).unwrap().as_str();
+    //             let out = Command::new("cargo")
+    //                 .args(["run", "--example", name, "--all-features"])
+    //                 .output()
+    //                 .expect("failed to execute process");
+    //             assert_eq!(out.status.code(), Some(0), "failed example {name} because exit code was not 0");
+    //             println!("ran {name} at {path}");
+    //             cnt += 1;
+    //         } else {
+    //             println!("not an example: {path}")
+    //         }
     //     }
+    //     assert!(cnt > 0, "did not find any examples");
+    //     println!("ran {cnt} examples");
     // }
 }
