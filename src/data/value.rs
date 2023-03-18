@@ -84,6 +84,12 @@ impl From<Array> for Value {
     }
 }
 
+impl From<Func> for Value {
+    fn from(val: Func) -> Self {
+        Value::Func(val)
+    }
+}
+
 impl Default for Value {
     fn default() -> Self {
         Value::Num(Nr::zero())

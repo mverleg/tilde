@@ -27,6 +27,7 @@ pub trait NullaryExecutor: OpTyp {
 }
 
 pub trait UnaryExecutor: OpTyp {
+
     fn exec_n(&self, value: Nr) -> Values;
 
     fn exec_t(&self, value: Text) -> Values;
@@ -40,6 +41,7 @@ pub trait UnaryExecutor: OpTyp {
 }
 
 pub trait BinaryExecutor: OpTyp {
+
     fn exec_nn(&self, deep: Nr, top: Nr) -> Values;
 
     fn exec_nt(&self, deep: Nr, top: Text) -> Values;
