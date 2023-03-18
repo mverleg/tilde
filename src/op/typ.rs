@@ -57,12 +57,12 @@ impl Clone for Op {
     }
 }
 
-// implemented automatically if PartialEq is derived/impl for an operation
+// implemented automatically if PartialEq + Eq are derived/impl for an operation
 pub trait OpEq {
     fn is_equal(&self, other: &dyn OpTyp) -> bool;
 }
 
-impl<T> OpEq for T where T: 'static + OpTyp + PartialEq {
+impl<T> OpEq for T where T: 'static + OpTyp + PartialEq + Eq {
     fn is_equal(&self, other: &dyn OpTyp) -> bool {
         other.as_any()
             .downcast_ref::<Self>()
@@ -75,3 +75,6 @@ impl PartialEq for Op {
         self.val.is_equal(&*other.val)
     }
 }
+
+impl Eq for Op {}
+

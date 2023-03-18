@@ -14,7 +14,7 @@ use crate::Text;
 use crate::Values;
 use crate::values;
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct TextOp(Text);
 
 impl OpTyp for TextOp {
@@ -59,7 +59,7 @@ impl NullaryExecutor for TextOp {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct NumberOp(Nr);
 
 impl OpTyp for NumberOp {

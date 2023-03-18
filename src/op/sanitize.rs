@@ -7,7 +7,7 @@ use crate::exec::{Executor, UnaryExecutor};
 use crate::op::{Op, OpTyp};
 use crate::op::collection::Split;
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct BaseWords;
 
 impl BaseWords {

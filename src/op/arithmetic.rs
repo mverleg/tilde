@@ -11,7 +11,7 @@ use crate::Text;
 use crate::Values;
 use crate::values;
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Plus;
 
 impl Plus {
@@ -97,7 +97,7 @@ impl BinaryExecutor for Plus {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Minus;
 
 impl Minus {
@@ -183,7 +183,7 @@ impl BinaryExecutor for Minus {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Mul;
 
 impl Mul {
@@ -269,7 +269,7 @@ impl BinaryExecutor for Mul {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Div;
 
 impl Div {
@@ -355,7 +355,7 @@ impl BinaryExecutor for Div {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct IntDiv;
 
 impl IntDiv {

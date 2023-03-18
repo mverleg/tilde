@@ -14,7 +14,7 @@ use crate::Text;
 use crate::Values;
 use crate::values;
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Arg;
 
 impl Arg {
@@ -53,7 +53,7 @@ impl NullaryExecutor for Arg {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Apply;
 
 impl Apply {

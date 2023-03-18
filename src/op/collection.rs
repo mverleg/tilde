@@ -17,7 +17,7 @@ use crate::values;
 //     static SPLIT_RE: LazyCell<Regex> = LazyCell::new(|| Regex::new("\\s+").unwrap());
 // }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Last;
 
 impl Last {
@@ -73,7 +73,7 @@ impl UnaryExecutor for Last {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Lookup;
 
 impl Lookup {
@@ -160,7 +160,7 @@ impl BinaryExecutor for Lookup {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Split;
 
 impl Split {
@@ -223,7 +223,7 @@ impl UnaryExecutor for Split {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Unique;
 
 impl Unique {
@@ -293,7 +293,7 @@ impl UnaryExecutor for Unique {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Count;
 
 impl Count {
