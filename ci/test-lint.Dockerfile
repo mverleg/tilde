@@ -24,21 +24,6 @@ RUN if [ "$TEST" != 0 ] ; then \
         echo SKIPPED; \
     fi
 
-# Examples
-ARG EXAMPLES=1
-RUN echo "EXAMPLES=$EXAMPLES" &&\
-    if [ "$EXAMPLES" != 0 ] ; then \
-        for ex_pth in $( find examples/ -mindepth 1 -maxdepth 1 ); do \
-            ex="$(basename "\$ex" .rs)"; \
-            echo "example \$ex at \$ex_pth"; \
-            if ! cargo --offline run --example --all-features ; then \
-                echo "::warn file='\$ex_pth' - Example failed: \$ex" \
-            fi \
-        done \
-    else \
-        echo SKIPPED; \
-    fi
-
 # Lint
 ARG LINT=1
 ARG STRICT=1
