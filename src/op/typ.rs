@@ -78,3 +78,23 @@ impl PartialEq for Op {
 
 impl Eq for Op {}
 
+// implemented automatically if Hash is derived/impl for an operation
+pub trait OpHash {
+    fn is_equal(&self, other: &dyn OpTyp) -> bool;
+}
+
+impl<T> OpHash for T where T: 'static + OpTyp + hash::Hash {
+    fn is_equal(&self, other: &dyn OpTyp) -> bool {
+        other.as_any()
+            .downcast_ref::<Self>()
+            .map_or(false, |other_cast| self == other_cast)
+    }
+}
+
+impl hash::Hash for Op {
+    fn hash<H: hash::Hasher>(&self, state: &mut H) {
+        other.as_any()
+            .downcast_ref::<Self>()
+            .map_or(false, |other_cast| self == other_cast)
+    }
+}
