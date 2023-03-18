@@ -2,10 +2,17 @@ use ::std::hash;
 use ::std::hash::Hasher;
 
 use crate::op::Op;
+use crate::Value;
+
+#[derive(Debug, Clone)]
+pub enum FuncItem {
+    Operation(Op),
+    Capture(Value),
+}
 
 #[derive(Debug, Clone)]
 pub struct Func {
-    ops: Vec<Op>,
+    ops: Vec<FuncItem>,
     //TODO @mark: tinyvec?
 }
 
@@ -14,8 +21,13 @@ impl Func {
         Func { ops: Vec::with_capacity(4) }
     }
 
-    pub fn with(mut self, op: Op) -> Self {
-        self.push(op);
+    pub fn with_op(mut self, op: Op) -> Self {
+        self.ops.push(FuncItem::Operation(op));
+        self
+    }
+
+    pub fn with_val(mut self, val: Value) -> Self {
+        self.ops.push(FuncItem::Capture(val));
         self
     }
 }
