@@ -19,7 +19,7 @@ impl Arg {
 impl OpTyp for Arg {
 
     fn description(&self) -> &'static str {
-        "Starts a new closure, representing its argument\nmost operations applied to arg are added to the closure instead of executed. A few operations will execute the closure on some input, possibly repeatedly."
+        "Starts a new closure, representing its argument\nMost operations applied to arg are added to the closure instead of executed. A few operations, like apply, will execute the closure on some input, possibly repeatedly."
     }
 
     fn long_code(&self) -> Cow<'static, str> {
@@ -47,22 +47,22 @@ impl NullaryExecutor for Arg {
 }
 
 #[derive(Debug, Clone, PartialEq)]
-pub struct Map;
+pub struct Apply;
 
-impl Map {
+impl Apply {
     pub fn new() -> Op {
-        Op::of(Map)
+        Op::of(Apply)
     }
 }
 
-impl OpTyp for Map {
+impl OpTyp for Apply {
 
     fn description(&self) -> &'static str {
-        "Starts a new closure, representing its argument\nmost operations applied to arg are added to the closure instead of executed. A few operations will execute the closure on some input, possibly repeatedly."
+        "Applies a closure to an argument."
     }
 
     fn long_code(&self) -> Cow<'static, str> {
-        Cow::Borrowed("map")
+        Cow::Borrowed("apply")
     }
 
     fn golf_code(&self) -> Option<GolfWord> {
@@ -78,7 +78,7 @@ impl OpTyp for Map {
     }
 }
 
-impl BinaryExecutor for Map {
+impl BinaryExecutor for Apply {
 
     fn exec_nn(&self, deep: Nr, top: Nr) -> Values {
         todo!()
