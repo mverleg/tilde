@@ -83,12 +83,23 @@ pub trait BinaryExecutor: OpTyp {
             .with_op(current_op.clone())]
     }
 
-    // fn exec_fn(&self, deep: Func, top: Nr) -> Values;
+    fn exec_fn(&self, deep: Func, top: Nr, current_op: &Op) -> Values {
+        values![deep
+            .with_val(Value::Num(top))
+            .with_op(current_op.clone())]
+    }
 
-    // fn exec_ft(&self, deep: Func, top: Text) -> Values;
+    fn exec_ft(&self, deep: Func, top: Text, current_op: &Op) -> Values {
+        values![deep
+            .with_val(Value::Txt(top))
+            .with_op(current_op.clone())]
+    }
 
-    // fn exec_fa(&self, deep: Func, top: Array) -> Values;
-    //TODO @mark: ^ x3
+    fn exec_fa(&self, deep: Func, top: Array, current_op: &Op) -> Values {
+        values![deep
+            .with_val(Value::Arr(top))
+            .with_op(current_op.clone())]
+    }
 
     fn exec_ff(&self, deep: Func, top: Func, current_op: &Op) -> Values {
         values![top
