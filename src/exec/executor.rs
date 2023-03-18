@@ -1,6 +1,6 @@
 use ::std::fmt::Debug;
 
-use crate::Array;
+use crate::{Array, Func};
 use crate::Nr;
 use crate::op::OpTyp;
 use crate::Text;
@@ -32,6 +32,8 @@ pub trait UnaryExecutor: OpTyp {
     fn exec_t(&self, value: Text) -> Values;
 
     fn exec_a(&self, value: Array) -> Values;
+
+    fn exec_f(&self, value: Func) -> Values;
 
     /// Fallback for if the stack is empty
     fn exec_empty(&self) -> Values;

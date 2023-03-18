@@ -1,7 +1,7 @@
 use ::std::any::Any;
 use ::std::borrow::Cow;
 
-use crate::{Array, Nr, Text, Values, values};
+use crate::{Array, Func, Nr, Text, Values, values};
 use crate::compile::GolfWord;
 use crate::exec::{Executor, UnaryExecutor};
 use crate::op::{Op, OpTyp};
@@ -64,7 +64,11 @@ impl UnaryExecutor for BaseWords {
     }
 
     fn exec_a(&self, value: Array) -> Values {
-        values![]
+        todo!()
+    }
+
+    fn exec_f(&self, value: Func) -> Values {
+        todo!()
     }
 
     fn exec_empty(&self) -> Values {

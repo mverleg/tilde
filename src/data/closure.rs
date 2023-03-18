@@ -1,8 +1,6 @@
 use ::std::hash;
 use ::std::hash::Hasher;
 
-use ::tinyvec::TinyVec;
-
 use crate::op::Op;
 
 #[derive(Debug, Clone)]

@@ -27,6 +27,7 @@ pub fn execute(
                     Some(Value::Num(top)) => exec.exec_n(top),
                     Some(Value::Txt(top)) => exec.exec_t(top),
                     Some(Value::Arr(top)) => exec.exec_a(top),
+                    Some(Value::Func(func)) => exec.exec_f(top),
                     None => exec.exec_empty(),
                 }
             },

@@ -1,7 +1,7 @@
 use ::std::any::Any;
 use ::std::borrow::Cow;
 
-use crate::Array;
+use crate::{Array, Func};
 use crate::compile::{GolfWord, Letter};
 use crate::exec::{Executor, UnaryExecutor};
 use crate::Nr;
@@ -71,6 +71,11 @@ impl UnaryExecutor for Drop {
         values![]
     }
 
+    fn exec_f(&self, value: Func) -> Values {
+        // no action, just drop the input
+        values![]
+    }
+
     fn exec_empty(&self) -> Values {
         todo!()
     }
@@ -108,17 +113,22 @@ impl OpTyp for Duplicate {
 impl UnaryExecutor for Duplicate {
 
     fn exec_n(&self, value: Nr) -> Values {
-        // no action, just drop the input
+        // duplicate the input
         values![value, value]
     }
 
     fn exec_t(&self, value: Text) -> Values {
-        // no action, just drop the input
+        // duplicate the input
         values![value.clone(), value]
     }
 
     fn exec_a(&self, value: Array) -> Values {
-        // no action, just drop the input
+        // duplicate the input
+        values![value.clone(), value]
+    }
+
+    fn exec_f(&self, value: Func) -> Values {
+        // duplicate the input
         values![value.clone(), value]
     }
 
