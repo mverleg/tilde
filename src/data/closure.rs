@@ -3,13 +3,13 @@ use ::std::fmt;
 use crate::op::Op;
 use crate::Value;
 
-#[derive(Debug, Clone, PartialEq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum FuncItem {
     Operation(Op),
     Capture(Value),
 }
 
-#[derive(Clone, PartialEq, Hash)]
+#[derive(Clone, PartialEq, Eq, Hash)]
 pub struct Func {
     items: Vec<FuncItem>,
     //TODO @mark: tinyvec?

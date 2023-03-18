@@ -7,6 +7,6 @@ fn main() {
     assert_eq!(res, "20");
 
     // compare x-3 and 3-x (scalar apply)
-    assert_eq!(tilde_strs("arg 3 sub 5 apply", ""), Some("2"));
-    assert_eq!(tilde_strs("3 arg sub 5 apply", ""), Some("-2"));
+    assert_eq!(tilde_strs("arg 3 sub 5 apply", "").unwrap(), "2");
+    assert_eq!(tilde_strs("3 arg sub 5 apply", "").unwrap(), "-2");
 }
