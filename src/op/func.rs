@@ -8,7 +8,6 @@ use crate::exec::Executor;
 use crate::exec::NullaryExecutor;
 use crate::Func;
 use crate::Nr;
-use crate::op::collection::Split;
 use crate::op::Op;
 use crate::op::OpTyp;
 use crate::Text;

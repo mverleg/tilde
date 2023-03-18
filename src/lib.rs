@@ -11,6 +11,8 @@
 #![allow(clippy::new_ret_no_self)]
 #![allow(clippy::len_without_is_empty)]
 
+extern crate core;
+
 use ::std::io;
 use ::std::io::BufRead;
 use ::std::io::Read;

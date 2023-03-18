@@ -1,6 +1,6 @@
 use ::std::fmt;
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Clone, PartialEq, Eq, Hash)]
 pub struct Text {
     val: String,
 }
@@ -20,11 +20,14 @@ impl Text {
 }
 
 impl fmt::Display for Text {
-    fn fmt(
-        &self,
-        f: &mut fmt::Formatter<'_>,
-    ) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>, ) -> fmt::Result {
         write!(f, "{}", self.val)
+    }
+}
+
+impl fmt::Debug for Text {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "\"{}\"", self.val)
     }
 }
 

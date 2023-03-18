@@ -34,6 +34,7 @@ impl fmt::Display for Value {
             Value::Num(val) => write!(f, "{val}"),
             Value::Txt(val) => write!(f, "{val}"),
             Value::Arr(val) => write!(f, "{val}"),
+            Value::Func(val) => write!(f, "{val}"),
         }
     }
 }
@@ -42,8 +43,9 @@ impl fmt::Debug for Value {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         match self {
             Value::Num(val) => write!(f, "{val}"),
-            Value::Txt(val) => write!(f, "\"{val}\""),
+            Value::Txt(val) => write!(f, "{val}"),
             Value::Arr(val) => write!(f, "{val}"),
+            Value::Func(val) => write!(f, ""),
         }
     }
 }
