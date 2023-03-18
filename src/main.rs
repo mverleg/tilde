@@ -157,3 +157,40 @@ enum ArgParseRes {
     Err(String),
     GenHelp,
 }
+
+#[cfg(test)]
+mod executable {
+    use ::std::fs::read_dir;
+    use std::process::Command;
+    use ::regex::Regex;
+
+    #[test]
+    fn test_bins() {
+        unimplemented!();  //TODO @mark
+    }
+
+    #[test]
+    fn text_examples() {
+        let re = Regex::new("^(?:.*/)?([^/]*).rs").unwrap();
+        let mut cnt = 0;
+        for example_res in read_dir("./examples").unwrap() {
+            let path_os = example_res.unwrap().file_name();
+            let path = path_os.to_str().unwrap();
+            if let Some(caps) = re.captures(path) {
+                let name = caps.get(1).unwrap().as_str();
+                let out = Command::new("cargo")
+                    .args(["run", "--example", name, "--all-features"])
+                    .output()
+                    .expect("failed to execute process");
+                assert_eq!(out.status.code(), Some(0), "failed {name}");
+                println!("ran {name} at {path}");
+                cnt += 1;
+            } else {
+                println!("not an example: {path}")
+            }
+        }
+        assert!(cnt > 0, "did not find any examples");
+        println!("ran {cnt} examples");
+        panic!();
+    }
+}
