@@ -39,11 +39,13 @@ fn find_all_bins() -> Vec<String> {
 
 fn find_all_examples() -> Vec<String> {
     let mut examples = Vec::new();
-    for example_res in fs::read_dir("./examples").expect("no example directory") {
-        let path = example_res.unwrap()
-            .file_name().to_str().unwrap().to_owned();
-        if path.ends_with(".rs") {
-            examples.push(path.strip_suffix(".rs").unwrap().to_owned());
+    if let Ok(examples_dir) = fs::read_dir("./examples") {
+        for example_res in examples_dir {
+            let path = example_res.unwrap()
+                .file_name().to_str().unwrap().to_owned();
+            if path.ends_with(".rs") {
+                examples.push(path.strip_suffix(".rs").unwrap().to_owned());
+            }
         }
     }
     examples
