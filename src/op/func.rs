@@ -1,12 +1,19 @@
 use ::std::any::Any;
 use ::std::borrow::Cow;
 
-use crate::{Array, Nr, Text, Value, Values, values};
+use crate::Array;
 use crate::compile::GolfWord;
-use crate::exec::{BinaryExecutor, Executor, NullaryExecutor, UnaryExecutor};
+use crate::exec::BinaryExecutor;
+use crate::exec::Executor;
+use crate::exec::NullaryExecutor;
 use crate::Func;
-use crate::op::{Op, OpTyp};
+use crate::Nr;
 use crate::op::collection::Split;
+use crate::op::Op;
+use crate::op::OpTyp;
+use crate::Text;
+use crate::Values;
+use crate::values;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Arg;

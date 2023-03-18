@@ -1,11 +1,13 @@
 use ::std::fmt::Debug;
 
-use crate::{Array, Func, values};
+use crate::Array;
+use crate::Func;
 use crate::Nr;
-use crate::op::{NumberOp, Op};
+use crate::op::NumberOp;
+use crate::op::Op;
 use crate::op::OpTyp;
-use crate::op::TextOp;
 use crate::Text;
+use crate::values;
 use crate::Values;
 
 /// Different types of execution, based on input.
@@ -64,7 +66,7 @@ pub trait BinaryExecutor: OpTyp {
 
     fn exec_tf(&self, deep: Text, top: Func, current_op: &Op) -> Values {
         values![top
-            .with_val(deep)
+            .with_val(Value::Txt(deep))
             .with_op(current_op.clone())]
         //TODO @mark: prevent clones like this (maybe Op COW?)
     }
@@ -77,7 +79,7 @@ pub trait BinaryExecutor: OpTyp {
 
     fn exec_af(&self, deep: Array, top: Func, current_op: &Op) -> Values {
         values![top
-            .with_op(ArrayOp::new(deep))
+            .with_val(Value::Arr(deep))
             .with_op(current_op.clone())]
     }
 
@@ -90,7 +92,7 @@ pub trait BinaryExecutor: OpTyp {
 
     fn exec_ff(&self, deep: Func, top: Func, current_op: &Op) -> Values {
         values![top
-            .with_op(deep)
+            .with_val(Value::Func(deep))
             .with_op(current_op.clone())]
     }
 
