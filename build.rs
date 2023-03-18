@@ -5,8 +5,6 @@ use ::std::fs;
 use ::std::path::PathBuf;
 use ::std::process::Command;
 
-use ::regex::Regex;
-
 include!("src/compile/var_uint_build.rs");
 
 fn main() {
@@ -40,14 +38,12 @@ fn find_all_bins() -> Vec<String> {
 }
 
 fn find_all_examples() -> Vec<String> {
-    let re = Regex::new("^(?:.*/)?([^/]*).rs").unwrap();
     let mut examples = Vec::new();
     for example_res in fs::read_dir("./examples").expect("no example directory") {
-        let path_os = example_res.unwrap().file_name();
-        let path = path_os.to_str().unwrap();
-        if let Some(caps) = re.captures(path) {
-            let name = caps.get(1).unwrap().as_str().to_owned();
-            examples.push(name);
+        let path = example_res.unwrap()
+            .file_name().to_str().unwrap().to_owned();
+        if path.ends_with(".rs") {
+            examples.push(path.strip_suffix(".rs").unwrap().to_owned());
         }
     }
     examples

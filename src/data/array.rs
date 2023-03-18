@@ -95,6 +95,7 @@ impl Array {
     }
 }
 
+#[allow(clippy::approx_constant)]
 #[cfg(test)]
 mod tests {
     use crate::Nr;
