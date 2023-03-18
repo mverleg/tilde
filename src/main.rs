@@ -161,19 +161,46 @@ enum ArgParseRes {
 #[cfg(test)]
 mod executable {
     use ::std::fs::read_dir;
-    use std::process::Command;
+    use ::std::process::Command;
     use ::regex::Regex;
 
+    fn get_all_bins() -> Vec<String> {
+        // trigger error message to list all binaries
+        let out = Command::new("cargo")
+            .args(["run", "--bin"])
+            .output()
+            .expect("failed to execute process");
+        String::from_utf8(out.stderr)
+            .expect("cargo output not utf8")
+            .lines()
+            .skip(2)
+            .map(|line| {
+                line.trim().to_owned()
+            })
+            .filter(|bin| !bin.is_empty())
+            .filter(|bin| !bin.contains("debug"))
+            .collect()
+    }
+
     #[test]
-    fn test_bins() {
-        unimplemented!();  //TODO @mark
+    fn test_bins_help() {
+        let bins = get_all_bins();
+        assert!(!bins.is_empty(), "no binaries found");
+        for bin in bins {
+            let out = Command::new("cargo")
+                .args(["run", "--bin", &bin, "--all-features", "--", "--help"])
+                .output()
+                .expect("failed to execute binary");
+            assert_eq!(out.status.code(), Some(0), "failed binary {bin} --help because exit code was not 0");
+            println!("ran binary {bin} --help");
+        }
     }
 
     #[test]
     fn text_examples() {
         let re = Regex::new("^(?:.*/)?([^/]*).rs").unwrap();
         let mut cnt = 0;
-        for example_res in read_dir("./examples").unwrap() {
+        for example_res in read_dir("./examples").expect("no example directory") {
             let path_os = example_res.unwrap().file_name();
             let path = path_os.to_str().unwrap();
             if let Some(caps) = re.captures(path) {
@@ -182,7 +209,7 @@ mod executable {
                     .args(["run", "--example", name, "--all-features"])
                     .output()
                     .expect("failed to execute process");
-                assert_eq!(out.status.code(), Some(0), "failed {name}");
+                assert_eq!(out.status.code(), Some(0), "failed example {name} because exit code was not 0");
                 println!("ran {name} at {path}");
                 cnt += 1;
             } else {
@@ -191,6 +218,5 @@ mod executable {
         }
         assert!(cnt > 0, "did not find any examples");
         println!("ran {cnt} examples");
-        panic!();
     }
 }
