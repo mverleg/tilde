@@ -31,6 +31,7 @@ use crate::dict::ALLOW_COMPRESSION;
 use crate::exec::execute;
 
 pub use self::data::Array;
+pub use self::data::Func;
 pub use self::data::Nr;
 pub use self::data::Text;
 pub use self::data::Value;

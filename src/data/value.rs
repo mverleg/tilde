@@ -12,6 +12,7 @@ pub enum Value {
     Num(Nr),
     Txt(Text),
     Arr(Array),
+    Func(Func),
     //TODO @mark: Func(),
 }
 
@@ -109,6 +110,7 @@ macro_rules! values {
 }
 
 pub use values;
+use crate::data::closure::Func;
 
 #[cfg(test)]
 mod tests {

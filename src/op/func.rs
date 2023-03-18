@@ -1,9 +1,10 @@
 use ::std::any::Any;
 use ::std::borrow::Cow;
 
-use crate::{Array, Nr, Text, Values, values};
+use crate::{Array, Nr, Text, Value, Values, values};
 use crate::compile::GolfWord;
 use crate::exec::{BinaryExecutor, Executor, NullaryExecutor, UnaryExecutor};
+use crate::Func;
 use crate::op::{Op, OpTyp};
 use crate::op::collection::Split;
 
@@ -42,7 +43,7 @@ impl OpTyp for Arg {
 impl NullaryExecutor for Arg {
 
     fn exec(&self) -> Values {
-        todo!()
+        values![Value::Func(Func::new())]
     }
 }
 
