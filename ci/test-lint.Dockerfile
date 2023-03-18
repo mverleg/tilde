@@ -9,7 +9,7 @@ COPY ./ ./
 # Build (for test)
 ARG TEST=1
 RUN echo "TEST=$TEST" &&\
-    find . -name target -prune -o -type f &&\
+    find . -type f &&\
     touch -c build.rs src/main.rs src/lib.rs &&\
     if [ "$TEST" != 0 ] ; then \
         cargo build --all-features --tests --locked; \
@@ -18,7 +18,6 @@ RUN echo "TEST=$TEST" &&\
     fi
 
 # Test
-ARG EXAMPLES=1
 RUN if [ "$TEST" != 0 ] ; then \
         cargo --offline test --all-features; \
     else \
@@ -26,6 +25,7 @@ RUN if [ "$TEST" != 0 ] ; then \
     fi
 
 # Examples
+ARG EXAMPLES=1
 RUN if [ "$EXAMPLES" != 0 ] ; then \
         for ex_pth in $( cd examples/; find -mindepth 1 -maxdepth 1 ); do \
             ex="$(basename "$ex" .rs)"; \
