@@ -1,10 +1,16 @@
 use ::std::any::Any;
 use ::std::borrow::Cow;
 
-use crate::{Array, Func, Nr, Text, Values, values};
+use crate::Values;
+use crate::Text;
+use crate::Nr;
+use crate::Array;
+use crate::values;
 use crate::compile::GolfWord;
-use crate::exec::{Executor, UnaryExecutor};
-use crate::op::{Op, OpTyp};
+use crate::exec::Executor;
+use crate::exec::UnaryExecutor;
+use crate::op::Op;
+use crate::op::OpTyp;
 use crate::op::collection::Split;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -64,10 +70,6 @@ impl UnaryExecutor for BaseWords {
     }
 
     fn exec_a(&self, value: Array) -> Values {
-        todo!()
-    }
-
-    fn exec_f(&self, value: Func) -> Values {
         todo!()
     }
 

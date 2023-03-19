@@ -73,9 +73,12 @@ impl fmt::Debug for Func {
                 write!(f, " ")?;
             }
             match item {
-                // CaptureType::Operation(op) => write!(f, "{op:?}")?,
-                // CaptureType::Capture(val) => write!(f, "{val:?}")?,
-                _ => todo!(),
+                CaptureType::Unary(op) => write!(f, "_ {op:?}")?,
+                CaptureType::BinaryFreeDeep(op, top) => write!(f, "(_ {top:?} {op:?})")?,
+                CaptureType::BinaryFreeTop(op, deep) => write!(f, "({deep:?} _ {op:?})")?,
+                CaptureType::TernaryFreeDeep(op, middle, top) => write!(f, "(_ {middle:?} {top:?} {op:?})")?,
+                CaptureType::TernaryFreeMiddle(op, deep, top) => write!(f, "({deep:?} _ {top:?} {op:?})")?,
+                CaptureType::TernaryFreeTop(op, deep, middle) => write!(f, "({deep:?} {middle:?} _ {op:?})")?,
             }
         }
         write!(f, ")")?;

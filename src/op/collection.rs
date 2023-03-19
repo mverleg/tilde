@@ -2,7 +2,8 @@ use ::std::any::Any;
 use ::std::borrow::Cow;
 use ::std::collections::HashSet;
 
-use crate::{Array, Func, Nr};
+use crate::Array;
+use crate::Nr;
 use crate::compile::GolfWord;
 use crate::exec::BinaryExecutor;
 use crate::exec::Executor;
@@ -61,10 +62,6 @@ impl UnaryExecutor for Last {
     }
 
     fn exec_a(&self, value: Array) -> Values {
-        todo!()
-    }
-
-    fn exec_f(&self, value: Func) -> Values {
         todo!()
     }
 
@@ -214,10 +211,6 @@ impl UnaryExecutor for Split {
         todo!()
     }
 
-    fn exec_f(&self, value: Func) -> Values {
-        todo!()
-    }
-
     fn exec_empty(&self) -> Values {
         todo!()
     }
@@ -284,10 +277,6 @@ impl UnaryExecutor for Unique {
         values![Value::Arr(Array::of(result))]
     }
 
-    fn exec_f(&self, value: Func) -> Values {
-        todo!()
-    }
-
     fn exec_empty(&self) -> Values {
         todo!()
     }
@@ -346,10 +335,6 @@ impl UnaryExecutor for Count {
     fn exec_a(&self, value: Array) -> Values {
         let len = value.len() as f64;
         values![Value::Num(Nr::new(len))]
-    }
-
-    fn exec_f(&self, value: Func) -> Values {
-        todo!()
     }
 
     fn exec_empty(&self) -> Values {

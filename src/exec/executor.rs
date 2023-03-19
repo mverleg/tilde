@@ -36,7 +36,9 @@ pub trait UnaryExecutor: OpTyp {
 
     fn exec_a(&self, value: Array) -> Values;
 
-    fn exec_f(&self, value: Func) -> Values;
+    fn exec_f(&self, value: Func, current_op: &Op) -> Values {
+        values![Value::Func(value.with_unary(current_op.clone()))]
+    }
 
     /// Fallback for if the stack is empty
     fn exec_empty(&self) -> Values;

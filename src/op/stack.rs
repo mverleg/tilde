@@ -1,9 +1,11 @@
 use ::std::any::Any;
 use ::std::borrow::Cow;
 
-use crate::{Array, Func};
-use crate::compile::{GolfWord, Letter};
-use crate::exec::{Executor, UnaryExecutor};
+use crate::Array;
+use crate::compile::GolfWord;
+use crate::compile::Letter;
+use crate::exec::Executor;
+use crate::exec::UnaryExecutor;
 use crate::Nr;
 use crate::op::Op;
 use crate::op::OpTyp;
@@ -71,10 +73,11 @@ impl UnaryExecutor for Drop {
         values![]
     }
 
-    fn exec_f(&self, value: Func) -> Values {
-        // no action, just drop the input
-        values![]
-    }
+    // fn exec_f(&self, value: Func) -> Values {
+    //     // no action, just drop the input
+    //     values![]
+    //     //TODO @mark: is it correct that this applies eagerly instead of lazily like most func operations?
+    // }
 
     fn exec_empty(&self) -> Values {
         todo!()
@@ -127,10 +130,11 @@ impl UnaryExecutor for Duplicate {
         values![value.clone(), value]
     }
 
-    fn exec_f(&self, value: Func) -> Values {
-        // duplicate the input
-        values![value.clone(), value]
-    }
+    // fn exec_f(&self, value: Func) -> Values {
+    //     // duplicate the input
+    //     values![value.clone(), value]
+    //     //TODO @mark: is it correct that this applies eagerly instead of lazily like most func operations?
+    // }
 
     fn exec_empty(&self) -> Values {
         todo!()
