@@ -26,27 +26,32 @@ impl Func {
     }
 
     pub fn with_unary(mut self, op: Op) -> Self {
-        self.push(CaptureType::Unary(op));
+        self.items.push(CaptureType::Unary(op));
         self
     }
-    pub fn with_bin_left(mut self, op: Op, right: Value) -> Self {
-        self.push(CaptureType::BinaryFreeDeep(op, right));
+
+    pub fn with_bin_deep(mut self, op: Op, top: Value) -> Self {
+        self.items.push(CaptureType::BinaryFreeDeep(op, top));
         self
     }
-    pub fn with_bin_right(mut self, op: Op, left: Value) -> Self {
-        self.push(CaptureType::BinaryFreeTop(op, left));
+
+    pub fn with_bin_top(mut self, op: Op, deep: Value) -> Self {
+        self.items.push(CaptureType::BinaryFreeTop(op, deep));
         self
     }
-    pub fn with_tern_left(mut self, op: Op, middle: Value, right: Value) -> Self {
-        self.push(CaptureType::TernaryFreeDeep(op, middle, right));
+
+    pub fn with_tern_deep(mut self, op: Op, middle: Value, top: Value) -> Self {
+        self.items.push(CaptureType::TernaryFreeDeep(op, middle, top));
         self
     }
-    pub fn with_tern_middle(mut self, op: Op, left: Value, right: Value) -> Self {
-        self.push(CaptureType::TernaryFreeMiddle(op, left, right));
+
+    pub fn with_tern_middle(mut self, op: Op, deep: Value, top: Value) -> Self {
+        self.items.push(CaptureType::TernaryFreeMiddle(op, deep, top));
         self
     }
-    pub fn with_tern_right(mut self, op: Op, left: Value, middle: Value) -> Self {
-        self.push(CaptureType::TernaryFreeTop(op, left, middle));
+
+    pub fn with_tern_top(mut self, op: Op, deep: Value, middle: Value) -> Self {
+        self.items.push(CaptureType::TernaryFreeTop(op, deep, middle));
         self
     }
 }

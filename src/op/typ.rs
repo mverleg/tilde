@@ -11,6 +11,7 @@ use crate::exec::Executor;
 pub struct Op {
     // This only allocates for the Ops with data, i.e. literals
     val: Box<dyn OpTyp>,
+    //TODO @mark: Rc
 }
 
 impl Op {

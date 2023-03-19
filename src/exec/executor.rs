@@ -1,9 +1,7 @@
 use ::std::fmt::Debug;
 
-use crate::{Array, Value};
-use crate::Func;
+use crate::{Array, Func};
 use crate::Nr;
-use crate::op::NumberOp;
 use crate::op::Op;
 use crate::op::OpTyp;
 use crate::Text;
@@ -53,9 +51,7 @@ pub trait BinaryExecutor: OpTyp {
     fn exec_na(&self, deep: Nr, top: Array) -> Values;
 
     fn exec_nf(&self, deep: Nr, top: Func, current_op: &Op) -> Values {
-        values![top
-            .with_op(NumberOp::new(deep))
-            .with_op(current_op.clone())]
+        values![Value::Func(top.with_bin_deep(current_op.clone(), Value::Num(deep)))]
     }
 
     fn exec_tn(&self, deep: Text, top: Nr) -> Values;
@@ -65,10 +61,7 @@ pub trait BinaryExecutor: OpTyp {
     fn exec_ta(&self, deep: Text, top: Array) -> Values;
 
     fn exec_tf(&self, deep: Text, top: Func, current_op: &Op) -> Values {
-        values![top
-            .with_val(Value::Txt(deep))
-            .with_op(current_op.clone())]
-        //TODO @mark: prevent clones like this (maybe Op COW?)
+        values![Value::Func(top.with_bin_deep(current_op.clone(), Value::Txt(deep)))]
     }
 
     fn exec_an(&self, deep: Array, top: Nr) -> Values;
@@ -78,34 +71,23 @@ pub trait BinaryExecutor: OpTyp {
     fn exec_aa(&self, deep: Array, top: Array) -> Values;
 
     fn exec_af(&self, deep: Array, top: Func, current_op: &Op) -> Values {
-        Value::Func(top.with_bin_right())
-        values![top
-            .with_val(Value::Arr(deep))
-            .with_op(self.clone())]
+        values![Value::Func(top.with_bin_deep(current_op.clone(), Value::Arr(deep)))]
     }
 
     fn exec_fn(&self, deep: Func, top: Nr, current_op: &Op) -> Values {
-        values![deep
-            .with_val(Value::Num(top))
-            .with_op(current_op.clone())]
+        values![Value::Func(deep.with_bin_top(current_op.clone(), Value::Num(top)))]
     }
 
     fn exec_ft(&self, deep: Func, top: Text, current_op: &Op) -> Values {
-        values![deep
-            .with_val(Value::Txt(top))
-            .with_op(current_op.clone())]
+        values![Value::Func(deep.with_bin_top(current_op.clone(), Value::Txt(top)))]
     }
 
     fn exec_fa(&self, deep: Func, top: Array, current_op: &Op) -> Values {
-        values![deep
-            .with_val(Value::Arr(top))
-            .with_op(current_op.clone())]
+        values![Value::Func(deep.with_bin_top(current_op.clone(), Value::Arr(top)))]
     }
 
     fn exec_ff(&self, deep: Func, top: Func, current_op: &Op) -> Values {
-        values![top
-            .with_val(Value::Func(deep))
-            .with_op(current_op.clone())]
+        values![Value::Func(top.with_bin_deep(current_op.clone(), Value::Func(deep)))]
     }
 
     /// Fallback for if there is only 1 value on the stack and it is a number
