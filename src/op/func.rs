@@ -1,7 +1,7 @@
 use ::std::any::Any;
 use ::std::borrow::Cow;
 
-use crate::Array;
+use crate::{Array, Value};
 use crate::compile::GolfWord;
 use crate::exec::BinaryExecutor;
 use crate::exec::Executor;
@@ -99,6 +99,13 @@ impl BinaryExecutor for Apply {
         todo!()
     }
 
+    fn exec_nf(&self, deep: Nr, top: Func, _: &Op) -> Values {
+        let mut stack = Values::new();
+        stack.push(Value::Num(deep));
+
+        Values::from(stack)
+    }
+
     fn exec_tn(&self, deep: Text, top: Nr) -> Values {
         todo!()
     }
@@ -108,6 +115,10 @@ impl BinaryExecutor for Apply {
     }
 
     fn exec_ta(&self, deep: Text, top: Array) -> Values {
+        todo!()
+    }
+
+    fn exec_tf(&self, deep: Text, top: Func, _: &Op) -> Values {
         todo!()
     }
 
@@ -123,6 +134,26 @@ impl BinaryExecutor for Apply {
         todo!()
     }
 
+    fn exec_af(&self, deep: Array, top: Func, _: &Op) -> Values {
+        todo!()
+    }
+
+    fn exec_fn(&self, deep: Func, top: Nr, _: &Op) -> Values {
+        todo!()
+    }
+
+    fn exec_ft(&self, deep: Func, top: Text, _: &Op) -> Values {
+        todo!()
+    }
+
+    fn exec_fa(&self, deep: Func, top: Array, _: &Op) -> Values {
+        todo!()
+    }
+
+    fn exec_ff(&self, deep: Func, top: Func, _: &Op) -> Values {
+        todo!()
+    }
+
     fn exec_single_n(&self, single: Nr) -> Values {
         todo!()
     }
@@ -132,6 +163,10 @@ impl BinaryExecutor for Apply {
     }
 
     fn exec_single_a(&self, single: Array) -> Values {
+        todo!()
+    }
+
+    fn exec_single_f(&self, single: Func, _: &Op) -> Values {
         todo!()
     }
 

@@ -1,13 +1,7 @@
-use crate::compile::Prog;
+use crate::exec::Executor;
 use crate::op::Op;
-use crate::{tilde_log, Values};
-use crate::TildeRes;
 use crate::Value;
-
-pub use self::executor::BinaryExecutor;
-pub use self::executor::Executor;
-pub use self::executor::NullaryExecutor;
-pub use self::executor::UnaryExecutor;
+use crate::Values;
 
 pub fn dispatch_op(mut pop: impl FnMut() -> Option<Value>, op: &Op) -> Values {
     let ret = match op.as_executor() {

@@ -1,6 +1,6 @@
 use crate::compile::Prog;
-use crate::op::Op;
-use crate::{tilde_log, Values};
+use crate::exec::dispatch::dispatch_op;
+use crate::tilde_log;
 use crate::TildeRes;
 use crate::Value;
 
