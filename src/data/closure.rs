@@ -1,7 +1,9 @@
 use ::std::fmt;
 
+use crate::{Value, Values};
+use crate::exec::new_small_stack;
+use crate::exec::Stack;
 use crate::op::Op;
-use crate::Value;
 
 /// Which type of capture
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -23,6 +25,12 @@ pub struct Func {
 impl Func {
     pub fn new() -> Self {
         Func { items: Vec::with_capacity(4) }
+    }
+
+    pub fn run_on_single(&self, initial_stack_value: Value) -> Values {
+        let mut stack = new_small_stack();
+        stack.push(initial_stack_value);
+        todo!()
     }
 
     pub fn with_unary(mut self, op: Op) -> Self {

@@ -52,6 +52,7 @@ pub trait BinaryExecutor: OpTyp {
 
     fn exec_na(&self, deep: Nr, top: Array) -> Values;
 
+    //TODO @mark: can current_op be removed? same as self?
     fn exec_nf(&self, deep: Nr, top: Func, current_op: &Op) -> Values {
         values![Value::Func(top.with_bin_top(current_op.clone(), Value::Num(deep)))]
     }
