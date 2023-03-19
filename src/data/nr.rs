@@ -3,10 +3,11 @@ use ::std::fmt;
 use ::std::hash;
 use ::std::num::ParseFloatError;
 use ::std::str::FromStr;
+use std::fmt::Formatter;
 
 use crate::UINT;
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Clone, Copy)]
 pub struct Nr {
     value: f64,
 }
@@ -116,6 +117,12 @@ impl From<i64> for Nr {
 
 impl fmt::Display for Nr {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.value)
+    }
+}
+
+impl fmt::Debug for Nr {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self.value)
     }
 }

@@ -15,8 +15,8 @@ extern crate core;
 
 use ::std::io;
 use ::std::io::BufRead;
-use ::std::io::Read;
 use ::std::io::stdin;
+use ::std::io::Read;
 use ::std::io::Write;
 use ::std::sync::Arc;
 use ::std::sync::atomic::AtomicBool;
@@ -144,7 +144,11 @@ fn build_input<R: io::Read>(mut reader: io::BufReader<R>) -> Value {
         if siz == 0 {
             break
         }
+        while line.ends_with('\n') || line.ends_with('\r') {
+            line.pop().unwrap();
+        }
         lines.push(Value::Txt(Text::of(&line)));
+        line.clear();
     }
     Value::Arr(Array::of(lines))
 }
