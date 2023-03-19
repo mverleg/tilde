@@ -53,7 +53,7 @@ pub trait BinaryExecutor: OpTyp {
     fn exec_na(&self, deep: Nr, top: Array) -> Values;
 
     fn exec_nf(&self, deep: Nr, top: Func, current_op: &Op) -> Values {
-        values![Value::Func(top.with_bin_deep(current_op.clone(), Value::Num(deep)))]
+        values![Value::Func(top.with_bin_top(current_op.clone(), Value::Num(deep)))]
     }
 
     fn exec_tn(&self, deep: Text, top: Nr) -> Values;
@@ -63,7 +63,7 @@ pub trait BinaryExecutor: OpTyp {
     fn exec_ta(&self, deep: Text, top: Array) -> Values;
 
     fn exec_tf(&self, deep: Text, top: Func, current_op: &Op) -> Values {
-        values![Value::Func(top.with_bin_deep(current_op.clone(), Value::Txt(deep)))]
+        values![Value::Func(top.with_bin_top(current_op.clone(), Value::Txt(deep)))]
     }
 
     fn exec_an(&self, deep: Array, top: Nr) -> Values;
@@ -73,23 +73,23 @@ pub trait BinaryExecutor: OpTyp {
     fn exec_aa(&self, deep: Array, top: Array) -> Values;
 
     fn exec_af(&self, deep: Array, top: Func, current_op: &Op) -> Values {
-        values![Value::Func(top.with_bin_deep(current_op.clone(), Value::Arr(deep)))]
+        values![Value::Func(top.with_bin_top(current_op.clone(), Value::Arr(deep)))]
     }
 
     fn exec_fn(&self, deep: Func, top: Nr, current_op: &Op) -> Values {
-        values![Value::Func(deep.with_bin_top(current_op.clone(), Value::Num(top)))]
+        values![Value::Func(deep.with_bin_deep(current_op.clone(), Value::Num(top)))]
     }
 
     fn exec_ft(&self, deep: Func, top: Text, current_op: &Op) -> Values {
-        values![Value::Func(deep.with_bin_top(current_op.clone(), Value::Txt(top)))]
+        values![Value::Func(deep.with_bin_deep(current_op.clone(), Value::Txt(top)))]
     }
 
     fn exec_fa(&self, deep: Func, top: Array, current_op: &Op) -> Values {
-        values![Value::Func(deep.with_bin_top(current_op.clone(), Value::Arr(top)))]
+        values![Value::Func(deep.with_bin_deep(current_op.clone(), Value::Arr(top)))]
     }
 
     fn exec_ff(&self, deep: Func, top: Func, current_op: &Op) -> Values {
-        values![Value::Func(top.with_bin_deep(current_op.clone(), Value::Func(deep)))]
+        values![Value::Func(top.with_bin_top(current_op.clone(), Value::Func(deep)))]
     }
 
     /// Fallback for if there is only 1 value on the stack and it is a number

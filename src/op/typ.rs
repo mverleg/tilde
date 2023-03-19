@@ -1,13 +1,12 @@
 use ::std::any::Any;
 use ::std::borrow::Cow;
-use ::std::fmt::Debug;
+use ::std::fmt;
 use ::std::hash;
 use ::std::ops::Deref;
 
 use crate::compile::GolfWord;
 use crate::exec::Executor;
 
-#[derive(Debug)]
 pub struct Op {
     // This only allocates for the Ops with data, i.e. literals
     val: Box<dyn OpTyp>,
@@ -20,7 +19,7 @@ impl Op {
     }
 }
 
-pub trait OpTyp: Debug + OpClone + OpEq {
+pub trait OpTyp: fmt::Debug + OpClone + OpEq {
 
     fn description(&self) -> &'static str;
 
@@ -83,5 +82,11 @@ impl Eq for Op {}
 impl hash::Hash for Op {
     fn hash<H: hash::Hasher>(&self, state: &mut H) {
         //TODO @mark: self.hash(state)
+    }
+}
+
+impl fmt::Debug for Op {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{:?}", self.val)
     }
 }
