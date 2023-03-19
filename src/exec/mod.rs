@@ -18,7 +18,7 @@ pub fn execute(
     let mut stack = Vec::new();
     stack.push(inp);
     while let Some(op) = prog.get(i) {
-        tilde_log!("stack before {:?}: {:?}", op, stack.iter().map(|s| format!("{:?}", s)).collect::<Vec<_>>().join(", "));
+        tilde_log!("stack before {:?}: {:?}", op, stack.iter().map(|s| format!("{:?}", s)).collect::<Vec<_>>().join(" | "));
         let ret = match op.as_executor() {
             Executor::Nullary(exec) => exec.exec(),
             Executor::Unary(exec) => {

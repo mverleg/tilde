@@ -1,6 +1,6 @@
 use ::std::fmt::Debug;
 
-use crate::Array;
+use crate::{Array, Value};
 use crate::Func;
 use crate::Nr;
 use crate::op::NumberOp;
@@ -78,9 +78,10 @@ pub trait BinaryExecutor: OpTyp {
     fn exec_aa(&self, deep: Array, top: Array) -> Values;
 
     fn exec_af(&self, deep: Array, top: Func, current_op: &Op) -> Values {
+        Value::Func(top.with_bin_right())
         values![top
             .with_val(Value::Arr(deep))
-            .with_op(current_op.clone())]
+            .with_op(self.clone())]
     }
 
     fn exec_fn(&self, deep: Func, top: Nr, current_op: &Op) -> Values {
