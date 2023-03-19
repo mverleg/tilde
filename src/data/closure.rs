@@ -1,7 +1,7 @@
 use ::std::fmt;
 
 use crate::{Value, Values};
-use crate::exec::new_small_stack;
+use crate::exec::{dispatch_op, new_small_stack};
 use crate::exec::Stack;
 use crate::op::Op;
 
@@ -19,7 +19,6 @@ pub enum CaptureType {
 #[derive(Clone, PartialEq, Eq, Hash)]
 pub struct Func {
     items: Vec<CaptureType>,
-    //TODO @mark: tinyvec?
 }
 
 impl Func {
@@ -30,6 +29,7 @@ impl Func {
     pub fn run_on_single(&self, initial_stack_value: Value) -> Values {
         let mut stack = new_small_stack();
         stack.push(initial_stack_value);
+        dispatch_op();
         todo!()
     }
 

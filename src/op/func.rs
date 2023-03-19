@@ -117,7 +117,8 @@ impl BinaryExecutor for Apply {
     }
 
     fn exec_tf(&self, deep: Text, top: Func, _: &Op) -> Values {
-        todo!()
+        let stack = top.run_on_single(Value::Txt(deep));
+        Values::from(stack)
     }
 
     fn exec_an(&self, deep: Array, top: Nr) -> Values {
@@ -133,7 +134,8 @@ impl BinaryExecutor for Apply {
     }
 
     fn exec_af(&self, deep: Array, top: Func, _: &Op) -> Values {
-        todo!()
+        let stack = top.run_on_single(Value::Arr(deep));
+        Values::from(stack)
     }
 
     fn exec_fn(&self, deep: Func, top: Nr, _: &Op) -> Values {

@@ -1,9 +1,9 @@
 use crate::compile::Prog;
-use crate::exec::dispatch::dispatch_op;
 use crate::tilde_log;
 use crate::TildeRes;
 use crate::Value;
 
+pub use self::dispatch::dispatch_op;
 pub use self::executor::BinaryExecutor;
 pub use self::executor::Executor;
 pub use self::executor::NullaryExecutor;
