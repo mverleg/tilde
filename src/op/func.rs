@@ -100,9 +100,7 @@ impl BinaryExecutor for Apply {
     }
 
     fn exec_nf(&self, deep: Nr, top: Func, _: &Op) -> Values {
-        let mut stack = Values::new();
-        stack.push(Value::Num(deep));
-
+        let stack = top.run_on_single(Value::Num(deep));
         Values::from(stack)
     }
 

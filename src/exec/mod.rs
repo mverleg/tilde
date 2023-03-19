@@ -1,5 +1,6 @@
 use crate::compile::Prog;
 use crate::exec::dispatch::dispatch_op;
+use crate::exec::stack::new_large_stack;
 use crate::tilde_log;
 use crate::TildeRes;
 use crate::Value;
@@ -11,17 +12,18 @@ pub use self::executor::UnaryExecutor;
 
 mod executor;
 mod dispatch;
+mod stack;
 
 pub fn execute(
     prog: Prog,
     inp: Value,
 ) -> TildeRes<Value> {
     let mut i = 0;
-    let mut stack = Vec::new();
+    let mut stack = new_large_stack();
     stack.push(inp);
     while let Some(op) = prog.get(i) {
         tilde_log!("stack before {:?}: {}", op, stack.iter().map(|s| format!("{:?}", s)).collect::<Vec<_>>().join(" | "));
-        let ret = dispatch_op(|| stack.pop(), op);
+        let ret = dispatch_op(&mut stack, op);
         stack.extend(ret);
         i += 1;
     }

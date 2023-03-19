@@ -1,13 +1,14 @@
 use crate::exec::Executor;
+use crate::exec::stack::Stack;
 use crate::op::Op;
 use crate::Value;
 use crate::Values;
 
-pub fn dispatch_op(mut pop: impl FnMut() -> Option<Value>, op: &Op) -> Values {
+pub fn dispatch_op(stack: &mut impl Stack, op: &Op) -> Values {
     let ret = match op.as_executor() {
         Executor::Nullary(exec) => exec.exec(),
         Executor::Unary(exec) => {
-            let top = pop();
+            let top = stack.pop();
             match top {
                 Some(Value::Num(top)) => exec.exec_n(top),
                 Some(Value::Txt(top)) => exec.exec_t(top),
@@ -17,8 +18,8 @@ pub fn dispatch_op(mut pop: impl FnMut() -> Option<Value>, op: &Op) -> Values {
             }
         },
         Executor::Binary(exec) => {
-            let top = pop();
-            let deep = pop();
+            let top = stack.pop();
+            let deep = stack.pop();
             match (deep, top) {
                 (Some(Value::Num(deep)), Some(Value::Num(top))) => exec.exec_nn(deep, top),
                 (Some(Value::Num(deep)), Some(Value::Txt(top))) => exec.exec_nt(deep, top),
