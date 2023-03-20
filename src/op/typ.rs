@@ -43,18 +43,18 @@ impl Deref for Op {
 
 // implemented automatically if Clone is derived/impl for an operation
 pub trait OpClone {
-    fn clone_box(&self) -> Box<dyn OpTyp>;
+    fn clone_op(&self) -> Op;
 }
 
 impl<T> OpClone for T where T: 'static + OpTyp + Clone {
-    fn clone_box(&self) -> Box<dyn OpTyp> {
-        Box::new(self.clone())
+    fn clone_op(&self) -> Op {
+        Op { val: Box::new(self.clone()) }
     }
 }
 
 impl Clone for Op {
     fn clone(&self) -> Self {
-        Op { val: self.val.clone_box() }
+        self.val.clone_op()
     }
 }
 

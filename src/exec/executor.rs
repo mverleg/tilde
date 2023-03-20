@@ -1,8 +1,8 @@
 use ::std::fmt::Debug;
 
-use crate::{Array, Func};
+use crate::Array;
+use crate::Func;
 use crate::Nr;
-use crate::op::Op;
 use crate::op::OpTyp;
 use crate::Text;
 use crate::values;
@@ -36,8 +36,8 @@ pub trait UnaryExecutor: OpTyp {
 
     fn exec_a(&self, value: Array) -> Values;
 
-    fn exec_f(&self, value: Func, current_op: &Op) -> Values {
-        values![Value::Func(value.with_unary(current_op.clone()))]
+    fn exec_f(&self, value: Func) -> Values {
+        values![Value::Func(value.with_unary(self.clone_op()))]
     }
 
     /// Fallback for if the stack is empty
@@ -53,8 +53,8 @@ pub trait BinaryExecutor: OpTyp {
     fn exec_na(&self, deep: Nr, top: Array) -> Values;
 
     //TODO @mark: can current_op be removed? same as self?
-    fn exec_nf(&self, deep: Nr, top: Func, current_op: &Op) -> Values {
-        values![Value::Func(top.with_bin_top(current_op.clone(), Value::Num(deep)))]
+    fn exec_nf(&self, deep: Nr, top: Func) -> Values {
+        values![Value::Func(top.with_bin_top(self.clone_op(), Value::Num(deep)))]
     }
 
     fn exec_tn(&self, deep: Text, top: Nr) -> Values;
@@ -63,8 +63,8 @@ pub trait BinaryExecutor: OpTyp {
 
     fn exec_ta(&self, deep: Text, top: Array) -> Values;
 
-    fn exec_tf(&self, deep: Text, top: Func, current_op: &Op) -> Values {
-        values![Value::Func(top.with_bin_top(current_op.clone(), Value::Txt(deep)))]
+    fn exec_tf(&self, deep: Text, top: Func) -> Values {
+        values![Value::Func(top.with_bin_top(self.clone_op(), Value::Txt(deep)))]
     }
 
     fn exec_an(&self, deep: Array, top: Nr) -> Values;
@@ -73,24 +73,24 @@ pub trait BinaryExecutor: OpTyp {
 
     fn exec_aa(&self, deep: Array, top: Array) -> Values;
 
-    fn exec_af(&self, deep: Array, top: Func, current_op: &Op) -> Values {
-        values![Value::Func(top.with_bin_top(current_op.clone(), Value::Arr(deep)))]
+    fn exec_af(&self, deep: Array, top: Func) -> Values {
+        values![Value::Func(top.with_bin_top(self.clone_op(), Value::Arr(deep)))]
     }
 
-    fn exec_fn(&self, deep: Func, top: Nr, current_op: &Op) -> Values {
-        values![Value::Func(deep.with_bin_deep(current_op.clone(), Value::Num(top)))]
+    fn exec_fn(&self, deep: Func, top: Nr) -> Values {
+        values![Value::Func(deep.with_bin_deep(self.clone_op(), Value::Num(top)))]
     }
 
-    fn exec_ft(&self, deep: Func, top: Text, current_op: &Op) -> Values {
-        values![Value::Func(deep.with_bin_deep(current_op.clone(), Value::Txt(top)))]
+    fn exec_ft(&self, deep: Func, top: Text) -> Values {
+        values![Value::Func(deep.with_bin_deep(self.clone_op(), Value::Txt(top)))]
     }
 
-    fn exec_fa(&self, deep: Func, top: Array, current_op: &Op) -> Values {
-        values![Value::Func(deep.with_bin_deep(current_op.clone(), Value::Arr(top)))]
+    fn exec_fa(&self, deep: Func, top: Array) -> Values {
+        values![Value::Func(deep.with_bin_deep(self.clone_op(), Value::Arr(top)))]
     }
 
-    fn exec_ff(&self, deep: Func, top: Func, current_op: &Op) -> Values {
-        values![Value::Func(top.with_bin_top(current_op.clone(), Value::Func(deep)))]
+    fn exec_ff(&self, deep: Func, top: Func) -> Values {
+        values![Value::Func(top.with_bin_top(self.clone_op(), Value::Func(deep)))]
     }
 
     /// Fallback for if there is only 1 value on the stack and it is a number
@@ -103,7 +103,7 @@ pub trait BinaryExecutor: OpTyp {
     fn exec_single_a(&self, single: Array) -> Values;
 
     /// Fallback for if there is only 1 value on the stack and it is a function
-    fn exec_single_f(&self, single: Func, current_op: &Op) -> Values {
+    fn exec_single_f(&self, single: Func) -> Values {
         todo!()
     }
 

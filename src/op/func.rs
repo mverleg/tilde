@@ -99,7 +99,7 @@ impl BinaryExecutor for Apply {
         todo!()
     }
 
-    fn exec_nf(&self, deep: Nr, top: Func, _: &Op) -> Values {
+    fn exec_nf(&self, deep: Nr, top: Func) -> Values {
         let stack = top.run_on_single(Value::Num(deep));
         Values::from(stack)
     }
@@ -116,7 +116,7 @@ impl BinaryExecutor for Apply {
         todo!()
     }
 
-    fn exec_tf(&self, deep: Text, top: Func, _: &Op) -> Values {
+    fn exec_tf(&self, deep: Text, top: Func) -> Values {
         let stack = top.run_on_single(Value::Txt(deep));
         Values::from(stack)
     }
@@ -133,24 +133,24 @@ impl BinaryExecutor for Apply {
         todo!()
     }
 
-    fn exec_af(&self, deep: Array, top: Func, _: &Op) -> Values {
+    fn exec_af(&self, deep: Array, top: Func) -> Values {
         let stack = top.run_on_single(Value::Arr(deep));
         Values::from(stack)
     }
 
-    fn exec_fn(&self, deep: Func, top: Nr, _: &Op) -> Values {
+    fn exec_fn(&self, deep: Func, top: Nr) -> Values {
         todo!()
     }
 
-    fn exec_ft(&self, deep: Func, top: Text, _: &Op) -> Values {
+    fn exec_ft(&self, deep: Func, top: Text) -> Values {
         todo!()
     }
 
-    fn exec_fa(&self, deep: Func, top: Array, _: &Op) -> Values {
+    fn exec_fa(&self, deep: Func, top: Array) -> Values {
         todo!()
     }
 
-    fn exec_ff(&self, deep: Func, top: Func, _: &Op) -> Values {
+    fn exec_ff(&self, deep: Func, top: Func) -> Values {
         todo!()
     }
 
@@ -166,7 +166,7 @@ impl BinaryExecutor for Apply {
         todo!()
     }
 
-    fn exec_single_f(&self, single: Func, _: &Op) -> Values {
+    fn exec_single_f(&self, single: Func) -> Values {
         todo!()
     }
 
