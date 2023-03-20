@@ -30,7 +30,7 @@ impl Func {
     pub fn run_on_single(&self, initial_stack_value: Value) -> Values {
         let mut stack = new_small_stack();
         stack.push(initial_stack_value);
-        for cap in self.items {
+        for cap in &self.items {
             let free_value = stack.pop();
             let res = match cap {
                 CaptureType::Unary(op) => todo!(),
@@ -38,13 +38,15 @@ impl Func {
                     let Executor::Binary(ex) = op.as_executor() else {
                         unreachable!();  //TODO @mark: really?
                     };
-                    dispatch_binary(ex, Some(top), free_value)
+                    dispatch_binary(ex, Some(top.clone()), free_value)
+                    //TODO @mark: get rid of top clone
                 }
                 CaptureType::BinaryFreeTop(op, deep) => {
                     let Executor::Binary(ex) = op.as_executor() else {
                         unreachable!();  //TODO @mark: really?
                     };
-                    dispatch_binary(ex, free_value, Some(deep))
+                    dispatch_binary(ex, free_value, Some(deep.clone()))
+                    //TODO @mark: get rid of deep clone
                 }
                 CaptureType::TernaryFreeDeep(op, _, _) => todo!(),
                 CaptureType::TernaryFreeMiddle(op, _, _) => todo!(),
