@@ -1,9 +1,10 @@
 use ::std::fmt;
 
-use crate::{Value, Values};
-use crate::exec::{dispatch_op, new_small_stack};
+use crate::exec::{dispatch_binary, new_small_stack};
 use crate::exec::Stack;
 use crate::op::Op;
+use crate::Value;
+use crate::Values;
 
 /// Which type of capture
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -29,7 +30,19 @@ impl Func {
     pub fn run_on_single(&self, initial_stack_value: Value) -> Values {
         let mut stack = new_small_stack();
         stack.push(initial_stack_value);
-        dispatch_op();
+        for cap in self.items {
+            let free_value = stack.pop();
+            match cap {
+                CaptureType::Unary(op) => {}
+                CaptureType::BinaryFreeDeep(op, top) =>
+                    dispatch_binary(&op, Some(top), free_value),
+                CaptureType::BinaryFreeTop(op, deep) =>
+                    dispatch_binary(&op, free_value, Some(deep)),
+                CaptureType::TernaryFreeDeep(op, _, _) => {}
+                CaptureType::TernaryFreeMiddle(op, _, _) => {}
+                CaptureType::TernaryFreeTop(op, _, _) => {}
+            }
+        }
         todo!()
     }
 

@@ -3,6 +3,7 @@ use crate::tilde_log;
 use crate::TildeRes;
 use crate::Value;
 
+pub use self::dispatch::dispatch_binary;
 pub use self::dispatch::dispatch_op;
 pub use self::executor::BinaryExecutor;
 pub use self::executor::Executor;
