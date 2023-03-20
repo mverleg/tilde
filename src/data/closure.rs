@@ -1,6 +1,6 @@
 use ::std::fmt;
 
-use crate::exec::{dispatch_binary, new_small_stack};
+use crate::exec::{dispatch_binary, Executor, new_small_stack};
 use crate::exec::Stack;
 use crate::op::Op;
 use crate::Value;
@@ -32,16 +32,25 @@ impl Func {
         stack.push(initial_stack_value);
         for cap in self.items {
             let free_value = stack.pop();
-            match cap {
-                CaptureType::Unary(op) => {}
-                CaptureType::BinaryFreeDeep(op, top) =>
-                    dispatch_binary(&op, Some(top), free_value),
-                CaptureType::BinaryFreeTop(op, deep) =>
-                    dispatch_binary(&op, free_value, Some(deep)),
-                CaptureType::TernaryFreeDeep(op, _, _) => {}
-                CaptureType::TernaryFreeMiddle(op, _, _) => {}
-                CaptureType::TernaryFreeTop(op, _, _) => {}
-            }
+            let res = match cap {
+                CaptureType::Unary(op) => todo!(),
+                CaptureType::BinaryFreeDeep(op, top) => {
+                    let Executor::Binary(ex) = op.as_executor() else {
+                        unreachable!();  //TODO @mark: really?
+                    };
+                    dispatch_binary(ex, Some(top), free_value)
+                }
+                CaptureType::BinaryFreeTop(op, deep) => {
+                    let Executor::Binary(ex) = op.as_executor() else {
+                        unreachable!();  //TODO @mark: really?
+                    };
+                    dispatch_binary(ex, free_value, Some(deep))
+                }
+                CaptureType::TernaryFreeDeep(op, _, _) => todo!(),
+                CaptureType::TernaryFreeMiddle(op, _, _) => todo!(),
+                CaptureType::TernaryFreeTop(op, _, _) => todo!(),
+            };
+            stack.push_all(res)
         }
         todo!()
     }
