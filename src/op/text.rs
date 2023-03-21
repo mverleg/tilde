@@ -2,6 +2,7 @@ use ::std::any::Any;
 use ::std::borrow::Cow;
 
 use crate::Text;
+use crate::values;
 use crate::Nr;
 use crate::Array;
 use crate::Values;
@@ -45,11 +46,11 @@ impl OpTyp for Concat {
 
 impl BinaryExecutor for Concat {
     fn exec_nn(&self, deep: Nr, top: Nr) -> Values {
-        todo!()
+        values![Value::Txt(Text::of(format!("{deep}{top}")))]
     }
 
     fn exec_nt(&self, deep: Nr, top: Text) -> Values {
-        todo!()
+        values![Value::Txt(Text::of(format!("{deep}{top}")))]
     }
 
     fn exec_na(&self, deep: Nr, top: Array) -> Values {
@@ -57,11 +58,11 @@ impl BinaryExecutor for Concat {
     }
 
     fn exec_tn(&self, deep: Text, top: Nr) -> Values {
-        todo!()
+        values![Value::Txt(Text::of(format!("{deep}{top}")))]
     }
 
     fn exec_tt(&self, deep: Text, top: Text) -> Values {
-        todo!()
+        values![Value::Txt(Text::of(format!("{deep}{top}")))]
     }
 
     fn exec_ta(&self, deep: Text, top: Array) -> Values {
