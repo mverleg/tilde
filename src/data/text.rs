@@ -10,6 +10,10 @@ impl Text {
         Text { val: val.into() }
     }
 
+    pub fn empty() -> Self {
+        Self::of("")
+    }
+
     pub fn as_str(&self) -> &str {
         &self.val
     }

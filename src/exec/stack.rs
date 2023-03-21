@@ -1,7 +1,7 @@
 use crate::Value;
 use crate::Values;
 
-pub fn new_small_stack() -> impl Stack {
+pub fn new_small_stack() -> Values {
     Values::new()
 }
 

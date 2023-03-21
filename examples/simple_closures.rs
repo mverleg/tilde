@@ -2,7 +2,7 @@ use ::tilde::tilde_strs;
 
 fn main() {
     // map and reduce array
-    let prog = "arg 1 plus apply plus";
+    let prog = "arg 1 plus apply sum";
     let res = tilde_strs(prog, "1\n2\n3\n4\n5").unwrap();
     assert_eq!(res, "20");
 

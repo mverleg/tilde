@@ -1,4 +1,4 @@
-use crate::op::collection::Count;
+use crate::op::collection::{Count, Sum};
 use crate::op::collection::Last;
 use crate::op::collection::Lookup;
 use crate::op::collection::Split;
@@ -28,7 +28,7 @@ mod sanitize;
 mod func;
 mod text;
 
-pub fn all_non_literals() -> [Op; 16] {
+pub fn all_non_literals() -> [Op; 17] {
     //TODO @mark:
     [
         Op::of(Plus),
@@ -47,6 +47,7 @@ pub fn all_non_literals() -> [Op; 16] {
         Op::of(Arg),
         Op::of(Apply),
         Op::of(Concat),
+        Op::of(Sum),
     ]
 }
 

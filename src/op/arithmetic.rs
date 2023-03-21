@@ -52,7 +52,7 @@ impl BinaryExecutor for Plus {
     }
 
     fn exec_nt(&self, deep: Nr, top: Text) -> Values {
-        todo!()
+
     }
 
     fn exec_na(&self, deep: Nr, top: Array) -> Values {
@@ -62,7 +62,7 @@ impl BinaryExecutor for Plus {
     fn exec_tn(&self, deep: Text, top: Nr) -> Values {
         match deep.as_str().parse::<Nr>() {
             Ok(nr) => self.exec_nn(nr, top),
-            Err(_) => Concat::new().as_executor().exec_tn(deep, top),
+            Err(_) => Concat.exec_tn(deep, top),
         }
     }
 

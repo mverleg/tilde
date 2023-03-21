@@ -2,15 +2,15 @@ use ::std::any::Any;
 use ::std::borrow::Cow;
 use ::std::collections::HashSet;
 
-use crate::Array;
-use crate::Nr;
+use crate::{Array, Text};
 use crate::compile::GolfWord;
-use crate::exec::BinaryExecutor;
+use crate::exec::{BinaryExecutor, dispatch_binary, dispatch_op};
 use crate::exec::Executor;
 use crate::exec::UnaryExecutor;
-use crate::op::Op;
+use crate::Nr;
+use crate::op::{Op, Plus};
 use crate::op::OpTyp;
-use crate::Text;
+use crate::Value;
 use crate::Values;
 use crate::values;
 
@@ -335,6 +335,62 @@ impl UnaryExecutor for Count {
     fn exec_a(&self, value: Array) -> Values {
         let len = value.len() as f64;
         values![Value::Num(Nr::new(len))]
+    }
+
+    fn exec_empty(&self) -> Values {
+        todo!()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct Sum;
+
+impl Sum {
+    pub fn new() -> Op {
+        Op::of(Sum)
+    }
+}
+
+impl OpTyp for Sum {
+
+    fn description(&self) -> &'static str {
+        "sum all the parts of value"
+    }
+
+    fn long_code(&self) -> Cow<'static, str> {
+        Cow::Borrowed("sum")
+    }
+
+    fn golf_code(&self) -> Option<GolfWord> {
+        None
+    }
+
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+
+    fn as_executor(&self) -> Executor {
+        Executor::Unary(self)
+    }
+}
+
+impl UnaryExecutor for Sum {
+    fn exec_n(&self, value: Nr) -> Values {
+        todo!()
+    }
+
+    fn exec_t(&self, value: Text) -> Values {
+        todo!()
+    }
+
+    fn exec_a(&self, value: Array) -> Values {
+        let mut total = Value::Txt(Text::empty());
+        for item in value {
+            let mut res = dispatch_binary(&Plus, Some(total), Some(item));
+            total = res.pop().expect("plus did not yield result");
+            assert!(res.is_empty());
+        }
+        values![total]
     }
 
     fn exec_empty(&self) -> Values {

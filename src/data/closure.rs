@@ -54,7 +54,7 @@ impl Func {
             };
             stack.push_all(res)
         }
-        todo!()
+        stack
     }
 
     pub fn with_unary(mut self, op: Op) -> Self {
