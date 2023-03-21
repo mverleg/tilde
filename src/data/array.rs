@@ -1,5 +1,5 @@
 use ::std::fmt;
-use ::std::vec::IntoIter;
+use ::std::vec;
 
 use crate::data::value::Value;
 use crate::Nr;
@@ -88,9 +88,13 @@ impl Array {
     pub fn len(&self) -> usize {
         self.val.len()
     }
+}
 
-    #[allow(clippy::should_implement_trait)]
-    pub fn into_iter(self) -> IntoIter<Value> {
+impl IntoIterator for Array {
+    type Item = Value;
+    type IntoIter = vec::IntoIter<Value>;
+
+    fn into_iter(self) -> Self::IntoIter {
         self.val.into_iter()
     }
 }

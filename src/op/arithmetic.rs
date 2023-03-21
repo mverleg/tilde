@@ -1,7 +1,7 @@
 use ::std::any::Any;
 use ::std::borrow::Cow;
 
-use crate::Array;
+use crate::{Array, Value};
 use crate::compile::GolfWord;
 use crate::exec::{BinaryExecutor, Executor};
 use crate::Nr;
@@ -69,7 +69,16 @@ impl BinaryExecutor for Plus {
     }
 
     fn exec_an(&self, deep: Array, top: Nr) -> Values {
-        todo!()
+        let mut new = Vec::new();
+        for item in deep {
+            new.extend(match item {
+                Value::Num(item) => self.exec_nn(item, top),
+                Value::Txt(item) => self.exec_tn(item, top),
+                Value::Arr(item) => self.exec_an(item, top),
+                Value::Func(item) => self.exec_fn(item, top),
+            })
+        }
+        values![Array::of(new)]
     }
 
     fn exec_at(&self, deep: Array, top: Text) -> Values {
