@@ -1,5 +1,6 @@
 use ::std::any::Any;
 use ::std::borrow::Cow;
+use std::num::ParseFloatError;
 
 use crate::{Array, Value};
 use crate::compile::GolfWord;
@@ -57,7 +58,10 @@ impl BinaryExecutor for Plus {
     }
 
     fn exec_tn(&self, deep: Text, top: Nr) -> Values {
-        todo!()
+        match deep.as_str().parse::<Nr>() {
+            Ok(nr) => self.exec_nn(top, nr),
+            Err(_) => values![Value::Txt(Text::of(format!("{deep}{top}")))],
+        }
     }
 
     fn exec_tt(&self, deep: Text, top: Text) -> Values {
@@ -71,6 +75,7 @@ impl BinaryExecutor for Plus {
     fn exec_an(&self, deep: Array, top: Nr) -> Values {
         let mut new = Vec::new();
         for item in deep {
+            //TODO @mark: this flattens results if there are more than 1, is that correct? or should they be nested arrays?
             new.extend(match item {
                 Value::Num(item) => self.exec_nn(item, top),
                 Value::Txt(item) => self.exec_tn(item, top),
