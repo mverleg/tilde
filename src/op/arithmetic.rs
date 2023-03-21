@@ -1,14 +1,16 @@
 use ::std::any::Any;
 use ::std::borrow::Cow;
-use std::num::ParseFloatError;
 
-use crate::{Array, Value};
+use crate::Array;
 use crate::compile::GolfWord;
-use crate::exec::{BinaryExecutor, Executor};
+use crate::exec::BinaryExecutor;
+use crate::exec::Executor;
 use crate::Nr;
 use crate::op::Op;
 use crate::op::OpTyp;
+use crate::op::text::Concat;
 use crate::Text;
+use crate::Value;
 use crate::Values;
 use crate::values;
 
@@ -59,8 +61,8 @@ impl BinaryExecutor for Plus {
 
     fn exec_tn(&self, deep: Text, top: Nr) -> Values {
         match deep.as_str().parse::<Nr>() {
-            Ok(nr) => self.exec_nn(top, nr),
-            Err(_) => values![Value::Txt(Text::of(format!("{deep}{top}")))],
+            Ok(nr) => self.exec_nn(nr, top),
+            Err(_) => Concat::new().as_executor().exec_tn(deep, top),
         }
     }
 
