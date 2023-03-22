@@ -1,9 +1,11 @@
-use crate::op::collection::{Count, Sum};
+use crate::op::collection::Count;
+use crate::op::collection::Sum;
 use crate::op::collection::Last;
 use crate::op::collection::Lookup;
 use crate::op::collection::Split;
 use crate::op::collection::Unique;
-use crate::op::func::{Apply, Arg};
+use crate::op::func::Apply;
+use crate::op::func::Arg;
 use crate::op::sanitize::BaseWords;
 pub use crate::op::stack::Drop;
 pub use crate::op::stack::Duplicate;
