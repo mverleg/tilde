@@ -30,6 +30,11 @@ impl Func {
     pub fn run_on_single(&self, initial_stack_value: Value) -> Values {
         let mut stack = new_small_stack();
         stack.push(initial_stack_value);
+        self.run_on_stack(&mut stack);
+        stack
+    }
+
+    pub fn run_on_stack(&self, stack: &mut impl Stack) {
         for cap in &self.items {
             let free_value = stack.pop();
             let res = match cap {
@@ -54,7 +59,6 @@ impl Func {
             };
             stack.push_all(res)
         }
-        stack
     }
 
     pub fn with_unary(mut self, op: Op) -> Self {

@@ -7,7 +7,8 @@ fn main() {
     assert_eq!(res, "5");
 
     // capture order
-    let prog = "arg arg sub 3 1 apply apply";
+    let prog = "3 1 arg arg sub apply apply";
     let res = tilde_strs(prog, "").unwrap();
     assert_eq!(res, "2");
+    //TODO @mark: is this indeed the desirable order? or -2?
 }
