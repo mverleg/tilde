@@ -50,6 +50,10 @@ impl Nr {
         self.value as UINT
         //TODO @mark: no try-into, why?
     }
+
+    pub fn abs_sqrt(&self) -> Nr {
+        Nr::new(self.value.abs().sqrt())
+    }
 }
 
 impl PartialEq for Nr {

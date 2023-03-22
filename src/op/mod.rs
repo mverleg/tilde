@@ -1,3 +1,4 @@
+use crate::op::arithmetic::Sqrt;
 use crate::op::collection::Count;
 use crate::op::collection::Sum;
 use crate::op::collection::Last;
@@ -30,13 +31,14 @@ mod sanitize;
 mod func;
 mod text;
 
-pub fn all_non_literals() -> [Op; 17] {
+pub fn all_non_literals() -> [Op; 18] {
     //TODO @mark:
     [
         Op::of(Plus),
         Op::of(Minus),
         Op::of(Mul),
         Op::of(Div),
+        Op::of(Sqrt),
         Op::of(IntDiv),
         Op::of(Drop),
         Op::of(Duplicate),

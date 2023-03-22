@@ -4,6 +4,7 @@ use ::std::borrow::Cow;
 use crate::Array;
 use crate::compile::GolfWord;
 use crate::exec::BinaryExecutor;
+use crate::exec::UnaryExecutor;
 use crate::exec::Executor;
 use crate::Nr;
 use crate::op::Op;
@@ -403,5 +404,55 @@ impl OpTyp for IntDiv {
 
     fn as_executor(&self) -> Executor {
         todo!()  //TODO @mark: TEMPORARY! REMOVE THIS!
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct Sqrt;
+
+impl Sqrt {
+    pub fn new() -> Op {
+        Op::of(Sqrt)
+    }
+}
+
+impl OpTyp for Sqrt {
+
+    fn description(&self) -> &'static str {
+        "square root"
+    }
+
+    fn long_code(&self) -> Cow<'static, str> {
+        Cow::Borrowed("sqrt")
+    }
+
+    fn golf_code(&self) -> Option<GolfWord> {
+        None  //TODO @mark:
+    }
+
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+
+    fn as_executor(&self) -> Executor {
+        Executor::Unary(self)
+    }
+}
+
+impl UnaryExecutor for Sqrt {
+    fn exec_n(&self, value: Nr) -> Values {
+        values![Value::Num(value.abs_sqrt())]
+    }
+
+    fn exec_t(&self, value: Text) -> Values {
+        todo!()
+    }
+
+    fn exec_a(&self, value: Array) -> Values {
+        todo!()
+    }
+
+    fn exec_empty(&self) -> Values {
+        todo!()
     }
 }
