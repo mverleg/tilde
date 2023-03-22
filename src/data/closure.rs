@@ -1,5 +1,6 @@
 use ::std::fmt;
 use std::rc::Rc;
+use crate::data::Fork;
 
 use crate::exec::{dispatch_binary, Executor, new_small_stack};
 use crate::exec::Stack;

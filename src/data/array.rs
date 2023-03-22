@@ -2,6 +2,7 @@ use ::std::fmt;
 use ::std::vec;
 use std::rc::Rc;
 
+use crate::data::fork::Fork;
 use crate::data::value::Value;
 use crate::Nr;
 
@@ -56,8 +57,10 @@ impl Array {
     pub fn len(&self) -> usize {
         self.val.len()
     }
+}
 
-    pub fn fork(&self) -> Array {
+impl Fork for Array {
+    fn fork(&self) -> Array {
         Array { val: self.val.clone() }
         //TODO @mark: use a better fork that can share part of the array
     }

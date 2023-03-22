@@ -4,6 +4,8 @@ use ::std::fmt::Formatter;
 use ::tinyvec::TinyVec;
 
 use crate::Array;
+use crate::data::closure::Func;
+use crate::data::fork::Fork;
 use crate::Nr;
 use crate::Text;
 
@@ -18,10 +20,10 @@ pub enum Value {
 
 pub type Values = TinyVec<[Value; 2]>;
 
-impl Value {
-    pub fn fork(&self) -> Value {
+impl Fork for Value {
+    fn fork(&self) -> Value {
         match self {
-            Value::Num(nr) => Value::Num(*nr),
+            Value::Num(nr) => Value::Num(nr.fork()),
             Value::Txt(text) => Value::Txt(text.fork()),
             Value::Arr(array) => Value::Arr(array.fork()),
             Value::Func(func) => Value::Func(func.fork()),
@@ -119,7 +121,6 @@ macro_rules! values {
 }
 
 pub use values;
-use crate::data::closure::Func;
 
 #[cfg(test)]
 mod tests {

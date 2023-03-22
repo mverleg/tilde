@@ -4,6 +4,7 @@ use ::std::borrow::Cow;
 use crate::Array;
 use crate::compile::GolfWord;
 use crate::compile::Letter;
+use crate::data::Fork;
 use crate::exec::Executor;
 use crate::exec::UnaryExecutor;
 use crate::Nr;

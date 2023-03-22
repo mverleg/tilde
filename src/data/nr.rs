@@ -4,6 +4,7 @@ use ::std::hash;
 use ::std::num::ParseFloatError;
 use ::std::str::FromStr;
 use std::fmt::Formatter;
+use crate::data::Fork;
 
 use crate::UINT;
 
@@ -53,6 +54,12 @@ impl Nr {
 
     pub fn abs_sqrt(&self) -> Nr {
         Nr::new(self.value.abs().sqrt())
+    }
+}
+
+impl Fork for Nr {
+    fn fork(&self) -> Self {
+        Nr { value: self.value }
     }
 }
 

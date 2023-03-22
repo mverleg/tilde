@@ -5,6 +5,7 @@ use ::std::collections::HashSet;
 use crate::Array;
 use crate::Text;
 use crate::compile::GolfWord;
+use crate::data::Fork;
 use crate::exec::dispatch_binary;
 use crate::exec::BinaryExecutor;
 use crate::exec::Executor;
