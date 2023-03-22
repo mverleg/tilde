@@ -7,7 +7,7 @@ use crate::Array;
 use crate::Nr;
 use crate::Text;
 
-#[derive(PartialEq, Eq, Hash, Clone)]
+#[derive(PartialEq, Eq, Hash)]
 pub enum Value {
     Num(Nr),
     Txt(Text),
@@ -18,15 +18,16 @@ pub enum Value {
 
 pub type Values = TinyVec<[Value; 2]>;
 
-// impl Value {
-//     pub fn num(nr: impl Into<Nr>) -> Value {
-//         Value::Num(nr.into())
-//     }
-//     pub fn txt(text: impl Into<Text>) -> Value {
-//         Value::Txt(text.into())
-//     }
-// }
-//TODO @mark: TEMPORARY! REMOVE THIS!
+impl Value {
+    pub fn fork(&self) -> Value {
+        match self {
+            Value::Num(nr) => Value::Num(*nr),
+            Value::Txt(text) => Value::Txt(text.fork()),
+            Value::Arr(array) => Value::Arr(array.fork()),
+            Value::Func(func) => Value::Func(func.fork()),
+        }
+    }
+}
 
 impl fmt::Display for Value {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {

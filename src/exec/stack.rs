@@ -39,7 +39,7 @@ impl Stack for Vec<Value> {
     }
 
     fn peek(&self) -> Option<Value> {
-        self.last().map(|val| val.clone())
+        self.last().map(|val| val.fork())
     }
 
     fn size(&self) -> usize {
@@ -66,7 +66,7 @@ impl Stack for Values {
     }
 
     fn peek(&self) -> Option<Value> {
-        self.last().map(|val| val.clone())
+        self.last().map(|val| val.fork())
     }
 
     fn size(&self) -> usize {

@@ -4,7 +4,7 @@ use ::std::vec;
 use crate::data::value::Value;
 use crate::Nr;
 
-#[derive(PartialEq, Eq, Hash, Clone)]
+#[derive(PartialEq, Eq, Hash)]
 pub struct Array {
     val: Vec<Value>,
 }
@@ -79,7 +79,7 @@ impl Array {
         let ix: usize = nr.floor().try_into().expect("value to large to use as index");
         match self.val.get(ix) {
             Some(val) => {
-                val.clone()
+                val.fork()
             },
             None => Value::default(),
         }

@@ -7,7 +7,7 @@ use crate::Value;
 use crate::Values;
 
 /// Which type of capture
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, PartialEq, Eq, Hash)]
 pub enum CaptureType {
     Unary(Op),
     BinaryFreeDeep(Op, Value),
@@ -17,7 +17,7 @@ pub enum CaptureType {
     TernaryFreeTop(Op, Value, Value),
 }
 
-#[derive(Clone, PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Hash)]
 pub struct Func {
     items: Vec<CaptureType>,
 }
@@ -43,14 +43,14 @@ impl Func {
                     let Executor::Binary(ex) = op.as_executor() else {
                         unreachable!();  //TODO @mark: really?
                     };
-                    dispatch_binary(ex, Some(top.clone()), free_value)
+                    dispatch_binary(ex, Some(top.fork()), free_value)
                     //TODO @mark: get rid of top clone
                 }
                 CaptureType::BinaryFreeTop(op, deep) => {
                     let Executor::Binary(ex) = op.as_executor() else {
                         unreachable!();  //TODO @mark: really?
                     };
-                    dispatch_binary(ex, free_value, Some(deep.clone()))
+                    dispatch_binary(ex, free_value, Some(deep.fork()))
                     //TODO @mark: get rid of deep clone
                 }
                 CaptureType::TernaryFreeDeep(op, _, _) => todo!(),

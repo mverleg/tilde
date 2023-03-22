@@ -127,7 +127,7 @@ impl UnaryExecutor for Duplicate {
 
     fn exec_a(&self, value: Array) -> Values {
         // duplicate the input
-        values![value.clone(), value]
+        values![value.fork(), value]
     }
 
     // fn exec_f(&self, value: Func) -> Values {

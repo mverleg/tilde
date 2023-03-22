@@ -272,7 +272,7 @@ impl UnaryExecutor for Unique {
         let mut seen = HashSet::with_capacity(value.len());
         let mut result = Vec::with_capacity(value.len());
         for val in value.into_iter() {
-            if seen.insert(val.clone()) {
+            if seen.insert(val.fork()) {
                 //TODO @mark: ^ remove clone
                 result.push(val)
             }
