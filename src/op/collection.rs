@@ -272,10 +272,10 @@ impl UnaryExecutor for Unique {
     fn exec_a(&self, value: Array) -> Values {
         let mut seen = HashSet::with_capacity(value.len());
         let mut result = Vec::with_capacity(value.len());
-        for val in value.into_iter() {
+        for val in value.iter() {
             if seen.insert(val.fork()) {
                 //TODO @mark: ^ remove clone
-                result.push(val)
+                result.push(val.fork())
             }
         }
         values![Value::Arr(Array::of(result))]
@@ -389,8 +389,8 @@ impl UnaryExecutor for Sum {
 
     fn exec_a(&self, value: Array) -> Values {
         let mut total = Value::Txt(Text::empty());
-        for item in value {
-            let mut res = dispatch_binary(&Plus, Some(total), Some(item));
+        for item in value.iter() {
+            let mut res = dispatch_binary(&Plus, Some(total), Some(item.fork()));
             total = res.pop().expect("plus did not yield result");
             assert!(res.is_empty());
         }

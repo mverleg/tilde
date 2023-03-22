@@ -3,9 +3,10 @@ use ::std::borrow::Cow;
 
 use crate::Array;
 use crate::compile::GolfWord;
+use crate::data::Fork;
 use crate::exec::BinaryExecutor;
-use crate::exec::UnaryExecutor;
 use crate::exec::Executor;
+use crate::exec::UnaryExecutor;
 use crate::Nr;
 use crate::op::Op;
 use crate::op::OpTyp;
@@ -80,13 +81,13 @@ impl BinaryExecutor for Plus {
 
     fn exec_an(&self, deep: Array, top: Nr) -> Values {
         let mut new = Vec::new();
-        for item in deep {
+        for item in deep.iter() {
             //TODO @mark: this flattens results if there are more than 1, is that correct? or should they be nested arrays?
             new.extend(match item {
-                Value::Num(item) => self.exec_nn(item, top),
-                Value::Txt(item) => self.exec_tn(item, top),
-                Value::Arr(item) => self.exec_an(item, top),
-                Value::Func(item) => self.exec_fn(item, top),
+                Value::Num(item) => self.exec_nn(item.fork(), top),
+                Value::Txt(item) => self.exec_tn(item.fork(), top),
+                Value::Arr(item) => self.exec_an(item.fork(), top),
+                Value::Func(item) => self.exec_fn(item.fork(), top),
             })
         }
         values![Array::of(new)]

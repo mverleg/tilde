@@ -1,6 +1,7 @@
 use ::std::fmt;
+use ::std::rc::Rc;
 use ::std::vec;
-use std::rc::Rc;
+use std::slice::Iter;
 
 use crate::data::fork::Fork;
 use crate::data::value::Value;
@@ -26,23 +27,20 @@ impl Array {
         Array::of(vec![val])
     }
 
-    pub fn push(
-        &mut self,
-        val: Value,
-    ) {
-        self.val.push(val)
-    }
+    // pub fn push(&mut self, val: Value) {
+    //     self.val.push(val)
+    // }
 
-    pub fn pop(&mut self) -> Value {
-        match self.val.pop() {
-            Some(val) => val,
-            None => Value::default(),
-        }
-    }
+    // pub fn pop(&mut self) -> Value {
+    //     match self.val.pop() {
+    //         Some(val) => val,
+    //         None => Value::default(),
+    //     }
+    // }
 
-    pub fn get_mut(&mut self) -> &mut Vec<Value> {
-        &mut self.val
-    }
+    // pub fn get_mut(&mut self) -> &mut Vec<Value> {
+    //     &mut self.val
+    // }
 
     pub fn index(&self, nr: Nr) -> Value {
         let ix: usize = nr.floor().try_into().expect("value to large to use as index");
@@ -52,6 +50,10 @@ impl Array {
             },
             None => Value::default(),
         }
+    }
+
+    pub fn iter(&self) -> Iter<'_, Value> {
+        self.val.iter()
     }
 
     pub fn len(&self) -> usize {
@@ -100,14 +102,14 @@ impl fmt::Debug for Array {
     }
 }
 
-impl IntoIterator for Array {
-    type Item = Value;
-    type IntoIter = vec::IntoIter<Value>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        self.val.into_iter()
-    }
-}
+// impl IntoIterator for Array {
+//     type Item = Value;
+//     type IntoIter = vec::IntoIter<Value>;
+//
+//     fn into_iter(self) -> Self::IntoIter {
+//         self.val.into_iter()
+//     }
+// }
 
 #[allow(clippy::approx_constant)]
 #[cfg(test)]
