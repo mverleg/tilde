@@ -19,6 +19,19 @@ pub enum CaptureType {
     TernaryFreeTop(Op, Value, Value),
 }
 
+impl Fork for CaptureType {
+    fn fork(&self) -> Self {
+        match self {
+            CaptureType::Unary(op) => CaptureType::Unary(op.clone()),
+            CaptureType::BinaryFreeDeep(op, top) => CaptureType::BinaryFreeDeep(op.clone(), top.fork()),
+            CaptureType::BinaryFreeTop(op, deep) => CaptureType::BinaryFreeTop(op.clone(), deep.fork()),
+            CaptureType::TernaryFreeDeep(op, middle, top) => CaptureType::TernaryFreeDeep(op.clone(), middle.fork(), top.fork()),
+            CaptureType::TernaryFreeMiddle(op, deep, top) => CaptureType::TernaryFreeMiddle(op.clone(), deep.fork(), top.fork()),
+            CaptureType::TernaryFreeTop(op, deep, middle) => CaptureType::TernaryFreeTop(op.clone(), deep.fork(), middle.fork()),
+        }
+    }
+}
+
 #[derive(PartialEq, Eq, Hash)]
 pub struct Func {
     items: Rc<Vec<CaptureType>>,
@@ -63,34 +76,45 @@ impl Func {
         }
     }
 
-    pub fn with_unary(mut self, op: Op) -> Self {
-        self.items.push(CaptureType::Unary(op));
-        self
+    pub fn with_unary(self, op: Op) -> Self {
+        let mut new = self.fork_content();
+        //TODO @mark: prevent clone (and sibling methods)
+        new.push(CaptureType::Unary(op));
+        Func { items: Rc::new(new) }
     }
 
-    pub fn with_bin_deep(mut self, op: Op, top: Value) -> Self {
-        self.items.push(CaptureType::BinaryFreeDeep(op, top));
-        self
+    pub fn with_bin_deep(self, op: Op, top: Value) -> Self {
+        let mut new = self.fork_content();
+        new.push(CaptureType::BinaryFreeDeep(op, top));
+        Func { items: Rc::new(new) }
     }
 
-    pub fn with_bin_top(mut self, op: Op, deep: Value) -> Self {
-        self.items.push(CaptureType::BinaryFreeTop(op, deep));
-        self
+    pub fn with_bin_top(self, op: Op, deep: Value) -> Self {
+        let mut new = self.fork_content();
+        new.push(CaptureType::BinaryFreeTop(op, deep));
+        Func { items: Rc::new(new) }
     }
 
-    pub fn with_tern_deep(mut self, op: Op, middle: Value, top: Value) -> Self {
-        self.items.push(CaptureType::TernaryFreeDeep(op, middle, top));
-        self
+    pub fn with_tern_deep(self, op: Op, middle: Value, top: Value) -> Self {
+        let mut new = self.fork_content();
+        new.push(CaptureType::TernaryFreeDeep(op, middle, top));
+        Func { items: Rc::new(new) }
     }
 
-    pub fn with_tern_middle(mut self, op: Op, deep: Value, top: Value) -> Self {
-        self.items.push(CaptureType::TernaryFreeMiddle(op, deep, top));
-        self
+    pub fn with_tern_middle(self, op: Op, deep: Value, top: Value) -> Self {
+        let mut new = self.fork_content();
+        new.push(CaptureType::TernaryFreeMiddle(op, deep, top));
+        Func { items: Rc::new(new) }
     }
 
-    pub fn with_tern_top(mut self, op: Op, deep: Value, middle: Value) -> Self {
-        self.items.push(CaptureType::TernaryFreeTop(op, deep, middle));
-        self
+    pub fn with_tern_top(self, op: Op, deep: Value, middle: Value) -> Self {
+        let mut new = self.fork_content();
+        new.push(CaptureType::TernaryFreeTop(op, deep, middle));
+        Func { items: Rc::new(new) }
+    }
+
+    fn fork_content(&self) -> Vec<CaptureType> {
+        self.items.iter().map(|item| item.fork()).collect()
     }
 
     pub fn fork(&self) -> Func {
