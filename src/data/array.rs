@@ -1,55 +1,23 @@
 use ::std::fmt;
 use ::std::vec;
+use std::rc::Rc;
 
 use crate::data::value::Value;
 use crate::Nr;
 
 #[derive(PartialEq, Eq, Hash)]
 pub struct Array {
-    val: Vec<Value>,
+    val: Rc<Vec<Value>>,
 }
 
-impl fmt::Display for Array {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "[")?;
-        let mut is_first = true;
-        for item in &self.val {
-            if is_first {
-                is_first = false;
-            } else {
-                write!(f, ",")?;
-            }
-            write!(f, "{item}")?;
-        }
-        write!(f, "]")?;
-        Ok(())
-    }
-}
-
-impl fmt::Debug for Array {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "[")?;
-        let mut is_first = true;
-        for item in &self.val {
-            if is_first {
-                is_first = false;
-            } else {
-                write!(f, ",")?;
-            }
-            write!(f, "{:?}", item)?;
-        }
-        write!(f, "]")?;
-        Ok(())
-    }
-}
 
 impl Array {
     pub fn of<V: Into<Value>>(vec: Vec<V>) -> Self {
         Array {
-            val: vec
+            val: Rc::new(vec
                 .into_iter()
                 .map(|v| v.into())
-                .collect(),
+                .collect())
         }
     }
 
@@ -87,6 +55,45 @@ impl Array {
 
     pub fn len(&self) -> usize {
         self.val.len()
+    }
+
+    pub fn fork(&self) -> Array {
+        Array { val: self.val.clone() }
+        //TODO @mark: use a better fork that can share part of the array
+    }
+}
+
+impl fmt::Display for Array {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "[")?;
+        let mut is_first = true;
+        for item in &*self.val {
+            if is_first {
+                is_first = false;
+            } else {
+                write!(f, ",")?;
+            }
+            write!(f, "{item}")?;
+        }
+        write!(f, "]")?;
+        Ok(())
+    }
+}
+
+impl fmt::Debug for Array {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "[")?;
+        let mut is_first = true;
+        for item in &*self.val {
+            if is_first {
+                is_first = false;
+            } else {
+                write!(f, ",")?;
+            }
+            write!(f, "{:?}", item)?;
+        }
+        write!(f, "]")?;
+        Ok(())
     }
 }
 

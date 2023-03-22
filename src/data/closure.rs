@@ -1,4 +1,5 @@
 use ::std::fmt;
+use std::rc::Rc;
 
 use crate::exec::{dispatch_binary, Executor, new_small_stack};
 use crate::exec::Stack;
@@ -19,12 +20,12 @@ pub enum CaptureType {
 
 #[derive(PartialEq, Eq, Hash)]
 pub struct Func {
-    items: Vec<CaptureType>,
+    items: Rc<Vec<CaptureType>>,
 }
 
 impl Func {
     pub fn new() -> Self {
-        Func { items: Vec::with_capacity(4) }
+        Func { items: Rc::new(Vec::with_capacity(4)) }
     }
 
     pub fn run_on_single(&self, initial_stack_value: Value) -> Values {
@@ -35,7 +36,7 @@ impl Func {
     }
 
     pub fn run_on_stack(&self, stack: &mut impl Stack) {
-        for cap in &self.items {
+        for cap in &*self.items {
             let free_value = stack.pop();
             let res = match cap {
                 CaptureType::Unary(op) => todo!(),
@@ -90,6 +91,10 @@ impl Func {
         self.items.push(CaptureType::TernaryFreeTop(op, deep, middle));
         self
     }
+
+    pub fn fork(&self) -> Func {
+        Func { items: self.items.clone() }
+    }
 }
 
 impl fmt::Display for Func {
@@ -102,7 +107,7 @@ impl fmt::Debug for Func {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "(arg ")?;
         let mut is_first = true;
-        for item in &self.items {
+        for item in &*self.items {
             if is_first {
                 is_first = false
             } else {
