@@ -17,6 +17,8 @@ pub trait Stack {
 
     fn pop(&mut self) -> Option<Value>;
 
+    fn peek(&self) -> Option<Value>;
+
     fn size(&self) -> usize;
 
     fn as_debug_str(&self) -> String;
@@ -34,6 +36,10 @@ impl Stack for Vec<Value> {
 
     fn pop(&mut self) -> Option<Value> {
         self.pop()
+    }
+
+    fn peek(&self) -> Option<Value> {
+        self.last().map(|val| val.clone())
     }
 
     fn size(&self) -> usize {
@@ -57,6 +63,10 @@ impl Stack for Values {
 
     fn pop(&mut self) -> Option<Value> {
         self.pop()
+    }
+
+    fn peek(&self) -> Option<Value> {
+        self.last().map(|val| val.clone())
     }
 
     fn size(&self) -> usize {

@@ -86,6 +86,7 @@ impl OpTyp for Apply {
 }
 
 impl BinaryExecutor for Apply {
+    //TODO @mark: make this apply until not a function, and make another Op that does apply-once (or maybe just map and reduce and filter are enough?)
 
     fn exec_nn(&self, deep: Nr, top: Nr) -> Values {
         todo!()

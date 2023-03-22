@@ -1,4 +1,5 @@
 use crate::compile::Prog;
+use crate::op::{Apply, Op};
 use crate::tilde_log;
 use crate::TildeRes;
 use crate::Value;
@@ -29,6 +30,11 @@ pub fn execute(
         let ret = dispatch_op(&mut stack, op);
         stack.push_all(ret);
         i += 1;
+    }
+    if let Some(Value::Func(func)) = stack.peek() {
+        tilde_log!("all ops done, but top of stack is function, adding apply op");
+        let ret = dispatch_op(&mut stack, &Op::of(Apply));
+        stack.push_all(ret);
     }
     tilde_log!("final stack: {}", stack.as_debug_str());
     Ok(match stack.pop() {

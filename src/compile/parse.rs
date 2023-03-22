@@ -24,7 +24,7 @@ pub fn parse(src: &str, mode: RunMode) -> TildeRes<Prog> {
             if mode.golf_only() {
                 return Err("golf-only mode does not allow whitespace".to_owned())
             }
-            tilde_log!("skipping whitespace");
+            //tilde_log!("skipping whitespace");
         } else if current == ',' || current == '\'' {
             if mode.golf_only() {
                 return Err(format!("golf-only mode does not allow plain-text (long-mode) string literals ({current})"))
