@@ -1,11 +1,13 @@
 use crate::compile::Prog;
-use crate::op::{Apply, Op};
+use crate::op::Apply;
+use crate::op::Op;
 use crate::tilde_log;
 use crate::TildeRes;
 use crate::Value;
 
 pub use self::dispatch::dispatch_binary;
 pub use self::dispatch::dispatch_op;
+pub use self::dispatch::dispatch_unary;
 pub use self::executor::BinaryExecutor;
 pub use self::executor::Executor;
 pub use self::executor::NullaryExecutor;
@@ -33,6 +35,7 @@ pub fn execute(
     }
     if let Some(Value::Func(func)) = stack.peek() {
         tilde_log!("all ops done, but top of stack is function, adding apply op");
+        dbg!(&stack);  //TODO @mark: TEMPORARY! REMOVE THIS!
         let ret = dispatch_op(&mut stack, &Op::of(Apply));
         stack.push_all(ret);
     }

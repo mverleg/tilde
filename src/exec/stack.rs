@@ -1,3 +1,5 @@
+use ::std::fmt::Debug;
+
 use crate::data::Fork;
 use crate::Value;
 use crate::Values;
@@ -10,7 +12,7 @@ pub fn new_large_stack() -> impl Stack {
     Vec::new()
 }
 
-pub trait Stack {
+pub trait Stack: Debug {
 
     fn push(&mut self, value: Value);
 

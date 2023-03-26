@@ -2,10 +2,10 @@ use ::std::fmt;
 use std::rc::Rc;
 use crate::data::Fork;
 
-use crate::exec::{dispatch_binary, Executor, new_small_stack};
+use crate::exec::{dispatch_binary, dispatch_unary, Executor, new_small_stack};
 use crate::exec::Stack;
 use crate::op::Op;
-use crate::Value;
+use crate::{tilde_log, Value};
 use crate::Values;
 
 /// Which type of capture
@@ -50,10 +50,16 @@ impl Func {
     }
 
     pub fn run_on_stack(&self, stack: &mut impl Stack) {
+        tilde_log!("using stack {:?} to run closure {:?}", stack, self);
         for cap in &*self.items {
             let free_value = stack.pop();
             let res = match cap {
-                CaptureType::Unary(op) => todo!(),
+                CaptureType::Unary(op) => {
+                    let Executor::Unary(ex) = op.as_executor() else {
+                        unreachable!();  //TODO @mark: really?
+                    };
+                    dispatch_unary(ex, free_value)
+                },
                 CaptureType::BinaryFreeDeep(op, top) => {
                     let Executor::Binary(ex) = op.as_executor() else {
                         unreachable!();  //TODO @mark: really?

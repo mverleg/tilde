@@ -1,4 +1,4 @@
-use crate::exec::{BinaryExecutor, Executor};
+use crate::exec::{BinaryExecutor, Executor, UnaryExecutor};
 use crate::exec::stack::Stack;
 use crate::op::Op;
 use crate::Value;
@@ -9,13 +9,7 @@ pub fn dispatch_op(stack: &mut impl Stack, op: &Op) -> Values {
         Executor::Nullary(exec) => exec.exec(),
         Executor::Unary(exec) => {
             let top = stack.pop();
-            match top {
-                Some(Value::Num(top)) => exec.exec_n(top),
-                Some(Value::Txt(top)) => exec.exec_t(top),
-                Some(Value::Arr(top)) => exec.exec_a(top),
-                Some(Value::Func(top)) => exec.exec_f(top),
-                None => exec.exec_empty(),
-            }
+            dispatch_unary(exec, top)
         },
         Executor::Binary(exec) => {
             let top = stack.pop();
@@ -26,6 +20,16 @@ pub fn dispatch_op(stack: &mut impl Stack, op: &Op) -> Values {
         Executor::TernaryOpaque => todo!(),
     };
     ret
+}
+
+pub fn dispatch_unary(exec: &dyn UnaryExecutor, top: Option<Value>) -> Values {
+    match top {
+        Some(Value::Num(top)) => exec.exec_n(top),
+        Some(Value::Txt(top)) => exec.exec_t(top),
+        Some(Value::Arr(top)) => exec.exec_a(top),
+        Some(Value::Func(top)) => exec.exec_f(top),
+        None => exec.exec_empty(),
+    }
 }
 
 pub fn dispatch_binary(exec: &dyn BinaryExecutor, top: Option<Value>, deep: Option<Value>) -> Values {
