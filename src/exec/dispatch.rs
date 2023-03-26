@@ -16,7 +16,16 @@ pub fn dispatch_op(stack: &mut impl Stack, op: &Op) -> Values {
             let deep = stack.pop();
             dispatch_binary(exec, top, deep)
         }
-        Executor::BinaryOpaque => todo!(),
+        Executor::BinaryOpaque(exec) => {
+            let top = stack.pop();
+            let deep = stack.pop();
+            match (deep, top) {
+                (Some(deep), Some(top)) => exec.exec_opaque(deep, top),
+                (None, Some(top)) => exec.exec_single_opaque(top),
+                (Some(_), None) => unreachable!(),
+                (None, None) => exec.exec_empty(),
+            }
+        },
         Executor::TernaryOpaque => todo!(),
     };
     ret

@@ -17,15 +17,12 @@ use crate::values;
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Drop;
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct Duplicate;
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct Rotate3;
+// #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+// pub struct Rotate3;
 //TODO @mark:
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct RevRotate3;
+// #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+// pub struct RevRotate3;
 //TODO @mark:
 
 impl Drop {
@@ -85,6 +82,9 @@ impl UnaryExecutor for Drop {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct Duplicate;
+
 impl Duplicate {
     pub fn new() -> Op {
         Op::of(Duplicate)
@@ -141,3 +141,36 @@ impl UnaryExecutor for Duplicate {
         todo!()
     }
 }
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct Swap;
+
+impl Swap {
+    pub fn new() -> Op {
+        Op::of(Swap)
+    }
+}
+
+impl OpTyp for Swap {
+
+    fn description(&self) -> &'static str {
+        "swap top two stack values"
+    }
+
+    fn long_code(&self) -> Cow<'static, str> {
+        Cow::Borrowed("swap")
+    }
+
+    fn golf_code(&self) -> Option<GolfWord> {
+        Some(GolfWord::new1(Letter::Plus))
+    }
+
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+
+    fn as_executor(&self) -> Executor {
+        Executor::BinaryOpaque(self)
+    }
+}
+

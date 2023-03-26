@@ -1,6 +1,6 @@
 use ::std::fmt::Debug;
 
-use crate::Array;
+use crate::{Array, Value};
 use crate::Func;
 use crate::Nr;
 use crate::op::OpTyp;
@@ -19,7 +19,7 @@ pub enum Executor<'a> {
     ///
     Binary(&'a dyn BinaryExecutor),
     ///
-    BinaryOpaque,
+    BinaryOpaque(&'a dyn BinaryOpaqueExecutor),
     ///
     TernaryOpaque,
 }
@@ -104,6 +104,19 @@ pub trait BinaryExecutor: OpTyp {
 
     /// Fallback for if there is only 1 value on the stack and it is a function
     fn exec_single_f(&self, single: Func) -> Values {
+        todo!()
+    }
+
+    /// Fallback for if the stack is empty
+    fn exec_empty(&self) -> Values;
+}
+
+pub trait BinaryOpaqueExecutor: OpTyp {
+
+    fn exec_opaque(&self, deep: Value, top: Value) -> Values;
+
+    /// Fallback for if there is only 1 value on the stack
+    fn exec_single_opaque(&self, single: Value) -> Values {
         todo!()
     }
 
