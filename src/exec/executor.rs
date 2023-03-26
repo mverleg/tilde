@@ -1,10 +1,13 @@
 use ::std::fmt::Debug;
 
-use crate::{Array, Value};
+use crate::Array;
+use crate::data::Fork;
+use crate::exec::dispatch_binary;
 use crate::Func;
 use crate::Nr;
 use crate::op::OpTyp;
 use crate::Text;
+use crate::Value;
 use crate::values;
 use crate::Values;
 
@@ -109,6 +112,20 @@ pub trait BinaryExecutor: OpTyp {
 
     /// Fallback for if the stack is empty
     fn exec_empty(&self) -> Values;
+
+    fn exec_elemwise(&self, deep: Array, top: Array) -> Values where Self: Sized {
+        let mut new = Vec::with_capacity(deep.len());
+        for (ix, deep_elem) in deep.iter().enumerate() {
+            let top_elem = top.index(Nr::from(ix));
+            let new_val = dispatch_binary(self, Some(deep_elem.fork()), Some(top_elem));
+            if new_val.len() == 1 {
+                new.push(new_val.into_iter().next().unwrap())
+            } else {
+                new.push(Value::Arr(Array::of(new_val.into_vec())))
+            }
+        }
+        values![Value::Arr(Array::of(new))]
+    }
 }
 
 pub trait BinaryOpaqueExecutor: OpTyp {

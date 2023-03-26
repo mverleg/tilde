@@ -126,6 +126,12 @@ impl From<i64> for Nr {
     }
 }
 
+impl From<usize> for Nr {
+    fn from(value: usize) -> Self {
+        value.try_into().unwrap()
+    }
+}
+
 impl fmt::Display for Nr {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self.value)

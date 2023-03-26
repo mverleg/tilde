@@ -78,7 +78,7 @@ impl BinaryExecutor for Concat {
     }
 
     fn exec_aa(&self, deep: Array, top: Array) -> Values {
-        todo!()
+        self.exec_elemwise(deep, top)
     }
 
     fn exec_single_n(&self, single: Nr) -> Values {
