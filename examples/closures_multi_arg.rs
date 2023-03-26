@@ -2,7 +2,7 @@ use ::tilde::tilde_strs;
 
 fn main() {
     // pythagoras, implicit apply
-    let prog = "arg dup mul arg dup mul plus sqrt";
+    let prog = "last arg dup mul arg dup mul plus sqrt";
     let res = tilde_strs(prog, "4\n3").unwrap();
     assert_eq!(res, "5");
 

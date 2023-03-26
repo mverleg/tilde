@@ -1,6 +1,11 @@
 use ::tilde::tilde_strs;
 
 fn main() {
+    // repeat a string
+    let prog = "arg dup concat";
+    let res = tilde_strs(prog, "hello").unwrap();
+    assert_eq!(res, "20");
+
     // map and reduce array
     let prog = "arg 1 plus apply sum";
     let res = tilde_strs(prog, "1\n2\n3\n4\n5").unwrap();

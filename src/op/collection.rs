@@ -54,7 +54,6 @@ impl OpTyp for Last {
     }
 }
 
-//TODO @mark: does nothing yet
 impl UnaryExecutor for Last {
 
     fn exec_n(&self, value: Nr) -> Values {
@@ -66,7 +65,8 @@ impl UnaryExecutor for Last {
     }
 
     fn exec_a(&self, value: Array) -> Values {
-        todo!()
+        let (rem, last) = value.tail();
+        values![Value::Arr(rem), last]
     }
 
     fn exec_empty(&self) -> Values {

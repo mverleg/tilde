@@ -1,7 +1,7 @@
 use ::std::fmt;
 use ::std::rc::Rc;
+use ::std::slice::Iter;
 use ::std::vec;
-use std::slice::Iter;
 
 use crate::data::fork::Fork;
 use crate::data::value::Value;
@@ -11,7 +11,6 @@ use crate::Nr;
 pub struct Array {
     val: Rc<Vec<Value>>,
 }
-
 
 impl Array {
     pub fn of<V: Into<Value>>(vec: Vec<V>) -> Self {
@@ -58,6 +57,12 @@ impl Array {
 
     pub fn len(&self) -> usize {
         self.val.len()
+    }
+
+    pub fn tail(&self) -> (Array, Value) {
+        let mut new = (*self.val).fork();
+        let last = new.pop().unwrap_or_else(Value::default);
+        (Array::of(new), last)
     }
 }
 
