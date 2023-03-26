@@ -1,5 +1,5 @@
 use crate::op::arithmetic::Sqrt;
-use crate::op::collection::Count;
+use crate::op::collection::{Count, Flatten};
 use crate::op::collection::Last;
 use crate::op::collection::Lookup;
 use crate::op::collection::Split;
@@ -32,7 +32,7 @@ mod sanitize;
 mod func;
 mod text;
 
-pub fn all_non_literals() -> [Op; 19] {
+pub fn all_non_literals() -> [Op; 20] {
     //TODO @mark:
     [
         Op::of(Plus),
@@ -54,6 +54,7 @@ pub fn all_non_literals() -> [Op; 19] {
         Op::of(Concat),
         Op::of(Sum),
         Op::of(Swap),
+        Op::of(Flatten),
     ]
 }
 

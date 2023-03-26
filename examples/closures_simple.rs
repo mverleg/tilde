@@ -2,7 +2,7 @@ use ::tilde::tilde_strs;
 
 fn main() {
     // repeat a string using closure
-    let prog = "arg dup apply concat";
+    let prog = "flatten arg dup apply concat";
     let res = tilde_strs(prog, "hello").unwrap();
     assert_eq!(res, "hellohello");
 

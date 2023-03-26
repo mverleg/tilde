@@ -401,3 +401,63 @@ impl UnaryExecutor for Sum {
         todo!()
     }
 }
+
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct Flatten;
+
+impl Flatten {
+    pub fn new() -> Op {
+        Op::of(Flatten)
+    }
+
+    pub fn split_str(text: &str) -> Vec<String> {
+        text
+            .split_whitespace()
+            .map(|slice| slice.to_owned())
+            .collect::<Vec<_>>()
+    }
+}
+
+impl OpTyp for Flatten {
+
+    fn description(&self) -> &'static str {
+        "take all values from collection and push them onto the stack one by one"
+    }
+
+    fn long_code(&self) -> Cow<'static, str> {
+        Cow::Borrowed("flatten")
+    }
+
+    fn golf_code(&self) -> Option<GolfWord> {
+        None
+    }
+
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+
+    fn as_executor(&self) -> Executor {
+        Executor::Unary(self)
+    }
+}
+
+impl UnaryExecutor for Flatten {
+
+    fn exec_n(&self, value: Nr) -> Values {
+        todo!()
+    }
+
+    fn exec_t(&self, value: Text) -> Values {
+        let parts = Split.exec_t(value);
+        self.exec_a(parts)
+    }
+
+    fn exec_a(&self, value: Array) -> Values {
+        todo!()
+    }
+
+    fn exec_empty(&self) -> Values {
+        todo!()
+    }
+}
