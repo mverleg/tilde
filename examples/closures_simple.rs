@@ -4,7 +4,7 @@ fn main() {
     // repeat a string using closure
     let prog = "arg dup apply concat";
     let res = tilde_strs(prog, "hello").unwrap();
-    assert_eq!(res, "20");
+    assert_eq!(res, "hellohello");
 
     // map and reduce array
     let prog = "arg 1 plus apply sum";

@@ -128,7 +128,7 @@ impl From<i64> for Nr {
 
 impl From<usize> for Nr {
     fn from(value: usize) -> Self {
-        value.try_into().unwrap()
+        Self::new(value as f64)  // there is no TryInto
     }
 }
 

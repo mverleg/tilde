@@ -42,9 +42,12 @@ impl Array {
     // }
 
     pub fn index(&self, nr: Nr) -> Value {
+        eprintln!("debug: A");  //TODO @mark: TEMPORARY! REMOVE THIS!
         let ix: usize = nr.floor().try_into().expect("value to large to use as index");
+        eprintln!("debug: B");  //TODO @mark: TEMPORARY! REMOVE THIS!
         match self.val.get(ix) {
             Some(val) => {
+                eprintln!("debug: C");  //TODO @mark: TEMPORARY! REMOVE THIS!
                 val.fork()
             },
             None => Value::default(),

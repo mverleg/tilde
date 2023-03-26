@@ -114,15 +114,23 @@ pub trait BinaryExecutor: OpTyp {
     fn exec_empty(&self) -> Values;
 
     fn exec_elemwise(&self, deep: Array, top: Array) -> Values where Self: Sized {
+        eprintln!("debug: 1");  //TODO @mark:
         let mut new = Vec::with_capacity(deep.len());
+        eprintln!("debug: 2");  //TODO @mark:
         for (ix, deep_elem) in deep.iter().enumerate() {
+            eprintln!("debug: 3");  //TODO @mark:
             let top_elem = top.index(Nr::from(ix));
-            let new_val = dispatch_binary(self, Some(deep_elem.fork()), Some(top_elem));
+            eprintln!("debug: 4");  //TODO @mark:
+            let mut new_val = dispatch_binary(self, Some(deep_elem.fork()), Some(top_elem));
+            eprintln!("debug: 5");  //TODO @mark:
             if new_val.len() == 1 {
+                eprintln!("debug: 6");  //TODO @mark:
                 new.push(new_val.into_iter().next().unwrap())
             } else {
-                new.push(Value::Arr(Array::of(new_val.into_vec())))
+                eprintln!("debug: 8");  //TODO @mark:
+                new.push(Value::Arr(Array::of(new_val.drain(..).collect())))
             }
+        eprintln!("debug: 10");  //TODO @mark:
         }
         values![Value::Arr(Array::of(new))]
     }
