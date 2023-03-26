@@ -450,11 +450,19 @@ impl UnaryExecutor for Flatten {
 
     fn exec_t(&self, value: Text) -> Values {
         let parts = Split.exec_t(value);
-        self.exec_a(parts)
+        let mut result = Values::with_capacity(parts.len());
+        for part in parts {
+            result.push(part)
+        }
+        result
     }
 
     fn exec_a(&self, value: Array) -> Values {
-        todo!()
+        let mut result = Values::with_capacity(value.len());
+        for part in value.iter() {
+            result.push(part.fork())
+        }
+        result
     }
 
     fn exec_empty(&self) -> Values {
