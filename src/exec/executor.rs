@@ -116,9 +116,7 @@ pub trait BinaryOpaqueExecutor: OpTyp {
     fn exec_opaque(&self, deep: Value, top: Value) -> Values;
 
     /// Fallback for if there is only 1 value on the stack
-    fn exec_single_opaque(&self, single: Value) -> Values {
-        todo!()
-    }
+    fn exec_single_opaque(&self, single: Value) -> Values;
 
     /// Fallback for if the stack is empty
     fn exec_empty(&self) -> Values;

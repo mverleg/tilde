@@ -9,6 +9,7 @@ pub use self::dispatch::dispatch_binary;
 pub use self::dispatch::dispatch_op;
 pub use self::dispatch::dispatch_unary;
 pub use self::executor::BinaryExecutor;
+pub use self::executor::BinaryOpaqueExecutor;
 pub use self::executor::Executor;
 pub use self::executor::NullaryExecutor;
 pub use self::executor::UnaryExecutor;

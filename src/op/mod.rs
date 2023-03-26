@@ -10,6 +10,7 @@ use crate::op::func::Arg;
 use crate::op::sanitize::BaseWords;
 pub use crate::op::stack::Drop;
 pub use crate::op::stack::Duplicate;
+use crate::op::stack::Swap;
 use crate::op::text::Concat;
 
 pub use self::arithmetic::Div;
@@ -31,7 +32,7 @@ mod sanitize;
 mod func;
 mod text;
 
-pub fn all_non_literals() -> [Op; 18] {
+pub fn all_non_literals() -> [Op; 19] {
     //TODO @mark:
     [
         Op::of(Plus),
@@ -52,6 +53,7 @@ pub fn all_non_literals() -> [Op; 18] {
         Op::of(Apply),
         Op::of(Concat),
         Op::of(Sum),
+        Op::of(Swap),
     ]
 }
 

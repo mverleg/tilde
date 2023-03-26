@@ -1,11 +1,11 @@
 use ::std::any::Any;
 use ::std::borrow::Cow;
 
-use crate::Array;
+use crate::{Array, Value};
 use crate::compile::GolfWord;
 use crate::compile::Letter;
 use crate::data::Fork;
-use crate::exec::Executor;
+use crate::exec::{BinaryOpaqueExecutor, Executor};
 use crate::exec::UnaryExecutor;
 use crate::Nr;
 use crate::op::Op;
@@ -174,3 +174,17 @@ impl OpTyp for Swap {
     }
 }
 
+impl BinaryOpaqueExecutor for Swap {
+
+    fn exec_opaque(&self, deep: Value, top: Value) -> Values {
+        values![top, deep]
+    }
+
+    fn exec_single_opaque(&self, single: Value) -> Values {
+        values![single]  // noop
+    }
+
+    fn exec_empty(&self) -> Values {
+        Values::new()  // noop
+    }
+}
